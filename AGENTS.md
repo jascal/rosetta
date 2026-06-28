@@ -12,6 +12,20 @@ circuit router — is a `.dl` program. Python (`py/`) is a thin driver: it runs 
 verdict that Datalog computed. When extending rosetta, prefer expressing a transform *and its check* in Datalog over
 doing it in Python; the whole point is that the certificate is a query result, not a claim.
 
+## The runtime-independence invariant (non-negotiable)
+
+The deliverable — the minimized `circuits.dl` — **runs in souffle alone: `token` facts in → `decide` out, with NO
+fieldrun, no Python, no weights, no `whole.dl` at runtime.** fieldrun (and Python, and the corpus) are **build-time
+only** — the oracle that produces and certifies the circuits, like a compiler's reference: used to build/verify, *gone*
+once the artifact exists. Pragmatic use of fieldrun for refs during minimization is fine and expected; a fieldrun (or
+any binary) dependency leaking into the *runtime* product is not.
+
+Concretely this forbids one tempting shortcut: **the residual must never fall back to the model at runtime.** A context
+the cover doesn't reach is handled by Datalog (a certified default / lookup, or an explicit abstain) — never by calling
+fieldrun or `whole.dl`. "Complete standalone replacement" = 100% coverage by certified circuits + a Datalog residual
+policy; until the tail is closed, ship a `circuits.dl` that is faithful-where-it-fires and abstains elsewhere, still
+souffle-only.
+
 ## Place in the PIC program
 
 rosetta is part of the PIC research instrument (see `../RESEARCH_MANIFESTO.md`), the **minimization arm** of the
