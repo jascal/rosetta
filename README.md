@@ -149,16 +149,23 @@ are agreement / delimiter-bracket / coreference. `proved`/`empirical`/`open` tag
   greedy predictor. It is a **semiring lift**: T=0 is the boolean/tropical (argmax) collapse; T>0 is the probability
   (sum-product) semiring where the incidence weights reappear. Each idiom keeps its *structure* but emits a distribution,
   and its incidence value **measures circuit sharpness** (induction strength = the copy probability). The same lift turns
-  the causal test binary→graded (mass shifts, not argmax flips) and the certificate exact→distributional: keep **top-K
-  with K chosen so the elided tail's mass is provably < ε at `T_max`** (the hottest point dominates) — the rank-1
-  shortlist certificate generalized to a TV/KL bound. `T_max` is the knob trading fidelity-range against compression
-  (`T=0` most compressible; `T→∞` ≈ the full unembed, minimization buys nothing).
+  the causal test binary→graded (mass shifts, not argmax flips) and the certificate exact→distributional (a TV/KL bound,
+  the rank-1 shortlist certificate generalized). **Built + certified on threx** (`py/temperature.py`, `oracle.logits`):
+  each rule carries top-K (token, logit); the runtime computes `softmax(logits/T)` in souffle at a queried `.input temp`;
+  `circuits.t.dl` reproduces the model's full distribution within ε across a temperature *range*. threx T∈[0.5,1.0] ε=0.02:
+  173 rules (top-K mean 3.8 — only 6 more than the 167-rule T=0 cover), CERTIFIED at T=0.5/0.75/1.0 (max TV ≤ 0.016).
+  - **A T-cover spans a [T_min, T_max] range, not a point — two opposing error sources.** Top-K *truncation* is worst at
+    the **hot** end (the tail fattens with T → size K at `T_max`); but *group consistency* (one representative per suffix)
+    is worst at the **cold** end (low T amplifies within-group logit gaps → check grouping at `T_min`). `T_max` still trades
+    fidelity-range against compression (`T=0` most compressible; `T→∞` ≈ the full unembed). *Done for the n-gram cover via
+    whole.dl; remaining: idioms carrying distributions too, and top-K logits from fieldrun for big models (serve `/predict`
+    returns argmax only — needs a top-K endpoint).*
   - **The routing *is* the T=0 shadow of this.** The cover-ordering priority in `circuits.dl` (compose > select-gate >
     longest n-gram > copy/induction fallback), encoded as hard negation guards, is exactly the **argmax-override collapse**
     of an incidence-weighted mixture: at T>0 the rules don't strictly override — each contributes logit-weighted mass and
     the model's distribution is their (semiring) sum; the priority order is just *which contribution has the max logit*.
     Bonus: induction's hard "OOD fallback" gating dissolves into a graded copy-mass contribution at T>0 (the incidence
-    weight handles it, no special-casing). *Not built yet — but the routing and the emitter already anticipate it.*
+    weight handles it, no special-casing). *The n-gram T-cover is built; folding the idioms into the weighted mixture is next.*
 - **Non-n-gram circuit detectors** beyond `ngram.dl`/`induction.dl` — agreement, delimiter/bracket-matching, coreference
   — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
 - **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing
