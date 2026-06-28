@@ -17,4 +17,8 @@ reference/*/whole.forward.dl
 models/*/*.fieldrun.json
 models/*/*.fieldrun.bin
 reference/*/logit_cache.json
+models/*/logit_cache.json
+# models commit only the T-path artifacts (circuits.t.dl / run.t.dl); non-T variants are scratch
+models/*/circuits.dl
+models/*/run.dl
 bundle.tokenizer.json
