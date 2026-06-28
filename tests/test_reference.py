@@ -39,6 +39,14 @@ def test_threx_full_program_certified():
     assert "nmiss=0  nuncov=0" in r.stdout, r.stdout
 
 
+def test_induction_detector_logic():
+    """dl/induction.dl predicts the copy after the most recent earlier occurrence of the current suffix."""
+    from oracle import run_induction
+    # [A B C A B]: last bigram 'A B' recurred at pos 0-1, the token after it was C → induction predicts C
+    assert run_induction([[5, 6, 7, 5, 6]], [7], 2)["n_hit"] == 1     # model follows the copy
+    assert run_induction([[5, 6, 7, 5, 6]], [99], 2)["n_miss"] == 1   # induction fires, model differs → flagged
+
+
 def test_equiv_catches_a_wrong_circuit():
     """Sanity: equiv.dl must FAIL a circuit that disagrees with the model (the certificate can't be vacuous)."""
     # corrupt the ∿ marker (id 20 → id 18, a valid token) so the circuit's frame guard fails and it fires nothing,

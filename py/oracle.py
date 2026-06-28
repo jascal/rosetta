@@ -13,6 +13,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EQUIV = os.path.join(HERE, "dl", "equiv.dl")
 NGRAM = os.path.join(HERE, "dl", "ngram.dl")
 MASTER = os.path.join(HERE, "dl", "master.dl")
+INDUCTION = os.path.join(HERE, "dl", "induction.dl")
 _COMPILED = {}   # whole_dl -> path of compiled native binary (or False if compilation isn't available)
 
 
@@ -35,6 +36,31 @@ def detect(insts, refs, w):
             p = os.path.join(outd, name)
             return [tuple(map(int, l.split("\t"))) for l in open(p).read().splitlines()] if os.path.exists(p) else []
         return {k: n for k, n in rows("orderhist.csv")}, {i: k for i, k in rows("minorder.csv")}
+
+
+def run_induction(insts, refs, m):
+    """Run dl/induction.dl at match length m. Returns {n_total, n_apply, n_hit, n_miss, hits:set(inst)}."""
+    with tempfile.TemporaryDirectory() as d:
+        ind, outd = os.path.join(d, "in"), os.path.join(d, "out")
+        os.makedirs(ind); os.makedirs(outd)
+        with open(os.path.join(ind, "ctx.facts"), "w") as cf, open(os.path.join(ind, "ref.facts"), "w") as rf:
+            for i, ctx in enumerate(insts):
+                if refs[i] is None:
+                    continue
+                for p, t in enumerate(ctx):
+                    cf.write(f"{i}\t{p}\t{t}\n")
+                rf.write(f"{i}\t{refs[i]}\n")
+        open(os.path.join(ind, "mlen.facts"), "w").write(f"{m}\n")
+        subprocess.run(["souffle", INDUCTION, "-F", ind, "-D", outd], capture_output=True, text=True)
+        def scalar(name):
+            p = os.path.join(outd, name + ".csv")
+            s = open(p).read().strip() if os.path.exists(p) else ""
+            return int(s) if s.isdigit() else 0
+        def col(name):
+            p = os.path.join(outd, name + ".csv")
+            return {int(l) for l in open(p).read().splitlines()} if os.path.exists(p) else set()
+        return {"n_total": scalar("n_total"), "n_apply": scalar("n_apply"), "n_hit": scalar("n_hit"),
+                "n_miss": scalar("n_miss"), "hits": col("induct_hit")}
 
 
 def run_master(insts, refs, w):

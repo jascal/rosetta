@@ -1,0 +1,53 @@
+// rosetta · induction.dl — the induction/copy circuit detector, in Datalog. The first NON-n-gram circuit class.
+//
+// Induction head (Olsson et al.): predict the token that FOLLOWED the most recent earlier occurrence of the current
+// m-token suffix — i.e. `[… A B … A] → B`, in-context copying that no fixed n-gram expresses. A context is
+// "induction-explained" iff the model's argmax equals that copied token (checked against ref — self-certifying).
+//
+//   ctx(inst,pos,id)  decision contexts (pos 0..W-1, W-1 = last)   [.input]
+//   ref(inst,out)     the model's argmax per context                [.input]
+//   mlen(m)           match length: m=1 basic induction, m≥2 stronger (match an m-suffix, less spurious)  [.input]
+//
+// Output: n_total, n_apply (contexts where the m-suffix recurs in-window so induction applies), n_hit (model FOLLOWS
+// the copy — certified), n_miss (induction fires but the model does otherwise). NB: with W-token contexts the copy
+// source must lie within the window; real long-range induction needs a larger W.
+
+.decl ctx(inst:number, pos:number, id:number)
+.input ctx
+.decl ref(inst:number, out:number)
+.input ref
+.decl mlen(m:number)
+.input mlen
+
+.decl lastp(inst:number, p:number)
+lastp(I, P) :- ctx(I, _, _), P = max PP : { ctx(I, PP, _) }.
+
+// smatch(I,J,K): the K tokens ending at position J match the K tokens ending at the last position (the current suffix)
+.decl smatch(inst:number, j:number, k:number)
+smatch(I, J, 1) :- lastp(I, P), ctx(I, P, X), ctx(I, J, X), J < P.
+smatch(I, J, K + 1) :- smatch(I, J, K), lastp(I, P), ctx(I, P - K, X), ctx(I, J - K, X).
+
+// a copy source: an earlier occurrence of the full m-suffix, with a next token to copy
+.decl src(inst:number, j:number)
+src(I, J) :- mlen(M), smatch(I, J, M).
+.decl lastsrc(inst:number, j:number)            // most recent matching source
+lastsrc(I, J) :- src(I, _), J = max JJ : { src(I, JJ) }.
+
+.decl induct_pred(inst:number, out:number)      // copy the token after that occurrence
+induct_pred(I, T) :- lastsrc(I, J), ctx(I, J + 1, T).
+
+.decl induct_hit(inst:number)                   // model FOLLOWS the copy — a certified induction context
+.output induct_hit
+induct_hit(I) :- induct_pred(I, T), ref(I, T).
+.decl induct_miss(inst:number)                  // induction applies but the model does something else
+.output induct_miss
+induct_miss(I) :- induct_pred(I, T), ref(I, O), T != O.
+
+.decl n_total(n:number)  .output n_total
+n_total(N) :- N = count : { ref(_, _) }.
+.decl n_apply(n:number)  .output n_apply
+n_apply(N) :- N = count : { induct_pred(I, _) }.
+.decl n_hit(n:number)    .output n_hit
+n_hit(N) :- N = count : { induct_hit(_) }.
+.decl n_miss(n:number)   .output n_miss
+n_miss(N) :- N = count : { induct_miss(_) }.

@@ -48,7 +48,14 @@ certified circuits out, end to end.
 
 - `dl/equiv.dl` — the keystone equivalence verifier (`tok`, `ref` in; `mismatch`/`uncovered`/`certified` out).
 - `dl/ngram.dl` — automatic n-gram detection: shortest model-deterministic suffix per context (`minorder`, `orderhist`).
+- `dl/induction.dl` — the first NON-n-gram detector: induction/copy (`[… A B … A] → B`), certified against `ref`.
 - `dl/master.dl` — the process as one program: `#include`s the modules → detection + cover + certificate in one run.
+
+### The circuit-detector library
+Minimization = a growing library of certified circuit detectors, each a `dl/` module checked against the model's `ref`
+(the same way `equiv.dl` certifies). `ngram.dl` is the recall floor; `induction.dl` the first computation circuit; next
+are agreement, delimiter/bracket-matching, coreference. On a tiny model the n-gram cover looks complete; on a real one
+it leaves a heavy long-order tail, and that tail is the map to the non-n-gram circuits the other detectors capture.
 - `py/oracle.py` — `souffle` driver: `decide`, `certify`, `run_equiv`, `detect`, `run_master`, and `compiled` (native).
 - `py/split_facts.py` — split inline-fact `whole.dl` → tiny `forward.dl` + `weights/*.facts` data modules (~100× faster).
 - `py/minimize.py` — model-general: build a certified circuits program + auto-write the per-model certificate.
