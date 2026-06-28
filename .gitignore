@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+# souffle scratch / generated outputs
+*.csv
+/tmp/
+models/*/whole.dl

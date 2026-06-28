@@ -1,0 +1,22 @@
+// rosetta · reference/threx · circuit.dl — the COMPOSED circuit, multi-instance, for equiv.dl to certify.
+//
+// THING = sumtable[ strength(Bi) + strength(Bj) ], fired at the `gɪ` frame `⟨ ∿ Bi Bj · · gɪ`. The strength map and the
+// additive structure were REDISCOVERED from the model's behavior alone (see py/discover.py / the fieldrun threx
+// experiment) — no grammar was used. equiv.dl checks this against the model's own answers (ref, from whole.dl).
+// Must define: cdecide(inst, out)  over tok(inst, pos, id).
+
+.decl mp(inst:number, m:number)
+mp(I, M) :- M = max P : { tok(I, P, _) }.
+
+.decl strength(b:number, s:number)     // recovered operand encoding (↑↗→↘↓ = 0..4)
+strength(21, 0). strength(22, 1). strength(23, 2). strength(24, 3). strength(25, 4).
+
+.decl sumthing(s:number, t:number)     // recovered sum→thing map (the anti-diagonals of the behavior table)
+sumthing(0, 10). sumthing(1, 11). sumthing(2, 12). sumthing(3, 13). sumthing(4, 26).
+sumthing(5, 27). sumthing(6, 28). sumthing(7, 29). sumthing(8, 30).
+
+.decl cdecide(inst:number, out:number)
+cdecide(I, T) :- mp(I, P), tok(I, P, 7),                                  // last token is gɪ (id 7)
+                 tok(I, P5, 20), P5 = P - 5,                             // ∿ five back
+                 tok(I, P4, Bi), P4 = P - 4, tok(I, P3, Bj), P3 = P - 3, // the two operands
+                 strength(Bi, Si), strength(Bj, Sj), sumthing(Si + Sj, T).

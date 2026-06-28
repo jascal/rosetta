@@ -1,0 +1,40 @@
+// rosetta · equiv.dl — the provable-faithfulness primitive, in Datalog itself.
+//
+// Given a finite set of INSTANCES (each a tokenized context), the faithful model's answer per instance (REF, read off
+// the whole-model Datalog program — the oracle), and a candidate CIRCUIT (rewrite rules, included below), this proves
+// equivalence over the WHOLE instance set at once: it is faithful iff `nmiss = 0` and `nuncov = 0`. No sampling — every
+// instance supplied is checked. This is how rosetta verifies a transform: not by trusting the Python that produced it,
+// but by a Datalog query whose result IS the certificate.
+//
+//   tok(inst,pos,id)  the instances (one tokenized context per inst)         [.input]
+//   ref(inst,out)      the model's argmax per instance, from whole.dl         [.input]
+//   cdecide(inst,out)  the candidate circuit's answer per instance            [from the included circuit]
+//
+// Run:  souffle dl/equiv.dl -F <facts_dir> -D <out_dir>  with circuit.dl resolvable on the include path (-I).
+
+.decl tok(inst:number, pos:number, id:number)
+.input tok
+.decl ref(inst:number, out:number)
+.input ref
+
+#include "circuit.dl"      // must define: .decl cdecide(inst:number, out:number)  over tok(...)
+
+// --- the verdict relations ----------------------------------------------------------------------------------------
+.decl mismatch(inst:number, ref_out:number, circ_out:number)   // circuit fires, but disagrees with the model
+.output mismatch
+mismatch(I, R, C) :- ref(I, R), cdecide(I, C), R != C.
+
+.decl uncovered(inst:number)                                    // model has an answer, no circuit fires
+.output uncovered
+uncovered(I) :- ref(I, _), !cdecide(I, _).
+
+.decl ncover(n:number)   .output ncover                         // instances checked
+ncover(N) :- N = count : { ref(_, _) }.
+.decl nmiss(n:number)    .output nmiss                          // disagreements  (0 ⇒ no infidelity)
+nmiss(N) :- N = count : { mismatch(_, _, _) }.
+.decl nuncov(n:number)   .output nuncov                         // gaps           (0 ⇒ full coverage)
+nuncov(N) :- N = count : { uncovered(_) }.
+
+// CERTIFIED ⇔ nmiss = 0 AND nuncov = 0 over the supplied domain.
+.decl certified()        .output certified
+certified() :- nmiss(0), nuncov(0).
