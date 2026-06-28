@@ -259,6 +259,54 @@ def learn_relational(insts, refs, idxs, decide_fn, fill=None, maxL=3, ntest=80):
     return out
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# GRAMMAR / closed-class SKELETON family (the cross-content generalizer): keep the most-frequent tokens (function words /
+# punctuation / structural), collapse content tokens to a sentinel O, and predict from the SKELETON — one rule for every
+# context sharing a syntactic frame, regardless of content. Causally confirmed by CONTENT-INVARIANCE: perturbing the
+# content (O) positions must NOT change the output (proof the skeleton, not the content, drives it). Ported from fieldrun's
+# `explain` GRAMMAR idiom (closed-class skeleton → successor), which lexical n-grams miss because they memorize content.
+
+OCONTENT = -1   # the content sentinel in a skeleton
+
+
+def learn_skeleton(insts, refs, idxs, w, decide_fn, closed_n=40, fill=None, max_confirm=24, ntest=8):
+    freq = Counter(t for i in idxs for t in insts[i])
+    closed = {t for t, _ in freq.most_common(closed_n)}            # closed class = the most frequent tokens (unsupervised)
+    skel = lambda ctx, k: tuple(t if t in closed else OCONTENT for t in ctx[-k:])
+    pool = list({t for i in idxs for t in insts[i]} - closed)      # content tokens, for the invariance perturbation
+    cands = {}
+    for k in range(1, w + 1):
+        groups = defaultdict(list)
+        for i in idxs:
+            if len(insts[i]) >= k:
+                groups[skel(insts[i], k)].append(i)
+        for sk, members in groups.items():
+            if OCONTENT not in sk:                                 # all function words = a literal n-gram (cover handles it)
+                continue
+            if len({refs[i] for i in members}) == 1 and len({tuple(insts[i][-k:]) for i in members}) >= 2:
+                cands[(k, sk)] = members                           # skeleton determines output across ≥2 distinct contents
+    ranked = sorted(cands.items(), key=lambda kv: -len(kv[1]))[:max_confirm]
+    import random as _r
+    rng = _r.Random(0)
+    out = []
+    for (k, sk), members in ranked:
+        tgt = refs[members[0]]
+        opos = [j for j in range(k) if sk[j] == OCONTENT]
+        tests = []
+        for i in members[:ntest]:
+            c = insts[i][:]
+            for j in opos:                                         # replace every content slot with random content
+                if pool:
+                    c[len(c) - k + j] = rng.choice(pool)
+            tests.append(c)
+        if fill:
+            fill(tests)
+        inv = sum(1 for c in tests if decide_fn(c) == tgt) / len(tests) if tests else 0.0
+        out.append(dict(k=k, sk=sk, members=members, out=tgt, inv=inv,
+                        ncontent=len({tuple(insts[i][-k:]) for i in members})))
+    return out, closed
+
+
 def idiom_coverage(insts, refs, idxs, gates, comps, rels):
     """Which instances the CONFIRMED idioms predict correctly (the generalizing rules). The residual is everything left —
     what the n-gram backfill must memoize. Idioms first, n-grams last: an n-gram is the cache of a rule, so we only
@@ -460,6 +508,13 @@ def main():
               + (f", {len(remaining)} UNCOVERED (raise w)" if remaining else " (complete)"))
         tot = len(real) + len(real_c) + len(rels_real) + len(rules)
         print(f"  full circuit = {len(real)+len(real_c)+len(rels_real)} idioms + {len(rules)} n-gram rules = {tot} rules for {len(idxs)} decisions")
+
+    sks, closed = learn_skeleton(insts, refs, idxs, w, decide_fn, fill=fill)
+    real_sk = [b for b in sks if b["inv"] >= 0.8 and b["ncontent"] >= 2]
+    print(f"\nGRAMMAR/SKELETON family (closed-class frame, content→O; causal = CONTENT-INVARIANCE) — {len(real_sk)} real:")
+    for b in sorted(real_sk, key=lambda b: -len(b["members"]))[:8]:
+        skd = " ".join("O" if t == OCONTENT else s(t) for t in b["sk"])
+        print(f"  [content-invariant {b['inv']:.0%}] covers {len(b['members'])} ({b['ncontent']} contents)  [{skd}] → {s(b['out'])}")
 
     if emit or cert:
         rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]   # induction → OOD fallback (below n-grams)
