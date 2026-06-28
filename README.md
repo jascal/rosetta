@@ -57,6 +57,10 @@ python3 py/verify_threx.py     # certify the threx composed circuit vs whole.dl 
 
 Expected: `25 instances · 0 disagreements · 0 gaps · CERTIFIED`.
 
+## License
+
+[Apache License 2.0](./LICENSE).
+
 ## Status
 
 Early. The keystone (`equiv.dl` + the threx composed circuit, **certified 25/25 in Datalog**) works end-to-end. The
