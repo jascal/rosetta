@@ -429,6 +429,93 @@ def emit_circuits(out_path, gates, comps, rels, ngram_rules, w, name=""):
         f'#include "{os.path.basename(out_path)}"\n.output cdecide\n')
 
 
+def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
+    """The reframed learner: learn every family on TRAIN (causal-soundness = the gate), then GREEDILY admit the family
+    with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
+    IDIOM_LEARNER objective). Reports the residual floor (what no family captures = the model, not us)."""
+    import random as _r
+    sh = idxs[:]; _r.Random(0).shuffle(sh)
+    cut = int(len(sh) * (1 - hold))
+    train, holdout = sh[:cut], sh[cut:]
+    gates = [b for b in learn_gates(insts, refs, train, w, decide_fn, fill=fill) if not b["viol"] and b["causal"] >= 0.8]
+    comps = [b for b in learn_compose(insts, refs, train, w, decide_fn, fill=fill) if b["causal"] >= 0.8]
+    rels = [r for r in learn_relational(insts, refs, train, decide_fn, fill=fill) if r["causal"] >= 0.8 and r["obs"] >= 0.5]
+    sks, closed = learn_skeleton(insts, refs, train, w, decide_fn, fill=fill)
+    sks = [b for b in sks if b["inv"] >= 0.8 and b["ncontent"] >= 2]
+    ng = minimal_suffix_cover(insts, refs, train, w)[0]
+    skr, OC = {}, OCONTENT
+    skl = lambda c, k: tuple(t if t in closed else OC for t in c[-k:])
+    for b in sks:
+        skr[b["sk"]] = b["out"]
+
+    def ng_pred(ctx):
+        for k in range(min(len(ctx), w), 0, -1):
+            o = ng.get(tuple(ctx[-k:]))
+            if o is not None:
+                return o
+        return None
+
+    def gate_pred(ctx):
+        for b in gates:
+            if all(len(ctx) >= m and ctx[-m] == v for m, v in b["frame"].items()) and len(ctx) >= b["k"] and ctx[-b["k"]] in b["table"]:
+                return b["table"][ctx[-b["k"]]]
+        return None
+
+    def comp_pred(ctx):
+        for b in comps:
+            if all(len(ctx) >= m and ctx[-m] == v for m, v in b["frame"].items()) and len(ctx) >= max(b["k1"], b["k2"]):
+                a, bb = ctx[-b["k1"]], ctx[-b["k2"]]
+                if a in b["lab"] and bb in b["lab"]:
+                    o = b["bysum"].get(b["lab"][a] + b["lab"][bb])
+                    if o is not None:
+                        return o
+        return None
+
+    def ind_pred(ctx):
+        for L in range(min(3, len(ctx) - 1), 0, -1):
+            suf = tuple(ctx[-L:]); js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+            if js and max(js) + L < len(ctx):
+                return ctx[max(js) + L]
+        return None
+
+    def sk_pred(ctx):
+        for k in range(min(len(ctx), w), 0, -1):
+            o = skr.get(skl(ctx, k))
+            if o is not None:
+                return o
+        return None
+
+    H = len(holdout)
+
+    def score(fns):
+        n = 0
+        for i in holdout:
+            for f in fns:
+                p = f(insts[i])
+                if p is not None:
+                    n += (p == refs[i]); break
+        return n
+
+    FAM = {"select": (gate_pred, sum(len(b["table"]) for b in gates)),
+           "compose": (comp_pred, sum(len(b["lab"]) + len(b["bysum"]) for b in comps)),
+           "induction": (ind_pred, 0),
+           "skeleton": (sk_pred, len(skr))}
+    FAM = {k: v for k, v in FAM.items() if k == "induction" or v[1] > 0}   # drop empty families
+    base = [ng_pred]; k0 = score(base); cur = k0; total = len(ng); chosen = []
+    pend = dict(FAM)
+    print(f"  baseline n-gram: {len(ng)} rules, holdout {k0}/{H} = {k0/H:.0%}")
+    while pend:
+        opts = [(score(base + [c[0] for c in chosen] + [fn]) - cur, rc, nm, fn) for nm, (fn, rc) in pend.items()]
+        gain, rc, nm, fn = max(opts, key=lambda o: (o[0] / max(1, o[1]), o[0]))
+        if gain <= 0:
+            print(f"  — not admitted (add 0 holdout, MDL): {', '.join(pend)}")
+            break
+        chosen.append((fn, nm)); cur += gain; total += rc; del pend[nm]
+        print(f"  + {nm}: +{gain} holdout (+{gain/H:.1%}) / {rc} rules → {cur}/{H}={cur/H:.0%}, {total} rules")
+    print(f"  ⇒ n-gram" + "".join(f" + {nm}" for _, nm in chosen) + f"  · holdout {cur/H:.0%} · {total} rules · residual {1-cur/H:.0%}")
+    return chosen, cur, H
+
+
 def main():
     backfill = "--backfill" in sys.argv                       # report idiom coverage + n-gram backfill stats
     emit = "--emit" in sys.argv                               # write circuits.dl + run.dl (idioms + n-gram cover, souffle-only)
@@ -462,6 +549,11 @@ def main():
             for c, o in zip(miss, ex.map(lambda t: _raw(list(t)), miss)):
                 _cache[c] = o
     print(f"=== idiom_learn · {name} · {len(idxs)} decisions (W={w}) — unsupervised, nothing hand-coded ===\n")
+
+    if "--select" in sys.argv:                                 # holdout+MDL admission over the full family set (the objective)
+        print("=== holdout+MDL family selection — minimize holdout loss, bias to fewer rules (causal-soundness = gate) ===")
+        select_cover(insts, refs, idxs, w, decide_fn, fill=fill, s=s)
+        return
 
     gates = learn_gates(insts, refs, idxs, w, decide_fn, max_confirm=(cb or 40), ntest=(6 if cb else 14), fill=fill)
     real = [b for b in gates if not b["viol"] and b["causal"] >= 0.8]
