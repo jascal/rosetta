@@ -5,3 +5,6 @@ __pycache__/
 *.csv
 /tmp/
 models/*/whole.dl
+*.exe
+*.cpp
+ref_cache.json

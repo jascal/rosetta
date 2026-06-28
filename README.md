@@ -52,10 +52,12 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 ## Quickstart
 
 ```bash
-python3 py/verify_threx.py     # certify the threx composed circuit vs whole.dl — verdict from dl/equiv.dl
+python3 py/verify_threx.py     # certify the threx composed circuit (25 cells) — verdict from dl/equiv.dl
+python3 py/minimize.py 300 8   # minimize + FULLY certify threx: composed + minimal-suffix cover, all 300 windows
 ```
 
-Expected: `25 instances · 0 disagreements · 0 gaps · CERTIFIED`.
+Expected: composed `25 · 0 · 0 · CERTIFIED`; full program `ncover=300 nmiss=0 nuncov=0 · FULLY CERTIFIED`.
+The oracle compiles `whole.dl` to a native binary on first use (~140× faster than the souffle interpreter; needs `g++`).
 
 ## License
 
@@ -63,7 +65,11 @@ Expected: `25 instances · 0 disagreements · 0 gaps · CERTIFIED`.
 
 ## Status
 
-Early. The keystone (`equiv.dl` + the threx composed circuit, **certified 25/25 in Datalog**) works end-to-end. The
-near-term goal is **breadth**: minimize *tens* of small models to confirm the rewrite-rule / idiom library is complete
-and general — the Rosetta Stone proves the method on one; confidence comes from many. `proved`/`empirical`/`open` tags
-gate every claim.
+The threx Rosetta Stone is **fully validated**: the complete `circuits.dl` (1 composed rule + 121 minimal-suffix rules)
+is **certified `nmiss=0 ∧ nuncov=0` over 300 decision windows** in Datalog — 122 rules for 300 decisions, a few hundred
+lines vs `whole.dl`'s 22,222. The breakdown is honest (`reference/threx/CERTIFICATE.md`): the composed *computation*
+collapses to one rule, free-choice *priors* are len-1 lookups, the rest are selected/structural transitions.
+
+Next is **breadth**: minimize *tens* of small models to confirm the rewrite-rule / idiom library is complete and general
+— the Rosetta Stone proves the method on one; confidence comes from many. `proved`/`empirical`/`open` tags gate every
+claim.

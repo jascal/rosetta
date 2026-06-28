@@ -30,6 +30,15 @@ def test_threx_composed_circuit_certified():
     assert r["nuncov"] == 0, f"gaps: {r['uncovered']}"
 
 
+def test_threx_full_program_certified():
+    """The complete minimized program (composed + minimal-suffix cover) certifies nmiss=0 ∧ nuncov=0 over the domain."""
+    import subprocess
+    r = subprocess.run([sys.executable, os.path.join(HERE, "py", "minimize.py"), "60", "8"],
+                       capture_output=True, text=True)
+    assert "FULLY CERTIFIED (Datalog): True" in r.stdout, r.stdout + r.stderr
+    assert "nmiss=0  nuncov=0" in r.stdout, r.stdout
+
+
 def test_equiv_catches_a_wrong_circuit():
     """Sanity: equiv.dl must FAIL a circuit that disagrees with the model (the certificate can't be vacuous)."""
     # corrupt the ∿ marker (id 20 → id 18, a valid token) so the circuit's frame guard fails and it fires nothing,
