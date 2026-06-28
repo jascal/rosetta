@@ -19,8 +19,8 @@ On threx this rediscovers, from behavior alone: the 'select' place gate {hï→f
 (THINGS[i+j], ≥2 operands) is the arith template's job (py/discover.py) — the single-slot gate learner correctly leaves
 it alone. select = one causal operand (lookup); compose = two operands (computation). Usage: idiom_learn.py [n] [w] [model_dir]
 """
-import os, sys, json
-from collections import defaultdict
+import os, sys, json, itertools
+from collections import defaultdict, Counter
 from minimize import instances, model_refs, ref_source
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -111,6 +111,98 @@ def learn_gates(insts, refs, idxs, w, decide_fn, n_anchor=240, max_confirm=40):
     return [b for b in ranked if "causal" in b]
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# COMPOSE family (the 'compute' idioms): output = h(value(slot k1) + value(slot k2)) — TWO operands combined by a binary
+# op, then indexed. Generalizes py/discover.py to discovered frames. select = one operand (lookup); compose = two
+# operands (computation) — distinct families, told apart by how many slots are causally load-bearing.
+
+def pair_table(insts, refs, sub, k1, k2):
+    vm = defaultdict(set)
+    for i in sub:
+        vm[(insts[i][-k1], insts[i][-k2])].add(refs[i])
+    return vm
+
+
+def single_functional(insts, refs, sub, k):
+    vm = defaultdict(set)
+    for i in sub:
+        vm[insts[i][-k]].add(refs[i])
+    return all(len(o) == 1 for o in vm.values()) and len({next(iter(o)) for o in vm.values()}) >= 2
+
+
+def additive(T):
+    """discover.py's search: a labeling of the operand alphabet under which the output depends only on the SUM."""
+    alpha = sorted(set(a for a, _ in T) | set(b for _, b in T))
+    if not 3 <= len(alpha) <= 7:
+        return None
+    for perm in itertools.permutations(range(len(alpha))):
+        lab, bysum, ok = dict(zip(alpha, perm)), {}, True
+        for (a, b), o in T.items():
+            if bysum.setdefault(lab[a] + lab[b], o) != o:
+                ok = False; break
+        if ok and len(set(bysum.values())) >= 3:
+            return lab, bysum
+    return None
+
+
+def confirm_compose(insts, k1, k2, region, lab, bysum, decide_fn):
+    """Causal confirmation over the FULL operand grid (not just corpus pairs): output must follow bysum[lab[a]+lab[b]].
+    Agreement across the whole grid proves the model computes the sum (same-sum pairs → same output), not a pair table.
+    Also reports extrapolation: agreement on grid pairs the corpus never showed."""
+    alpha, base = sorted(lab), region[0]
+    seen = {(insts[i][-k1], insts[i][-k2]) for i in region}
+    ok = tr = ext = etr = 0
+    for a in alpha:
+        for b in alpha:
+            pred = bysum.get(lab[a] + lab[b])
+            if pred is None:
+                continue
+            p = insts[base][:]; p[-k1] = a; p[-k2] = b
+            hit = decide_fn(p) == pred
+            tr += 1; ok += hit
+            if (a, b) not in seen:
+                etr += 1; ext += hit
+    return (ok / tr if tr else 0.0), (ext / etr if etr else None)
+
+
+def learn_compose(insts, refs, idxs, w, decide_fn, guard_cap=80, max_confirm=30):
+    """Frame-first mining: iterate single-guard frame regions, find an operand PAIR with a clean additive 2D table where
+    neither slot alone determines the output, then causally confirm."""
+    offval = defaultdict(Counter)
+    for i in idxs:
+        for m in range(1, w + 1):
+            offval[m][insts[i][-m]] += 1
+    seen, cands = set(), []
+    for m in range(1, w + 1):
+        for v, c in offval[m].most_common(guard_cap):
+            if c < MINCOV:
+                continue
+            region = [i for i in idxs if insts[i][-m] == v]
+            for k1, k2 in itertools.combinations([x for x in range(1, w + 1) if x != m], 2):
+                vm = pair_table(insts, refs, region, k1, k2)
+                if any(len(o) > 1 for o in vm.values()):
+                    continue
+                a1 = len({insts[i][-k1] for i in region}); a2 = len({insts[i][-k2] for i in region})
+                if len({next(iter(o)) for o in vm.values()}) < 3 or a1 < 3 or a2 < 3:
+                    continue
+                if single_functional(insts, refs, region, k1) or single_functional(insts, refs, region, k2):
+                    continue
+                add = additive({p: next(iter(o)) for p, o in vm.items()})
+                if not add:
+                    continue
+                frame = {mm: next(iter({insts[i][-mm] for i in region})) for mm in range(1, w + 1)
+                         if mm not in (k1, k2) and len({insts[i][-mm] for i in region}) == 1}
+                key = (k1, k2, tuple(sorted(frame.items())))
+                if key in seen:
+                    continue
+                seen.add(key)
+                cands.append(dict(k1=k1, k2=k2, frame=frame, region=region, lab=add[0], bysum=add[1]))
+    cands.sort(key=lambda b: len(b["region"]), reverse=True)
+    for b in cands[:max_confirm]:
+        b["causal"], b["extrap"] = confirm_compose(insts, b["k1"], b["k2"], b["region"], b["lab"], b["bysum"], decide_fn)
+    return [b for b in cands if "causal" in b]
+
+
 def main():
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 1400
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 8
@@ -135,7 +227,21 @@ def main():
         print(f"  [causal {b['causal']:.0%}] GATE@{b['k']}  support={len(b['support'])}  ignore@{b['ignore']}")
         print(f"       frame[{fr}]")
         print(f"       {td}")
-    print("\n(select = one causal operand → lookup table; the 'compose' idiom THINGS[i+j] is ≥2 operands → py/discover.py.)")
+    comps = learn_compose(insts, refs, idxs, w, decide_fn)
+    real_c = [b for b in comps if b["causal"] >= 0.8]
+    print(f"\n2-operand COMPOSE idioms (compute family) — {len(real_c)} REAL (causally confirmed) of {len(comps)} mined:\n")
+    for b in real_c[:10]:
+        lab, bysum = b["lab"], b["bysum"]
+        fr = " ".join(f"@{m}={s(v)}" for m, v in sorted(b["frame"].items())) or "∅"
+        ex = "" if b["extrap"] is None else f"  extrapolate {b['extrap']:.0%}"
+        vals = ", ".join(f"{s(t)}:{lab[t]}" for t in sorted(lab))
+        sums = ", ".join(f"{n}:{s(o)}" for n, o in sorted(bysum.items()))
+        print(f"  [causal {b['causal']:.0%}{ex}] COMPOSE @{b['k1']}+@{b['k2']}  support={len(b['region'])}")
+        print(f"       frame[{fr}]   values {{{vals}}}")
+        print(f"       sum→out {{{sums}}}")
+
+    print("\nselect = one causal operand → lookup (gate); compose = two operands → sum→index (computation). "
+          "Both learned from behavior, nothing hand-coded.")
 
 
 if __name__ == "__main__":

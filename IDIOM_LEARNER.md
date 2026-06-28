@@ -65,26 +65,35 @@ gate (via a keyed-lookup primitive), and copy/echo (via previous-occurrence). If
 drops threx's holdout loss toward 0, the approach is proven; then scale to the stories ladder, where the unknown circuits
 live.
 
-## Status — unsupervised gate learning SOLVED on threx (`py/idiom_learn.py`)
+## Status — BOTH idiom families learned unsupervised on threx (`py/idiom_learn.py`)
 
-The 'select' family (frame-conditioned single-slot gates) is learned **fully unsupervised** — nothing about the grammar
-given — and the place gate is rediscovered exactly: `GATE@4, frame {wø@1, ·@3, ⟨@5, ⟩@6}, table {hï→fï, fa→bo, dø→sto}`,
-with `who@2` correctly identified as **ignored**, zero faithfulness violations, **causal 100%**. The three ideas that
-made it work (each was a failed simpler attempt first):
+All three threx tiers are now rediscovered from behavior alone, nothing hand-coded, in one tool:
+- **retrieved / select** — frame-conditioned single-slot GATEs. The place gate exactly: `GATE@4, frame {wø@1, ·@3, ⟨@5,
+  ⟩@6}, table {hï→fï, fa→bo, dø→sto}`, `who@2` correctly **ignored**, zero faithfulness violations, **causal 100%**.
+- **compose** — 2-operand arithmetic. `THINGS[i+j]` exactly: `COMPOSE @4+@5, frame {gɪ,·,·,∿,⟨,⟩}`, recovered strengths
+  `↑↗→↘↓ = 0..4` (the hidden labeling), `sum→thing` table, **causal 100%** over the full operand grid.
 
+The ideas that made the GATE (select) learner work — each fixed a failed simpler attempt:
 1. **Anchored harvesting, not global greedy.** Global purity-greedy chases the largest pure region and never grows a rare
    idiom's frame. Anchoring on each instance and growing with *that instance's own values* surfaces every local idiom.
 2. **Separate table-discovery from frame-invention.** Greedy overfits the frame to a co-occurring content word
    (`@7=lum`). So keep only the *table*, EXPAND it to its full support, and DERIVE the frame as the offsets CONSTANT
-   across that support — the true structural frame; varying offsets are the ignored slots. (This is the data-derived
-   frame validated earlier, but the support class is now discovered, not seeded.)
-3. **Observational mine, causal confirm.** Frame-conditioned gates are an observational pattern — mine them with **zero**
-   perturbations, then spend `decide()` only to causally confirm the top candidates (perturb the slot; output must follow
-   the table). This both bounds cost and is the discriminator that prunes correlational/leaky gates.
+   across that support — the true structural frame; varying offsets are the ignored slots.
+3. **Observational mine, causal confirm.** Frame-conditioned gates are an observational pattern — mine with **zero**
+   perturbations; spend `decide()` only to causally confirm the top candidates (perturb the slot; output must follow the
+   table). Bounds cost AND is the discriminator that prunes correlational/leaky gates.
 
-`select` (one causal operand → lookup) and `compose` (≥2 operands → computation, e.g. `THINGS[i+j]`) are distinct
-families: the gate learner correctly captures the former and leaves the latter to the arith template (`py/discover.py`).
-**Next:** the arith/compose learner as a second unsupervised template, then run both up the stories ladder (idioms unknown).
+The COMPOSE learner is the same shape lifted to **pairs** of slots, plus one access-pattern fix:
+4. **Frame-first, not anchored, for compose.** Compose frames are rare (~2% of decisions), so uniform anchor-sampling
+   misses them. Instead iterate single-guard frame *regions* directly (cheap, exhaustive), and within each search operand
+   PAIRS for a clean additive 2D table where *neither slot alone* determines the output (that's what makes it compose,
+   not two gates). Additive structure is `discover.py`'s permutation-labeling search; over-generation (sparse 2D tables
+   admit some labeling) is killed by causal confirmation over the full operand grid (threx: 1 real of 14 mined).
+
+`select` = one causal operand (lookup); `compose` = two operands (computation) — told apart by how many slots are
+causally load-bearing. **Next:** run both up the stories ladder (idioms unknown there); add the additive solver beyond
+brute-force permutations for large operand alphabets; wire confirmed idioms into the cover (`minimize.py` + `equiv.dl`)
+to measure the holdout-loss drop.
 
 ## Payoff
 
