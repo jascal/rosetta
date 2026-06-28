@@ -8,3 +8,8 @@ models/*/whole.dl
 *.exe
 *.cpp
 ref_cache.json
+models/*/whole.weights/
+models/*/whole.forward.dl
+models/*/*.facts
+reference/*/whole.weights/
+reference/*/whole.forward.dl

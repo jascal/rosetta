@@ -63,17 +63,23 @@ def compiled(whole_dl):
 
 
 def decide(whole_dl, ctx):
-    """The faithful model's argmax for one context. Uses the compiled binary when available (~140x faster), else souffle."""
+    """The faithful model's argmax for one context. Splits weights into .facts data modules (so souffle bulk-loads them
+    instead of re-parsing 99.96%-facts every call — ~100x faster and lets large models run at all), then evaluates the
+    tiny forward.dl (compiled if possible, else interpreted) over the weights + this context's token.facts."""
+    from split_facts import split
+    forward, wdir = split(whole_dl)
     with tempfile.TemporaryDirectory() as d:
         ind, outd = os.path.join(d, "in"), os.path.join(d, "out")
         os.makedirs(ind); os.makedirs(outd)
+        for fn in os.listdir(wdir):                      # stage weight modules (symlink, no copy)
+            os.symlink(os.path.join(wdir, fn), os.path.join(ind, fn))
         with open(os.path.join(ind, "token.facts"), "w") as f:
             f.write("".join(f"{p}\t{t}\n" for p, t in enumerate(ctx)))
-        exe = compiled(whole_dl)
+        exe = compiled(forward)                          # forward.dl is tiny now → small .cpp, fast compile
         if exe:
             subprocess.run([exe, "-F", ind, "-D", outd], capture_output=True, text=True)
         else:
-            _run(whole_dl, ind, outd)
+            _run(forward, ind, outd)
         dc = os.path.join(outd, "decide.csv")
         if not os.path.exists(dc):
             return None

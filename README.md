@@ -45,6 +45,8 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 | `dl/equiv.dl` | **the keystone** — multi-instance equivalence verifier; `certified()` iff `nmiss=0 ∧ nuncov=0` over the domain |
 | `dl/` | the Datalog implementation: equivalence, causal ablation, circuit routing |
 | `py/oracle.py` | thin `souffle` driver — runs `whole.dl`, stages the `ref`/`tok` facts, returns the Datalog verdict |
+| `py/minimize.py` | model-general: build a certified circuits-only program (composed plugin + minimal-suffix cover) |
+| `py/split_facts.py` | split inline-fact `whole.dl` → tiny `forward.dl` + `weights/*.facts` data modules (~100× faster) |
 | `reference/threx/` | **the Rosetta Stone** — a tiny model fully worked: `whole.dl`, a certified `circuit.dl`, corpus, certificate |
 | `models/` | where real models get minimized (one dir each: `whole.dl` + corpus + discovered circuits + certificate) |
 | `tests/` | the certificate must stay clean on the reference model(s) |
@@ -58,6 +60,23 @@ python3 py/minimize.py 300 8   # minimize + FULLY certify threx: composed + mini
 
 Expected: composed `25 · 0 · 0 · CERTIFIED`; full program `ncover=300 nmiss=0 nuncov=0 · FULLY CERTIFIED`.
 The oracle compiles `whole.dl` to a native binary on first use (~140× faster than the souffle interpreter; needs `g++`).
+
+## Scaling: whole.dl in parts (the dense-Gram wall)
+
+A whole.dl is ~99.96% **weights-as-facts** and ~0.04% rules (stories260K: 261,092 fact lines vs 116 rules). Two
+consequences, and the fixes:
+
+- **facts-as-data, not facts-as-code** (`py/split_facts.py`): inline facts make souffle re-parse the weights every call
+  and make `souffle -c` inline them into a giant `.cpp` (a 261k-fact model → a 106 MB `.cpp` that g++ chokes on). The
+  splitter rewrites whole.dl into a tiny `forward.dl` (the rules + an `.input` per weight relation) plus
+  `weights/<relation>.facts` data modules. souffle then bulk-loads weights as data and compiles only the rules.
+  Measured: **~0.4 s/call vs ~30–60 s** for the 261k-line inline form. The oracle does this automatically.
+- **the dense-Gram wall** — embed/unembed are `vocab × d` facts; `emit_whole` refuses above ~4M. Decompositions that
+  *preserve* faithfulness (each carries a Datalog-checkable bound): **corpus-restricted embed** (emit only rows for
+  tokens the corpus uses — exact for a fixed corpus, the biggest win for minimization); **tiled unembed with per-block
+  rank-1 certificates** (a block whose best-possible logit can't beat the leader is provably elided — `--shortlist` is
+  the 1-block case); **low-rank `U≈A·B` with a certified residual bound**; **hierarchical coarse-to-fine argmax**. These
+  are emitter changes (a `fieldrun` branch + PR) and are what unlock full-vocab real models.
 
 ## License
 
