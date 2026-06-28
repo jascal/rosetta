@@ -95,6 +95,44 @@ causally load-bearing. **Next:** run both up the stories ladder (idioms unknown 
 brute-force permutations for large operand alphabets; wire confirmed idioms into the cover (`minimize.py` + `equiv.dl`)
 to measure the holdout-loss drop.
 
+## Status — third family: COPY/INDUCTION, learned unsupervised on pythia-160m
+
+Moving up size + changing domain is what surfaces NEW families (the whole point). TinyStories (s260K/15M/110M) turned out
+to be **pure n-gram recall at every scale** — 0 causally-confirmed select/compose, and copy/induction is causally **absent**
+(the decisive test: perturb the earlier occurrence of the output token → output follows only **2%**; the high observational
+"output appears earlier" rate, up to 87% at large W, is coincidental recurrent vocabulary). The learner correctly finds
+nothing (no false positives — validated against threx). Two lessons banked: (a) the **window must = full context** (W=8 was
+a threx holdover that forces n-gram behavior); (b) a near-constant gate table is a false-positive mode (s110M's "Once upon
+a time" boilerplate) — fixed with a **discrimination filter** (the slot must genuinely select: majority output < 70%).
+
+So we went to a model KNOWN to have the circuit: **pythia-160m** (induction heads). The COPY/INDUCTION family is
+content-relative (not offset-relative): `output = ctx[ prev_occ(last-L suffix) + L ]` (the `prev_occ` primitive). Learned
+unsupervised + causally confirmed: **L=1/2/3 causal 84-90%** (`py/probe_induction.py`, `learn_relational`). The decisive
+methodological result — **observational induction is confounded by n-gram determinism**, and only the causal test
+disentangles them:
+
+| corpus | observational | **causal** | verdict |
+|---|---|---|---|
+| pythia greedy natural text | 59-91% | **11%** | n-gram determinism (a recurring suffix → same next for n-gram reasons) |
+| pythia repeated NOVEL tokens | 79-84% | **85-90%** | **true induction** (no n-gram to lean on; only copy can predict) |
+| threx (negative control) | 12-38% | **1-2%** | no copy circuit (correctly) |
+
+The **causal test is the universal discriminator** across all three families — it pruned correlational gates, spurious
+additive fits, AND n-gram-masquerading-as-induction. Probe novel-repeat to isolate the circuit; perturb to prove it.
+
+**select** (one operand → lookup) and **compose** (two operands → computation) are *offset-relative*; **copy/induction**
+is *content-relative* — the two axes of idiom. Next families likely live on these axes too (coreference, delimiter/bracket
+matching = content-relative; agreement = offset- or content-relative constraint).
+
+## n-grams are memoized rules (cover-ordering principle, user)
+
+For the whole-`circuits.dl` goal: **learn the generalizing idioms FIRST (unsupervised), then backfill n-gram determinism
+LAST** — never the reverse. An n-gram is the *compiled cache* of a rule the model actually learned; if you seed the cover
+with n-grams before exhausting idiom learning you can't tell which n-grams are just memoized instances of a rule you should
+have captured generally. So: idioms = the algorithm (generalizing, drops holdout loss); the n-gram suffix-cover = the
+memoization backstop for the residual + runtime efficiency, added only after the unsupervised learners have said what's
+genuinely irreducible. (The minimal-suffix cover in `minimize.py` is already that backstop; integration = idioms-then-ngrams.)
+
 ## Payoff
 
 A **learned, certified, per-model idiom library** — and across models, the idioms that *recur* are the universal circuits

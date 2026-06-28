@@ -71,6 +71,8 @@ def build_gate(insts, refs, idxs, k, table, w):
     support = [i for i in idxs if insts[i][-k] in table and refs[i] == table[insts[i][-k]]]
     if len(support) < MINCOV or len(set(table.values())) < 2:
         return None
+    if max(Counter(table.values()).values()) / len(table) > 0.7:   # near-constant table → the slot doesn't SELECT
+        return None                                                # (kills n-gram boilerplate like "<s> …→upon", not a gate)
     frame = {m: next(iter({insts[i][-m] for i in support})) for m in range(1, w + 1)
              if m != k and len({insts[i][-m] for i in support}) == 1}
     fmatch = [i for i in idxs if all(insts[i][-m] == v for m, v in frame.items())]
@@ -89,7 +91,7 @@ def confirm(insts, b, decide_fn, ntest=18):
     return ok / tr if tr else 0.0
 
 
-def learn_gates(insts, refs, idxs, w, decide_fn, n_anchor=240, max_confirm=40):
+def learn_gates(insts, refs, idxs, w, decide_fn, n_anchor=240, max_confirm=40, ntest=14, fill=None):
     anchors = idxs[::max(1, len(idxs) // n_anchor)]
     tables = defaultdict(set)
     for a in anchors:
@@ -106,9 +108,13 @@ def learn_gates(insts, refs, idxs, w, decide_fn, n_anchor=240, max_confirm=40):
             cands[(k, tuple(sorted(b["frame"].items())), tuple(sorted(b["table"].items())))] = b
     # rank observationally (faithful first, then coverage); causally confirm only the top candidates (bounds decide() calls)
     ranked = sorted(cands.values(), key=lambda b: (not b["viol"], len(b["support"])), reverse=True)
-    for b in ranked[:max_confirm]:
-        b["causal"] = confirm(insts, b, decide_fn)
-    return [b for b in ranked if "causal" in b]
+    top = ranked[:max_confirm]
+    if fill:                                                  # batch the perturbation oracle calls so they run in parallel
+        fill([(*insts[i][:-b["k"]], key, *insts[i][len(insts[i]) - b["k"] + 1:])
+              for b in top for i in b["fmatch"][:ntest] for key in b["table"]])
+    for b in top:
+        b["causal"] = confirm(insts, b, decide_fn, ntest)
+    return top
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -165,7 +171,7 @@ def confirm_compose(insts, k1, k2, region, lab, bysum, decide_fn):
     return (ok / tr if tr else 0.0), (ext / etr if etr else None)
 
 
-def learn_compose(insts, refs, idxs, w, decide_fn, guard_cap=80, max_confirm=30):
+def learn_compose(insts, refs, idxs, w, decide_fn, guard_cap=80, max_confirm=30, fill=None):
     """Frame-first mining: iterate single-guard frame regions, find an operand PAIR with a clean additive 2D table where
     neither slot alone determines the output, then causally confirm."""
     offval = defaultdict(Counter)
@@ -198,9 +204,59 @@ def learn_compose(insts, refs, idxs, w, decide_fn, guard_cap=80, max_confirm=30)
                 seen.add(key)
                 cands.append(dict(k1=k1, k2=k2, frame=frame, region=region, lab=add[0], bysum=add[1]))
     cands.sort(key=lambda b: len(b["region"]), reverse=True)
-    for b in cands[:max_confirm]:
+    top = cands[:max_confirm]
+    if fill:                                                  # batch the operand-grid oracle calls for parallelism
+        grid = []
+        for b in top:
+            base = insts[b["region"][0]]
+            for a in b["lab"]:
+                for bb in b["lab"]:
+                    p = base[:]; p[-b["k1"]] = a; p[-b["k2"]] = bb
+                    grid.append(p)
+        fill(grid)
+    for b in top:
         b["causal"], b["extrap"] = confirm_compose(insts, b["k1"], b["k2"], b["region"], b["lab"], b["bysum"], decide_fn)
-    return [b for b in cands if "causal" in b]
+    return top
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# COPY / INDUCTION family (content-relative, not offset-relative): output = ctx[ prev_occ(last-L suffix) + L ] — the
+# token following the most-recent earlier occurrence of the current suffix (the prev_occ primitive). CRITICAL: the
+# OBSERVATIONAL rate is confounded by n-gram determinism (a recurring suffix yields the same next token for n-gram
+# reasons, not copying), so the CAUSAL test — perturb the pointed-to token, output must follow — is the real signal.
+# On pythia-160m: greedy natural text observational 59-91% but causal 11% (n-gram); repeated NOVEL tokens causal 85-90%
+# (true induction). select/compose are offset-relative; this family is content-relative — the other axis of idiom.
+
+def learn_relational(insts, refs, idxs, decide_fn, fill=None, maxL=3, ntest=80):
+    out = []
+    lo = min(min(c) for c in insts if c); hi = max(max(c) for c in insts if c)
+    for L in range(1, maxL + 1):
+        app, hit = [], 0
+        for i in idxs:
+            ctx = insts[i]
+            if len(ctx) <= L:
+                continue
+            suf = tuple(ctx[-L:])
+            js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+            if js:
+                ptr = max(js) + L
+                if ptr < len(ctx):
+                    app.append((i, ptr)); hit += (ctx[ptr] == refs[i])
+        if not app:
+            continue
+        import random as _r
+        rng = _r.Random(1)
+        tests = []
+        for i, ptr in app[:ntest]:
+            ctx = insts[i]; xp = rng.randint(lo, hi)
+            while xp == ctx[ptr]:
+                xp = rng.randint(lo, hi)
+            p = ctx[:]; p[ptr] = xp; tests.append((p, xp))
+        if fill:
+            fill([p for p, _ in tests])
+        causal = sum(1 for p, xp in tests if decide_fn(p) == xp) / len(tests) if tests else 0.0
+        out.append(dict(L=L, applicable=len(app), obs=hit / len(app), causal=causal))
+    return out
 
 
 def main():
@@ -215,10 +271,23 @@ def main():
     insts = instances(ids, n, w)
     refs = model_refs(md, insts)
     idxs = [i for i in range(len(insts)) if refs[i] is not None and len(insts[i]) >= w]
-    decide_fn = ref_source(md)[1]
+    _raw, _cache = ref_source(md)[1], {}                      # memoize the oracle — fieldrun calls are ~0.1-0.4s each
+    def decide_fn(ctx):
+        key = tuple(ctx)
+        if key not in _cache:
+            _cache[key] = _raw(ctx)
+        return _cache[key]
+    def fill(ctxs, workers=8):                                # batch-compute perturbations in parallel (fieldrun subprocess releases the GIL)
+        miss = list({tuple(c) for c in ctxs} - set(_cache))
+        if not miss:
+            return
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            for c, o in zip(miss, ex.map(lambda t: _raw(list(t)), miss)):
+                _cache[c] = o
     print(f"=== idiom_learn · {name} · {len(idxs)} decisions (W={w}) — unsupervised, nothing hand-coded ===\n")
 
-    gates = learn_gates(insts, refs, idxs, w, decide_fn)
+    gates = learn_gates(insts, refs, idxs, w, decide_fn, fill=fill)
     real = [b for b in gates if not b["viol"] and b["causal"] >= 0.8]
     print(f"frame-conditioned GATEs (select family) — {len(real)} REAL (faithful + causally confirmed) of {len(gates)} mined:\n")
     for b in real[:20]:
@@ -227,7 +296,7 @@ def main():
         print(f"  [causal {b['causal']:.0%}] GATE@{b['k']}  support={len(b['support'])}  ignore@{b['ignore']}")
         print(f"       frame[{fr}]")
         print(f"       {td}")
-    comps = learn_compose(insts, refs, idxs, w, decide_fn)
+    comps = learn_compose(insts, refs, idxs, w, decide_fn, fill=fill)
     real_c = [b for b in comps if b["causal"] >= 0.8]
     print(f"\n2-operand COMPOSE idioms (compute family) — {len(real_c)} REAL (causally confirmed) of {len(comps)} mined:\n")
     for b in real_c[:10]:
@@ -240,8 +309,19 @@ def main():
         print(f"       frame[{fr}]   values {{{vals}}}")
         print(f"       sum→out {{{sums}}}")
 
-    print("\nselect = one causal operand → lookup (gate); compose = two operands → sum→index (computation). "
-          "Both learned from behavior, nothing hand-coded.")
+    rels = learn_relational(insts, refs, idxs, decide_fn, fill=fill)
+    print("\nCOPY/INDUCTION family (content-relative; observational is n-gram-CONFOUNDED — causal is the real signal):")
+    for r in rels:
+        if r["causal"] >= 0.8 and r["obs"] >= 0.5:
+            tag = "  ← REAL copy/induction (causally confirmed)"
+        elif r["obs"] >= 0.5:
+            tag = "  (n-gram determinism, NOT copy — causal too low)"
+        else:
+            tag = ""
+        print(f"  induction L={r['L']}: applicable {r['applicable']}, observational {r['obs']:.0%}, causal {r['causal']:.0%}{tag}")
+
+    print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
+          "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")
 
 
 if __name__ == "__main__":
