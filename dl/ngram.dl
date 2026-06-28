@@ -1,0 +1,46 @@
+// rosetta · ngram.dl — automatic n-gram detection, in Datalog. Given decision contexts and the model's argmax per
+// context, find the SHORTEST suffix under which the model is deterministic (a certified (k+1)-gram), per instance.
+//
+//   ctx(inst,pos,id)  the decision contexts (pos 0..W-1, W-1 = last token)   [.input]
+//   ref(inst,out)     the model's argmax per context (from whole.dl)          [.input]
+//   wmax(w)           the window length / max suffix to consider              [.input]
+//
+// Output: minorder(inst,k) = the model's effective order for that context; orderhist(k,n) = how many contexts resolve
+// at each order. This is the detection the minimal-suffix cover relies on — expressed as a query, not a Python loop.
+
+.decl ctx(inst:number, pos:number, id:number)
+.input ctx
+.decl ref(inst:number, out:number)
+.input ref
+.decl wmax(w:number)
+.input wmax
+
+.decl lastp(inst:number, p:number)
+lastp(I, P) :- ctx(I, _, _), P = max PP : { ctx(I, PP, _) }.
+
+.decl krange(k:number)
+krange(1).
+krange(K + 1) :- krange(K), wmax(W), K < W.
+
+// eqsuf(I,J,K): instances I,J agree on their last K tokens (ordered pairs, both directions, for conflict detection)
+.decl eqsuf(i:number, j:number, k:number)
+eqsuf(I, J, 1) :- lastp(I, PI), ctx(I, PI, X), lastp(J, PJ), ctx(J, PJ, X), I != J.
+eqsuf(I, J, K + 1) :- eqsuf(I, J, K), krange(K + 1),
+                      lastp(I, PI), ctx(I, PI - K, X), lastp(J, PJ), ctx(J, PJ - K, X).
+
+// at suffix length K, instance I conflicts if some J shares its K-suffix but the model gives a different answer
+.decl conflict(inst:number, k:number)
+conflict(I, K) :- eqsuf(I, J, K), ref(I, OI), ref(J, OJ), OI != OJ.
+
+// resolved at K: the K-suffix determines I's output over the instance set (no conflicting partner)
+.decl resolved(inst:number, k:number)
+resolved(I, K) :- ref(I, _), krange(K), !conflict(I, K).
+
+// the model's effective order for this context = the shortest resolving suffix; (k+1)-gram in n-gram terms
+.decl minorder(inst:number, k:number)
+.output minorder
+minorder(I, K) :- ref(I, _), K = min KK : { resolved(I, KK) }.
+
+.decl orderhist(k:number, n:number)
+.output orderhist
+orderhist(K, N) :- minorder(_, K), N = count : { minorder(I, K) }.

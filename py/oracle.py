@@ -11,7 +11,58 @@ import os, subprocess, tempfile, shutil, glob
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EQUIV = os.path.join(HERE, "dl", "equiv.dl")
+NGRAM = os.path.join(HERE, "dl", "ngram.dl")
+MASTER = os.path.join(HERE, "dl", "master.dl")
 _COMPILED = {}   # whole_dl -> path of compiled native binary (or False if compilation isn't available)
+
+
+def detect(insts, refs, w):
+    """Run the Datalog n-gram detector (dl/ngram.dl): shortest model-deterministic suffix per context. Returns
+    (orderhist {k:n_contexts}, minorder {inst:k}). The detection is the query — Python only stages the facts."""
+    with tempfile.TemporaryDirectory() as d:
+        ind, outd = os.path.join(d, "in"), os.path.join(d, "out")
+        os.makedirs(ind); os.makedirs(outd)
+        with open(os.path.join(ind, "ctx.facts"), "w") as cf, open(os.path.join(ind, "ref.facts"), "w") as rf:
+            for i, ctx in enumerate(insts):
+                if refs[i] is None:
+                    continue
+                for p, t in enumerate(ctx):
+                    cf.write(f"{i}\t{p}\t{t}\n")
+                rf.write(f"{i}\t{refs[i]}\n")
+        open(os.path.join(ind, "wmax.facts"), "w").write(f"{w}\n")
+        subprocess.run(["souffle", NGRAM, "-F", ind, "-D", outd], capture_output=True, text=True)
+        def rows(name):
+            p = os.path.join(outd, name)
+            return [tuple(map(int, l.split("\t"))) for l in open(p).read().splitlines()] if os.path.exists(p) else []
+        return {k: n for k, n in rows("orderhist.csv")}, {i: k for i, k in rows("minorder.csv")}
+
+
+def run_master(insts, refs, w):
+    """Run dl/master.dl: detection + cover + certificate in ONE Datalog program over staged ctx/ref/wmax facts.
+    Returns {ncover, nmiss, nuncov, certified, orderhist}. Demonstrates the master-dl process (host only stages I/O)."""
+    with tempfile.TemporaryDirectory() as d:
+        ind, outd = os.path.join(d, "in"), os.path.join(d, "out")
+        os.makedirs(ind); os.makedirs(outd)
+        with open(os.path.join(ind, "ctx.facts"), "w") as cf, open(os.path.join(ind, "ref.facts"), "w") as rf:
+            for i, ctx in enumerate(insts):
+                if refs[i] is None:
+                    continue
+                for p, t in enumerate(ctx):
+                    cf.write(f"{i}\t{p}\t{t}\n")
+                rf.write(f"{i}\t{refs[i]}\n")
+        open(os.path.join(ind, "wmax.facts"), "w").write(f"{w}\n")
+        subprocess.run(["souffle", MASTER, "-F", ind, "-D", outd, "-I", os.path.join(HERE, "dl")],
+                       capture_output=True, text=True)
+        def scalar(name):
+            p = os.path.join(outd, name + ".csv")
+            s = open(p).read().strip() if os.path.exists(p) else ""
+            return int(s) if s.isdigit() else (0 if not s else s)
+        cert = os.path.join(outd, "certified.csv")
+        return {"ncover": scalar("ncover"), "nmiss": scalar("nmiss"), "nuncov": scalar("nuncov"),
+                "certified": os.path.exists(cert) and os.path.getsize(cert) > 0,
+                "orderhist": {k: n for k, n in (tuple(map(int, l.split("\t")))
+                              for l in (open(os.path.join(outd, "orderhist.csv")).read().splitlines()
+                                        if os.path.exists(os.path.join(outd, "orderhist.csv")) else []))}}
 
 
 def _run(dl, facts_dir, out_dir, includes=()):

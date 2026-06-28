@@ -1,0 +1,33 @@
+// rosetta · master.dl — the minimization PROCESS as one Datalog program over modules.
+//
+// Composes the modules and produces the certified result in a single souffle run:
+//   #include "ngram.dl"   → minorder (the cover) + orderhist (n-gram structure) from ctx + ref
+//   here                  → the faithfulness certificate over that cover
+//
+// Inputs today: ctx(inst,pos,id), ref(inst,out), wmax(w)  [ref from whole.dl]. The ONE part still outside this program
+// is computing ref — it needs a MULTI-INSTANCE forward. With `#include "forward_mi.dl"` (ctx → ref over all instances at
+// once, a fieldrun emit change), `ref` becomes a computed relation and this master takes *weights + corpus* in and emits
+// *certified circuits* out, end to end, with no per-context host loop. The host then only stages input facts and reads
+// these output relations — I/O, not logic.
+//
+// Faithfulness here is BY CONSTRUCTION: minorder(I,K) fires only where the K-suffix has no conflicting partner, so the
+// rule reproduces the model for every context it covers. nmiss is computed independently anyway, as a genuine check.
+
+#include "ngram.dl"
+
+.decl uncovered(inst:number)            // a context the cover leaves with no rule
+.output uncovered
+uncovered(I) :- ref(I, _), !minorder(I, _).
+
+.decl ncover(n:number)   .output ncover
+ncover(N) :- N = count : { ref(_, _) }.
+
+.decl nuncov(n:number)   .output nuncov
+nuncov(N) :- N = count : { uncovered(_) }.
+
+// independent check: a covered context whose chosen (minimal) suffix STILL conflicts would be infidelity. Must be 0.
+.decl nmiss(n:number)    .output nmiss
+nmiss(N) :- N = count : { minorder(I, K), conflict(I, K) }.
+
+.decl certified()        .output certified
+certified() :- nmiss(0), nuncov(0).

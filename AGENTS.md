@@ -34,11 +34,24 @@ Every claim is `proved` / `empirical` / `open`. In rosetta concretely:
 - `open` — a proposed circuit not yet certified, or a structure-search hypothesis.
 Never promote a tag without the artifact (here, the `souffle` output) that backs it.
 
+## What's logic, what's I/O
+
+The dividing line: **every decision is Datalog; the host (Python) only does I/O** — stage input fact files, invoke
+souffle, read output relations. souffle can't read a checkpoint, generate a corpus, spawn itself, or serialize a
+runnable `.dl`, so a thin host shim is irreducible; but mining, detection, the cover, and certification are all `.dl`.
+`dl/master.dl` shows the direction: it `#include`s the modules and runs detection + cover + certificate in ONE souffle
+run. The last piece still outside it is computing `ref` (the forward) per context — that needs a **multi-instance
+forward emit** (`ctx(inst,pos,id) → ref`, a fieldrun change); with it, the master takes weights + corpus in and emits
+certified circuits out, end to end.
+
 ## Layout
 
 - `dl/equiv.dl` — the keystone equivalence verifier (`tok`, `ref` in; `mismatch`/`uncovered`/`certified` out).
-- `dl/` — Datalog impl: equivalence, ablation, routing.
-- `py/oracle.py` — `souffle` driver: `decide(whole, ctx)` and `certify(circuit, whole, instances)`.
+- `dl/ngram.dl` — automatic n-gram detection: shortest model-deterministic suffix per context (`minorder`, `orderhist`).
+- `dl/master.dl` — the process as one program: `#include`s the modules → detection + cover + certificate in one run.
+- `py/oracle.py` — `souffle` driver: `decide`, `certify`, `run_equiv`, `detect`, `run_master`, and `compiled` (native).
+- `py/split_facts.py` — split inline-fact `whole.dl` → tiny `forward.dl` + `weights/*.facts` data modules (~100× faster).
+- `py/minimize.py` — model-general: build a certified circuits program + auto-write the per-model certificate.
 - `reference/<model>/` — the Rosetta Stones: `whole.dl`, certified `circuit.dl`/`circuits.dl`, `corpus.json`,
   `lexicon.json`, `CERTIFICATE.md`. `threx` is the seed (from the fieldrun whole-datalog experiment).
 - `models/<model>/` — real models being minimized, same shape.
