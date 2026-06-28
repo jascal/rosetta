@@ -12,8 +12,14 @@ Usage: FIELDRUN_SERVE=<port> python3 py/probe_families.py <model_dir> [n]
 """
 import sys, os, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from oracle import serve_decide
+from oracle import serve_decide, serve_topk
 from tokenizers import Tokenizer
+
+
+def in_topk(port, ctx, target, k=5):
+    """set-based detect for NON-UNIQUE families (antonym: hot→cold/cool; relation): is the answer in the model's top-K,
+    and does it shift causally with the cue? Fairer than argmax-exact when several answers are valid."""
+    return target in [t for t, _ in serve_topk(port, list(ctx), k)]
 
 NAMES = [" John", " Mary", " Tom", " Sara", " Paul", " Anna", " Mark", " Lucy", " Mike", " Emma", " David", " Kate",
          " James", " Laura", " Peter", " Alice", " Henry", " Julia", " Robert", " Nancy"]
@@ -86,9 +92,9 @@ def family_coreference(tok, port, n=40):
     det = cfollow = trials = 0
     for _ in range(n):
         a, b = rng.sample(names, 2)
-        o1 = serve_decide(port, tok.encode(f"{a} is a girl.{b} is a boy. The girl is named").ids)
-        o2 = serve_decide(port, tok.encode(f"{a} is a boy.{b} is a girl. The girl is named").ids)
-        det += (o1 == nm[a]); cfollow += (o2 == nm[b]); trials += 1
+        det += in_topk(port, tok.encode(f"{a} is a girl.{b} is a boy. The girl is named").ids, nm[a])
+        cfollow += in_topk(port, tok.encode(f"{a} is a boy.{b} is a girl. The girl is named").ids, nm[b])
+        trials += 1
     return det / trials, cfollow / trials
 
 
@@ -104,11 +110,9 @@ def family_pairs(tok, port, pairs, template, n=40):
     det = cfollow = trials = 0
     for _ in range(n):
         a = rng.choice(keys)
-        o1 = serve_decide(port, tok.encode(template(a)).ids)
-        det += (o1 == sb[p[a]])
+        det += in_topk(port, tok.encode(template(a)).ids, sb[p[a]])
         a2 = rng.choice([k for k in keys if k != a])
-        o2 = serve_decide(port, tok.encode(template(a2)).ids)
-        cfollow += (o2 == sb[p[a2]]); trials += 1
+        cfollow += in_topk(port, tok.encode(template(a2)).ids, sb[p[a2]]); trials += 1
     return det / trials, cfollow / trials
 
 
