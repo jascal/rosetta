@@ -193,6 +193,35 @@ def decide(whole_dl, ctx):
         return int(s) if s else None
 
 
+def logits(whole_dl, ctx):
+    """The faithful model's full logit scoreboard for one context: list of (token_id, logit). These are the T-INVARIANT
+    incidence values — softmax(logits/T) is the model's next-token distribution at ANY temperature (T only scales them).
+    Same machinery as decide(), but reads the whole.dl `logit` relation instead of collapsing to argmax."""
+    from split_facts import split
+    forward, wdir = split(whole_dl)
+    with tempfile.TemporaryDirectory() as d:
+        ind, outd = os.path.join(d, "in"), os.path.join(d, "out")
+        os.makedirs(ind); os.makedirs(outd)
+        for fn in os.listdir(wdir):
+            os.symlink(os.path.join(wdir, fn), os.path.join(ind, fn))
+        with open(os.path.join(ind, "token.facts"), "w") as f:
+            f.write("".join(f"{p}\t{t}\n" for p, t in enumerate(ctx)))
+        exe = compiled(forward)
+        if exe:
+            subprocess.run([exe, "-F", ind, "-D", outd], capture_output=True, text=True)
+        else:
+            _run(forward, ind, outd)
+        lc = os.path.join(outd, "logit.csv")
+        if not os.path.exists(lc):
+            return None
+        out = []
+        for ln in open(lc).read().splitlines():
+            if "\t" in ln:
+                v, s = ln.split("\t")
+                out.append((int(v), float(s)))
+        return out
+
+
 def run_equiv(circuit_dl, instances, refs):
     """Like certify(), but with the model answers ALREADY computed (refs aligned to instances). Lets the slow whole.dl
     oracle be paid once and cached, so the minimization loop can re-certify candidate circuits cheaply (equiv.dl only)."""
