@@ -12,9 +12,23 @@ Model-general. Strategy:
   5. emit + certify = write a multi-instance circuits.dl and let dl/equiv.dl PROVE it == model (nmiss=0 ∧ nuncov=0).
 Usage: python3 py/minimize.py [n_instances] [window] [model_dir]   (model_dir default: reference/threx)
 """
-import os, sys, json
+import os, sys, json, random
 from collections import defaultdict, Counter
 from oracle import decide, run_equiv, detect
+
+
+def cover_predict(ctx, rules, composed, w):
+    """What circuits.dl outputs for a context: composed (if it fires), else the LONGEST matching n-gram suffix rule, else
+    None (abstain). Used to MEASURE generalization on held-out contexts the cover never saw (the empirical loss metric)."""
+    if composed:
+        c = composed_fires(ctx)
+        if c is not None:
+            return c
+    for k in range(min(len(ctx), w), 0, -1):
+        o = rules.get(tuple(ctx[-k:]))
+        if o is not None:
+            return o
+    return None
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BEARINGS, THINGS = [21, 22, 23, 24, 25], [10, 11, 12, 13, 26, 27, 28, 29, 30]  # threx composed plugin
@@ -225,30 +239,44 @@ def main():
     print(f"1. build-time refs oracle = {src_label} (fieldrun is build-time only; circuits.dl is runtime-independent) — cached:")
     refs = model_refs(md, insts)
     valid = [i for i in range(len(insts)) if refs[i] is not None]
+    hold_frac = float(sys.argv[4]) if len(sys.argv) > 4 else 0.1
+    shuf = valid[:]; random.Random(0).shuffle(shuf)
+    holdout = set(shuf[:int(len(shuf) * hold_frac)]); train = [i for i in valid if i not in holdout]
+    print(f"   split: {len(train)} train (certified in-domain) / {len(holdout)} holdout ({hold_frac:.0%}, measured generalization)")
 
     comp_idx = []
     if use_composed:
-        comp_idx = [i for i in valid if composed_fires(insts[i]) is not None and composed_fires(insts[i]) == refs[i]]
-        print(f"2. composed plugin covers {len(comp_idx)} instances (1 rule)")
-    rest = [i for i in valid if i not in set(comp_idx)]
+        comp_idx = [i for i in train if composed_fires(insts[i]) is not None and composed_fires(insts[i]) == refs[i]]
+        print(f"2. composed plugin covers {len(comp_idx)} train instances (1 rule)")
+    rest = [i for i in train if i not in set(comp_idx)]
     rules, remaining, order_of = minimal_suffix_cover(insts, refs, rest, w)
     bylen = Counter(len(s) for s in rules)
     print(f"3. minimal-suffix cover on {len(rest)}: {len(rules)} rules, {len(remaining)} unresolved")
     print(f"   rule lengths {dict(sorted(bylen.items()))}  (len1=priors · mid=structural/idiom · len{w}=memorized)")
     emit(out, rules, use_composed, sym, name)
-    print("4. certify whole program vs the model, in Datalog (equiv.dl):")
-    r = run_equiv(out, [insts[i] for i in valid], [refs[i] for i in valid])
+    print("4. certify train program vs the model, in Datalog (equiv.dl):")
+    r = run_equiv(out, [insts[i] for i in train], [refs[i] for i in train])
     if "error" in r:
         print("   ERROR:", r["error"]); return
     print(f"   ncover={r['ncover']}  nmiss={r['nmiss']}  nuncov={r['nuncov']}")
     if r["mismatches"]:
         print("   mismatches:", [(sym.get(a), sym.get(b)) for _, a, b in r["mismatches"][:6]])
     nrules = (1 if use_composed else 0) + len(rules)
-    ok = r["nmiss"] == 0 and r["nuncov"] == 0 and r["ncover"] == len(valid)
-    print(f"\n   {name} FULLY CERTIFIED (Datalog): {ok}")
+    ok = r["nmiss"] == 0 and r["nuncov"] == 0 and r["ncover"] == len(train)
+    print(f"\n   {name} train CERTIFIED (Datalog): {ok}")
     memo = bylen.get(w, 0)
-    print(f"   program: {nrules} rules for {len(valid)} decisions "
-          f"({100*(1-nrules/max(1,len(valid))):.0f}% fewer than memorizing); {memo} are full-W (memorized tail)")
+    print(f"   program: {nrules} rules for {len(train)} train decisions "
+          f"({100*(1-nrules/max(1,len(train))):.0f}% fewer than memorizing); {memo} are full-W (memorized tail)")
+    # HOLDOUT generalization — MEASURED (not certified) fidelity on contexts the cover never saw. The empirical loss to
+    # minimize with more/diverse corpus. covered = a rule fired; correct = matched the model; else abstain or wrong.
+    hcov = hcorr = 0
+    for i in holdout:
+        p = cover_predict(insts[i], rules, use_composed, w)
+        hcov += p is not None
+        hcorr += p is not None and p == refs[i]
+    nh = max(1, len(holdout))
+    print(f"   HOLDOUT generalization ({len(holdout)} unseen): covered {100*hcov/nh:.0f}%, matches model "
+          f"{hcorr}/{len(holdout)} = {100*hcorr/nh:.0f}%  → generalization loss {100*(1-hcorr/nh):.0f}%")
     params = model_params(md)
     if params:
         print(f"   params/rule: {params:,} params / {nrules} rules = {params/max(1,nrules):,.0f} "
@@ -263,18 +291,27 @@ def main():
     eff = next((o for o in sorted(hist) if sum(hist[k] for k in hist if k <= o) >= 0.9 * tot), max(hist, default=0))
     print(f"   n-gram order (contexts) {dict(sorted(hist.items()))}  → effective order {eff}-gram"
           f"{' (bigram/trigram-dominated)' if eff <= 3 else ''}")
-    write_certificate(md, name, w, len(valid), nrules, use_composed, r, ok, rules, hist, eff, sym)
+    write_certificate(md, name, w, len(train), nrules, use_composed, r, ok, rules, hist, eff, sym,
+                      (len(holdout), hcov, hcorr))
     print(f"   wrote {os.path.join(md, 'CERTIFICATE.md')}")
 
 
-def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, eff, sym):
+def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, eff, sym, holdout=None):
     dec = lambda t: (sym.get(t, str(t)).strip() or f"[{t}]")
     samp = lambda k: [(s, o) for s, o in rules.items() if len(s) == k][:10]
+    hline = ""
+    if holdout:
+        nh, hcov, hcorr = holdout
+        nh = max(1, nh)
+        hline = (f"**Generalization (holdout, {holdout[0]} unseen — MEASURED, not certified):** covered "
+                 f"{100*hcov/nh:.0f}%, matches model **{100*hcorr/nh:.0f}%** → generalization loss "
+                 f"{100*(1-hcorr/nh):.0f}%. (Minimize by larger / more diverse corpus and better idiom detection — "
+                 f"idioms generalize structurally where n-grams only memorize.)")
     lines = [f"# {name} — faithfulness certificate (auto-generated by minimize.py)", "",
-             f"**Domain:** {ndec} deduped decision windows (W={w}).  "
+             f"**Train domain:** {ndec} deduped decision windows (W={w}).  "
              f"**Verdict (dl/equiv.dl):** ncover={r['ncover']}, nmiss={r['nmiss']}, nuncov={r['nuncov']} → "
-             f"**{'CERTIFIED' if ok else 'NOT certified'}**.", "",
-             f"**Program:** {nrules} rules{' (incl. 1 composed plugin)' if composed else ''} for {ndec} decisions "
+             f"**{'CERTIFIED' if ok else 'NOT certified'}** in-domain.", "", hline, "",
+             f"**Program:** {nrules} rules{' (incl. 1 composed plugin)' if composed else ''} for {ndec} train decisions "
              f"({100*(1-nrules/max(1,ndec)):.0f}% fewer than memorizing).",
              (f"**Params/rule:** {model_params(md):,} / {nrules} = **{model_params(md)/max(1,nrules):,.0f}** "
               f"(capacity per certified rule — the part beyond the recall skeleton; grows with model size)."
