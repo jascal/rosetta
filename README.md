@@ -51,28 +51,52 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 
 | path | role |
 |------|------|
-| `dl/equiv.dl` | **the keystone** — multi-instance equivalence verifier; `certified()` iff `nmiss=0 ∧ nuncov=0` over the domain |
-| `dl/` | the Datalog implementation: equivalence, causal ablation, circuit routing |
-| `py/oracle.py` | thin `souffle` driver — runs `whole.dl`, stages the `ref`/`tok` facts, returns the Datalog verdict |
-| `py/minimize.py` | model-general: build a certified circuits-only program (composed plugin + minimal-suffix cover) |
-| `py/split_facts.py` | split inline-fact `whole.dl` → tiny `forward.dl` + `weights/*.facts` data modules (~100× faster) |
-| `reference/threx/` | **the Rosetta Stone** — a tiny model fully worked: `whole.dl`, a certified `circuit.dl`, corpus, certificate |
-| `models/` | where real models get minimized (one dir each: `whole.dl` + corpus + discovered circuits + certificate) |
+| `dl/equiv.dl` | **the keystone (live)** — multi-instance equivalence verifier; `certified()` iff `nmiss=0 ∧ nuncov=0` over the domain. Every emitted `circuits.dl` is proved against the model through this. |
+| `dl/{ngram,induction,master}.dl` | **reference / legacy** hand-coded Datalog detectors — *subsumed* by the learner, which discovers these circuits unsupervised and inlines them into the emitted `circuits.dl`. Not on the live path. |
+| `dl/primitives.dl` | **design reference** — the ILP primitive vocabulary (`prev_occ`, `at_offset`, `sum_at`, …) the learner composes over (implemented in Python, inlined when emitted). |
+| `py/idiom_learn.py` | **the main tool** — unsupervised idiom learning (select / compose / copy-induction, causally confirmed) → `--emit` a runtime-independent `circuits.dl` + `run.dl` → `--certify` via `equiv.dl`. Model-general (CLI flags). |
+| `py/probe_induction.py` | measure a model's copy/induction circuit, isolated from the n-gram confound (novel-repeat + causal perturbation). |
+| `py/oracle.py` | model-oracle + `souffle` driver. Build-time refs come from `whole.dl` (small/pure), a `fieldrun` bundle, or a **resident `fieldrun --serve` server** (`serve_decide`, big models); runtime stays souffle-only. |
+| `py/minimize.py` | the n-gram minimal-suffix cover + emit + certify (the memoization backstop the idioms sit on top of). |
+| `py/make_corpus.py` | tokenize real text → `corpus.json` with the model's bundle tokenizer (needs the rosetta `.venv`). |
+| `reference/threx/` | **the Rosetta Stone** — a tiny model fully worked: `whole.dl`, a certified `circuits.dl` (now from *learned* idioms), corpus, certificate |
+| `models/` | real models (one dir each: `bundle.fieldrun.*` + `corpus.json` + emitted `circuits.dl` + certificate) |
 | `tests/` | the certificate must stay clean on the reference model(s) |
 
 ## Quickstart
 
 ```bash
-python3 py/verify_threx.py     # certify the threx composed circuit (25 cells) — verdict from dl/equiv.dl
-python3 py/minimize.py 300 8   # minimize + FULLY certify threx: composed + minimal-suffix cover, all 300 windows
+# learn idioms, emit a souffle-only circuits.dl, and prove it == the model — one tool, CLI-configured:
+python3 py/idiom_learn.py 1400 8 reference/threx --emit --certify
+#   → 1 compose + 2 select-gate idioms (LEARNED, nothing hand-coded) + n-gram backfill, CERTIFIED nmiss=0 nuncov=0
+
+# a real model (resident server oracle; bundle loads once):
+fieldrun --bundle models/<m>/bundle --serve 8177 &        # build-time refs server
+FIELDRUN_SERVE=8177 python3 py/idiom_learn.py 1000 8 models/<m> --emit --certify
 ```
 
-Expected: composed `25 · 0 · 0 · CERTIFIED`; full program `ncover=300 nmiss=0 nuncov=0 · FULLY CERTIFIED`.
-The oracle compiles `whole.dl` to a native binary on first use (~140× faster than the souffle interpreter; needs `g++`).
+The oracle compiles `whole.dl` to a native binary on first use (~140× faster than the souffle interpreter; needs `g++`);
+for bundles it uses the resident `fieldrun --serve` server (`FIELDRUN_SERVE=<port>`).
 
-## Scaling: whole.dl in parts (the dense-Gram wall)
+## Scaling to real models: the fieldrun-refs path + resident server
 
-A whole.dl is ~99.96% **weights-as-facts** and ~0.04% rules (stories260K: 261,092 fact lines vs 116 rules). Two
+For real models the build-time oracle is the **`fieldrun` binary**, not `whole.dl` (which is faithful but slow, and its
+logic-export is rope-only). A model dir ships a `bundle.fieldrun.*` (`fieldrun convert --model <hf-id> --arch <rope|neox|
+gemma4|…> --dtype int8`); the learner reads its argmax via `oracle`. This sidesteps both the dense-Gram wall and the
+rope-only export, so the ladder is open to **any architecture fieldrun runs** (Llama/Qwen RoPE, Pythia NeoX, Gemma…).
+
+- **Resident server, not subprocess-per-call.** A naive `fieldrun --bundle … --ids …` reloads the whole bundle every
+  call — fatal for big models (a 1B int8 bundle is 1.2 GB). Instead run one **`fieldrun --bundle <stem> --serve <port>`**
+  and point the oracle at it with `FIELDRUN_SERVE=<port>` (`oracle.serve_decide` → `POST /predict`). The bundle loads
+  **once**; measured **0.11 s vs 1.78 s/call (16×)** on Llama-3.2-1B. The server is single-threaded but each forward uses
+  all cores, so one resident server + internally-parallel forward is the right shape (no RAM blow-up, no oversubscription).
+- **Runtime independence is preserved.** fieldrun is *build-time only* (computing the refs the circuits are certified
+  against). The emitted `circuits.dl` runs in **souffle alone** — no fieldrun, no weights — via `run.dl`.
+
+### whole.dl in parts (the purity path, the dense-Gram wall)
+
+The `whole.dl` route — the model's forward pass *as Datalog* — remains the showcase/purity path for small models. A
+whole.dl is ~99.96% **weights-as-facts** and ~0.04% rules (stories260K: 261,092 fact lines vs 116 rules). Two
 consequences, and the fixes:
 
 - **facts-as-data, not facts-as-code** (`py/split_facts.py`): inline facts make souffle re-parse the weights every call
@@ -111,20 +135,30 @@ generalizes at **38%** (62% loss). **The idiom is what generalizes** — direct 
 idiom detection = a more substrate-transferable algorithm. That gap (the ~60% the n-gram cover can't generalize) is the
 idiom research program, now with a score.
 
-Next: the non-n-gram detector library (induction is in; agreement / delimiter / coreference next) to attack that
-holdout gap. `proved`/`empirical`/`open` tags gate every claim.
+Next: more idiom **families** to attack that holdout gap. Detection is now **learned, not hand-coded** — `py/idiom_learn.py`
+discovers idioms unsupervised and causally confirms them (select gate, compose, copy/induction so far); the open families
+are agreement / delimiter-bracket / coreference. `proved`/`empirical`/`open` tags gate every claim.
 
 ## Frontiers (revisit later)
 
-- **Temperature-parameterized completeness.** Today's `circuits.dl` is the **T=0 (greedy)** corner: each context → its
-  **argmax** (top-1), exact. "Complete for this corpus at temperatures {T₁…T_N}" reduces to **complete up to `T_max`**
-  (the softmax tail only grows with T, so the hottest point dominates): make each rule a **top-K distribution** (token +
-  logit, from fieldrun's `logit` scoreboard) with **K chosen so the elided tail's softmax mass is provably < ε at
-  `T_max`** — the rank-1 shortlist certificate generalized from argmax-equality to a *distributional* bound (TV/KL). The
-  `run.dl` harness then softmax-samples the kept logits at any supported T, making `circuits.dl` a faithful **sampler**,
-  not just a greedy predictor. Spectrum: `T=0` → argmax (exact, most compressible); `T≤T_max` → top-K + logits
-  (distributional certificate, larger K, less compressible); `T→∞` → ≈ the full unembed (minimization buys nothing). So
-  `T_max` is the knob trading fidelity-range against compression. *Not built yet — slot after the detector library.*
+- **Temperature: one rule set, T parameterized at query time.** Today's `circuits.dl` is the **T=0 (greedy)** corner —
+  each context → its **argmax**, exact, rules with no weights. The goal is *not* a separate program per temperature but
+  **one set of rules carrying the logits as incidence values**, with **T applied at query time** as `softmax(logits/T)`.
+  This works because logits are **T-invariant** (T only scales them in the softmax), so a single export serves every
+  temperature; `run.dl` softmax-samples the kept logits at any T, making `circuits.dl` a faithful **sampler**, not just a
+  greedy predictor. It is a **semiring lift**: T=0 is the boolean/tropical (argmax) collapse; T>0 is the probability
+  (sum-product) semiring where the incidence weights reappear. Each idiom keeps its *structure* but emits a distribution,
+  and its incidence value **measures circuit sharpness** (induction strength = the copy probability). The same lift turns
+  the causal test binary→graded (mass shifts, not argmax flips) and the certificate exact→distributional: keep **top-K
+  with K chosen so the elided tail's mass is provably < ε at `T_max`** (the hottest point dominates) — the rank-1
+  shortlist certificate generalized to a TV/KL bound. `T_max` is the knob trading fidelity-range against compression
+  (`T=0` most compressible; `T→∞` ≈ the full unembed, minimization buys nothing).
+  - **The routing *is* the T=0 shadow of this.** The cover-ordering priority in `circuits.dl` (compose > select-gate >
+    longest n-gram > copy/induction fallback), encoded as hard negation guards, is exactly the **argmax-override collapse**
+    of an incidence-weighted mixture: at T>0 the rules don't strictly override — each contributes logit-weighted mass and
+    the model's distribution is their (semiring) sum; the priority order is just *which contribution has the max logit*.
+    Bonus: induction's hard "OOD fallback" gating dissolves into a graded copy-mass contribution at T>0 (the incidence
+    weight handles it, no special-casing). *Not built yet — but the routing and the emitter already anticipate it.*
 - **Non-n-gram circuit detectors** beyond `ngram.dl`/`induction.dl` — agreement, delimiter/bracket-matching, coreference
   — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
 - **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing
