@@ -61,26 +61,45 @@ def main():
                 return o
         return None
 
-    def score(predfns):
-        cov = corr = 0
+    def ind_pred(ctx):                                                 # induction/copy: token after the latest recurrence
+        for L in range(min(3, len(ctx) - 1), 0, -1):
+            suf = tuple(ctx[-L:])
+            js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+            if js and max(js) + L < len(ctx):
+                return ctx[max(js) + L]
+        return None
+
+    H = len(holdout)
+    def correct(predfns):                                             # held-out windows the ordered cover gets right
+        n = 0
         for i in holdout:
-            p = None
             for f in predfns:
                 p = f(insts[i])
                 if p is not None:
-                    break
-            if p is not None:
-                cov += 1; corr += (p == refs[i])
-        return cov, corr
+                    n += (p == refs[i]); break
+        return n
 
-    H = len(holdout)
-    c1, k1 = score([ng_pred])
-    c2, k2 = score([ng_pred, sk_pred])
-    print(f"=== holdout_score · {name} · {len(train)} train / {H} holdout windows (W={w}, {len(ng)} n-gram + {len(skr)} skeleton rules) ===")
-    print(f"  n-gram only : covers {c1/H:.0%}  correct {k1}/{H} = {k1/H:.0%}   (holdout loss {1-k1/H:.0%})")
-    print(f"  + skeleton  : covers {c2/H:.0%}  correct {k2}/{H} = {k2/H:.0%}   (holdout loss {1-k2/H:.0%})")
-    print(f"  → skeleton recovers +{k2-k1} held-out windows ({(k2-k1)/H:+.1%}) that lexical n-grams missed"
-          + ("  ← cross-content generalization (was 'us memoizing')" if k2 > k1 else "  (no gain — redundant with n-grams here)"))
+    # candidate families beyond the n-gram baseline (causal-soundness is the gate; holdout/MDL is the objective)
+    FAM = {"skeleton": (sk_pred, len(skr)), "induction": (ind_pred, 0)}
+    base = [ng_pred]
+    k0 = correct(base)
+    print(f"=== holdout_score · {name} · {len(train)} train / {H} holdout (W={w}) — minimize holdout loss, bias to fewer rules ===")
+    print(f"  baseline n-gram: {len(ng)} rules, correct {k0}/{H} = {k0/H:.0%}  (holdout loss {1-k0/H:.0%})")
+    chosen, cur, total = [], k0, len(ng)
+    pending = dict(FAM)
+    while pending:                                                     # greedy: admit the family with best Δcorrect/Δrules
+        scored = []
+        for nm, (fn, rc) in pending.items():
+            gain = correct(base + [g[0] for g in chosen] + [fn]) - cur
+            scored.append((gain, rc, nm, fn))
+        gain, rc, nm, fn = max(scored, key=lambda s: (s[0] / max(1, s[1]), s[0]))   # holdout gain per rule, then raw gain
+        if gain <= 0:                                                  # nothing pays → stop (MDL: don't add non-generalizing rules)
+            print(f"  — remaining families add 0 holdout → not admitted (MDL): {', '.join(pending)}")
+            break
+        chosen.append((fn, nm)); cur += gain; total += rc; del pending[nm]
+        print(f"  + {nm}: +{gain} holdout (+{gain/H:.1%}) for {rc} rules → correct {cur}/{H} = {cur/H:.0%}, {total} rules total")
+    print(f"  ⇒ admitted: n-gram" + ("".join(f" + {nm}" for _, nm in chosen) or " only")
+          + f"  · holdout {cur/H:.0%} · {total} rules · residual (irreducible-here) loss {1-cur/H:.0%}")
 
 
 if __name__ == "__main__":
