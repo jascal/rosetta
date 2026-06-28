@@ -67,6 +67,31 @@ def get_refs(ref_fn, insts, cache_path, workers=1):
     return [cache[key(ctx)] for ctx in insts]
 
 
+def model_params(md):
+    """Parameter count from the model config [n_layer,H,nkv,hd,d,ffn,vocab,tied] (bundle.fieldrun.json, or the whole.dl
+    header). Used for the params/rule ratio — capacity per certified behavioral rule (how much of the model is beyond the
+    n-gram recall skeleton; it grows with model size)."""
+    import glob, re
+    cfg = None
+    bundles = glob.glob(os.path.join(md, "*.fieldrun.json"))
+    if bundles:
+        cfg = json.load(open(bundles[0])).get("config")
+    elif os.path.exists(os.path.join(md, "whole.dl")):
+        for line in open(os.path.join(md, "whole.dl")):
+            if "config: n_layer=" in line:
+                d = dict(re.findall(r"(\w+)=(\w+)", line))   # values may be ints or true/false (tied)
+                conv = lambda v: 1 if v == "true" else (0 if v == "false" else int(v))
+                cfg = [conv(d[k]) for k in ("n_layer", "H", "nkv", "hd", "d", "ffn", "vocab", "tied")]
+                break
+    if not cfg or len(cfg) < 8:
+        return None
+    nl, H, nkv, hd, d, ffn, vocab, tied = cfg[:8]
+    qd, kvd = H * hd, nkv * hd
+    p = vocab * d + (0 if tied else vocab * d)                       # embed (+ untied unembed)
+    p += nl * (2 * d * qd + 2 * d * kvd + 3 * d * ffn + 2 * d) + d   # q/o, k/v, gate/up/down, norms, final
+    return p
+
+
 def model_refs(md, insts, cache_name="ref_cache.json"):
     """refs for a model dir via its chosen build-time oracle (fieldrun parallel; whole.dl serial+compiled)."""
     label, fn = ref_source(md)
@@ -224,6 +249,10 @@ def main():
     memo = bylen.get(w, 0)
     print(f"   program: {nrules} rules for {len(valid)} decisions "
           f"({100*(1-nrules/max(1,len(valid))):.0f}% fewer than memorizing); {memo} are full-W (memorized tail)")
+    params = model_params(md)
+    if params:
+        print(f"   params/rule: {params:,} params / {nrules} rules = {params/max(1,nrules):,.0f} "
+              f"(capacity per certified rule — grows with model size; the part beyond the recall skeleton)")
 
     # n-gram order, context-based, derived from the cover's per-instance resolving length (O(n) — scales to big corpora,
     # same quantity dl/ngram.dl computes; `py/ngram.py` runs the Datalog detector directly for small showcase corpora).
@@ -246,7 +275,10 @@ def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, 
              f"**Verdict (dl/equiv.dl):** ncover={r['ncover']}, nmiss={r['nmiss']}, nuncov={r['nuncov']} → "
              f"**{'CERTIFIED' if ok else 'NOT certified'}**.", "",
              f"**Program:** {nrules} rules{' (incl. 1 composed plugin)' if composed else ''} for {ndec} decisions "
-             f"({100*(1-nrules/max(1,ndec)):.0f}% fewer than memorizing).", "",
+             f"({100*(1-nrules/max(1,ndec)):.0f}% fewer than memorizing).",
+             (f"**Params/rule:** {model_params(md):,} / {nrules} = **{model_params(md)/max(1,nrules):,.0f}** "
+              f"(capacity per certified rule — the part beyond the recall skeleton; grows with model size)."
+              if model_params(md) else ""), "",
              "## Automatic n-gram characterization", "",
              "A length-k suffix rule is a certified (k+1)-gram (prefix-invariant over the preceding W−k tokens on the "
              "domain). Order histogram (contexts, from dl/ngram.dl):", "",
