@@ -50,6 +50,18 @@ def serve_decide(port, ctx):
         return json.loads(r.read())["next"]
 
 
+def serve_topk(port, ctx, k=64):
+    """Top-K (token, logit) of the next-token scoreboard via a resident `fieldrun --serve` server (POST /topk). The
+    logits are T-INVARIANT incidence values; K large enough that the dropped tail's softmax mass is < ε at T_max. This is
+    how the T>0 path (temperature.py) gets distributions for big models — whole.dl's `logit` relation is rope-only/slow."""
+    import urllib.request, json
+    data = json.dumps({"ids": [int(t) for t in ctx], "k": k}).encode()
+    req = urllib.request.Request(f"http://127.0.0.1:{port}/topk", data=data,
+                                 headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=300) as r:
+        return [(int(t), float(s)) for t, s in json.loads(r.read())["topk"]]
+
+
 def fieldrun_decide(bundle, ctx):
     """The model's argmax for one context via the fieldrun binary (build-time refs oracle; faithful == the model).
     bundle is the .fieldrun stem. Used for large models where the whole.dl forward is too slow to run in souffle —

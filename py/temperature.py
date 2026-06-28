@@ -19,7 +19,7 @@ import os, sys, json, math, subprocess, tempfile
 from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from minimize import instances
-from oracle import logits as model_logits, _run
+from oracle import logits as model_logits, serve_topk, _run
 
 E = "2.718281828459045"
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -146,6 +146,8 @@ def main():
     T_lo = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5    # T_min (cold end — sizes the grouping)
     name = os.path.basename(md.rstrip("/"))
     whole = os.path.join(md, "whole.dl")
+    serve = os.environ.get("FIELDRUN_SERVE")                   # logits from a resident server (big models) or whole.dl (pure)
+    get_lg = (lambda ctx: serve_topk(int(serve), ctx)) if serve else (lambda ctx: model_logits(whole, ctx))
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
     cache_p = os.path.join(md, "logit_cache.json")
@@ -154,7 +156,7 @@ def main():
     print(f"=== temperature · {name} · {len(insts)} windows · T∈[{T_lo},{T}] ε={eps} ===")
     for j, ctx in enumerate(insts):
         if key(ctx) not in cache:
-            lg = model_logits(whole, ctx)
+            lg = get_lg(ctx)
             if lg:
                 cache[key(ctx)] = lg
             if j % 50 == 0:
