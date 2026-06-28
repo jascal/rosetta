@@ -1,0 +1,41 @@
+// rosetta · primitives.dl — the relational PRIMITIVE library the idiom-learner composes over.
+//
+// These are ergo/core.dl's domain-general inference relations GROUNDED in the token context tok(inst,pos,id): the
+// low-level vocabulary (few, general) from which the ILP/anti-unification learner builds idiom RULES (many, specific),
+// each then certified by dl/equiv.dl. Hand-coded detectors (ngram, induction, composed) are special cases the learner
+// rediscovers by combining these. See IDIOM_LEARNER.md.
+//
+// Assumes tok(inst,pos,id) + mp(inst,m) (last position) are in scope (provided by the harness, as in equiv.dl).
+
+// ---- equality across positions (core.dl `eq`/congruence, grounded) — basis for copy / agreement / repetition --------
+.decl same_tok(inst:number, p1:number, p2:number)          // two positions hold the SAME token
+same_tok(I, P1, P2) :- tok(I, P1, X), tok(I, P2, X), P1 != P2.
+
+// ---- previous occurrence (induction's core) — the most recent earlier copy of the last token ------------------------
+.decl prev_occ(inst:number, j:number)                      // last token recurs at j (< lastpos)
+prev_occ(I, J) :- mp(I, P), tok(I, P, X), tok(I, J, X), J < P.
+.decl last_prev_occ(inst:number, j:number)                 // the MOST RECENT such j (induction looks here)
+last_prev_occ(I, J) :- prev_occ(I, _), J = max JJ : { prev_occ(I, JJ) }.
+
+// ---- relative position (the structural skeleton: "k tokens back") ---------------------------------------------------
+.decl at_offset(inst:number, k:number, id:number)          // token k back from the last position
+at_offset(I, K, X) :- mp(I, P), tok(I, P - K, X).
+
+// ---- ordering / arithmetic (core.dl `greater`/`num`, grounded) — temporal/spatial + state-update (composed i+j) -----
+// operand VALUE of a token is supplied per-model as a fact (e.g. threx bearing→strength); the learner searches over it.
+.decl tok_val(id:number, v:number)        .input tok_val   // optional: token → numeric value (strengths, digits, …)
+.decl greater_tok(inst:number, p1:number, p2:number)       // token at p1 has greater value than at p2
+greater_tok(I, P1, P2) :- tok(I, P1, A), tok(I, P2, B), tok_val(A, VA), tok_val(B, VB), VA > VB.
+.decl sum_at(inst:number, k1:number, k2:number, s:number)  // sum of the values at offsets k1,k2 (state-update building block)
+sum_at(I, K1, K2, S) :- at_offset(I, K1, A), at_offset(I, K2, B), tok_val(A, VA), tok_val(B, VB), S = VA + VB.
+
+// ---- transitivity scaffold (core.dl: is-a/implies/extends are all transitive closure over a binary relation) --------
+// the learner can instantiate this over any model-supplied binary edge(inst,a,b) to learn inheritance/ordering chains.
+.decl edge(inst:number, a:number, b:number)   .input edge
+.decl reach(inst:number, a:number, b:number)               // transitive closure (inheritance / ordering / reachability)
+reach(I, A, B) :- edge(I, A, B).
+reach(I, A, C) :- reach(I, A, B), edge(I, B, C).
+
+// The learner proposes candidate next-token rules whose body is a conjunction of the relations above (+ the n-gram
+// suffix match), variabilizing the output via same_tok/last_prev_occ/sum_at/reach etc.; dl/equiv.dl certifies each and
+// the holdout split scores its generalization. Nothing here predicts on its own — it's the search vocabulary.
