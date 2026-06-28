@@ -38,6 +38,18 @@ def detect(insts, refs, w):
         return {k: n for k, n in rows("orderhist.csv")}, {i: k for i, k in rows("minorder.csv")}
 
 
+def serve_decide(port, ctx):
+    """The model's argmax via a RESIDENT fieldrun server (`fieldrun --bundle <stem> --serve <port>`): POST /predict
+    {"ids":[…]} -> {"next": id}. Loads the bundle ONCE (vs subprocess-per-call which reloads it every time) — essential
+    for big models (a 1B int8 bundle is 1.2 GB to reload). Build-time refs oracle only; no runtime dependency."""
+    import urllib.request, json
+    data = json.dumps({"ids": [int(t) for t in ctx]}).encode()
+    req = urllib.request.Request(f"http://127.0.0.1:{port}/predict", data=data,
+                                 headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=300) as r:
+        return json.loads(r.read())["next"]
+
+
 def fieldrun_decide(bundle, ctx):
     """The model's argmax for one context via the fieldrun binary (build-time refs oracle; faithful == the model).
     bundle is the .fieldrun stem. Used for large models where the whole.dl forward is too slow to run in souffle —

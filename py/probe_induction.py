@@ -15,7 +15,9 @@ import sys, os, random
 from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from oracle import fieldrun_decide
+from oracle import fieldrun_decide, serve_decide
+
+_SERVE = os.environ.get("FIELDRUN_SERVE")   # a resident `fieldrun --serve <port>` — loads the bundle once (big models)
 
 VLO, VHI = 200, 40000   # sample novel tokens from a mid-vocab range (avoids specials / very rare ids)
 
@@ -29,15 +31,16 @@ def main():
     def dec(ctx):
         k = tuple(ctx)
         if k not in cache:
-            cache[k] = fieldrun_decide(bundle, ctx)
+            cache[k] = serve_decide(int(_SERVE), ctx) if _SERVE else fieldrun_decide(bundle, ctx)
         return cache[k]
 
     def fill(ctxs, workers=8):
         miss = list({tuple(c) for c in ctxs} - set(cache))
         if not miss:
             return
-        with ThreadPoolExecutor(max_workers=workers) as ex:
-            for c, o in zip(miss, ex.map(lambda t: fieldrun_decide(bundle, list(t)), miss)):
+        d = (lambda t: serve_decide(int(_SERVE), list(t))) if _SERVE else (lambda t: fieldrun_decide(bundle, list(t)))
+        with ThreadPoolExecutor(max_workers=(2 if _SERVE else workers)) as ex:   # server is sequential; few clients suffice
+            for c, o in zip(miss, ex.map(d, miss)):
                 cache[c] = o
 
     # repeated NOVEL sequences S + S[:k]: predict S[k], reachable only by copying the first occurrence

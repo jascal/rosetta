@@ -50,7 +50,10 @@ def ref_source(md):
     whole-model Datalog program (pure). Returns (label, fn) where fn(ctx) -> argmax. fieldrun is build-time only; the
     minimized circuits.dl it certifies has no fieldrun dependency at runtime (see AGENTS runtime-independence invariant)."""
     import glob
-    from oracle import fieldrun_decide
+    from oracle import fieldrun_decide, serve_decide
+    serve = os.environ.get("FIELDRUN_SERVE")               # a resident `fieldrun --serve <port>` (loads the bundle once)
+    if serve:
+        return ("fieldrun-serve", lambda ctx: serve_decide(int(serve), ctx))
     stem = os.path.join(md, "bundle")
     bundles = ([stem] if os.path.exists(stem + ".fieldrun.json")
                else [p[:-len(".fieldrun.json")] for p in glob.glob(os.path.join(md, "*.fieldrun.json"))])
