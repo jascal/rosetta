@@ -4,6 +4,24 @@
 .decl mp(inst:number,m:number)
 mp(I,M) :- M = max P : { tok(I,P,_) }.
 .decl ctxlogit(inst:number,token:number,s:float)
+.decl cval(id:number,v:number)
+cval(21,0).
+cval(22,1).
+cval(23,2).
+cval(24,3).
+cval(25,4).
+.decl csum_logit(s:number,token:number,sc:float)
+csum_logit(0,10,16.77562249601935).
+csum_logit(2,12,14.212692134933103).
+csum_logit(3,13,16.582374426603305).
+csum_logit(5,27,15.018880885414363).
+csum_logit(6,28,16.803193612936802).
+csum_logit(8,30,16.790170490249693).
+.decl comp_ctxlogit(inst:number,token:number,s:float)
+comp_ctxlogit(I,Tk,SC) :- mp(I,P), tok(I,P,7), tok(I,Pm1,19), tok(I,Pm2,19), tok(I,Pm5,20), tok(I,Pm6,0), tok(I,Pm7,1), tok(I,Pm3,A), tok(I,Pm4,B), cval(A,VA), cval(B,VB), csum_logit(VA+VB,Tk,SC), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7.
+.decl comp_any(inst:number)
+comp_any(I) :- comp_ctxlogit(I,_,_).
+ctxlogit(I,Tk,S) :- comp_ctxlogit(I,Tk,S).
 .decl gram2d(c0:number,token:number,s:float)
 .decl gram2d_any(inst:number)
 gram2d(18,1,18.666889466559926).
@@ -235,13 +253,11 @@ gram6d(18,1,0,20,23,23,9.473974255378877).
 gram6d(18,1,0,20,23,24,9.390318193885907).
 gram6d(18,1,0,20,23,21,9.290686376545805).
 gram6d(18,1,0,20,23,22,9.14910271310809).
-gram6d(23,24,19,19,7,27,15.018880885414363).
 gram6d(27,1,0,20,22,25,9.576562227071706).
 gram6d(27,1,0,20,22,24,9.513323646452841).
 gram6d(27,1,0,20,22,23,9.464607850474493).
 gram6d(27,1,0,20,22,21,9.264951251099289).
 gram6d(27,1,0,20,22,22,9.203179620348532).
-gram6d(22,25,19,19,7,27,16.7330244743572).
 gram6d(27,1,0,14,19,3,11.069132736023633).
 gram6d(27,1,0,14,19,5,11.023530215440175).
 gram6d(27,1,0,14,19,4,10.959048379301661).
@@ -255,7 +271,6 @@ gram6d(10,1,0,20,23,22,9.494832881848495).
 gram6d(10,1,0,20,23,25,9.421132354387108).
 gram6d(10,1,0,20,23,23,9.370946765501069).
 gram6d(10,1,0,20,23,21,9.230568260526441).
-gram6d(23,25,19,19,7,28,16.803193612936802).
 gram6d(28,1,0,5,8,28,7.7672250424562845).
 gram6d(28,1,0,5,8,29,7.742113871303461).
 gram6d(28,1,0,5,8,27,7.737538357031871).
@@ -290,7 +305,6 @@ gram6d(27,1,0,20,25,25,9.12006510891355).
 gram6d(27,1,0,20,25,23,9.109004022207559).
 gram6d(27,1,0,20,25,22,9.098421561804923).
 gram6d(27,1,0,20,25,21,8.928126484388219).
-gram6d(25,23,19,19,7,28,16.36878576789728).
 gram6d(16,1,0,5,6,30,7.982756326200868).
 gram6d(16,1,0,5,6,10,7.946187488800492).
 gram6d(16,1,0,5,6,11,7.804905172907935).
@@ -308,7 +322,6 @@ gram6d(4,17,1,0,20,21,9.372115897307884).
 gram6d(4,17,1,0,20,24,9.301254701847455).
 gram6d(4,17,1,0,20,23,9.237789363526462).
 gram6d(4,17,1,0,20,22,9.228434236257835).
-gram6d(23,22,19,19,7,13,16.582374426603305).
 gram6d(13,1,0,5,6,28,7.919394396485722).
 gram6d(13,1,0,5,6,30,7.824775444598295).
 gram6d(13,1,0,5,6,29,7.798709061376471).
@@ -355,7 +368,6 @@ gram6d(13,1,0,20,25,23,9.193929232323315).
 gram6d(13,1,0,20,25,25,9.191073322012478).
 gram6d(13,1,0,20,25,24,9.104759014253958).
 gram6d(13,1,0,20,25,21,9.070206771969339).
-gram6d(25,22,19,19,7,27,14.601105717530132).
 gram6d(27,1,0,5,8,27,7.782890019676965).
 gram6d(27,1,0,5,8,13,7.672997096349204).
 gram6d(27,1,0,5,8,28,7.648658170871942).
@@ -365,7 +377,6 @@ gram6d(27,1,0,5,8,26,7.617850088865598).
 gram6d(27,1,0,5,8,30,7.593534653892879).
 gram6d(27,1,0,5,8,12,7.526510262423809).
 gram6d(27,1,0,5,8,10,7.374765641106178).
-gram6d(22,23,19,19,7,13,15.564210845954939).
 gram6d(13,1,0,14,19,5,11.105823552048928).
 gram6d(13,1,0,14,19,3,11.007207376565141).
 gram6d(13,1,0,14,19,4,10.870167862789726).
@@ -387,15 +398,11 @@ gram6d(18,1,0,20,22,25,9.606689747254437).
 gram6d(18,1,0,20,22,21,9.292165225924272).
 gram6d(18,1,0,20,22,24,9.249168428954617).
 gram6d(18,1,0,20,22,22,9.18562060878687).
-gram6d(22,22,19,19,7,12,14.212692134933103).
-gram6d(23,21,19,19,7,12,16.874779345458194).
-gram6d(21,24,19,19,7,13,17.284873473152924).
 gram6d(13,1,0,20,23,25,9.601851122968798).
 gram6d(13,1,0,20,23,24,9.420879315643893).
 gram6d(13,1,0,20,23,22,9.382113198864369).
 gram6d(13,1,0,20,23,23,9.242474126952175).
 gram6d(13,1,0,20,23,21,9.212267722948363).
-gram6d(21,21,19,19,7,10,16.77562249601935).
 gram6d(10,1,0,3,6,30,7.952011164377338).
 gram6d(10,1,0,3,6,27,7.8025742411079495).
 gram6d(10,1,0,3,6,29,7.798875105972173).
@@ -408,7 +415,6 @@ gram6d(10,1,0,3,6,11,7.610532089689299).
 gram6d(13,2,1,0,5,7,12.081681199499085).
 gram6d(13,2,1,0,5,18,11.01889968145322).
 gram6d(13,2,1,0,5,17,10.985179536305656).
-gram6d(25,25,19,19,7,30,16.790170490249693).
 gram6d(7,10,1,0,20,25,9.44004729168692).
 gram6d(7,10,1,0,20,24,9.408990678040913).
 gram6d(7,10,1,0,20,23,9.329693041730705).
@@ -689,14 +695,14 @@ gram9d(2,1,0,5,7,13,1,0,14,6.565051879052787).
 gram9d(2,1,0,5,7,13,1,0,15,6.508231874613381).
 gram9d(2,1,0,5,7,13,1,0,16,6.291288827450478).
 gram9d_any(I) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,_,_).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S), !comp_any(I).
 
 // --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---
 .decl lmax(inst:number,m:float)

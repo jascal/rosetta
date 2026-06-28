@@ -70,11 +70,46 @@ def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
     return rules, remaining
 
 
-def emit_T(out_path, rules, w):
+def build_threx_compose(insts, logmap, idxs, T_hi, eps):
+    """The threx COMPOSE idiom (discovered by idiom_learn) carrying a DISTRIBUTION: operands @4,@5 are bearings, strength
+    = id-21, sum → top-K logits. Validated: a composed context's full distribution depends only on the sum (within-sum
+    TV≈0), so one sum→logits table generalizes the distribution to operand pairs never seen — not just the argmax."""
+    BRG = set(range(21, 26))
+    frame = {1: 7, 2: 19, 3: 19, 6: 20, 7: 0, 8: 1}            # gɪ · · ∿ ⟨ ⟩ — the learned compose frame
+    composed = [i for i in idxs if len(insts[i]) >= 8 and insts[i][-4] in BRG and insts[i][-5] in BRG
+                and all(insts[i][-o] == t for o, t in frame.items())]
+    if not composed:
+        return None
+    bysum = defaultdict(list)
+    for i in composed:
+        bysum[(insts[i][-4] - 21) + (insts[i][-5] - 21)].append(i)
+    csum = {s: topk(logmap[mem[0]], T_hi, eps) for s, mem in bysum.items()}
+    return dict(frame=frame, k1=4, k2=5, valmap={b: b - 21 for b in BRG}, csum=csum, covered=set(composed))
+
+
+def emit_T(out_path, rules, w, compose=None):
     L = ["// rosetta · circuits.t.dl — T-PARAMETERIZED: rules carry top-K logits (incidence); softmax(logits/T) at query.",
          "// tok(inst,pos,id) + temp(t) provided by the includer (run.t.dl). cdist(inst,token,prob) is the distribution at T.",
          "", ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number,token:number,s:float)"]
+    comp_guard = ""
+    if compose:                                                  # the COMPOSE idiom carrying a DISTRIBUTION (sum → top-K logits)
+        k1, k2, vm, csum = compose["k1"], compose["k2"], compose["valmap"], compose["csum"]
+        pm, eqns = {}, []                                        # position vars for the frame + operand offsets
+        for off in sorted(set(list(compose["frame"]) + [k1, k2])):
+            pm[off] = "P" if off == 1 else f"Pm{off - 1}"
+            if off != 1:
+                eqns.append(f"Pm{off - 1}=P-{off - 1}")
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[o]},{t})" for o, t in sorted(compose["frame"].items())]
+        atoms += [f"tok(I,{pm[k1]},A)", f"tok(I,{pm[k2]},B)", "cval(A,VA)", "cval(B,VB)", "csum_logit(VA+VB,Tk,SC)"]
+        L += [".decl cval(id:number,v:number)"] + [f"cval({t},{v})." for t, v in sorted(vm.items())]
+        L += [".decl csum_logit(s:number,token:number,sc:float)"]
+        L += [f"csum_logit({s},{t},{sc})." for s in sorted(csum) for t, sc in csum[s]]
+        L += [".decl comp_ctxlogit(inst:number,token:number,s:float)",
+              f"comp_ctxlogit(I,Tk,SC) :- {', '.join(atoms + eqns)}.",
+              ".decl comp_any(inst:number)", "comp_any(I) :- comp_ctxlogit(I,_,_).",
+              "ctxlogit(I,Tk,S) :- comp_ctxlogit(I,Tk,S)."]    # compose wins (highest priority)
+        comp_guard = ", !comp_any(I)"
     bylen = defaultdict(dict)
     for suf, kept in rules.items():
         bylen[len(suf)][suf] = kept
@@ -95,7 +130,7 @@ def emit_T(out_path, rules, w):
         eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
         pull = f"gram{N}d({','.join(f'C{i}' for i in range(n))},Tk,S)"
         guard = "".join(f", !gram{m+1}d_any(I)" for m in lens if m > n)
-        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}.")
+        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}{comp_guard}.")
     L += ["", "// --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---",
           ".decl lmax(inst:number,m:float)", "lmax(I,M) :- mp(I,_), M = max S : { ctxlogit(I,_,S) }.",
           ".decl wexp(inst:number,token:number,w:float)",
@@ -164,11 +199,17 @@ def main():
     json.dump(cache, open(cache_p, "w"))
     logmap = {i: [(int(v), float(s)) for v, s in cache[key(insts[i])]] for i in range(len(insts)) if key(insts[i]) in cache}
     idxs = sorted(logmap)
-    rules, remaining = dist_cover(insts, logmap, idxs, T_lo, T, eps, w)
+    compose = build_threx_compose(insts, logmap, idxs, T, eps) if "--compose" in sys.argv else None
+    cover_idxs = [i for i in idxs if not (compose and i in compose["covered"])]
+    rules, remaining = dist_cover(insts, logmap, cover_idxs, T_lo, T, eps, w)
     out = os.path.join(md, "circuits.t.dl")
-    emit_T(out, rules, w)
+    emit_T(out, rules, w, compose=compose)
     Ks = [len(v) for v in rules.values()]
-    print(f"distributional cover: {len(rules)} rules for {len(idxs)} windows (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
+    if compose:
+        cks = [len(v) for v in compose["csum"].values()]
+        print(f"COMPOSE idiom carrying a distribution: 1 sum→logits table ({len(compose['csum'])} sums, top-K mean "
+              f"{sum(cks)/len(cks):.1f}) covers {len(compose['covered'])} composed windows — generalizes the distribution.")
+    print(f"distributional n-gram cover: {len(rules)} rules for {len(cover_idxs)} windows (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
           + (f"; {len(remaining)} uncovered" if remaining else "") + f" → {out}")
     grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
     ok_all = True
