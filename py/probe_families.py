@@ -173,6 +173,106 @@ def family_temporal(tok, port, n=40):
     return det / trials, cfollow / trials
 
 
+def family_syllogism(tok, port, n=40):
+    """universal instantiation: 'Every Y is Z. name is a Y. So name is' → Z. Causal: change Z → conclusion follows."""
+    sn, sa, sN = single(tok, NAMES), single(tok, ADJ), single(tok, NOUNS)
+    if len(sn) < 3 or len(sa) < 3 or len(sN) < 2:
+        return None
+    names, adjs, nouns = list(sn), list(sa), list(sN)
+    rng = random.Random(7)
+    det = cf = tr = 0
+    for _ in range(n):
+        x, y, (z, z2) = rng.choice(names), rng.choice(nouns), rng.sample(adjs, 2)
+        det += in_topk(port, tok.encode(f"Every{y} is{z}.{x} is a{y}. So{x} is").ids, sa[z])
+        cf += in_topk(port, tok.encode(f"Every{y} is{z2}.{x} is a{y}. So{x} is").ids, sa[z2]); tr += 1
+    return det / tr, cf / tr
+
+
+def family_spatial(tok, port, n=40):
+    """spatial relational composition: 'X left of Y. Y left of Z. So X left of' → Z. Causal: change Z."""
+    s = single(tok, NOUNS)
+    nn = list(s)
+    if len(nn) < 6:
+        return None
+    rng = random.Random(8)
+    det = cf = tr = 0
+    for _ in range(n):
+        x, y, z, z2 = rng.sample(nn, 4)
+        det += in_topk(port, tok.encode(f"The{x} is left of the{y}. The{y} is left of the{z}. So the{x} is left of the").ids, s[z])
+        cf += in_topk(port, tok.encode(f"The{x} is left of the{y}. The{y} is left of the{z2}. So the{x} is left of the").ids, s[z2]); tr += 1
+    return det / tr, cf / tr
+
+
+def family_set(tok, port, n=40):
+    """set membership / intersection: 'A has a P and a Q. B has a P. The one with the Q is' → A. Causal: swap who has Q."""
+    sn, sN = single(tok, NAMES), single(tok, NOUNS)
+    if len(sn) < 3 or len(sN) < 3:
+        return None
+    names, nouns = list(sn), list(sN)
+    rng = random.Random(10)
+    det = cf = tr = 0
+    for _ in range(n):
+        x, y = rng.sample(names, 2)
+        p, q = rng.sample(nouns, 2)
+        det += in_topk(port, tok.encode(f"{x} has a{p} and a{q}.{y} has a{p}. The one with the{q} is").ids, sn[x])
+        cf += in_topk(port, tok.encode(f"{y} has a{p} and a{q}.{x} has a{p}. The one with the{q} is").ids, sn[y]); tr += 1
+    return det / tr, cf / tr
+
+
+def family_defeasible(tok, port, n=40):
+    """defeasible / exception override: 'Most Y can V. An X is a Y that cannot V. Can an X V? Answer:' → No (exception
+    beats the default). Causal: drop the exception → Yes (default applies)."""
+    yes, no = single(tok, [" Yes"]), single(tok, [" No"])
+    s = single(tok, NOUNS)
+    if not yes or not no or len(s) < 4:
+        return None
+    yid, nid = yes[" Yes"], no[" No"]
+    nn = list(s)
+    rng = random.Random(11)
+    det = cf = tr = 0
+    for _ in range(n):
+        x, y = rng.sample(nn, 2)
+        det += in_topk(port, tok.encode(f"Most{y} can swim. A{x} is a{y} that cannot swim. Can a{x} swim? Answer:").ids, nid)
+        cf += in_topk(port, tok.encode(f"Most{y} can swim. A{x} is a{y}. Can a{x} swim? Answer:").ids, yid); tr += 1
+    return det / tr, cf / tr
+
+
+def family_analogy(tok, port, n=40):
+    """analogy / structure-mapping: 'c1 is to cap1 as c2 is to' → cap2 (the relation is INFERRED from the first pair,
+    not named). Causal: change c2 → the mapped target follows the relation."""
+    p = {a: b for a, b in CAPITALS if a in single(tok, [a]) and b in single(tok, [b])}
+    sb = single(tok, [b for _, b in CAPITALS])
+    keys = list(p)
+    if len(keys) < 4:
+        return None
+    rng = random.Random(12)
+    det = cf = tr = 0
+    for _ in range(n):
+        c1, c2, c3 = rng.sample(keys, 3)
+        det += in_topk(port, tok.encode(f"{c1} is to{p[c1]} as{c2} is to").ids, sb[p[c2]])
+        cf += in_topk(port, tok.encode(f"{c1} is to{p[c1]} as{c3} is to").ids, sb[p[c3]]); tr += 1
+    return det / tr, cf / tr
+
+
+def family_causal(tok, port, n=40):
+    """causal do-vs-see (intervention): 'A turns on B. B turns on C. We unplug B. Is C on?' → No (intervention breaks the
+    chain), vs the observational control 'A is on. Is C on?' → Yes. The family is real iff the model distinguishes do
+    from see — both the intervention(No) AND the control(Yes) must hold (the do-calculus asymmetry)."""
+    yes, no = single(tok, [" Yes"]), single(tok, [" No"])
+    s = single(tok, NOUNS)
+    if not yes or not no or len(s) < 4:
+        return None
+    yid, nid = yes[" Yes"], no[" No"]
+    nn = list(s)
+    rng = random.Random(13)
+    interv = ctrl = tr = 0
+    for _ in range(n):
+        a, b, c = rng.sample(nn, 3)
+        interv += in_topk(port, tok.encode(f"The{a} turns on the{b}. The{b} turns on the{c}. We unplug the{b}. The{a} is on. Is the{c} on? Answer:").ids, nid)
+        ctrl += in_topk(port, tok.encode(f"The{a} turns on the{b}. The{b} turns on the{c}. The{a} is on. Is the{c} on? Answer:").ids, yid); tr += 1
+    return interv / tr, ctrl / tr
+
+
 def main():
     md = sys.argv[1] if len(sys.argv) > 1 else "models/llama32_1b"
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 40
@@ -188,7 +288,13 @@ def main():
               ("antonym (opposite-of)", lambda: family_pairs(tok, port, ANTONYMS, lambda a: f"The opposite of{a} is", n)),
               ("is-a transitivity", lambda: family_transitive(tok, port, n)),
               ("modus ponens", lambda: family_mp(tok, port, n)),
-              ("temporal ordering", lambda: family_temporal(tok, port, n))]
+              ("temporal ordering", lambda: family_temporal(tok, port, n)),
+              ("syllogism (instantiation)", lambda: family_syllogism(tok, port, n)),
+              ("spatial (left-of)", lambda: family_spatial(tok, port, n)),
+              ("set membership (∩)", lambda: family_set(tok, port, n)),
+              ("defeasible (exception)", lambda: family_defeasible(tok, port, n)),
+              ("analogy (a:b::c:?)", lambda: family_analogy(tok, port, n)),
+              ("causal do-vs-see", lambda: family_causal(tok, port, n))]
     for label, fn in probes:
         r = fn()
         if r is None:
