@@ -92,3 +92,19 @@ collapses to one rule, free-choice *priors* are len-1 lookups, the rest are sele
 Next is **breadth**: minimize *tens* of small models to confirm the rewrite-rule / idiom library is complete and general
 — the Rosetta Stone proves the method on one; confidence comes from many. `proved`/`empirical`/`open` tags gate every
 claim.
+
+## Frontiers (revisit later)
+
+- **Temperature-parameterized completeness.** Today's `circuits.dl` is the **T=0 (greedy)** corner: each context → its
+  **argmax** (top-1), exact. "Complete for this corpus at temperatures {T₁…T_N}" reduces to **complete up to `T_max`**
+  (the softmax tail only grows with T, so the hottest point dominates): make each rule a **top-K distribution** (token +
+  logit, from fieldrun's `logit` scoreboard) with **K chosen so the elided tail's softmax mass is provably < ε at
+  `T_max`** — the rank-1 shortlist certificate generalized from argmax-equality to a *distributional* bound (TV/KL). The
+  `run.dl` harness then softmax-samples the kept logits at any supported T, making `circuits.dl` a faithful **sampler**,
+  not just a greedy predictor. Spectrum: `T=0` → argmax (exact, most compressible); `T≤T_max` → top-K + logits
+  (distributional certificate, larger K, less compressible); `T→∞` → ≈ the full unembed (minimization buys nothing). So
+  `T_max` is the knob trading fidelity-range against compression. *Not built yet — slot after the detector library.*
+- **Non-n-gram circuit detectors** beyond `ngram.dl`/`induction.dl` — agreement, delimiter/bracket-matching, coreference
+  — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
+- **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing
+  control-char tokens (tab/newline); `<0xNN>` rendering for byte-fallback tokens in the lexicon.
