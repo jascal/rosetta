@@ -116,6 +116,63 @@ def family_pairs(tok, port, pairs, template, n=40):
     return det / trials, cfollow / trials
 
 
+NOUNS = [" dog", " cat", " bird", " fish", " tree", " rock", " star", " car", " boat", " house",
+         " king", " wolf", " lion", " bear", " duck", " frog", " horse", " sheep", " goat", " mouse"]
+ADJ = [" red", " big", " hot", " soft", " loud", " green", " tall", " round", " sharp", " heavy",
+       " blue", " small", " cold", " hard", " quiet", " short", " flat", " light", " smooth", " warm"]
+
+
+def family_transitive(tok, port, n=40):
+    """is-a / inheritance transitivity over STATED (arbitrary) facts: 'A X is a Y. A Y is a Z. So a X is a' → Z. Nonce
+    chains so world knowledge can't shortcut it; causal: change the 2nd premise's Z → the conclusion follows (it's
+    reasoning over the stated chain, not recalling)."""
+    s = single(tok, NOUNS)
+    nn = list(s)
+    if len(nn) < 6:
+        return None
+    rng = random.Random(4)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        x, y, z, z2 = rng.sample(nn, 4)
+        det += in_topk(port, tok.encode(f"A{x} is a{y}. A{y} is a{z}. So a{x} is a").ids, s[z])
+        cfollow += in_topk(port, tok.encode(f"A{x} is a{y}. A{y} is a{z2}. So a{x} is a").ids, s[z2])
+        trials += 1
+    return det / trials, cfollow / trials
+
+
+def family_mp(tok, port, n=40):
+    """modus ponens: 'If something is A, it is B. This is A. So this is' → B. Causal: change the consequent B → the
+    conclusion follows (the model applies the stated conditional, given the antecedent holds)."""
+    s = single(tok, ADJ)
+    aa = list(s)
+    if len(aa) < 4:
+        return None
+    rng = random.Random(5)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        a, b, b2 = rng.sample(aa, 3)
+        det += in_topk(port, tok.encode(f"If something is{a}, it is{b}. This is{a}. So this is").ids, s[b])
+        cfollow += in_topk(port, tok.encode(f"If something is{a}, it is{b2}. This is{a}. So this is").ids, s[b2])
+        trials += 1
+    return det / trials, cfollow / trials
+
+
+def family_temporal(tok, port, n=40):
+    """temporal/ordering transitivity: 'X before Y. Y before Z. So X before' → Z. Causal: change Z → conclusion follows."""
+    s = single(tok, NOUNS)
+    nn = list(s)
+    if len(nn) < 6:
+        return None
+    rng = random.Random(6)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        x, y, z, z2 = rng.sample(nn, 4)
+        det += in_topk(port, tok.encode(f"{x} comes before{y}.{y} comes before{z}. So{x} comes before").ids, s[z])
+        cfollow += in_topk(port, tok.encode(f"{x} comes before{y}.{y} comes before{z2}. So{x} comes before").ids, s[z2])
+        trials += 1
+    return det / trials, cfollow / trials
+
+
 def main():
     md = sys.argv[1] if len(sys.argv) > 1 else "models/llama32_1b"
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 40
@@ -128,7 +185,10 @@ def main():
               ("succession (months)", lambda: family_succession(tok, port, MONTHS, "months", n)),
               ("coreference (gender)", lambda: family_coreference(tok, port, n)),
               ("relation (capital-of)", lambda: family_pairs(tok, port, CAPITALS, lambda a: f"The capital of{a} is", n)),
-              ("antonym (opposite-of)", lambda: family_pairs(tok, port, ANTONYMS, lambda a: f"The opposite of{a} is", n))]
+              ("antonym (opposite-of)", lambda: family_pairs(tok, port, ANTONYMS, lambda a: f"The opposite of{a} is", n)),
+              ("is-a transitivity", lambda: family_transitive(tok, port, n)),
+              ("modus ponens", lambda: family_mp(tok, port, n)),
+              ("temporal ordering", lambda: family_temporal(tok, port, n))]
     for label, fn in probes:
         r = fn()
         if r is None:
