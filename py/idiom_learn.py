@@ -21,7 +21,7 @@ it alone. select = one causal operand (lookup); compose = two operands (computat
 """
 import os, sys, json, itertools
 from collections import defaultdict, Counter
-from minimize import instances, model_refs, ref_source
+from minimize import instances, model_refs, ref_source, minimal_suffix_cover
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MINCOV, MAXF = 4, 4
@@ -259,10 +259,43 @@ def learn_relational(insts, refs, idxs, decide_fn, fill=None, maxL=3, ntest=80):
     return out
 
 
+def idiom_coverage(insts, refs, idxs, gates, comps, rels):
+    """Which instances the CONFIRMED idioms predict correctly (the generalizing rules). The residual is everything left —
+    what the n-gram backfill must memoize. Idioms first, n-grams last: an n-gram is the cache of a rule, so we only
+    backfill what no learned idiom captured."""
+    covered, by = set(), {}
+    for b in gates:
+        c = {i for i in idxs if all(len(insts[i]) >= m and insts[i][-m] == v for m, v in b["frame"].items())
+             and len(insts[i]) >= b["k"] and insts[i][-b["k"]] in b["table"]
+             and refs[i] == b["table"][insts[i][-b["k"]]]}
+        by[f"select gate@{b['k']}"] = len(c); covered |= c
+    for b in comps:
+        c = set()
+        for i in idxs:
+            ctx = insts[i]
+            if all(len(ctx) >= m and ctx[-m] == v for m, v in b["frame"].items()) and len(ctx) >= max(b["k1"], b["k2"]):
+                a, bb = ctx[-b["k1"]], ctx[-b["k2"]]
+                if a in b["lab"] and bb in b["lab"] and refs[i] == b["bysum"].get(b["lab"][a] + b["lab"][bb]):
+                    c.add(i)
+        by[f"compose@{b['k1']}+{b['k2']}"] = len(c); covered |= c
+    for r in rels:
+        L, c = r["L"], set()
+        for i in idxs:
+            ctx = insts[i]
+            if len(ctx) > L:
+                suf = tuple(ctx[-L:]); js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+                if js and max(js) + L < len(ctx) and ctx[max(js) + L] == refs[i]:
+                    c.add(i)
+        by[f"induction L={L}"] = len(c); covered |= c
+    return covered, by
+
+
 def main():
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else 1400
-    w = int(sys.argv[2]) if len(sys.argv) > 2 else 8
-    md = sys.argv[3] if len(sys.argv) > 3 else os.path.join(HERE, "reference", "threx")
+    backfill = "--backfill" in sys.argv                       # optional: memoize the residual with the n-gram suffix cover
+    a = [x for x in sys.argv[1:] if not x.startswith("--")]
+    n = int(a[0]) if len(a) > 0 else 1400
+    w = int(a[1]) if len(a) > 1 else 8
+    md = a[2] if len(a) > 2 else os.path.join(HERE, "reference", "threx")
     md = md if os.path.isabs(md) else os.path.join(HERE, md)
     name = os.path.basename(md.rstrip("/"))
     sym = {i: t[0] for i, t in enumerate(json.load(open(os.path.join(md, "lexicon.json")))["tokens"])}
@@ -319,6 +352,19 @@ def main():
         else:
             tag = ""
         print(f"  induction L={r['L']}: applicable {r['applicable']}, observational {r['obs']:.0%}, causal {r['causal']:.0%}{tag}")
+
+    if backfill:
+        rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]
+        covered, by = idiom_coverage(insts, refs, idxs, real, real_c, rels_real)
+        residual = [i for i in idxs if i not in covered]
+        rules, remaining, _ = minimal_suffix_cover(insts, refs, residual, w)
+        print(f"\n=== n-gram BACKFILL (idioms first, memoize the residual last) ===")
+        print(f"  idioms (generalizing rules) cover {len(covered)}/{len(idxs)} = {len(covered)/len(idxs):.0%}"
+              + (f"  [{', '.join(f'{k}:{v}' for k, v in by.items() if v)}]" if any(by.values()) else "  [none — pure n-gram model]"))
+        print(f"  n-gram suffix cover memoizes the residual: {len(rules)} rules for {len(residual)} instances"
+              + (f", {len(remaining)} UNCOVERED (raise w)" if remaining else " (complete)"))
+        tot = len(real) + len(real_c) + len(rels_real) + len(rules)
+        print(f"  full circuit = {len(real)+len(real_c)+len(rels_real)} idioms + {len(rules)} n-gram rules = {tot} rules for {len(idxs)} decisions")
 
     print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
           "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")
