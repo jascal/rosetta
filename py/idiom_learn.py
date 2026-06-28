@@ -385,7 +385,8 @@ def main():
     backfill = "--backfill" in sys.argv                       # report idiom coverage + n-gram backfill stats
     emit = "--emit" in sys.argv                               # write circuits.dl + run.dl (idioms + n-gram cover, souffle-only)
     cert = "--certify" in sys.argv                            # prove the emitted circuits.dl == model via equiv.dl (cached refs)
-    a = [x for x in sys.argv[1:] if not x.startswith("--")]
+    cb = next((int(x.split("=")[1]) for x in sys.argv if x.startswith("--confirm=")), None)   # confirmation budget per family
+    a = [x for x in sys.argv[1:] if not x.startswith("--")]   # (cap candidates causally confirmed — big/slow models need a small one)
     n = int(a[0]) if len(a) > 0 else 1400
     w = int(a[1]) if len(a) > 1 else 8
     md = a[2] if len(a) > 2 else os.path.join(HERE, "reference", "threx")
@@ -414,7 +415,7 @@ def main():
                 _cache[c] = o
     print(f"=== idiom_learn · {name} · {len(idxs)} decisions (W={w}) — unsupervised, nothing hand-coded ===\n")
 
-    gates = learn_gates(insts, refs, idxs, w, decide_fn, fill=fill)
+    gates = learn_gates(insts, refs, idxs, w, decide_fn, max_confirm=(cb or 40), ntest=(6 if cb else 14), fill=fill)
     real = [b for b in gates if not b["viol"] and b["causal"] >= 0.8]
     print(f"frame-conditioned GATEs (select family) — {len(real)} REAL (faithful + causally confirmed) of {len(gates)} mined:\n")
     for b in real[:20]:
@@ -423,7 +424,7 @@ def main():
         print(f"  [causal {b['causal']:.0%}] GATE@{b['k']}  support={len(b['support'])}  ignore@{b['ignore']}")
         print(f"       frame[{fr}]")
         print(f"       {td}")
-    comps = learn_compose(insts, refs, idxs, w, decide_fn, fill=fill)
+    comps = learn_compose(insts, refs, idxs, w, decide_fn, max_confirm=(cb or 30), fill=fill)
     real_c = [b for b in comps if b["causal"] >= 0.8]
     print(f"\n2-operand COMPOSE idioms (compute family) — {len(real_c)} REAL (causally confirmed) of {len(comps)} mined:\n")
     for b in real_c[:10]:
