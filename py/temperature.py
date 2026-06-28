@@ -58,7 +58,8 @@ def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
     must check the whole [T_lo, T_hi] grid, not one endpoint), with the representative's top-K sized at the hot end (where
     the tail is fattest). Always terminates: at full-W each context is its own group (the per-context memorization corner)."""
     grid = trange(T_lo, T_hi)
-    rules, order_of, remaining = {}, {}, set(idxs)
+    half = eps / 2                                              # split the ε budget: group-consistency AND top-K truncation
+    rules, order_of, remaining = {}, {}, set(idxs)             # each < ε/2, so their compounded error stays < ε at certify
     dists = {i: {T: softmax(logmap[i], T) for T in grid} for i in idxs}
     for k in range(1, w + 1):
         groups = defaultdict(list)
@@ -66,8 +67,8 @@ def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
             groups[tuple(insts[i][-k:])].append(i)
         for suf, members in groups.items():
             rep = dists[members[0]]
-            if all(tv(rep[T], dists[i][T]) < eps for i in members for T in grid):   # consistent across the whole range
-                rules[suf] = topk(logmap[members[0]], T_hi, eps)
+            if all(tv(rep[T], dists[i][T]) < half for i in members for T in grid):   # consistent across the whole range
+                rules[suf] = topk(logmap[members[0]], T_hi, half)
                 for i in members:
                     order_of[i] = k
                 remaining -= set(members)
@@ -89,7 +90,7 @@ def build_threx_compose(insts, logmap, idxs, T_hi, eps):
     bysum = defaultdict(list)
     for i in composed:
         bysum[(insts[i][-4] - 21) + (insts[i][-5] - 21)].append(i)
-    csum = {s: topk(logmap[mem[0]], T_hi, eps) for s, mem in bysum.items()}
+    csum = {s: topk(logmap[mem[0]], T_hi, eps / 2) for s, mem in bysum.items()}
     return dict(frame=frame, k1=4, k2=5, valmap={b: b - 21 for b in BRG}, csum=csum, covered=set(composed))
 
 

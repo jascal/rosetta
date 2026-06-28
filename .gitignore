@@ -17,3 +17,4 @@ reference/*/whole.forward.dl
 models/*/*.fieldrun.json
 models/*/*.fieldrun.bin
 reference/*/logit_cache.json
+bundle.tokenizer.json
