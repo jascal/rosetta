@@ -429,6 +429,51 @@ def emit_circuits(out_path, gates, comps, rels, ngram_rules, w, name=""):
         f'#include "{os.path.basename(out_path)}"\n.output cdecide\n')
 
 
+def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, T=1.0, eps=0.02, T_lo=0.7):
+    """FINAL STEP of extraction: emit the CANONICAL distributional circuits.dl (+ run.dl + symbols twin) from the LEARNED
+    idioms carrying DISTRIBUTIONS. compose (sum→top-K logits) and select-gate (content→top-K logits) each keep a key only
+    where the model's softmax is CONSISTENT within that key's group across the T-range (temperature.dist_table) — so the
+    idiom genuinely carries+generalizes the distribution, certifiably; inconsistent contexts fall back to the n-gram cover.
+    Routing compose > gate > n-gram > induction(OOD). This is the distributional twin of emit_circuits, and the canonical
+    artifact (vs equiv.dl's exact-argmax cert on the crisp emit). Returns the across-range verdict."""
+    from temperature import dist_table, dist_cover, finalize          # the distributional machinery lives in temperature
+    cache_p = os.path.join(md, "logit_cache.json")
+    cache = json.load(open(cache_p)) if os.path.exists(cache_p) else {}
+    kf = lambda c: ",".join(map(str, c))
+    for j, i in enumerate(idxs):                                       # gather the T-invariant logit scoreboards (cached)
+        if kf(insts[i]) not in cache:
+            lg = get_lg(insts[i])
+            if lg:
+                cache[kf(insts[i])] = lg
+            if j % 50 == 0:
+                json.dump(cache, open(cache_p, "w")); print(f"   …{j}/{len(idxs)} logits")
+    json.dump(cache, open(cache_p, "w"))
+    logmap = {i: [(int(v), float(s)) for v, s in cache[kf(insts[i])]] for i in idxs if kf(insts[i]) in cache}
+    lidx = sorted(logmap)
+    idioms, covered = [], set()
+    for j, b in enumerate(comps):                                      # compose (highest priority) carrying a distribution
+        mem = [i for i in lidx if all(len(insts[i]) >= m and insts[i][-m] == v for m, v in b["frame"].items())
+               and len(insts[i]) >= max(b["k1"], b["k2"]) and insts[i][-b["k1"]] in b["lab"] and insts[i][-b["k2"]] in b["lab"]]
+        csum, bad = dist_table(insts, logmap, mem, lambda c, b=b: b["lab"][c[-b["k1"]]] + b["lab"][c[-b["k2"]]], T_lo, T, eps)
+        if csum:
+            idioms.append(dict(kind="compose", name=f"comp{j}", frame=b["frame"], k1=b["k1"], k2=b["k2"], valmap=b["lab"], csum=csum))
+            covered |= {i for i in mem if i not in bad}
+    for j, b in enumerate(gates):                                      # select-gate carrying a distribution
+        mem = [i for i in lidx if i not in covered and all(len(insts[i]) >= m and insts[i][-m] == v for m, v in b["frame"].items())
+               and len(insts[i]) >= b["k"] and insts[i][-b["k"]] in b["table"]]
+        tab, bad = dist_table(insts, logmap, mem, lambda c, b=b: c[-b["k"]], T_lo, T, eps)
+        if tab:
+            idioms.append(dict(kind="gate", name=f"gate{j}", frame=b["frame"], k=b["k"], tab=tab))
+            covered |= {i for i in mem if i not in bad}
+    residual = [i for i in lidx if i not in covered]                  # n-gram distributional backfill on the rest
+    rules, remaining = dist_cover(insts, logmap, residual, T_lo, T, eps, w)
+    induction = any(r["L"] == 1 for r in rels)                        # copy/induction OOD fallback (structural point-mass)
+    src = "a fieldrun --serve /topk server" if os.environ.get("FIELDRUN_SERVE") else ("whole.dl" if os.path.exists(os.path.join(md, "whole.dl")) else "the cached logits")
+    print(f"\n=== EMIT (canonical, distributional — the FINAL STEP of extraction) ===")
+    print(f"  learned idioms carrying distributions cover {len(covered)}/{len(lidx)} windows (the rest → n-gram backfill)")
+    return finalize(md, insts, logmap, lidx, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
+
+
 def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
     """The reframed learner: learn every family on TRAIN (causal-soundness = the gate), then GREEDILY admit the family
     with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
@@ -634,21 +679,31 @@ def main():
 
     if emit or cert:
         rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]   # induction → OOD fallback (below n-grams)
-        covered, _ = idiom_coverage(insts, refs, idxs, real, real_c, [])          # faithful idioms only (gate/compose)
-        residual = [i for i in idxs if i not in covered]
-        rules, remaining, _ = minimal_suffix_cover(insts, refs, residual, w)
-        out = os.path.join(md, "circuits.dl")
-        emit_circuits(out, real, real_c, rels_real, rules, w, name)
-        print(f"\n=== EMIT → {out} ===")
-        print(f"  {len(real_c)} compose + {len(real)} select-gate idioms (faithful, in-domain) cover {len(covered)}/{len(idxs)};"
-              f" {len(rules)} n-gram rules memoize the residual" + (f"; {len(remaining)} uncovered" if remaining else "")
-              + (f"; {len(rels_real)} induction OOD fallback" if rels_real else "") + ".  + run.dl (souffle-only harness).")
-        if cert:
+        if "--crisp" in sys.argv:                                 # legacy: crisp argmax circuits.dl + the EXACT equiv.dl cert
+            covered, _ = idiom_coverage(insts, refs, idxs, real, real_c, [])      # (research path; canonical artifact is the T one)
+            residual = [i for i in idxs if i not in covered]
+            rules, remaining, _ = minimal_suffix_cover(insts, refs, residual, w)
+            out = os.path.join(md, "circuits.dl")
+            emit_circuits(out, real, real_c, rels_real, rules, w, name)
+            print(f"\n=== EMIT (crisp/argmax) → {out} ===")
+            print(f"  {len(real_c)} compose + {len(real)} select-gate idioms (faithful, in-domain) cover {len(covered)}/{len(idxs)};"
+                  f" {len(rules)} n-gram rules memoize the residual" + (f"; {len(remaining)} uncovered" if remaining else "")
+                  + (f"; {len(rels_real)} induction OOD fallback" if rels_real else "") + ".  + run.dl (souffle-only harness).")
             from oracle import run_equiv
             r = run_equiv(out, [insts[i] for i in idxs], [refs[i] for i in idxs])
             ok = r.get("nmiss", 1) == 0 and r.get("nuncov", 1) == 0
-            print(f"  CERTIFY (equiv.dl): ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
+            print(f"  CERTIFY (equiv.dl, EXACT argmax): ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
                   + ("CERTIFIED — circuits.dl == model over the corpus (souffle-only)" if ok else "NOT certified"))
+        else:                                                     # CANONICAL (default): the distributional T circuits.dl + symbols,
+            from oracle import logits as model_logits, serve_topk  # learned idioms carrying distributions, as the FINAL STEP
+            serve = os.environ.get("FIELDRUN_SERVE"); whole = os.path.join(md, "whole.dl")
+            if serve:
+                get_lg = lambda c: serve_topk(int(serve), c)
+            elif os.path.exists(whole):
+                get_lg = lambda c: model_logits(whole, c)
+            else:
+                get_lg = lambda c: None                           # cache-only: regenerate from logit_cache.json
+            emit_canonical_T(md, insts, idxs, real, real_c, rels_real, w, sym, name, get_lg)
 
     print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
           "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")

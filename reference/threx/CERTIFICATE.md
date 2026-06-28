@@ -6,7 +6,7 @@ at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from w
 
 - domain: 300 decision windows (W=8)
 - range: T ∈ [0.7, 1.0], ε = 0.02
-- rules: 166 (1 compose idiom + 165 n-gram, top-K mean 4.1)
+- rules: 161 (1 compose, 2 select-gate + 158 n-gram, top-K mean 4.2)
 
 | T | contexts | max TV | verdict |
 |---|---|---|---|

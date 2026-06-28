@@ -54,6 +54,66 @@ def trange(T_lo, T_hi):
     return sorted({T_lo, round((T_lo + T_hi) / 2, 3), T_hi})
 
 
+def dist_table(insts, logmap, members, keyfn, T_lo, T_hi, eps):
+    """An idiom CARRIES A DISTRIBUTION iff, grouped by its key (compose sum / gate content value), the model's softmax is
+    consistent within the group across the T-grid (the same ε/2 test dist_cover uses). Returns ({key: top-K logits},
+    inconsistent-members) — a key whose group disagrees can't carry one faithful distribution, so its members fall back to
+    the n-gram cover. This is what 'the learned idiom carries + generalizes the distribution' means, made certifiable."""
+    grid = trange(T_lo, T_hi); half = eps / 2
+    groups = defaultdict(list)
+    for i in members:
+        groups[keyfn(insts[i])].append(i)
+    table, bad = {}, set()
+    for key, mem in groups.items():
+        rep = {T: softmax(logmap[mem[0]], T) for T in grid}
+        if all(tv(rep[T], softmax(logmap[i], T)) < half for i in mem for T in grid):
+            table[key] = topk(logmap[mem[0]], T_hi, half)
+        else:
+            bad.update(mem)
+    return table, bad
+
+
+def _pos(offsets):
+    """offset k (1 = last token) → souffle position var relative to mp P (offset1=P, offset k = Pm{k-1}=P-{k-1}).
+    Mirrors idiom_learn._positions so learned frames/operands emit at the same positions."""
+    pm, eqns = {}, []
+    for off in sorted(set(offsets)):
+        pm[off] = "P" if off == 1 else f"Pm{off - 1}"
+        if off != 1:
+            eqns.append(f"Pm{off - 1}=P-{off - 1}")
+    return pm, eqns
+
+
+def _idiom_lines(idiom, q, ktype):
+    """Datalog for ONE distributional idiom: its table facts + <name>_ctxlogit(I,token,logit) + <name>_any. q maps a token
+    id to its literal (str for ids, a quoting fn for symbols); ktype is 'number' or 'symbol'. Gate is a lookup (symbolizable);
+    compose is arithmetic over operand VALUES (ids only — the caller omits it from the symbol twin). Returns (lines, any_name)."""
+    nm = idiom["name"]
+    if idiom["kind"] == "gate":                                  # frame + content slot k → top-K logits per content value
+        frame, k, tab = idiom["frame"], idiom["k"], idiom["tab"]
+        pm, eqns = _pos(list(frame) + [k])
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[o]},{q(t)})" for o, t in sorted(frame.items())]
+        atoms += [f"tok(I,{pm[k]},K)", f"{nm}_tab(K,Tk,SC)"]
+        lines = [f".decl {nm}_tab(k:{ktype},token:{ktype},sc:float)   // select-gate carrying a distribution"]
+        lines += [f"{nm}_tab({q(key)},{q(t)},{s})." for key in sorted(tab) for t, s in tab[key]]
+        lines += [f".decl {nm}_ctxlogit(inst:number,token:{ktype},s:float)",
+                  f"{nm}_ctxlogit(I,Tk,SC) :- {', '.join(atoms + eqns)}.",
+                  f".decl {nm}_any(inst:number)", f"{nm}_any(I) :- {nm}_ctxlogit(I,_,_)."]
+        return lines, f"{nm}_any"
+    # compose: operands @k1,@k2 → values → sum → top-K logits (generalizes the distribution to unseen operand pairs)
+    frame, k1, k2, vm, csum = idiom["frame"], idiom["k1"], idiom["k2"], idiom["valmap"], idiom["csum"]
+    pm, eqns = _pos(list(frame) + [k1, k2])
+    atoms = ["mp(I,P)"] + [f"tok(I,{pm[o]},{t})" for o, t in sorted(frame.items())]
+    atoms += [f"tok(I,{pm[k1]},A)", f"tok(I,{pm[k2]},B)", f"{nm}_val(A,VA)", f"{nm}_val(B,VB)", f"{nm}_sum(VA+VB,Tk,SC)"]
+    lines = [f".decl {nm}_val(id:number,v:number)   // compose carrying a distribution"] + [f"{nm}_val({t},{v})." for t, v in sorted(vm.items())]
+    lines += [f".decl {nm}_sum(s:number,token:number,sc:float)"]
+    lines += [f"{nm}_sum({s},{t},{sc})." for s in sorted(csum) for t, sc in csum[s]]
+    lines += [f".decl {nm}_ctxlogit(inst:number,token:number,s:float)",
+              f"{nm}_ctxlogit(I,Tk,SC) :- {', '.join(atoms + eqns)}.",
+              f".decl {nm}_any(inst:number)", f"{nm}_any(I) :- {nm}_ctxlogit(I,_,_)."]
+    return lines, f"{nm}_any"
+
+
 def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
     """shortest suffix s.t. the group's softmax is consistent within eps at EVERY T across the range (the two error
     sources sit at opposite ends — group-divergence is worst cold for structured models, hot for diverse ones — so we
@@ -96,14 +156,18 @@ def build_threx_compose(insts, logmap, idxs, T_hi, eps):
     return dict(frame=frame, k1=4, k2=5, valmap={b: b - 21 for b in BRG}, csum=csum, covered=set(composed))
 
 
-def emit_symbols_T(path, rules, sym, name, compose=None):
+def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
     """The legible, RUNNABLE twin of circuits.dl: the SAME distributional rules carrying top-K logits, with token STRINGS
     instead of ids — a self-contained, symbol-typed souffle program that computes softmax(logits/T) at a queried temp.
-    A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. (The composed arithmetic idiom computes
-    over operand VALUES, not token lookups, so it can't be symbolized — it stays in circuits.dl; noted here.)"""
+    A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Select-GATE idioms symbolize (they are
+    token lookups); COMPOSE (arithmetic over operand values) and induction (a structural pointer) can't, so they stay in
+    circuits.dl and their contexts are omitted here (noted)."""
     safe = lambda s: "".join(c if (0x20 <= ord(c) != 0x7f) else f"<0x{ord(c):02X}>" for c in s)  # control chars → visible,
     esc = lambda s: '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'                       # TSV-safe & roundtrippable
     q = lambda t: esc(safe(sym[t])) if sym.get(t) else esc(f"id{t}")
+    idioms = idioms or []
+    symbolizable = [i for i in idioms if i["kind"] == "gate"]
+    omitted = [i["name"] for i in idioms if i["kind"] != "gate"] + (["induction"] if induction else [])
     L = [f"// {name} — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).",
          "// Same DISTRIBUTIONAL rules carrying top-K logits (incidence); the runtime computes softmax(logits/T) at a",
          "// queried temp. A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Run on symbol input:",
@@ -113,13 +177,22 @@ def emit_symbols_T(path, rules, sym, name, compose=None):
          ".decl temp(t:float)", ".input temp",
          ".decl mp(inst:number, m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number, token:symbol, s:float)"]
-    if compose:
-        L.append("// NOTE: this model also has a COMPOSED arithmetic circuit (computes over operand values, not a token"
-                 " lookup) — see circuits.dl; not representable in symbol form, omitted here.")
+    if omitted:
+        L.append(f"// NOTE: {', '.join(omitted)} compute over operand VALUES / are structural pointers, not token lookups —")
+        L.append("// not representable in symbol form; see circuits.dl (their contexts are covered there, omitted here).")
+    anys = []
+    for idiom in symbolizable:                                    # select-gate idioms carry distributions AND symbolize
+        lines, anm = _idiom_lines(idiom, q, "symbol")
+        L += [""] + lines
+        guard = "".join(f", !{a}(I)" for a in anys)
+        L.append(f"ctxlogit(I,Tk,S) :- {idiom['name']}_ctxlogit(I,Tk,S){guard}.")
+        anys.append(anm)
+    idiom_guard = "".join(f", !{a}(I)" for a in anys)
     bylen = defaultdict(dict)
     for suf, kept in rules.items():
         bylen[len(suf)][suf] = kept
     lens = sorted(bylen)
+    L.append("")
     for n in lens:
         N = n + 1
         cols = ",".join(f"c{i}:symbol" for i in range(n))
@@ -136,7 +209,7 @@ def emit_symbols_T(path, rules, sym, name, compose=None):
         eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
         pull = f"gram{N}d({','.join(f'C{i}' for i in range(n))},Tk,S)"
         guard = "".join(f", !gram{m+1}d_any(I)" for m in lens if m > n)
-        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}.")
+        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}{idiom_guard}.")
     L += ["", "// --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---",
           ".decl lmax(inst:number,m:float)", "lmax(I,M) :- mp(I,_), M = max S : { ctxlogit(I,_,S) }.",
           ".decl wexp(inst:number,token:symbol,w:float)",
@@ -146,36 +219,31 @@ def emit_symbols_T(path, rules, sym, name, compose=None):
     open(path, "w").write("\n".join(L) + "\n")
 
 
-def emit_T(out_path, rules, w, compose=None, sym=None, name=""):
-    """Canonical emit: circuits.dl (distributional, ids) + run.dl + — as the FINAL STEP — circuits.symbols.dl (the legible
-    token-string twin) whenever a lexicon (sym) is supplied. T=0 is the argmax collapse of this same artifact (query temp→0)."""
+def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
+    """Canonical emit: circuits.dl (distributional, ids) + run.dl + — as the FINAL STEP — circuits.symbols.dl (legible twin)
+    when a lexicon (sym) is given. Routing (priority via negation guards): the LEARNED idioms (compose/gate carrying top-K
+    logits) in order > longest n-gram > induction (OOD point-mass) > abstain; each fires its full distribution into ctxlogit,
+    then softmax(logits/T) runs uniformly. T=0 is the argmax collapse of this same artifact (query temp→0)."""
+    idioms = idioms or []
+    order = " > ".join([i["name"] for i in idioms] + ["longest-ngram"] + (["induction(OOD)"] if induction else []) + ["abstain"])
     L = ["// rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at",
          "// query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.",
-         "// tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) is the distribution at T.",
+         f"// Routing: {order}.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.",
          "", ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number,token:number,s:float)"]
-    comp_guard = ""
-    if compose:                                                  # the COMPOSE idiom carrying a DISTRIBUTION (sum → top-K logits)
-        k1, k2, vm, csum = compose["k1"], compose["k2"], compose["valmap"], compose["csum"]
-        pm, eqns = {}, []                                        # position vars for the frame + operand offsets
-        for off in sorted(set(list(compose["frame"]) + [k1, k2])):
-            pm[off] = "P" if off == 1 else f"Pm{off - 1}"
-            if off != 1:
-                eqns.append(f"Pm{off - 1}=P-{off - 1}")
-        atoms = ["mp(I,P)"] + [f"tok(I,{pm[o]},{t})" for o, t in sorted(compose["frame"].items())]
-        atoms += [f"tok(I,{pm[k1]},A)", f"tok(I,{pm[k2]},B)", "cval(A,VA)", "cval(B,VB)", "csum_logit(VA+VB,Tk,SC)"]
-        L += [".decl cval(id:number,v:number)"] + [f"cval({t},{v})." for t, v in sorted(vm.items())]
-        L += [".decl csum_logit(s:number,token:number,sc:float)"]
-        L += [f"csum_logit({s},{t},{sc})." for s in sorted(csum) for t, sc in csum[s]]
-        L += [".decl comp_ctxlogit(inst:number,token:number,s:float)",
-              f"comp_ctxlogit(I,Tk,SC) :- {', '.join(atoms + eqns)}.",
-              ".decl comp_any(inst:number)", "comp_any(I) :- comp_ctxlogit(I,_,_).",
-              "ctxlogit(I,Tk,S) :- comp_ctxlogit(I,Tk,S)."]    # compose wins (highest priority)
-        comp_guard = ", !comp_any(I)"
+    anys = []
+    for idiom in idioms:                                          # LEARNED idioms carrying distributions, in priority order
+        lines, anm = _idiom_lines(idiom, str, "number")
+        L += [""] + lines
+        guard = "".join(f", !{a}(I)" for a in anys)              # guarded by all higher-priority idioms
+        L.append(f"ctxlogit(I,Tk,S) :- {idiom['name']}_ctxlogit(I,Tk,S){guard}.")
+        anys.append(anm)
+    idiom_guard = "".join(f", !{a}(I)" for a in anys)
     bylen = defaultdict(dict)
     for suf, kept in rules.items():
         bylen[len(suf)][suf] = kept
     lens = sorted(bylen)
+    L.append("")
     for n in lens:
         N = n + 1
         cols = ",".join(f"c{i}:number" for i in range(n))
@@ -186,13 +254,23 @@ def emit_T(out_path, rules, w, compose=None, sym=None, name=""):
         eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
         key = f"gram{N}d({','.join(f'C{i}' for i in range(n))},_,_)"
         L.append(f"gram{N}d_any(I) :- mp(I,P), {', '.join(toks + eqs + [key])}.")
-    for n in lens:                                                     # longest matching suffix supplies the logits
+    for n in lens:                                                     # longest matching suffix supplies the logits (below idioms)
         N = n + 1
         toks = [f"tok(I,{'P' if i == n - 1 else f'Pm{n-1-i}'},C{i})" for i in range(n)]
         eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
         pull = f"gram{N}d({','.join(f'C{i}' for i in range(n))},Tk,S)"
         guard = "".join(f", !gram{m+1}d_any(I)" for m in lens if m > n)
-        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}{comp_guard}.")
+        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}{idiom_guard}.")
+    if induction:                                                     # copy/induction OOD fallback — structural pointer
+        gram_guard = "".join(f", !gram{m+1}d_any(I)" for m in lens)
+        L += ["", "// copy/induction OOD fallback: a structural pointer, NOT a calibrated distribution → POINT-MASS on the",
+              "// copied token. Fires only where no idiom/n-gram matches, so it never affects the in-domain certificate.",
+              ".decl ind_pj(inst:number,j:number)", "ind_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.",
+              ".decl ind_last(inst:number,j:number)", "ind_last(I,J) :- ind_pj(I,_), J = max JJ : { ind_pj(I,JJ) }.",
+              ".decl ind_ctxlogit(inst:number,token:number,s:float)",
+              f"ind_ctxlogit(I,OUT,0.0) :- ind_last(I,J), tok(I,J+1,OUT){idiom_guard}{gram_guard}.",
+              ".decl ind_any(inst:number)", "ind_any(I) :- ind_ctxlogit(I,_,_).",
+              "ctxlogit(I,Tk,S) :- ind_ctxlogit(I,Tk,S)."]
     L += ["", "// --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---",
           ".decl lmax(inst:number,m:float)", "lmax(I,M) :- mp(I,_), M = max S : { ctxlogit(I,_,S) }.",
           ".decl wexp(inst:number,token:number,w:float)",
@@ -206,7 +284,7 @@ def emit_T(out_path, rules, w, compose=None, sym=None, name=""):
                          ".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
                          f'#include "{os.path.basename(out_path)}"\n.output cdist\n')
     if sym:                                                       # FINAL STEP of extraction: the legible token-string twin
-        emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name, compose=compose)
+        emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name, idioms=idioms, induction=bool(induction))
 
 
 def certify_T(out_path, insts, logmap, idxs, T, eps):
@@ -235,6 +313,42 @@ def certify_T(out_path, insts, logmap, idxs, T, eps):
     for i in idxs:
         worst = max(worst, tv(got.get(i, {}), softmax(logmap[i], T)))
     return worst, len(got)
+
+
+def finalize(md, insts, logmap, idxs, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src):
+    """Emit the canonical circuits.dl (+ run.dl + symbols twin) from idioms + n-gram cover (+ induction OOD), certify across
+    the T-grid, write CERTIFICATE.md. Shared by temperature.main (n-gram + threx-compose) and idiom_learn (full learned
+    idioms carrying distributions). Returns the across-range verdict."""
+    out = os.path.join(md, "circuits.dl")
+    emit_T(out, rules, w, idioms=idioms, induction=induction, sym=sym, name=name)
+    Ks = [len(v) for v in rules.values()] or [0]
+    nc = sum(1 for i in idioms if i["kind"] == "compose"); ng = sum(1 for i in idioms if i["kind"] == "gate")
+    idiom_desc = ", ".join(f"{x} {k}" for x, k in [(nc, "compose"), (ng, "select-gate")] if x) or "no idioms"
+    print(f"canonical emit: {idiom_desc} carrying distributions + {len(rules)} n-gram (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
+          + (" + induction OOD" if induction else "") + (f"; {len(remaining)} uncovered" if remaining else "")
+          + f" → {out}" + (" + circuits.symbols.dl (legible twin)" if sym else ""))
+    grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
+    ok_all, results = True, []
+    for q in grid:                                                    # ONE rule set, certified across the whole range
+        worst, ngot = certify_T(out, insts, logmap, idxs, q, eps)
+        ok = worst < eps and ngot == len(idxs)
+        ok_all &= ok
+        results.append((q, ngot, worst, ok))
+        print(f"  CERTIFY @T={q}: {ngot}/{len(idxs)} contexts, max TV={worst:.4f} {'✓' if ok else '✗'}")
+    print("→ " + (f"CERTIFIED across T∈[{T_lo},{T}] — learned idioms + n-gram, softmax(logits/T) in souffle" if ok_all else "NOT certified over the range"))
+    nrules = len(rules) + len(idioms)
+    lines = [f"# {name} · certificate (T-parameterized — the canonical artifact)", "",
+             "`circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle",
+             f"at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from {src}.",
+             (f"`circuits.symbols.dl` is the legible token-string twin (inherits this certificate)." if sym else None), "",
+             f"- domain: {len(idxs)} decision windows (W={w})",
+             f"- range: T ∈ [{T_lo}, {T}], ε = {eps}",
+             f"- rules: {nrules} ({idiom_desc} + {len(rules)} n-gram" + (", induction OOD" if induction else "") + f", top-K mean {sum(Ks)/len(Ks):.1f})",
+             "", "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
+    lines += [f"| {q} | {ngot}/{len(idxs)} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, ngot, worst, ok in results]
+    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.dl`."]
+    open(os.path.join(md, "CERTIFICATE.md"), "w").write("\n".join([x for x in lines if x is not None]) + "\n")
+    return ok_all
 
 
 def main():
@@ -273,38 +387,10 @@ def main():
     logmap = {i: [(int(v), float(s)) for v, s in cache[key(insts[i])]] for i in range(len(insts)) if key(insts[i]) in cache}
     idxs = sorted(logmap)
     compose = build_threx_compose(insts, logmap, idxs, T, eps) if "--compose" in sys.argv else None
+    idioms = [{**compose, "kind": "compose", "name": "comp0"}] if compose else []
     cover_idxs = [i for i in idxs if not (compose and i in compose["covered"])]
     rules, remaining = dist_cover(insts, logmap, cover_idxs, T_lo, T, eps, w)
-    out = os.path.join(md, "circuits.dl")
-    emit_T(out, rules, w, compose=compose, sym=sym, name=name)
-    Ks = [len(v) for v in rules.values()]
-    if compose:
-        cks = [len(v) for v in compose["csum"].values()]
-        print(f"COMPOSE idiom carrying a distribution: 1 sum→logits table ({len(compose['csum'])} sums, top-K mean "
-              f"{sum(cks)/len(cks):.1f}) covers {len(compose['covered'])} composed windows — generalizes the distribution.")
-    print(f"distributional n-gram cover: {len(rules)} rules for {len(cover_idxs)} windows (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
-          + (f"; {len(remaining)} uncovered" if remaining else "") + f" → {out}" + (" + circuits.symbols.dl (legible twin)" if sym else ""))
-    grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
-    ok_all, results = True, []
-    for q in grid:                                                    # ONE rule set, certified across the whole range
-        worst, ngot = certify_T(out, insts, logmap, idxs, q, eps)
-        ok = worst < eps and ngot == len(idxs)
-        ok_all &= ok
-        results.append((q, ngot, worst, ok))
-        print(f"  CERTIFY @T={q}: {ngot}/{len(idxs)} contexts, max TV={worst:.4f} {'✓' if ok else '✗'}")
-    print("→ " + (f"CERTIFIED across T∈[{T_lo},{T}] — one rule set, softmax(logits/T) in souffle" if ok_all else "NOT certified over the range"))
-    nrules = len(rules) + (1 if compose else 0)
-    lines = [f"# {name} · certificate (T-parameterized — the canonical artifact)", "",
-             f"`circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle",
-             f"at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from {src}.",
-             (f"`circuits.symbols.dl` is the legible token-string twin (inherits this certificate)." if sym else ""), "",
-             f"- domain: {len(idxs)} decision windows (W={w})",
-             f"- range: T ∈ [{T_lo}, {T}], ε = {eps}",
-             f"- rules: {nrules}" + (f" ({1} compose idiom + {len(rules)} n-gram, top-K mean {sum(Ks)/len(Ks):.1f})" if compose else f" (n-gram, top-K mean {sum(Ks)/len(Ks):.1f})"),
-             "", "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
-    lines += [f"| {q} | {ngot}/{len(idxs)} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, ngot, worst, ok in results]
-    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.dl`."]
-    open(os.path.join(md, "CERTIFICATE.md"), "w").write("\n".join([x for x in lines if x is not None]) + "\n")
+    finalize(md, insts, logmap, idxs, idioms, rules, remaining, False, w, sym, name, T, eps, T_lo, src)
 
 
 if __name__ == "__main__":

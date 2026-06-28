@@ -1,32 +1,50 @@
 // rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at
 // query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.
-// tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) is the distribution at T.
+// Routing: comp0 > gate0 > gate1 > longest-ngram > abstain.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.
 
 .decl mp(inst:number,m:number)
 mp(I,M) :- M = max P : { tok(I,P,_) }.
 .decl ctxlogit(inst:number,token:number,s:float)
-.decl cval(id:number,v:number)
-cval(21,0).
-cval(22,1).
-cval(23,2).
-cval(24,3).
-cval(25,4).
-.decl csum_logit(s:number,token:number,sc:float)
-csum_logit(0,10,16.77562249601935).
-csum_logit(2,12,14.212692134933103).
-csum_logit(3,13,16.582374426603305).
-csum_logit(5,27,15.018880885414363).
-csum_logit(6,28,16.803193612936802).
-csum_logit(8,30,16.790170490249693).
-.decl comp_ctxlogit(inst:number,token:number,s:float)
-comp_ctxlogit(I,Tk,SC) :- mp(I,P), tok(I,P,7), tok(I,Pm1,19), tok(I,Pm2,19), tok(I,Pm5,20), tok(I,Pm6,0), tok(I,Pm7,1), tok(I,Pm3,A), tok(I,Pm4,B), cval(A,VA), cval(B,VB), csum_logit(VA+VB,Tk,SC), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7.
-.decl comp_any(inst:number)
-comp_any(I) :- comp_ctxlogit(I,_,_).
-ctxlogit(I,Tk,S) :- comp_ctxlogit(I,Tk,S).
+
+.decl comp0_val(id:number,v:number)   // compose carrying a distribution
+comp0_val(21,0).
+comp0_val(22,1).
+comp0_val(23,2).
+comp0_val(24,3).
+comp0_val(25,4).
+.decl comp0_sum(s:number,token:number,sc:float)
+comp0_sum(0,10,16.77562249601935).
+comp0_sum(2,12,14.212692134933103).
+comp0_sum(3,13,16.582374426603305).
+comp0_sum(5,27,15.018880885414363).
+comp0_sum(6,28,16.803193612936802).
+comp0_sum(8,30,16.790170490249693).
+.decl comp0_ctxlogit(inst:number,token:number,s:float)
+comp0_ctxlogit(I,Tk,SC) :- mp(I,P), tok(I,P,7), tok(I,Pm1,19), tok(I,Pm2,19), tok(I,Pm5,20), tok(I,Pm6,0), tok(I,Pm7,1), tok(I,Pm3,A), tok(I,Pm4,B), comp0_val(A,VA), comp0_val(B,VB), comp0_sum(VA+VB,Tk,SC), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7.
+.decl comp0_any(inst:number)
+comp0_any(I) :- comp0_ctxlogit(I,_,_).
+ctxlogit(I,Tk,S) :- comp0_ctxlogit(I,Tk,S).
+
+.decl gate0_tab(k:number,token:number,sc:float)   // select-gate carrying a distribution
+gate0_tab(1,0,20.04733301857001).
+gate0_tab(2,1,21.62315000928641).
+.decl gate0_ctxlogit(inst:number,token:number,s:float)
+gate0_ctxlogit(I,Tk,SC) :- mp(I,P), tok(I,P,K), gate0_tab(K,Tk,SC).
+.decl gate0_any(inst:number)
+gate0_any(I) :- gate0_ctxlogit(I,_,_).
+ctxlogit(I,Tk,S) :- gate0_ctxlogit(I,Tk,S), !comp0_any(I).
+
+.decl gate1_tab(k:number,token:number,sc:float)   // select-gate carrying a distribution
+gate1_tab(19,19,19.12976912486767).
+.decl gate1_ctxlogit(inst:number,token:number,s:float)
+gate1_ctxlogit(I,Tk,SC) :- mp(I,P), tok(I,Pm4,0), tok(I,Pm5,1), tok(I,P,K), gate1_tab(K,Tk,SC), Pm4=P-4, Pm5=P-5.
+.decl gate1_any(inst:number)
+gate1_any(I) :- gate1_ctxlogit(I,_,_).
+ctxlogit(I,Tk,S) :- gate1_ctxlogit(I,Tk,S), !comp0_any(I), !gate0_any(I).
+
 .decl gram2d(c0:number,token:number,s:float)
 .decl gram2d_any(inst:number)
 gram2d(18,1,18.666889466559926).
-gram2d(1,0,20.04733301857001).
 gram2d(24,19,20.766825079518643).
 gram2d(14,19,17.69443453603187).
 gram2d(10,1,21.67548736073619).
@@ -34,17 +52,14 @@ gram2d(26,3,11.544865244841251).
 gram2d(26,5,10.316675691314115).
 gram2d(26,4,10.218651710416653).
 gram2d(9,16,18.832511455451552).
-gram2d(2,1,21.62315000928641).
 gram2d(17,1,21.924882104792818).
 gram2d(11,2,19.534959409133297).
 gram2d_any(I) :- mp(I,P), tok(I,P,C0), gram2d(C0,_,_).
 .decl gram3d(c0:number,c1:number,token:number,s:float)
 .decl gram3d_any(inst:number)
-gram3d(24,19,19,19.12976912486767).
 gram3d(19,19,7,15.615306622244413).
 gram3d(7,27,1,21.104292119557215).
 gram3d(22,25,19,18.82784023611681).
-gram3d(25,19,19,21.080915576949838).
 gram3d(19,3,6,15.422238665089557).
 gram3d(23,25,19,19.079470050053658).
 gram3d(7,28,1,20.51749731940957).
@@ -52,9 +67,7 @@ gram3d(26,3,1,17.90815302235457).
 gram3d(9,16,1,20.691526193935015).
 gram3d(6,27,2,21.302403247623644).
 gram3d(25,23,19,18.75357440474471).
-gram3d(23,19,19,20.08196748717408).
 gram3d(23,22,19,19.12024123498186).
-gram3d(22,19,19,18.505134079589663).
 gram3d(7,13,1,23.466475964389268).
 gram3d(5,7,13,17.016713958423818).
 gram3d(6,13,2,16.457966900738857).
@@ -72,7 +85,6 @@ gram3d(6,30,2,19.68898441639389).
 gram3d(22,22,19,18.24680382232108).
 gram3d(6,28,2,19.782848279911892).
 gram3d(23,21,19,21.112938813083765).
-gram3d(21,19,19,18.60027796579791).
 gram3d(0,16,19,17.1648605939044).
 gram3d(16,19,5,11.081482499711749).
 gram3d(16,19,3,11.029768376211662).
@@ -722,14 +734,14 @@ gram9d(2,1,0,5,7,13,1,0,14,6.565051879052787).
 gram9d(2,1,0,5,7,13,1,0,15,6.508231874613381).
 gram9d(2,1,0,5,7,13,1,0,16,6.291288827450478).
 gram9d_any(I) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,_,_).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I), !comp_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S), !comp_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I), !comp0_any(I), !gate0_any(I), !gate1_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S), !comp0_any(I), !gate0_any(I), !gate1_any(I).
 
 // --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---
 .decl lmax(inst:number,m:float)
