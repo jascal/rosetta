@@ -48,20 +48,26 @@ def topk(ls, T, eps):
     return kept
 
 
+def trange(T_lo, T_hi):
+    return sorted({T_lo, round((T_lo + T_hi) / 2, 3), T_hi})
+
+
 def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
-    """shortest suffix s.t. the group's softmax is consistent within eps at the COLDEST T_lo (where grouping is hardest —
-    low T amplifies within-group logit gaps); store a representative's top-K sized at the HOTTEST T_hi (where truncation
-    is hardest — the tail is fattest). Two opposing error sources, so the cover must straddle the whole [T_lo, T_hi] range."""
+    """shortest suffix s.t. the group's softmax is consistent within eps at EVERY T across the range (the two error
+    sources sit at opposite ends — group-divergence is worst cold for structured models, hot for diverse ones — so we
+    must check the whole [T_lo, T_hi] grid, not one endpoint), with the representative's top-K sized at the hot end (where
+    the tail is fattest). Always terminates: at full-W each context is its own group (the per-context memorization corner)."""
+    grid = trange(T_lo, T_hi)
     rules, order_of, remaining = {}, {}, set(idxs)
-    dists = {i: softmax(logmap[i], T_lo) for i in idxs}
+    dists = {i: {T: softmax(logmap[i], T) for T in grid} for i in idxs}
     for k in range(1, w + 1):
         groups = defaultdict(list)
         for i in remaining:
             groups[tuple(insts[i][-k:])].append(i)
         for suf, members in groups.items():
             rep = dists[members[0]]
-            if all(tv(rep, dists[i]) < eps for i in members):          # consistent at the cold end
-                rules[suf] = topk(logmap[members[0]], T_hi, eps)        # K sized at the hot end
+            if all(tv(rep[T], dists[i][T]) < eps for i in members for T in grid):   # consistent across the whole range
+                rules[suf] = topk(logmap[members[0]], T_hi, eps)
                 for i in members:
                     order_of[i] = k
                 remaining -= set(members)
@@ -212,13 +218,25 @@ def main():
     print(f"distributional n-gram cover: {len(rules)} rules for {len(cover_idxs)} windows (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
           + (f"; {len(remaining)} uncovered" if remaining else "") + f" → {out}")
     grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
-    ok_all = True
+    ok_all, results = True, []
     for q in grid:                                                    # ONE rule set, certified across the whole range
         worst, ngot = certify_T(out, insts, logmap, idxs, q, eps)
         ok = worst < eps and ngot == len(idxs)
         ok_all &= ok
+        results.append((q, ngot, worst, ok))
         print(f"  CERTIFY @T={q}: {ngot}/{len(idxs)} contexts, max TV={worst:.4f} {'✓' if ok else '✗'}")
     print("→ " + (f"CERTIFIED across T∈[{T_lo},{T}] — one rule set, softmax(logits/T) in souffle" if ok_all else "NOT certified over the range"))
+    nrules = len(rules) + (1 if compose else 0)
+    lines = [f"# {name} · T-parameterized certificate", "",
+             f"`circuits.t.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in",
+             f"souffle at a queried `.input temp`. Build-time logits from {'a fieldrun --serve /topk server' if serve else 'whole.dl'}.", "",
+             f"- domain: {len(idxs)} decision windows (W={w})",
+             f"- range: T ∈ [{T_lo}, {T}], ε = {eps}",
+             f"- rules: {nrules}" + (f" ({1} compose idiom + {len(rules)} n-gram, top-K mean {sum(Ks)/len(Ks):.1f})" if compose else f" (n-gram, top-K mean {sum(Ks)/len(Ks):.1f})"),
+             "", "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
+    lines += [f"| {q} | {ngot}/{len(idxs)} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, ngot, worst, ok in results]
+    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.t.dl`."]
+    open(os.path.join(md, "CERTIFICATE.t.md"), "w").write("\n".join(lines) + "\n")
 
 
 if __name__ == "__main__":
