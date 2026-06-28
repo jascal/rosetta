@@ -166,8 +166,8 @@ def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, 
              "A length-k suffix rule is a certified (k+1)-gram (prefix-invariant over the preceding W−k tokens on the "
              "domain). Order histogram (contexts, from dl/ngram.dl):", "",
              f"```\n{dict(sorted(order.items()))}\n```", "",
-             f"**Effective order (≥90% of rules): {eff}-gram** "
-             f"({'bigram/trigram-dominated — recall, not computation' if eff <= 3 else f'{eff}-gram'}).", ""]
+             f"**Effective order (≥90% of contexts): {eff}-gram** — "
+             f"{'bigram/trigram-dominated (recall, not computation)' if eff <= 3 else 'recall-dominated, longer window'}.", ""]
     for k, lbl in ((1, "Bigrams (after X → Y)"), (2, "Trigrams (after X Y → Z)")):
         s = samp(k)
         if s:
