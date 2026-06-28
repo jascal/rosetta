@@ -67,6 +67,51 @@ def family_succession(tok, port, seq, label, n=30):
     return det / trials, cfollow / trials
 
 
+CAPITALS = [(" France", " Paris"), (" Germany", " Berlin"), (" Japan", " Tokyo"), (" Italy", " Rome"),
+            (" Spain", " Madrid"), (" Russia", " Moscow"), (" China", " Beijing"), (" Egypt", " Cairo"),
+            (" Canada", " Ottawa"), (" Greece", " Athens")]
+ANTONYMS = [(" hot", " cold"), (" big", " small"), (" up", " down"), (" fast", " slow"), (" happy", " sad"),
+            (" open", " closed"), (" black", " white"), (" good", " bad"), (" rich", " poor"), (" hard", " soft"),
+            (" light", " dark"), (" high", " low"), (" true", " false"), (" old", " young"), (" wet", " dry")]
+
+
+def family_coreference(tok, port, n=40):
+    """coreference: '{A} is a girl. {B} is a boy. The girl is named' → A. Causal: swap the genders → the answer follows
+    the role, not the position (the binding tracks the referent, not a slot)."""
+    nm = single(tok, NAMES)
+    names = list(nm)
+    if len(names) < 4:
+        return None
+    rng = random.Random(2)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        a, b = rng.sample(names, 2)
+        o1 = serve_decide(port, tok.encode(f"{a} is a girl.{b} is a boy. The girl is named").ids)
+        o2 = serve_decide(port, tok.encode(f"{a} is a boy.{b} is a girl. The girl is named").ids)
+        det += (o1 == nm[a]); cfollow += (o2 == nm[b]); trials += 1
+    return det / trials, cfollow / trials
+
+
+def family_pairs(tok, port, pairs, template, n=40):
+    """relational lookup (analogy / antonym): one-shot relation by example or a named relation → the related token.
+    Causal: change the cue → the related token follows the RELATION (not a fixed output)."""
+    p = {a: b for a, b in pairs if a in single(tok, [a]) and b in single(tok, [b])}
+    if len(p) < 4:
+        return None
+    sb = single(tok, [b for _, b in pairs])
+    keys = list(p)
+    rng = random.Random(3)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        a = rng.choice(keys)
+        o1 = serve_decide(port, tok.encode(template(a)).ids)
+        det += (o1 == sb[p[a]])
+        a2 = rng.choice([k for k in keys if k != a])
+        o2 = serve_decide(port, tok.encode(template(a2)).ids)
+        cfollow += (o2 == sb[p[a2]]); trials += 1
+    return det / trials, cfollow / trials
+
+
 def main():
     md = sys.argv[1] if len(sys.argv) > 1 else "models/llama32_1b"
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 40
@@ -76,7 +121,10 @@ def main():
     print(f"=== probe_families · {name} === (detect ≥80% AND causal ≥80% ⇒ in the toolkit)")
     probes = [("copy/name-mover (IOI)", lambda: family_ioi(tok, port, n)),
               ("succession (days)", lambda: family_succession(tok, port, DAYS, "days", n)),
-              ("succession (months)", lambda: family_succession(tok, port, MONTHS, "months", n))]
+              ("succession (months)", lambda: family_succession(tok, port, MONTHS, "months", n)),
+              ("coreference (gender)", lambda: family_coreference(tok, port, n)),
+              ("relation (capital-of)", lambda: family_pairs(tok, port, CAPITALS, lambda a: f"The capital of{a} is", n)),
+              ("antonym (opposite-of)", lambda: family_pairs(tok, port, ANTONYMS, lambda a: f"The opposite of{a} is", n))]
     for label, fn in probes:
         r = fn()
         if r is None:
