@@ -38,6 +38,23 @@ def detect(insts, refs, w):
         return {k: n for k, n in rows("orderhist.csv")}, {i: k for i, k in rows("minorder.csv")}
 
 
+def fieldrun_decide(bundle, ctx):
+    """The model's argmax for one context via the fieldrun binary (build-time refs oracle; faithful == the model).
+    bundle is the .fieldrun stem. Used for large models where the whole.dl forward is too slow to run in souffle —
+    fieldrun is BUILD-TIME only; the minimized circuits.dl it certifies has no fieldrun dependency at runtime."""
+    import re
+    fr = os.environ.get("FIELDRUN_BIN") or "fieldrun"
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        f.write('{"holdout_ids":[' + ",".join(map(str, ctx)) + "]}")
+        path = f.name
+    try:
+        r = subprocess.run([fr, "--bundle", bundle, "--ids", path, "--explain"], capture_output=True, text=True)
+    finally:
+        os.unlink(path)
+    m = re.search(r"model predicts \[(\d+)\]", r.stdout + r.stderr)
+    return int(m.group(1)) if m else None
+
+
 def run_induction(insts, refs, m):
     """Run dl/induction.dl at match length m. Returns {n_total, n_apply, n_hit, n_miss, hits:set(inst)}."""
     with tempfile.TemporaryDirectory() as d:

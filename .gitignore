@@ -13,3 +13,6 @@ models/*/whole.forward.dl
 models/*/*.facts
 reference/*/whole.weights/
 reference/*/whole.forward.dl
+
+models/*/*.fieldrun.json
+models/*/*.fieldrun.bin

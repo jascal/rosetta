@@ -31,18 +31,46 @@ def instances(ids, n, w):
     return out
 
 
-def get_refs(whole, insts, cache_path):
+def ref_source(md):
+    """Pick the BUILD-TIME refs oracle for a model dir: a fieldrun bundle (fast, for large models) if present, else the
+    whole-model Datalog program (pure). Returns (label, fn) where fn(ctx) -> argmax. fieldrun is build-time only; the
+    minimized circuits.dl it certifies has no fieldrun dependency at runtime (see AGENTS runtime-independence invariant)."""
+    import glob
+    from oracle import fieldrun_decide
+    stem = os.path.join(md, "bundle")
+    bundles = ([stem] if os.path.exists(stem + ".fieldrun.json")
+               else [p[:-len(".fieldrun.json")] for p in glob.glob(os.path.join(md, "*.fieldrun.json"))])
+    if bundles:
+        b = bundles[0]
+        return ("fieldrun", lambda ctx: fieldrun_decide(b, ctx))
+    whole = os.path.join(md, "whole.dl")
+    return ("whole.dl", lambda ctx: decide(whole, ctx))
+
+
+def get_refs(ref_fn, insts, cache_path, workers=1):
+    """Compute the model's argmax per instance (cached). Parallel across workers (each ref is an independent subprocess
+    forward) — primes the first call serially so a compiled/split oracle compiles once before fanning out."""
     cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
-    refs, miss = [], 0
-    for ctx in insts:
-        k = ",".join(map(str, ctx))
-        if k not in cache:
-            cache[k] = decide(whole, ctx); miss += 1
-            if miss % 25 == 0:
-                json.dump(cache, open(cache_path, "w")); print(f"   …{miss} oracle calls")
-        refs.append(cache[k])
-    json.dump(cache, open(cache_path, "w"))
-    return refs
+    key = lambda ctx: ",".join(map(str, ctx))
+    todo = [ctx for ctx in insts if key(ctx) not in cache]
+    if todo:
+        cache[key(todo[0])] = ref_fn(todo[0])                       # prime (compile/split happens once)
+        rest, done = todo[1:], 1
+        if rest:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
+                for ctx, out in zip(rest, ex.map(ref_fn, rest)):
+                    cache[key(ctx)] = out; done += 1
+                    if done % 50 == 0:
+                        json.dump(cache, open(cache_path, "w")); print(f"   …{done}/{len(todo)} refs")
+        json.dump(cache, open(cache_path, "w"))
+    return [cache[key(ctx)] for ctx in insts]
+
+
+def model_refs(md, insts, cache_name="ref_cache.json"):
+    """refs for a model dir via its chosen build-time oracle (fieldrun parallel; whole.dl serial+compiled)."""
+    label, fn = ref_source(md)
+    return get_refs(fn, insts, os.path.join(md, cache_name), workers=8 if label == "fieldrun" else 1)
 
 
 def composed_fires(ctx):
@@ -99,6 +127,14 @@ def emit(out_path, rules, composed):
         guard = "".join(f", !any{m}(I)" for m in lens if m > n) + (", !has_comp(I)" if composed else "")
         L.append(f"cdecide(I,T) :- s{n}p(I,T){guard}.")
     open(out_path, "w").write("\n".join(L) + "\n")
+    # standalone runtime harness — souffle-only, NO fieldrun/whole.dl/weights (the runtime-independence invariant):
+    #   souffle run.dl -F <dir with tok.facts: inst<TAB>pos<TAB>id>  →  cdecide.csv = (inst, argmax id)
+    run = os.path.join(os.path.dirname(out_path), "run.dl")
+    open(run, "w").write(
+        "// standalone runtime harness for circuits.dl — souffle only, no fieldrun/whole.dl/weights.\n"
+        "// souffle run.dl -F <dir with tok.facts (inst<TAB>pos<TAB>id)> -D <out>  →  cdecide.csv = (inst, argmax id)\n"
+        ".decl tok(inst:number, pos:number, id:number)\n.input tok\n"
+        f'#include "{os.path.basename(out_path)}"\n.output cdecide\n')
 
 
 def main():
@@ -107,16 +143,16 @@ def main():
     md = sys.argv[3] if len(sys.argv) > 3 else os.path.join(HERE, "reference", "threx")
     md = md if os.path.isabs(md) else os.path.join(HERE, md)
     name = os.path.basename(md.rstrip("/"))
-    whole = os.path.join(md, "whole.dl")
     out = os.path.join(md, "circuits.dl")
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     sym = {i: t[0] for i, t in enumerate(json.load(open(os.path.join(md, "lexicon.json")))["tokens"])}
     use_composed = name == "threx"
 
     insts = instances(ids, n, w)
+    src_label, _ = ref_source(md)
     print(f"=== rosetta · minimize+certify {name} · {len(insts)} unique decision windows (W={w}) ===")
-    print("1. oracle (whole.dl, compiled) — cached:")
-    refs = get_refs(whole, insts, os.path.join(md, "ref_cache.json"))
+    print(f"1. build-time refs oracle = {src_label} (fieldrun is build-time only; circuits.dl is runtime-independent) — cached:")
+    refs = model_refs(md, insts)
     valid = [i for i in range(len(insts)) if refs[i] is not None]
 
     comp_idx = []

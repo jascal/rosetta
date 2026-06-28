@@ -6,7 +6,7 @@ copies what followed) and coverage. Then the DISTINCTIVE part: induction hits on
 resolve at long order (≥4) — i.e. decisions recall can't compress but copying explains. Usage: python3 py/induction.py [n] [w] [model_dir]
 """
 import os, sys, json
-from minimize import instances, get_refs
+from minimize import instances, model_refs
 from oracle import run_induction, detect
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +20,7 @@ def main():
     name = os.path.basename(md.rstrip("/"))
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
-    refs = get_refs(os.path.join(md, "whole.dl"), insts, os.path.join(md, "ref_cache.json"))
+    refs = model_refs(md, insts)
     valid = [insts[i] for i in range(len(insts)) if refs[i] is not None]
     vrefs = [refs[i] for i in range(len(insts)) if refs[i] is not None]
 

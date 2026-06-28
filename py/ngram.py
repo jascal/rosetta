@@ -6,7 +6,7 @@ script only STAGES the facts (the contexts, and the model's argmax per context f
 humans — no mining logic in Python. Usage: python3 py/ngram.py [n] [w] [model_dir]
 """
 import os, sys, json
-from minimize import instances, get_refs
+from minimize import instances, model_refs
 from oracle import detect   # the detection itself lives in dl/ngram.dl, driven from oracle.py
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +22,7 @@ def main():
     dec = lambda t: (sym.get(t, str(t)).strip() or f"[{t}]")
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
-    refs = get_refs(os.path.join(md, "whole.dl"), insts, os.path.join(md, "ref_cache.json"))
+    refs = model_refs(md, insts)
 
     hist, minord = detect(insts, refs, w)        # ← the detection happens in Datalog
     tot = max(1, sum(hist.values()))
