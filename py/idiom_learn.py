@@ -496,24 +496,48 @@ def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
                     n += (p == refs[i]); break
         return n
 
-    FAM = {"select": (gate_pred, sum(len(b["table"]) for b in gates)),
-           "compose": (comp_pred, sum(len(b["lab"]) + len(b["bysum"]) for b in comps)),
-           "induction": (ind_pred, 0),
-           "skeleton": (sk_pred, len(skr))}
-    FAM = {k: v for k, v in FAM.items() if k == "induction" or v[1] > 0}   # drop empty families
-    base = [ng_pred]; k0 = score(base); cur = k0; total = len(ng); chosen = []
-    pend = dict(FAM)
-    print(f"  baseline n-gram: {len(ng)} rules, holdout {k0}/{H} = {k0/H:.0%}")
+    FAM = {"compose": (comp_pred, sum(len(b["lab"]) + len(b["bysum"]) for b in comps)),
+           "select": (gate_pred, sum(len(b["table"]) for b in gates)),
+           "induction": (ind_pred, 0), "skeleton": (sk_pred, len(skr))}
+    FAM = {k: v for k, v in FAM.items() if (gates if k == "select" else comps if k == "compose"
+           else sks if k == "skeleton" else True)}
+    covt = {nm: {i for i in train if fn(insts[i]) == refs[i]} for nm, (fn, _) in FAM.items()}   # train coverage per family
+
+    def build(adm):
+        """re-derive the n-gram cover on the residual AFTER the admitted families — so a family pays by SHRINKING the
+        n-gram cover (extrapolation/compression credit: a generalizer that covers many contexts with few rules wins MDL
+        even at 0 marginal holdout, because it replaces the n-grams it made redundant)."""
+        covered = set().union(*[covt[nm] for nm in adm]) if adm else set()
+        ng2 = minimal_suffix_cover(insts, refs, [i for i in train if i not in covered], w)[0]
+        rules = sum(FAM[nm][1] for nm in adm) + len(ng2)
+
+        def pred(ctx):
+            for nm in adm:
+                p = FAM[nm][0](ctx)
+                if p is not None:
+                    return p
+            for k in range(min(len(ctx), w), 0, -1):
+                o = ng2.get(tuple(ctx[-k:]))
+                if o is not None:
+                    return o
+            return None
+        return rules, sum(pred(insts[i]) == refs[i] for i in holdout)
+
+    lam = 0.5                                                          # rule cost in holdout-window units (MDL knob)
+    obj = lambda r, k: (H - k) + lam * r
+    R0, k0 = build([])
+    print(f"  baseline n-gram: {R0} rules, holdout {k0}/{H}={k0/H:.0%}  obj {obj(R0, k0):.1f}")
+    adm, cur_obj, pend = [], obj(R0, k0), set(FAM)
     while pend:
-        opts = [(score(base + [c[0] for c in chosen] + [fn]) - cur, rc, nm, fn) for nm, (fn, rc) in pend.items()]
-        gain, rc, nm, fn = max(opts, key=lambda o: (o[0] / max(1, o[1]), o[0]))
-        if gain <= 0:
-            print(f"  — not admitted (add 0 holdout, MDL): {', '.join(pend)}")
+        (r, k), nm = min(((build(adm + [nm]), nm) for nm in pend), key=lambda o: obj(*o[0]))
+        if obj(r, k) >= cur_obj - 1e-9:
+            print(f"  — not admitted (no holdout+MDL gain): {', '.join(sorted(pend))}")
             break
-        chosen.append((fn, nm)); cur += gain; total += rc; del pend[nm]
-        print(f"  + {nm}: +{gain} holdout (+{gain/H:.1%}) / {rc} rules → {cur}/{H}={cur/H:.0%}, {total} rules")
-    print(f"  ⇒ n-gram" + "".join(f" + {nm}" for _, nm in chosen) + f"  · holdout {cur/H:.0%} · {total} rules · residual {1-cur/H:.0%}")
-    return chosen, cur, H
+        adm.append(nm); pend.discard(nm); cur_obj = obj(r, k)
+        print(f"  + {nm}: {r} rules (Δ{r - R0:+d}), holdout {k}/{H}={k/H:.0%}, obj {obj(r, k):.1f}")
+    rr, kk = build(adm)
+    print(f"  ⇒ n-gram" + "".join(f" + {nm}" for nm in adm) + f"  · holdout {kk/H:.0%} · {rr} rules (baseline {R0}) · residual {1-kk/H:.0%}")
+    return adm, kk, H
 
 
 def main():
