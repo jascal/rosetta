@@ -1,5 +1,6 @@
-// rosetta · circuits.t.dl — T-PARAMETERIZED: rules carry top-K logits (incidence); softmax(logits/T) at query.
-// tok(inst,pos,id) + temp(t) provided by the includer (run.t.dl). cdist(inst,token,prob) is the distribution at T.
+// rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at
+// query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.
+// tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) is the distribution at T.
 
 .decl mp(inst:number,m:number)
 mp(I,M) :- M = max P : { tok(I,P,_) }.

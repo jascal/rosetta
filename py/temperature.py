@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
-"""rosetta · temperature.py — the T>0 path: ONE rule set carrying logits as incidence values, T parameterized at query.
+"""rosetta · temperature.py — THE canonical emitter: ONE rule set carrying logits as incidence values, T at query.
 
-T=0 circuits.dl maps each context → its argmax (no weights). This emits the distributional version: each rule carries the
-top-K (token, LOGIT) — the incidence values, which are T-INVARIANT — and the runtime computes softmax(logits/T) IN SOUFFLE
-at any query temperature (`.input temp`). It is a semiring lift: T=0 = argmax collapse; T>0 = the probability semiring with
-the incidence weights restored.
+This is the canonical `circuits.dl` (no `.t` suffix — we always emit T-rules). Each rule carries the top-K
+(token, LOGIT) — the incidence values, which are T-INVARIANT — and the runtime computes softmax(logits/T) IN SOUFFLE
+at any query temperature (`.input temp`). It is a semiring lift: **T=0 = the argmax (tropical) collapse, recovered by
+querying temp→0** (so the crisp argmax cover is just this artifact at T=0, not a separate file); T>0 = the probability
+semiring with the incidence weights restored. The legible `circuits.symbols.dl` is the transliteration of THIS
+distributional artifact (token strings + the same logits), when a lexicon.json is present.
 
 Pipeline (pure souffle at runtime, fieldrun/whole.dl only at build time):
-  1. logits   — the full scoreboard per context (oracle.logits, T-invariant), cached.
+  1. logits   — the full scoreboard per context (oracle.logits, T-invariant), cached → regenerable cache-only (no oracle).
   2. cover    — DISTRIBUTIONAL minimal-suffix cover: shortest suffix under which the softmax (at T_max) is consistent
                 within ε across the group (stronger than T=0's argmax-consistency → longer suffixes, the honest T cost).
   3. top-K    — per rule keep the top-K logits covering ≥1-ε mass at T_max (K small: threx ~3, max 9).
-  4. emit     — circuits.t.dl: gramN_dist facts + softmax-at-T (E^((S-max)/T)) + cdist(inst,token,prob).
+  4. emit     — circuits.dl: gramNd facts + softmax-at-T (E^((S-max)/T)) + cdist(inst,token,prob); + run.dl + symbols twin.
   5. certify  — run it in souffle at T_max, compare cdist to the model's full softmax; CERTIFIED iff max TV < ε over the corpus.
-Usage: python3 py/temperature.py [n] [w] [model_dir] [T_max] [eps]
+Usage: python3 py/temperature.py [n] [w] [model_dir] [T_max] [eps] [T_min] [--compose]
 """
 import os, sys, json, math, subprocess, tempfile
 from collections import defaultdict
@@ -94,9 +96,62 @@ def build_threx_compose(insts, logmap, idxs, T_hi, eps):
     return dict(frame=frame, k1=4, k2=5, valmap={b: b - 21 for b in BRG}, csum=csum, covered=set(composed))
 
 
-def emit_T(out_path, rules, w, compose=None):
-    L = ["// rosetta · circuits.t.dl — T-PARAMETERIZED: rules carry top-K logits (incidence); softmax(logits/T) at query.",
-         "// tok(inst,pos,id) + temp(t) provided by the includer (run.t.dl). cdist(inst,token,prob) is the distribution at T.",
+def emit_symbols_T(path, rules, sym, name, compose=None):
+    """The legible, RUNNABLE twin of circuits.dl: the SAME distributional rules carrying top-K logits, with token STRINGS
+    instead of ids — a self-contained, symbol-typed souffle program that computes softmax(logits/T) at a queried temp.
+    A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. (The composed arithmetic idiom computes
+    over operand VALUES, not token lookups, so it can't be symbolized — it stays in circuits.dl; noted here.)"""
+    safe = lambda s: "".join(c if (0x20 <= ord(c) != 0x7f) else f"<0x{ord(c):02X}>" for c in s)  # control chars → visible,
+    esc = lambda s: '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'                       # TSV-safe & roundtrippable
+    q = lambda t: esc(safe(sym[t])) if sym.get(t) else esc(f"id{t}")
+    L = [f"// {name} — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).",
+         "// Same DISTRIBUTIONAL rules carrying top-K logits (incidence); the runtime computes softmax(logits/T) at a",
+         "// queried temp. A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Run on symbol input:",
+         "//   souffle circuits.symbols.dl -F <dir: tok.facts (inst<TAB>pos<TAB>token) + temp.facts (T)> -D out  →  cdist.csv",
+         "//   (control-char tokens — tab/newline — render as <0xNN> so the symbol stays TSV-safe; tokenize input the same way.)", "",
+         ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
+         ".decl temp(t:float)", ".input temp",
+         ".decl mp(inst:number, m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl ctxlogit(inst:number, token:symbol, s:float)"]
+    if compose:
+        L.append("// NOTE: this model also has a COMPOSED arithmetic circuit (computes over operand values, not a token"
+                 " lookup) — see circuits.dl; not representable in symbol form, omitted here.")
+    bylen = defaultdict(dict)
+    for suf, kept in rules.items():
+        bylen[len(suf)][suf] = kept
+    lens = sorted(bylen)
+    for n in lens:
+        N = n + 1
+        cols = ",".join(f"c{i}:symbol" for i in range(n))
+        L += [f".decl gram{N}d({cols},token:symbol,s:float)   // {N}-gram, distributional", f".decl gram{N}d_any(inst:number)"]
+        for suf, kept in bylen[n].items():
+            L += [f"gram{N}d({','.join(q(t) for t in suf)},{q(v)},{s})." for v, s in kept]
+        toks = [f"tok(I,{'P' if i == n - 1 else f'Pm{n-1-i}'},C{i})" for i in range(n)]
+        eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
+        key = f"gram{N}d({','.join(f'C{i}' for i in range(n))},_,_)"
+        L.append(f"gram{N}d_any(I) :- mp(I,P), {', '.join(toks + eqs + [key])}.")
+    for n in lens:                                                     # longest matching suffix supplies the logits
+        N = n + 1
+        toks = [f"tok(I,{'P' if i == n - 1 else f'Pm{n-1-i}'},C{i})" for i in range(n)]
+        eqs = [f"Pm{j}=P-{j}" for j in range(1, n)]
+        pull = f"gram{N}d({','.join(f'C{i}' for i in range(n))},Tk,S)"
+        guard = "".join(f", !gram{m+1}d_any(I)" for m in lens if m > n)
+        L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}.")
+    L += ["", "// --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---",
+          ".decl lmax(inst:number,m:float)", "lmax(I,M) :- mp(I,_), M = max S : { ctxlogit(I,_,S) }.",
+          ".decl wexp(inst:number,token:symbol,w:float)",
+          f"wexp(I,Tk,W) :- ctxlogit(I,Tk,S), lmax(I,M), temp(T), W = {E}^((S-M)/T).",
+          ".decl wz(inst:number,z:float)", "wz(I,Z) :- mp(I,_), Z = sum W : { wexp(I,_,W) }.",
+          ".decl cdist(inst:number,token:symbol,prob:float)", ".output cdist", "cdist(I,Tk,W/Z) :- wexp(I,Tk,W), wz(I,Z)."]
+    open(path, "w").write("\n".join(L) + "\n")
+
+
+def emit_T(out_path, rules, w, compose=None, sym=None, name=""):
+    """Canonical emit: circuits.dl (distributional, ids) + run.dl + — as the FINAL STEP — circuits.symbols.dl (the legible
+    token-string twin) whenever a lexicon (sym) is supplied. T=0 is the argmax collapse of this same artifact (query temp→0)."""
+    L = ["// rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at",
+         "// query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.",
+         "// tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) is the distribution at T.",
          "", ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number,token:number,s:float)"]
     comp_guard = ""
@@ -145,13 +200,17 @@ def emit_T(out_path, rules, w, compose=None):
           ".decl wz(inst:number,z:float)", "wz(I,Z) :- mp(I,_), Z = sum W : { wexp(I,_,W) }.",
           ".decl cdist(inst:number,token:number,prob:float)", "cdist(I,Tk,W/Z) :- wexp(I,Tk,W), wz(I,Z)."]
     open(out_path, "w").write("\n".join(L) + "\n")
-    run = os.path.join(os.path.dirname(out_path), "run.t.dl")
-    open(run, "w").write(".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
+    run = os.path.join(os.path.dirname(out_path), "run.dl")
+    open(run, "w").write("// standalone runtime harness for circuits.dl — souffle only, no fieldrun/whole.dl/weights.\n"
+                         "// souffle run.dl -F <dir: tok.facts (inst<TAB>pos<TAB>id) + temp.facts (T)> -D <out>  →  cdist.csv\n"
+                         ".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
                          f'#include "{os.path.basename(out_path)}"\n.output cdist\n')
+    if sym:                                                       # FINAL STEP of extraction: the legible token-string twin
+        emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name, compose=compose)
 
 
 def certify_T(out_path, insts, logmap, idxs, T, eps):
-    """run circuits.t.dl in souffle at T, compare cdist to the model's full softmax; CERTIFIED iff max TV < eps."""
+    """run circuits.dl in souffle at T, compare cdist to the model's full softmax; CERTIFIED iff max TV < eps."""
     with tempfile.TemporaryDirectory() as d:
         ind, outd, inc = os.path.join(d, "in"), os.path.join(d, "out"), os.path.join(d, "inc")
         os.makedirs(ind); os.makedirs(outd); os.makedirs(inc)
@@ -188,8 +247,15 @@ def main():
     T_lo = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5    # T_min (cold end — sizes the grouping)
     name = os.path.basename(md.rstrip("/"))
     whole = os.path.join(md, "whole.dl")
+    lexp = os.path.join(md, "lexicon.json")                    # optional — if present, emit the legible symbols twin
+    sym = {i: t[0] for i, t in enumerate(json.load(open(lexp))["tokens"])} if os.path.exists(lexp) else {}
     serve = os.environ.get("FIELDRUN_SERVE")                   # logits from a resident server (big models) or whole.dl (pure)
-    get_lg = (lambda ctx: serve_topk(int(serve), ctx)) if serve else (lambda ctx: model_logits(whole, ctx))
+    if serve:
+        get_lg, src = (lambda ctx: serve_topk(int(serve), ctx)), "a fieldrun --serve /topk server"
+    elif os.path.exists(whole):
+        get_lg, src = (lambda ctx: model_logits(whole, ctx)), "whole.dl"
+    else:
+        get_lg, src = (lambda ctx: None), "the cached logits (cache-only — no oracle)"   # regenerate from logit_cache.json
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
     cache_p = os.path.join(md, "logit_cache.json")
@@ -209,15 +275,15 @@ def main():
     compose = build_threx_compose(insts, logmap, idxs, T, eps) if "--compose" in sys.argv else None
     cover_idxs = [i for i in idxs if not (compose and i in compose["covered"])]
     rules, remaining = dist_cover(insts, logmap, cover_idxs, T_lo, T, eps, w)
-    out = os.path.join(md, "circuits.t.dl")
-    emit_T(out, rules, w, compose=compose)
+    out = os.path.join(md, "circuits.dl")
+    emit_T(out, rules, w, compose=compose, sym=sym, name=name)
     Ks = [len(v) for v in rules.values()]
     if compose:
         cks = [len(v) for v in compose["csum"].values()]
         print(f"COMPOSE idiom carrying a distribution: 1 sum→logits table ({len(compose['csum'])} sums, top-K mean "
               f"{sum(cks)/len(cks):.1f}) covers {len(compose['covered'])} composed windows — generalizes the distribution.")
     print(f"distributional n-gram cover: {len(rules)} rules for {len(cover_idxs)} windows (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
-          + (f"; {len(remaining)} uncovered" if remaining else "") + f" → {out}")
+          + (f"; {len(remaining)} uncovered" if remaining else "") + f" → {out}" + (" + circuits.symbols.dl (legible twin)" if sym else ""))
     grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
     ok_all, results = True, []
     for q in grid:                                                    # ONE rule set, certified across the whole range
@@ -228,16 +294,17 @@ def main():
         print(f"  CERTIFY @T={q}: {ngot}/{len(idxs)} contexts, max TV={worst:.4f} {'✓' if ok else '✗'}")
     print("→ " + (f"CERTIFIED across T∈[{T_lo},{T}] — one rule set, softmax(logits/T) in souffle" if ok_all else "NOT certified over the range"))
     nrules = len(rules) + (1 if compose else 0)
-    lines = [f"# {name} · T-parameterized certificate", "",
-             f"`circuits.t.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in",
-             f"souffle at a queried `.input temp`. Build-time logits from {'a fieldrun --serve /topk server' if serve else 'whole.dl'}.", "",
+    lines = [f"# {name} · certificate (T-parameterized — the canonical artifact)", "",
+             f"`circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle",
+             f"at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from {src}.",
+             (f"`circuits.symbols.dl` is the legible token-string twin (inherits this certificate)." if sym else ""), "",
              f"- domain: {len(idxs)} decision windows (W={w})",
              f"- range: T ∈ [{T_lo}, {T}], ε = {eps}",
              f"- rules: {nrules}" + (f" ({1} compose idiom + {len(rules)} n-gram, top-K mean {sum(Ks)/len(Ks):.1f})" if compose else f" (n-gram, top-K mean {sum(Ks)/len(Ks):.1f})"),
              "", "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
     lines += [f"| {q} | {ngot}/{len(idxs)} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, ngot, worst, ok in results]
-    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.t.dl`."]
-    open(os.path.join(md, "CERTIFICATE.t.md"), "w").write("\n".join(lines) + "\n")
+    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.dl`."]
+    open(os.path.join(md, "CERTIFICATE.md"), "w").write("\n".join([x for x in lines if x is not None]) + "\n")
 
 
 if __name__ == "__main__":

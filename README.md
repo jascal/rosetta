@@ -152,7 +152,8 @@ are agreement / delimiter-bracket / coreference. `proved`/`empirical`/`open` tag
   the causal test binary→graded (mass shifts, not argmax flips) and the certificate exact→distributional (a TV/KL bound,
   the rank-1 shortlist certificate generalized). **Built + certified on threx** (`py/temperature.py`, `oracle.logits`):
   each rule carries top-K (token, logit); the runtime computes `softmax(logits/T)` in souffle at a queried `.input temp`;
-  `circuits.t.dl` reproduces the model's full distribution within ε across a temperature *range*. threx T∈[0.5,1.0] ε=0.02:
+  `circuits.dl` reproduces the model's full distribution within ε across a temperature *range* (it is canonical — we always
+  emit T-rules; `circuits.symbols.dl` is its legible token-string twin, emitted as the final step). threx T∈[0.5,1.0] ε=0.02:
   173 rules (top-K mean 3.8 — only 6 more than the 167-rule T=0 cover), CERTIFIED at T=0.5/0.75/1.0 (max TV ≤ 0.016).
   - **A T-cover spans a [T_min, T_max] range, not a point — two opposing error sources.** Top-K *truncation* is worst at
     the **hot** end (the tail fattens with T → size K at `T_max`); but *group consistency* (one representative per suffix)

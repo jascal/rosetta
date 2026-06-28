@@ -30,12 +30,18 @@ def test_threx_composed_circuit_certified():
     assert r["nuncov"] == 0, f"gaps: {r['uncovered']}"
 
 
-def test_threx_full_program_certified():
-    """The complete minimized program (composed + minimal-suffix cover) certifies nmiss=0 ∧ nuncov=0 over the domain."""
+def test_threx_full_program_certified(tmp_path):
+    """The complete minimized program (composed + minimal-suffix cover) certifies nmiss=0 ∧ nuncov=0 over the train domain.
+    Runs against a temp copy so minimize.py's crisp emit doesn't clobber the committed canonical reference/threx artifacts
+    (the T-distributional circuits.dl + symbols, written by py/temperature.py)."""
     import subprocess
-    r = subprocess.run([sys.executable, os.path.join(HERE, "py", "minimize.py"), "60", "8"],
+    work = tmp_path / "threx"
+    work.mkdir()
+    for f in ("whole.dl", "corpus.json", "lexicon.json"):
+        shutil.copyfile(os.path.join(REF, f), work / f)
+    r = subprocess.run([sys.executable, os.path.join(HERE, "py", "minimize.py"), "60", "8", str(work)],
                        capture_output=True, text=True)
-    assert "FULLY CERTIFIED (Datalog): True" in r.stdout, r.stdout + r.stderr
+    assert "threx train CERTIFIED (Datalog): True" in r.stdout, r.stdout + r.stderr
     assert "nmiss=0  nuncov=0" in r.stdout, r.stdout
 
 

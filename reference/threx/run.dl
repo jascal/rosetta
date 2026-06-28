@@ -1,6 +1,8 @@
-// standalone runtime harness — souffle only, no fieldrun/weights.
-// souffle run.dl -F <dir with tok.facts: inst<TAB>pos<TAB>id> -D <out>  →  cdecide.csv
-.decl tok(inst:number, pos:number, id:number)
+// standalone runtime harness for circuits.dl — souffle only, no fieldrun/whole.dl/weights.
+// souffle run.dl -F <dir: tok.facts (inst<TAB>pos<TAB>id) + temp.facts (T)> -D <out>  →  cdist.csv
+.decl tok(inst:number,pos:number,id:number)
 .input tok
+.decl temp(t:float)
+.input temp
 #include "circuits.dl"
-.output cdecide
+.output cdist

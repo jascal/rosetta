@@ -1,6 +1,0 @@
-.decl tok(inst:number,pos:number,id:number)
-.input tok
-.decl temp(t:float)
-.input temp
-#include "circuits.t.dl"
-.output cdist
