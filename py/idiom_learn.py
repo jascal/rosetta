@@ -290,15 +290,109 @@ def idiom_coverage(insts, refs, idxs, gates, comps, rels):
     return covered, by
 
 
+def _positions(offsets):
+    """offset k (1=last token) → souffle position var relative to mp P: offset1=P, offset k=Pm{k-1} with Pm{k-1}=P-{k-1}.
+    Returns ({offset: var}, [eqns])."""
+    pm, eqns = {}, []
+    for off in sorted(set(offsets)):
+        if off == 1:
+            pm[off] = "P"
+        else:
+            pm[off] = f"Pm{off - 1}"; eqns.append(f"Pm{off - 1}=P-{off - 1}")
+    return pm, eqns
+
+
+def emit_circuits(out_path, gates, comps, rels, ngram_rules, w, name=""):
+    """Emit a runtime-independent circuits.dl (souffle only) from LEARNED idioms + n-gram backfill. Cover-ordering:
+    faithful idioms (compose, then select gate) WIN; else the longest n-gram suffix; else copy/induction as the OOD
+    fallback (fires only where no n-gram matches — generalizes off-corpus without breaking the in-domain certificate)."""
+    L = ["// rosetta · circuits.dl — LEARNED idioms (unsupervised, causally confirmed) + n-gram backfill. Numbers = token ids.",
+         f"// model: {name}.  Routing: compose > select-gate > longest n-gram > copy/induction (OOD fallback) > abstain.",
+         "// Runtime: souffle only (see run.dl). tok(inst,pos,id) is provided by the includer (run.dl / equiv.dl).", "",
+         ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl cdecide(inst:number,out:number)", ""]
+    fired, anys = [], []                                       # (predicate, _any) in priority order — for negation guards
+
+    for j, b in enumerate(comps):                              # ---- compose (highest priority) ----
+        nm = f"comp{j}"
+        pm, eqns = _positions(list(b["frame"]) + [b["k1"], b["k2"]])
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[m]},{v})" for m, v in sorted(b["frame"].items())]
+        atoms += [f"tok(I,{pm[b['k1']]},A)", f"tok(I,{pm[b['k2']]},B)",
+                  f"{nm}_val(A,VA)", f"{nm}_val(B,VB)", f"{nm}_sum(VA+VB,OUT)"]
+        L += [f".decl {nm}_val(id:number,v:number)"] + [f"{nm}_val({t},{v})." for t, v in sorted(b["lab"].items())]
+        L += [f".decl {nm}_sum(s:number,o:number)"] + [f"{nm}_sum({s},{o})." for s, o in sorted(b["bysum"].items())]
+        L += [f".decl {nm}(inst:number,out:number)", f"{nm}(I,OUT) :- {', '.join(atoms + eqns)}.",
+              f".decl {nm}_any(inst:number)", f"{nm}_any(I) :- {nm}(I,_).", ""]
+        fired.append(nm); anys.append(f"{nm}_any")
+
+    for j, b in enumerate(gates):                              # ---- select gates ----
+        nm = f"gate{j}"
+        pm, eqns = _positions(list(b["frame"]) + [b["k"]])
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[m]},{v})" for m, v in sorted(b["frame"].items())]
+        atoms += [f"tok(I,{pm[b['k']]},K)", f"{nm}_tab(K,OUT)"]
+        L += [f".decl {nm}_tab(k:number,out:number)"] + [f"{nm}_tab({k},{o})." for k, o in sorted(b["table"].items())]
+        L += [f".decl {nm}(inst:number,out:number)", f"{nm}(I,OUT) :- {', '.join(atoms + eqns)}.",
+              f".decl {nm}_any(inst:number)", f"{nm}_any(I) :- {nm}(I,_).", ""]
+        fired.append(nm); anys.append(f"{nm}_any")
+
+    bylen = defaultdict(dict)                                  # ---- n-gram cover ----
+    for suf, o in ngram_rules.items():
+        bylen[len(suf)][suf] = o
+    lens = sorted(bylen)
+    for n in lens:
+        N = n + 1
+        pm, _ = _positions(range(1, n + 1))
+        cols = ",".join(f"c{i}:number" for i in range(n))
+        L += [f".decl gram{N}({cols},t:number)", f".decl gram{N}_hit(inst:number,t:number)", f".decl gram{N}_any(inst:number)"]
+        L += [f"gram{N}({','.join(map(str, suf))},{o})." for suf, o in bylen[n].items()]
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[n - i]},C{i})" for i in range(n)] + [f"gram{N}({','.join(f'C{i}' for i in range(n))},T)"]
+        eqns = [f"Pm{k}=P-{k}" for k in range(1, n)]
+        L += [f"gram{N}_hit(I,T) :- {', '.join(atoms + eqns)}.", f"gram{N}_any(I) :- gram{N}_hit(I,_).", ""]
+
+    ind = []                                                   # ---- copy/induction OOD fallback (L=1) ----
+    for r in rels:
+        if r["L"] != 1:
+            continue
+        L += [".decl ind1_pj(inst:number,j:number)", "ind1_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.",
+              ".decl ind1_last(inst:number,j:number)", "ind1_last(I,J) :- ind1_pj(I,_), J = max JJ : { ind1_pj(I,JJ) }.",
+              ".decl ind1(inst:number,out:number)", "ind1(I,OUT) :- ind1_last(I,J), tok(I,J+1,OUT).",
+              ".decl ind1_any(inst:number)", "ind1_any(I) :- ind1(I,_).", ""]
+        ind.append("ind1")
+        break
+
+    L.append("// --- routing (priority via negation guards) ---")
+    for i, nm in enumerate(fired):                             # idioms: each guarded by all higher-priority idioms
+        guard = "".join(f", !{anys[k]}(I)" for k in range(i))
+        L.append(f"cdecide(I,T) :- {nm}(I,T){guard}.")
+    no_idiom = "".join(f", !{a}(I)" for a in anys)
+    for n in lens:                                             # n-grams: longest wins, below all idioms
+        g = no_idiom + "".join(f", !gram{m + 1}_any(I)" for m in lens if m > n)
+        L.append(f"cdecide(I,T) :- gram{n + 1}_hit(I,T){g}.")
+    no_gram = "".join(f", !gram{m + 1}_any(I)" for m in lens)
+    for nm in ind:                                             # induction: OOD fallback, below idioms AND n-grams
+        L.append(f"cdecide(I,T) :- {nm}(I,T){no_idiom}{no_gram}.")
+
+    open(out_path, "w").write("\n".join(L) + "\n")
+    run = os.path.join(os.path.dirname(out_path), "run.dl")
+    open(run, "w").write(
+        "// standalone runtime harness — souffle only, no fieldrun/weights.\n"
+        "// souffle run.dl -F <dir with tok.facts: inst<TAB>pos<TAB>id> -D <out>  →  cdecide.csv\n"
+        ".decl tok(inst:number, pos:number, id:number)\n.input tok\n"
+        f'#include "{os.path.basename(out_path)}"\n.output cdecide\n')
+
+
 def main():
-    backfill = "--backfill" in sys.argv                       # optional: memoize the residual with the n-gram suffix cover
+    backfill = "--backfill" in sys.argv                       # report idiom coverage + n-gram backfill stats
+    emit = "--emit" in sys.argv                               # write circuits.dl + run.dl (idioms + n-gram cover, souffle-only)
+    cert = "--certify" in sys.argv                            # prove the emitted circuits.dl == model via equiv.dl (cached refs)
     a = [x for x in sys.argv[1:] if not x.startswith("--")]
     n = int(a[0]) if len(a) > 0 else 1400
     w = int(a[1]) if len(a) > 1 else 8
     md = a[2] if len(a) > 2 else os.path.join(HERE, "reference", "threx")
     md = md if os.path.isabs(md) else os.path.join(HERE, md)
     name = os.path.basename(md.rstrip("/"))
-    sym = {i: t[0] for i, t in enumerate(json.load(open(os.path.join(md, "lexicon.json")))["tokens"])}
+    lexp = os.path.join(md, "lexicon.json")                    # optional — large LMs (Llama) decode to token ids
+    sym = {i: t[0] for i, t in enumerate(json.load(open(lexp))["tokens"])} if os.path.exists(lexp) else {}
     s = lambda t: (sym.get(t, str(t)).strip() or f"[{t}]")
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
@@ -365,6 +459,24 @@ def main():
               + (f", {len(remaining)} UNCOVERED (raise w)" if remaining else " (complete)"))
         tot = len(real) + len(real_c) + len(rels_real) + len(rules)
         print(f"  full circuit = {len(real)+len(real_c)+len(rels_real)} idioms + {len(rules)} n-gram rules = {tot} rules for {len(idxs)} decisions")
+
+    if emit or cert:
+        rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]   # induction → OOD fallback (below n-grams)
+        covered, _ = idiom_coverage(insts, refs, idxs, real, real_c, [])          # faithful idioms only (gate/compose)
+        residual = [i for i in idxs if i not in covered]
+        rules, remaining, _ = minimal_suffix_cover(insts, refs, residual, w)
+        out = os.path.join(md, "circuits.dl")
+        emit_circuits(out, real, real_c, rels_real, rules, w, name)
+        print(f"\n=== EMIT → {out} ===")
+        print(f"  {len(real_c)} compose + {len(real)} select-gate idioms (faithful, in-domain) cover {len(covered)}/{len(idxs)};"
+              f" {len(rules)} n-gram rules memoize the residual" + (f"; {len(remaining)} uncovered" if remaining else "")
+              + (f"; {len(rels_real)} induction OOD fallback" if rels_real else "") + ".  + run.dl (souffle-only harness).")
+        if cert:
+            from oracle import run_equiv
+            r = run_equiv(out, [insts[i] for i in idxs], [refs[i] for i in idxs])
+            ok = r.get("nmiss", 1) == 0 and r.get("nuncov", 1) == 0
+            print(f"  CERTIFY (equiv.dl): ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
+                  + ("CERTIFIED — circuits.dl == model over the corpus (souffle-only)" if ok else "NOT certified"))
 
     print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
           "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")
