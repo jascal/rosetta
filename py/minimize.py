@@ -85,7 +85,7 @@ def composed_fires(ctx):
 
 
 def minimal_suffix_cover(insts, refs, idxs, wmax):
-    rules, remaining = {}, set(idxs)
+    rules, remaining, order_of = {}, set(idxs), {}
     for k in range(1, wmax + 1):
         groups = defaultdict(list)
         for i in remaining:
@@ -94,14 +94,56 @@ def minimal_suffix_cover(insts, refs, idxs, wmax):
             outs = {refs[i] for i in members}
             if len(outs) == 1:
                 rules[suf] = outs.pop()
+                for i in members:
+                    order_of[i] = k          # this instance resolved at suffix length k → a (k+1)-gram
                 remaining -= set(members)
         if not remaining:
             break
-    return rules, remaining
+    return rules, remaining, order_of        # order_of: per-instance resolving length (the n-gram order, O(n), no O(n²) detector)
 
 
-def emit(out_path, rules, composed):
-    L = [".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+def emit_symbols(path, rules, composed, sym, name):
+    """The legible twin of circuits.dl: the SAME n-gram rules with token STRINGS instead of ids — a valid, runnable
+    souffle program (symbol-typed). A transliteration of circuits.dl via the lexicon (id↔token bijection), so it inherits
+    the certificate. Run it on symbol-tokenized input: tok(inst,pos,sym:symbol). (Composed/arithmetic circuits can't be
+    symbolized — they compute over operand VALUES, not look tokens up — so they stay in circuits.dl; noted here.)"""
+    esc = lambda s: '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\t", "\\t") + '"'
+    q = lambda t: esc(sym[t]) if sym.get(t) else esc(f"id{t}")
+    bylen = defaultdict(dict)
+    for suf, o in rules.items():
+        bylen[len(suf)][suf] = o
+    lens = sorted(bylen)
+    L = [f"// {name} — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).",
+         "// Same rules; a transliteration via the lexicon, so it inherits circuits.dl's certificate. gramN = N-gram",
+         "// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:",
+         "//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>\"token\"> -D out  →  cdecide.csv", "",
+         ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
+         ".decl mp(inst:number, m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl cdecide(inst:number, out:symbol)", ".output cdecide"]
+    if composed:
+        L.append("// NOTE: this model also has a COMPOSED arithmetic circuit (a computation, not a token lookup) — see"
+                 " circuits.dl; it is not representable in symbol form and is omitted here.")
+    for n in lens:
+        N = n + 1
+        cols = ",".join(f"c{i}:symbol" for i in range(n))
+        L += [f".decl gram{N}({cols},t:symbol)   // {N}-gram", f".decl gram{N}_hit(inst:number,t:symbol)",
+              f".decl gram{N}_any(inst:number)"]
+        L += [f"gram{N}({','.join(q(t) for t in suf)},{q(o)})." for suf, o in bylen[n].items()]
+        atoms = ["mp(I,P)"] + [f"tok(I,{'P' if i == n - 1 else f'P{n-1-i}'},C{i})" for i in range(n)]
+        atoms += [f"P{k}=P-{k}" for k in range(1, n)] + [f"gram{N}({','.join(f'C{i}' for i in range(n))},T)"]
+        L += [f"gram{N}_hit(I,T) :- {', '.join(atoms)}.", f"gram{N}_any(I) :- gram{N}_hit(I,_)."]
+    for n in lens:
+        guard = "".join(f", !gram{m+1}_any(I)" for m in lens if m > n)
+        L.append(f"cdecide(I,T) :- gram{n+1}_hit(I,T){guard}.")
+    open(path, "w").write("\n".join(L) + "\n")
+
+
+def emit(out_path, rules, composed, sym=None, name=""):
+    L = ["// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).",
+         "// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…",
+         "// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.",
+         "// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.", "",
+         ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl cdecide(inst:number,out:number)"]
     if composed:
         L += [".decl strength(b:number,s:number)", ".decl sumthing(s:number,t:number)",
@@ -115,18 +157,22 @@ def emit(out_path, rules, composed):
         bylen[len(suf)][suf] = o
     lens = sorted(bylen)
     for n in lens:
+        N = n + 1                                                # n context tokens → an N-gram
         cols = ",".join(f"c{i}:number" for i in range(n))
-        L += [f".decl s{n}({cols},t:number)", f".decl s{n}p(inst:number,t:number)", f".decl any{n}(inst:number)"]
-        L += [f"s{n}({','.join(map(str,suf))},{o})." for suf, o in bylen[n].items()]
+        L += [f".decl gram{N}({cols},t:number)   // {N}-gram: {n} context token(s) → next",
+              f".decl gram{N}_hit(inst:number,t:number)", f".decl gram{N}_any(inst:number)"]
+        L += [f"gram{N}({','.join(map(str,suf))},{o})." for suf, o in bylen[n].items()]
         atoms = ["mp(I,P)"] + [f"tok(I,{'P' if i==n-1 else f'P{n-1-i}'},C{i})" for i in range(n)]
-        atoms += [f"P{k}=P-{k}" for k in range(1, n)] + [f"s{n}({','.join(f'C{i}' for i in range(n))},T)"]
-        L += [f"s{n}p(I,T) :- {', '.join(atoms)}.", f"any{n}(I) :- s{n}p(I,_)."]
+        atoms += [f"P{k}=P-{k}" for k in range(1, n)] + [f"gram{N}({','.join(f'C{i}' for i in range(n))},T)"]
+        L += [f"gram{N}_hit(I,T) :- {', '.join(atoms)}.", f"gram{N}_any(I) :- gram{N}_hit(I,_)."]
     if composed:
         L.append("cdecide(I,T) :- comp(I,T).")
     for n in lens:
-        guard = "".join(f", !any{m}(I)" for m in lens if m > n) + (", !has_comp(I)" if composed else "")
-        L.append(f"cdecide(I,T) :- s{n}p(I,T){guard}.")
+        guard = "".join(f", !gram{m+1}_any(I)" for m in lens if m > n) + (", !has_comp(I)" if composed else "")
+        L.append(f"cdecide(I,T) :- gram{n+1}_hit(I,T){guard}.")
     open(out_path, "w").write("\n".join(L) + "\n")
+    if sym is not None:
+        emit_symbols(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, composed, sym, name)
     # standalone runtime harness — souffle-only, NO fieldrun/whole.dl/weights (the runtime-independence invariant):
     #   souffle run.dl -F <dir with tok.facts: inst<TAB>pos<TAB>id>  →  cdecide.csv = (inst, argmax id)
     run = os.path.join(os.path.dirname(out_path), "run.dl")
@@ -160,11 +206,11 @@ def main():
         comp_idx = [i for i in valid if composed_fires(insts[i]) is not None and composed_fires(insts[i]) == refs[i]]
         print(f"2. composed plugin covers {len(comp_idx)} instances (1 rule)")
     rest = [i for i in valid if i not in set(comp_idx)]
-    rules, remaining = minimal_suffix_cover(insts, refs, rest, w)
+    rules, remaining, order_of = minimal_suffix_cover(insts, refs, rest, w)
     bylen = Counter(len(s) for s in rules)
     print(f"3. minimal-suffix cover on {len(rest)}: {len(rules)} rules, {len(remaining)} unresolved")
     print(f"   rule lengths {dict(sorted(bylen.items()))}  (len1=priors · mid=structural/idiom · len{w}=memorized)")
-    emit(out, rules, use_composed)
+    emit(out, rules, use_composed, sym, name)
     print("4. certify whole program vs the model, in Datalog (equiv.dl):")
     r = run_equiv(out, [insts[i] for i in valid], [refs[i] for i in valid])
     if "error" in r:
@@ -179,8 +225,11 @@ def main():
     print(f"   program: {nrules} rules for {len(valid)} decisions "
           f"({100*(1-nrules/max(1,len(valid))):.0f}% fewer than memorizing); {memo} are full-W (memorized tail)")
 
-    # n-gram characterization comes from the Datalog detector (dl/ngram.dl) — one detector, context-based, not Python.
-    hist, _ = detect([insts[i] for i in valid], [refs[i] for i in valid], w)
+    # n-gram order, context-based, derived from the cover's per-instance resolving length (O(n) — scales to big corpora,
+    # same quantity dl/ngram.dl computes; `py/ngram.py` runs the Datalog detector directly for small showcase corpora).
+    hist = Counter(k + 1 for k in order_of.values())
+    if comp_idx:
+        hist[0] += len(comp_idx)   # composed-covered instances (order 0 = a computed rule, not an n-gram)
     tot = max(1, sum(hist.values()))
     eff = next((o for o in sorted(hist) if sum(hist[k] for k in hist if k <= o) >= 0.9 * tot), max(hist, default=0))
     print(f"   n-gram order (contexts) {dict(sorted(hist.items()))}  → effective order {eff}-gram"

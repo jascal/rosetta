@@ -1,0 +1,169 @@
+// threx — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).
+// Same rules; a transliteration via the lexicon, so it inherits circuits.dl's certificate. gramN = N-gram
+// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:
+//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>"token"> -D out  →  cdecide.csv
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+// NOTE: this model also has a COMPOSED arithmetic circuit (a computation, not a token lookup) — see circuits.dl; it is not representable in symbol form and is omitted here.
+.decl gram2(c0:symbol,t:symbol)   // 2-gram
+.decl gram2_hit(inst:number,t:symbol)
+.decl gram2_any(inst:number)
+gram2("ne","⟩").
+gram2("⟩","⟨").
+gram2("↘","·").
+gram2("hï","·").
+gram2("fï","⟩").
+gram2("kel","mi").
+gram2("na","dø").
+gram2("?","⟩").
+gram2("ko","⟩").
+gram2("bo","?").
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+.decl gram3(c0:symbol,c1:symbol,t:symbol)   // 3-gram
+.decl gram3_hit(inst:number,t:symbol)
+.decl gram3_any(inst:number)
+gram3("↘","·","·").
+gram3("·","·","gɪ").
+gram3("gɪ","vor","⟩").
+gram3("↗","↓","·").
+gram3("↓","·","·").
+gram3("·","mi","wø").
+gram3("→","↓","·").
+gram3("gɪ","sib","⟩").
+gram3("kel","mi","⟩").
+gram3("na","dø","⟩").
+gram3("wø","vor","?").
+gram3("↓","→","·").
+gram3("→","·","·").
+gram3("→","↗","·").
+gram3("↗","·","·").
+gram3("gɪ","lum","⟩").
+gram3("ka","gɪ","lum").
+gram3("wø","lum","?").
+gram3("tu","gɪ","sto").
+gram3("gɪ","sto","⟩").
+gram3("wø","nok","?").
+gram3("↓","↗","·").
+gram3("ru","nok","mi").
+gram3("nok","tu","⟩").
+gram3("↗","→","·").
+gram3("mi","gɪ","sto").
+gram3("wø","eel","?").
+gram3("↗","↗","·").
+gram3("wø","sib","?").
+gram3("→","↑","·").
+gram3("↑","·","·").
+gram3("∿","↑","↑").
+gram3("⟨","dø","·").
+gram3("dø","·","ka").
+gram3("·","tu","wø").
+gram3("↑","↑","·").
+gram3("↓","↓","·").
+gram3("gɪ","eel","⟩").
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+.decl gram4(c0:symbol,c1:symbol,c2:symbol,t:symbol)   // 4-gram
+.decl gram4_hit(inst:number,t:symbol)
+.decl gram4_any(inst:number)
+gram4("ne","⟩","⟨","∿").
+gram4("vor","⟩","⟨","∿").
+gram4("·","mi","wø","fï").
+gram4("fï","⟩","⟨","∿").
+gram4("sib","⟩","⟨","∿").
+gram4("mi","⟩","⟨","∿").
+gram4("dø","⟩","⟨","∿").
+gram4("⟨","tu","wø","eel").
+gram4("ko","⟩","⟨","∿").
+gram4("lum","⟩","⟨","∿").
+gram4("ka","wø","sto","?").
+gram4("sto","⟩","⟨","∿").
+gram4("⟨","mi","wø","eel").
+gram4("tu","⟩","⟨","∿").
+gram4("mi","wø","sto","?").
+gram4("·","tu","wø","sto").
+gram4("tu","wø","sto","⟩").
+gram4("eel","⟩","⟨","∿").
+gram4_hit(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, gram4(C0,C1,C2,T).
+gram4_any(I) :- gram4_hit(I,_).
+.decl gram5(c0:symbol,c1:symbol,c2:symbol,c3:symbol,t:symbol)   // 5-gram
+.decl gram5_hit(inst:number,t:symbol)
+.decl gram5_any(inst:number)
+gram5("?","⟩","⟨","tu","gɪ").
+gram5("ne","⟩","⟨","∿","↓").
+gram5("vor","⟩","⟨","∿","↓").
+gram5("fï","⟩","⟨","∿","↓").
+gram5("sib","⟩","⟨","ka","wø").
+gram5("mi","⟩","⟨","mi","wø").
+gram5("dø","⟩","⟨","tu","wø").
+gram5("vor","?","⟩","⟨","mi").
+gram5("?","⟩","⟨","ka","gɪ").
+gram5("sib","⟩","⟨","∿","↓").
+gram5("dø","⟩","⟨","ka","wø").
+gram5("bo","?","⟩","⟨","mi").
+gram5("lum","⟩","⟨","ka","wø").
+gram5("lum","?","⟩","⟨","tu").
+gram5("?","⟩","⟨","mi","gɪ").
+gram5("ko","⟩","⟨","ka","wø").
+gram5("sto","?","⟩","⟨","tu").
+gram5("sto","⟩","⟨","tu","wø").
+gram5("dø","⟩","⟨","mi","wø").
+gram5("nok","?","⟩","⟨","mi").
+gram5("ne","⟩","⟨","ka","wø").
+gram5("lum","⟩","⟨","∿","↓").
+gram5("vor","⟩","⟨","ka","wø").
+gram5("tu","⟩","⟨","tu","wø").
+gram5("dø","⟩","⟨","∿","↓").
+gram5("sto","⟩","⟨","ka","wø").
+gram5("eel","?","⟩","⟨","mi").
+gram5("sib","?","⟩","⟨","mi").
+gram5("sto","⟩","⟨","∿","↓").
+gram5("sto","⟩","⟨","mi","wø").
+gram5("fï","⟩","⟨","mi","wø").
+gram5("eel","⟩","⟨","∿","↓").
+gram5_hit(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, gram5(C0,C1,C2,C3,T).
+gram5_any(I) :- gram5_hit(I,_).
+.decl gram6(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,t:symbol)   // 6-gram
+.decl gram6_hit(inst:number,t:symbol)
+.decl gram6_any(inst:number)
+gram6("ne","⟩","⟨","∿","→","↓").
+gram6("vor","⟩","⟨","∿","↗","↓").
+gram6("vor","⟩","⟨","hï","·","mi").
+gram6("fï","⟩","⟨","∿","→","↘").
+gram6("sib","⟩","⟨","ka","ru","sib").
+gram6("ka","ko","⟩","⟨","∿","↑").
+gram6("ko","⟩","⟨","∿","→","↓").
+gram6("sib","⟩","⟨","∿","↗","↓").
+gram6("vor","⟩","⟨","∿","↓","↘").
+gram6("dø","⟩","⟨","ka","wø","eel").
+gram6("tu","ko","⟩","⟨","∿","↓").
+gram6("lum","⟩","⟨","ka","wø","sib").
+gram6("ko","⟩","⟨","ka","wø","eel").
+gram6("lum","⟩","⟨","∿","↓","↗").
+gram6("vor","⟩","⟨","ka","ru","vor").
+gram6("lum","⟩","⟨","hï","·","ka").
+gram6("ne","⟩","⟨","∿","↗","→").
+gram6("lum","⟩","⟨","∿","→","↓").
+gram6("fï","⟩","⟨","∿","↓","↘").
+gram6_hit(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, gram6(C0,C1,C2,C3,C4,T).
+gram6_any(I) :- gram6_hit(I,_).
+.decl gram8(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,c6:symbol,t:symbol)   // 8-gram
+.decl gram8_hit(inst:number,t:symbol)
+.decl gram8_any(inst:number)
+gram8("tu","na","dø","⟩","⟨","∿","↗","↓").
+gram8("mi","gɪ","sto","⟩","⟨","ka","wø","sto").
+gram8("·","gɪ","sto","⟩","⟨","ka","wø","vor").
+gram8("mi","na","dø","⟩","⟨","∿","↗","→").
+gram8_hit(I,T) :- mp(I,P), tok(I,P6,C0), tok(I,P5,C1), tok(I,P4,C2), tok(I,P3,C3), tok(I,P2,C4), tok(I,P1,C5), tok(I,P,C6), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, gram8(C0,C1,C2,C3,C4,C5,C6,T).
+gram8_any(I) :- gram8_hit(I,_).
+cdecide(I,T) :- gram2_hit(I,T), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram8_any(I).
+cdecide(I,T) :- gram3_hit(I,T), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram8_any(I).
+cdecide(I,T) :- gram4_hit(I,T), !gram5_any(I), !gram6_any(I), !gram8_any(I).
+cdecide(I,T) :- gram5_hit(I,T), !gram6_any(I), !gram8_any(I).
+cdecide(I,T) :- gram6_hit(I,T), !gram8_any(I).
+cdecide(I,T) :- gram8_hit(I,T).

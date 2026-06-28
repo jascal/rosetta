@@ -1,3 +1,8 @@
+// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).
+// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…
+// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.
+// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.
+
 .decl mp(inst:number,m:number)
 mp(I,M) :- M = max P : { tok(I,P,_) }.
 .decl cdecide(inst:number,out:number)
@@ -21,77 +26,161 @@ sumthing(7,29).
 sumthing(8,30).
 comp(I,T) :- mp(I,P), tok(I,P,7), tok(I,P5,20),P5=P-5, tok(I,P4,Bi),P4=P-4, tok(I,P3,Bj),P3=P-3, strength(Bi,Si), strength(Bj,Sj), sumthing(Si+Sj,T).
 has_comp(I) :- comp(I,_).
-.decl s1(c0:number,t:number)
-.decl s1p(inst:number,t:number)
-.decl any1(inst:number)
-s1(18,1).
-s1(1,0).
-s1(24,19).
-s1(22,25).
-s1(25,19).
-s1(14,19).
-s1(10,1).
-s1(28,1).
-s1(8,28).
-s1(26,3).
-s1(9,16).
-s1(16,1).
-s1(2,1).
-s1(17,1).
-s1p(I,T) :- mp(I,P), tok(I,P,C0), s1(C0,T).
-any1(I) :- s1p(I,_).
-.decl s2(c0:number,c1:number,t:number)
-.decl s2p(inst:number,t:number)
-.decl any2(inst:number)
-s2(24,19,19).
-s2(19,19,7).
-s2(7,27,1).
-s2(25,19,19).
-s2(14,19,3).
-s2(19,3,6).
-s2(3,6,10).
-s2(26,3,1).
-s2(0,3,6).
-s2(4,6,30).
-s2(6,27,2).
-s2p(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, s2(C0,C1,T).
-any2(I) :- s2p(I,_).
-.decl s3(c0:number,c1:number,c2:number,t:number)
-.decl s3p(inst:number,t:number)
-.decl any3(inst:number)
-s3(18,1,0,20).
-s3(27,1,0,20).
-s3(10,1,0,20).
-s3(28,1,0,20).
-s3(3,1,0,20).
-s3(16,1,0,20).
-s3(2,1,0,3).
-s3(17,1,0,20).
-s3p(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, s3(C0,C1,C2,T).
-any3(I) :- s3p(I,_).
-.decl s4(c0:number,c1:number,c2:number,c3:number,t:number)
-.decl s4p(inst:number,t:number)
-.decl any4(inst:number)
-s4(2,1,0,4,7).
-s4(18,1,0,20,25).
-s4(27,1,0,20,25).
-s4(10,1,0,20,25).
-s4(28,1,0,5,6).
-s4(16,1,0,4,6).
-s4(2,1,0,5,7).
-s4(17,1,0,20,21).
-s4p(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, s4(C0,C1,C2,C3,T).
-any4(I) :- s4p(I,_).
-.decl s5(c0:number,c1:number,c2:number,c3:number,c4:number,t:number)
-.decl s5p(inst:number,t:number)
-.decl any5(inst:number)
-s5(18,1,0,20,23,25).
-s5(10,1,0,20,23,24).
-s5p(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, s5(C0,C1,C2,C3,C4,T).
-any5(I) :- s5p(I,_).
+.decl gram2(c0:number,t:number)   // 2-gram: 1 context token(s) → next
+.decl gram2_hit(inst:number,t:number)
+.decl gram2_any(inst:number)
+gram2(18,1).
+gram2(1,0).
+gram2(24,19).
+gram2(14,19).
+gram2(10,1).
+gram2(26,3).
+gram2(9,16).
+gram2(2,1).
+gram2(17,1).
+gram2(11,2).
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+.decl gram3(c0:number,c1:number,t:number)   // 3-gram: 2 context token(s) → next
+.decl gram3_hit(inst:number,t:number)
+.decl gram3_any(inst:number)
+gram3(24,19,19).
+gram3(19,19,7).
+gram3(7,27,1).
+gram3(22,25,19).
+gram3(25,19,19).
+gram3(19,3,6).
+gram3(23,25,19).
+gram3(7,28,1).
+gram3(26,3,1).
+gram3(9,16,1).
+gram3(6,27,2).
+gram3(25,23,19).
+gram3(23,19,19).
+gram3(23,22,19).
+gram3(22,19,19).
+gram3(7,13,1).
+gram3(5,7,13).
+gram3(6,13,2).
+gram3(4,7,12).
+gram3(7,12,1).
+gram3(6,29,2).
+gram3(25,22,19).
+gram3(8,29,3).
+gram3(29,4,1).
+gram3(22,23,19).
+gram3(3,7,12).
+gram3(6,30,2).
+gram3(22,22,19).
+gram3(6,28,2).
+gram3(23,21,19).
+gram3(21,19,19).
+gram3(20,21,21).
+gram3(0,16,19).
+gram3(16,19,5).
+gram3(19,4,6).
+gram3(21,21,19).
+gram3(25,25,19).
+gram3(7,30,1).
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+.decl gram4(c0:number,c1:number,c2:number,t:number)   // 4-gram: 3 context token(s) → next
+.decl gram4_hit(inst:number,t:number)
+.decl gram4_any(inst:number)
+gram4(18,1,0,20).
+gram4(27,1,0,20).
+gram4(19,3,6,10).
+gram4(10,1,0,20).
+gram4(28,1,0,20).
+gram4(3,1,0,20).
+gram4(16,1,0,20).
+gram4(0,4,6,30).
+gram4(17,1,0,20).
+gram4(13,1,0,20).
+gram4(5,6,12,2).
+gram4(12,1,0,20).
+gram4(0,3,6,30).
+gram4(4,1,0,20).
+gram4(3,6,12,2).
+gram4(19,4,6,12).
+gram4(4,6,12,1).
+gram4(30,1,0,20).
+gram4_hit(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, gram4(C0,C1,C2,T).
+gram4_any(I) :- gram4_hit(I,_).
+.decl gram5(c0:number,c1:number,c2:number,c3:number,t:number)   // 5-gram: 4 context token(s) → next
+.decl gram5_hit(inst:number,t:number)
+.decl gram5_any(inst:number)
+gram5(2,1,0,4,7).
+gram5(18,1,0,20,25).
+gram5(27,1,0,20,25).
+gram5(10,1,0,20,25).
+gram5(28,1,0,5,6).
+gram5(3,1,0,3,6).
+gram5(16,1,0,4,6).
+gram5(27,2,1,0,3).
+gram5(2,1,0,5,7).
+gram5(28,1,0,20,25).
+gram5(16,1,0,5,6).
+gram5(11,2,1,0,3).
+gram5(13,1,0,5,6).
+gram5(13,2,1,0,4).
+gram5(2,1,0,3,7).
+gram5(17,1,0,5,6).
+gram5(12,2,1,0,4).
+gram5(12,1,0,4,6).
+gram5(16,1,0,3,6).
+gram5(29,2,1,0,3).
+gram5(18,1,0,5,6).
+gram5(13,1,0,20,25).
+gram5(27,1,0,5,6).
+gram5(4,1,0,4,6).
+gram5(16,1,0,20,25).
+gram5(12,1,0,5,6).
+gram5(30,2,1,0,3).
+gram5(28,2,1,0,3).
+gram5(12,1,0,20,25).
+gram5(12,1,0,3,6).
+gram5(10,1,0,3,6).
+gram5(30,1,0,20,25).
+gram5_hit(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, gram5(C0,C1,C2,C3,T).
+gram5_any(I) :- gram5_hit(I,_).
+.decl gram6(c0:number,c1:number,c2:number,c3:number,c4:number,t:number)   // 6-gram: 5 context token(s) → next
+.decl gram6_hit(inst:number,t:number)
+.decl gram6_any(inst:number)
+gram6(18,1,0,20,23,25).
+gram6(27,1,0,20,22,25).
+gram6(27,1,0,14,19,3).
+gram6(10,1,0,20,23,24).
+gram6(28,1,0,5,8,28).
+gram6(5,17,1,0,20,21).
+gram6(17,1,0,20,23,25).
+gram6(28,1,0,20,22,25).
+gram6(27,1,0,20,25,24).
+gram6(16,1,0,5,6,30).
+gram6(4,17,1,0,20,25).
+gram6(13,1,0,5,6,28).
+gram6(17,1,0,5,6,30).
+gram6(13,1,0,20,25,22).
+gram6(27,1,0,5,8,27).
+gram6(13,1,0,14,19,5).
+gram6(18,1,0,20,22,23).
+gram6(13,1,0,20,23,25).
+gram6(10,1,0,20,25,24).
+gram6_hit(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, gram6(C0,C1,C2,C3,C4,T).
+gram6_any(I) :- gram6_hit(I,_).
+.decl gram8(c0:number,c1:number,c2:number,c3:number,c4:number,c5:number,c6:number,t:number)   // 8-gram: 7 context token(s) → next
+.decl gram8_hit(inst:number,t:number)
+.decl gram8_any(inst:number)
+gram8(4,9,16,1,0,20,22,25).
+gram8(3,7,12,1,0,5,6,12).
+gram8(19,7,12,1,0,5,6,27).
+gram8(3,9,16,1,0,20,22,23).
+gram8_hit(I,T) :- mp(I,P), tok(I,P6,C0), tok(I,P5,C1), tok(I,P4,C2), tok(I,P3,C3), tok(I,P2,C4), tok(I,P1,C5), tok(I,P,C6), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, gram8(C0,C1,C2,C3,C4,C5,C6,T).
+gram8_any(I) :- gram8_hit(I,_).
 cdecide(I,T) :- comp(I,T).
-cdecide(I,T) :- s1p(I,T), !any2(I), !any3(I), !any4(I), !any5(I), !has_comp(I).
-cdecide(I,T) :- s2p(I,T), !any3(I), !any4(I), !any5(I), !has_comp(I).
-cdecide(I,T) :- s3p(I,T), !any4(I), !any5(I), !has_comp(I).
-cdecide(I,T) :- s4p(I,T), !any5(I), !has_comp(I).
-cdecide(I,T) :- s5p(I,T), !has_comp(I).
+cdecide(I,T) :- gram2_hit(I,T), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram8_any(I), !has_comp(I).
+cdecide(I,T) :- gram3_hit(I,T), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram8_any(I), !has_comp(I).
+cdecide(I,T) :- gram4_hit(I,T), !gram5_any(I), !gram6_any(I), !gram8_any(I), !has_comp(I).
+cdecide(I,T) :- gram5_hit(I,T), !gram6_any(I), !gram8_any(I), !has_comp(I).
+cdecide(I,T) :- gram6_hit(I,T), !gram8_any(I), !has_comp(I).
+cdecide(I,T) :- gram8_hit(I,T), !has_comp(I).
