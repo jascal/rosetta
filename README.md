@@ -11,9 +11,18 @@ carries the same text in both — with a proof that the translation is exact.
 
 ## The thesis
 
-> A trained model *is* a Datalog program. If we can identify every circuit it computes — each as a rewrite rule
-> certified against the faithful whole-model program — then the weights are redundant and can be dropped. The minimized
-> Datalog program is the model, made legible.
+> A trained model *is* an **algorithm**, and an algorithm is **substrate-free**. rosetta extracts that algorithm into a
+> certified, legible Datalog form you can **re-run, rebuild, and re-learn in any substrate — and prove it's the same**.
+> The weights ("thingies that do stuff") are one realizer; the algorithm is the invariant. We already demonstrate one
+> substrate transfer: `circuits.dl` runs the model's behavior in **souffle alone — pure logic, no weights, no GPU** —
+> with a Datalog certificate that it computes the same function.
+
+The corollary that drives the research: capturing the algorithm needs the *computation*, not just the recall. An n-gram
+rule transfers a lookup table; an **idiom** (the composed `i+j`, an induction/copy circuit) transfers a *generalizing*
+circuit — the way the model itself generalizes. So **holdout generalization is the "how much of the algorithm did we
+actually capture" metric**, and better idiom detection is what drives it toward a faithful, substrate-portable whole.
+Two models with different weights that extract to the *same* `circuits.dl` are the same algorithm — an algorithmic
+identity test, regardless of mechanism.
 
 This is the minimization arm of the PIC **certified-compression loop** (`i-orca` verifies · `fieldrun` analyzes ·
 `pil` learns · **rosetta minimizes**). See [`AGENTS.md`](./AGENTS.md) for how it wires in, and the tag discipline
@@ -82,16 +91,28 @@ consequences, and the fixes:
 
 [Apache License 2.0](./LICENSE).
 
-## Status
+## Status — the T=0 ladder so far
 
-The threx Rosetta Stone is **fully validated**: the complete `circuits.dl` (1 composed rule + 121 minimal-suffix rules)
-is **certified `nmiss=0 ∧ nuncov=0` over 300 decision windows** in Datalog — 122 rules for 300 decisions, a few hundred
-lines vs `whole.dl`'s 22,222. The breakdown is honest (`reference/threx/CERTIFICATE.md`): the composed *computation*
-collapses to one rule, free-choice *priors* are len-1 lookups, the rest are selected/structural transitions.
+Four models minimized and **certified `nmiss=0 ∧ nuncov=0` in-domain** (T=0 / greedy), via the fieldrun-refs path for
+the real models. Same generation budget (250×80, temp 0.8) so the comparison is fair; threx is the capped toy.
 
-Next is **breadth**: minimize *tens* of small models to confirm the rewrite-rule / idiom library is complete and general
-— the Rosetta Stone proves the method on one; confidence comes from many. `proved`/`empirical`/`open` tags gate every
-claim.
+| model | params | corpus windows | rules | compression | params/rule | **holdout loss** |
+|-------|------:|------:|------:|----:|----:|----:|
+| threx (Threxian) | 21,632 | 360 | 151 | 58% | 143 | **12%** |
+| stories260K | 260K | 13,911 | 7,921 | 43% | 33 | **47%** |
+| stories15M | 15.2M | 15,264 | 10,890 | 29% | 1,395 | **63%** |
+| stories110M | 110M | 18,124 | 12,959 | 28% | 8,452 | **62%** |
+
+Three curves, all pointing the same way: as capacity grows, **compression drops** (less idiomatic), **params/rule
+explodes** (more capacity beyond the recall skeleton), and **holdout generalization loss rises** (a pure n-gram cover
+generalizes *worse* on bigger, more diverse models). The standout is **threx vs stories110M**: threx, which has one real
+*computed* idiom (`THINGS[i+j]`), generalizes at **88%** (12% loss); the 110M model, captured as n-grams only,
+generalizes at **38%** (62% loss). **The idiom is what generalizes** — direct evidence that closing holdout loss = better
+idiom detection = a more substrate-transferable algorithm. That gap (the ~60% the n-gram cover can't generalize) is the
+idiom research program, now with a score.
+
+Next: the non-n-gram detector library (induction is in; agreement / delimiter / coreference next) to attack that
+holdout gap. `proved`/`empirical`/`open` tags gate every claim.
 
 ## Frontiers (revisit later)
 
@@ -108,3 +129,14 @@ claim.
   — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
 - **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing
   control-char tokens (tab/newline); `<0xNN>` rendering for byte-fallback tokens in the lexicon.
+- **The learning-curriculum (time axis).** Run rosetta over a model's **training checkpoints**. The conjecture — *learn
+  n-grams first, then progressively more abstract/tight circuits on top* — makes concrete predictions: early steps →
+  low effective order, behavior ≈ the n-gram cover, **high** holdout loss (memorizing); later → idiom structure appears,
+  holdout loss **drops**, the induction detector starts firing — with the induction *phase transition* showing as a
+  sudden holdout-loss drop at a specific step. rosetta + the detectors are the instrument to *watch* the curriculum, with
+  certificates. (Size axis = this Status ladder; temperature axis = above; this is the time axis.)
+- **Substrate transfer / re-learning.** Because the extracted algorithm is certified and substrate-free, it can be
+  re-instantiated *or re-trained* in another substrate (silicon, a rule engine, a smaller/native model) and **re-certified
+  against the same spec** (`equiv.dl`) — verifiable distillation against the *algorithm*, not black-box input→output
+  matching. Precondition: low holdout loss (the real algorithm captured, not just a lookup table). This is the link to
+  the rest of the PIC program (`fieldrun` circuit-identity, `sae-forge` re-forging, `pil` learning).
