@@ -42,12 +42,18 @@ def serve_decide(port, ctx):
     """The model's argmax via a RESIDENT fieldrun server (`fieldrun --bundle <stem> --serve <port>`): POST /predict
     {"ids":[…]} -> {"next": id}. Loads the bundle ONCE (vs subprocess-per-call which reloads it every time) — essential
     for big models (a 1B int8 bundle is 1.2 GB to reload). Build-time refs oracle only; no runtime dependency."""
-    import urllib.request, json
+    import urllib.request, json, time
     data = json.dumps({"ids": [int(t) for t in ctx]}).encode()
     req = urllib.request.Request(f"http://127.0.0.1:{port}/predict", data=data,
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        return json.loads(r.read())["next"]
+    for attempt in range(4):                                        # the single-threaded server can transiently 500 under load
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r:
+                return json.loads(r.read())["next"]
+        except Exception:
+            if attempt == 3:
+                raise
+            time.sleep(0.3)
 
 
 def serve_topk(port, ctx, k=64):
