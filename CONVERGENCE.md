@@ -29,8 +29,30 @@ into a **delineated layer**, not the core:
   explicitly separate from it.
 
 **Invariant:** the minimization core must never `import` from `pack/`. `pack/` orchestrates the core plus the
-deployment-only concerns. A grep gate (`core never imports pack`) keeps the boundary honest. This is how rosetta absorbs
-the whole builder without the minimization science absorbing retrieval/packaging concerns.
+deployment-only concerns. This is how rosetta absorbs the whole builder without the minimization science absorbing
+retrieval/packaging concerns. Enforcement, in order of strength:
+1. **Phase-1 MVP — a test/grep gate** in CI: no `from pack`/`import pack` in any core module under `py/`. Cheap, immediate.
+2. **Stronger, deferred — a structural boundary**: `pack/` as its own namespace package (its own `__init__`, optionally a
+   `pyproject` extra) so the dependency direction is harder to violate by accident. Adopt if the layer grows past a few
+   modules.
+
+### `pack/` public surface (sketch, Q for Phase 1 to finalize)
+
+`pack/` exposes **one builder entry** over the per-concern modules it orchestrates; the core's public surface *to* `pack/`
+is just the cover emit:
+
+```
+pack/
+  build.py        build_expert(corpus, out, *, bundle=None, steps=…, citation=…, adapter=None) -> package_dir
+                  # the single entry; replaces build_expert(s).sh
+  cover.py        → calls CORE (idiom_learn.emit_expert_package) for manifest.json   # the ONLY place pack touches core
+  answers.py      model-distilled curated Q&A (the dl2package role): oracle/gen → index.json + facts_*/
+  grounding.py    corpus → wordvec.txt + knowledge.tsv (the build_grounding role)
+  adapters/       structured-source → package, model-free (the normrules2package role)
+```
+
+Direction is one-way: `pack/ → core`, never the reverse. `build.py` is the only surface a caller (or a future
+`rosetta build-expert` CLI) needs.
 
 ## What moves, stays, retires
 
@@ -59,6 +81,19 @@ One directory, extends the [`PACKAGE.md`](./PACKAGE.md) schema. sgiandubh serves
 - scope / citation metadata.
 
 All gitignored on both sides (reproducible from the build recipe; may carry licensed source content).
+
+### Versioning (the cross-repo contract)
+
+The package layout becomes *the* contract between the two repos, so it versions explicitly:
+
+- `manifest.json` carries an integer **`schema_version`**.
+- **Forward-compatible by construction** (already how the consumer behaves): unknown fields and unknown rule `kind`s are
+  *ignored*, not errors — `rosetta_package.h::load` skips unknown kinds today. So **additive** changes (a new optional
+  component, a new idiom kind) never break an older runtime.
+- **Breaking** changes bump the major; the runtime refuses a `schema_version` major it doesn't understand with a clear
+  error rather than silently mis-serving.
+- **Optional components** (`index.json`, grounding) are detected by *presence*, not by version — a model-free expert
+  simply ships without them.
 
 ## Runtime shape after migration (sgiandubh)
 
@@ -91,8 +126,15 @@ become **outcomes** of rosetta becoming the builder (Phase 1 and Phase 2 respect
 
 ## Open questions (tagged)
 
-- `open` **gram subsumption** — does the cover's gated-n-gram tier fully cover `build_gram`'s n-grams? Measure before
-  retiring `gram.h`; if not, fold the gap into the cover emit rather than keeping a second n-gram path.
+- `open` **gram subsumption** (the highest-risk retirement) — does the cover's gated-n-gram tier dominate
+  `build_gram`'s n-grams? **Concrete gate before deleting `gram.h`/`build_gram`:** over a held-out corpus sample, build
+  *both* the old `build_gram` table and the cover's gated n-grams, then for every context where `build_gram` fires,
+  compare:
+  - **recall** = `|{ctx : cover predicts the same next-token as gram}| / |{ctx : gram fires}|` — require cover ⊇ gram (≈1.0);
+  - **no confident disagreement** = the cover never returns a *different* confident token where gram fired (it may abstain
+    with cause, never contradict).
+  Pass both ⇒ retire `gram`. Any gap ⇒ fold it into the cover's n-gram emit rather than keep a second n-gram path. `open`
+  until this runs.
 - `open` **grounding necessity** — retrieval/grounding earns its place by supplying *citation* (the bounded/cited
   property), but its answer quality was mediocre (mean-pooled embeddings have a similarity floor). Measure its marginal
   contribution; it stays a package component regardless, built in `pack/`.
@@ -100,6 +142,15 @@ become **outcomes** of rosetta becoming the builder (Phase 1 and Phase 2 respect
   different artifacts; the package carries both, the runtime prefers curated on an exact match. Confirm this ordering is
   what we want per expert.
 - `design` **`pack/` boundary** — enforce "core never imports `pack`" with a test/grep gate.
+
+## Existing minimizations are unaffected
+
+The certified minimizations already in the repo (threx … stories110M) are **core artifacts** — model → certified cover
++ `dl/equiv.dl` certificate. The `pack/` layer builds *on* the core for *deployment*; it does not change how the core
+minimizes or its existing certified outputs, so **those packages are not rebuilt by this migration — they're
+grandfathered as core artifacts.** `build-expert` (`pack/`) produces *deployable bounded-expert* packages (the
+sgiandubh-served kind), a different output than a minimization certificate. The two example experts (logic, riscv) *are*
+rebuilt via `build-expert` in Phase 1 — because they're deployment packages, not minimization certificates.
 
 ## Non-goals
 
