@@ -40,3 +40,41 @@ def test_build_model_free_expert(tmp_path):
     kn = (out / "knowledge.tsv").read_text()                    # grounding (citation)
     assert "ecall" in kn and "x0" in kn
     assert not (out / "gram").exists()                          # cover-first: NO bare gram tier (CONVERGENCE.md)
+
+
+def test_build_expert_cover_orchestration(tmp_path, monkeypatch):
+    """Exercise the distilled + cover orchestration hermetically: stub the model-dependent steps (fieldrun distill,
+    cover extraction) and assert build_expert wires curated answers + grounding(citation) + the cover, still no gram."""
+    import pack.build as B
+
+    out = tmp_path / "pkg"
+    out.mkdir()
+    corpus = tmp_path / "kb.txt"
+    corpus.write_text("Logic is the study of valid inference. A tautology is always true regardless of its parts.\n")
+    questions = tmp_path / "q.txt"
+    questions.write_text("What is a tautology?\n")
+
+    monkeypatch.setattr(B.subprocess, "run", lambda *a, **k: None)              # skip the real fieldrun distill
+
+    def fake_answers(o, c, dl, *, citation="", cite=None, model="m"):           # pretend distill produced 1 curated item
+        json.dump({"model": model, "items": [{"id": "p00000", "query": "q", "answer": "a",
+                                              "citation": citation, "facts": ""}]},
+                  open(os.path.join(o, "index.json"), "w"))
+        return [1]
+    monkeypatch.setattr(B.answers, "from_export", fake_answers)
+
+    def fake_cover(model_dir, *, minsupp=3, mindet=1.0, **k):                   # pretend the core emitted a cover
+        pk = os.path.join(model_dir, "package")
+        os.makedirs(pk, exist_ok=True)
+        json.dump({"model": "m", "n_rules": 1, "rules": [{"kind": "ngram", "ctx": [1], "out": 2}]},
+                  open(os.path.join(pk, "manifest.json"), "w"))
+        return os.path.join(pk, "manifest.json")
+    monkeypatch.setattr(B.cover_mod, "build", fake_cover)
+
+    B.build_expert(str(out), corpus=str(corpus), bundle="dummy", questions=str(questions),
+                   fieldrun=sys.executable, dim=0, cover=True, model="m")        # fieldrun=existing path; run() stubbed
+
+    assert (out / "index.json").exists()                                       # curated answers wired
+    assert (out / "knowledge.tsv").exists()                                    # grounding (citation) wired
+    assert (out / "package" / "manifest.json").exists()                        # cover wired
+    assert not (out / "gram").exists()                                         # still no bare gram tier
