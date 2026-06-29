@@ -56,21 +56,27 @@ def family_ioi(tok, port, n=40):
 
 def family_succession(tok, port, seq, label, n=30):
     """succession / greater-than: an ordered run 'X Y Z' → the next item. Causal: shift the window's start → the
-    predicted successor shifts with it (the model tracks ordinal position, not a memorized token)."""
+    predicted successor shifts with it (the model tracks ordinal position, not a memorized token). FORMAT-ROBUST: models
+    differ in list-format prior (a code model reads bare-space ' Mon Tue Wed' as a token list → predicts a number/comma,
+    but reads 'Mon, Tue, Wed,' as a sequence → the successor), so try both joins and report the best — the CIRCUIT is what
+    we test, not one surface format; a 0% under one format is a probe artifact, not an architectural absence."""
     s = single(tok, seq)
     items = [w for w in seq if w in s]
     if len(items) < 5:
         return None
-    rng = random.Random(1)
-    det = cfollow = trials = 0
-    for _ in range(n):
-        i = rng.randint(0, len(items) - 4)
-        o1 = serve_decide(port, tok.encode(f"{items[i]}{items[i+1]}{items[i+2]}").ids)
-        det += (o1 == s[items[i + 3]])
-        j = (i + 1) % (len(items) - 3)                              # shift the window → successor must shift
-        o2 = serve_decide(port, tok.encode(f"{items[j]}{items[j+1]}{items[j+2]}").ids)
-        cfollow += (o2 == s[items[j + 3]]); trials += 1
-    return det / trials, cfollow / trials
+    fmts = [lambda a, b, c: f"{a}{b}{c}", lambda a, b, c: f"{a},{b},{c},"]   # bare-space vs comma-separated
+    best = (0.0, 0.0)
+    for fmt in fmts:
+        rng = random.Random(1)
+        det = cfollow = trials = 0
+        for _ in range(n):
+            i = rng.randint(0, len(items) - 4)
+            det += (serve_decide(port, tok.encode(fmt(items[i], items[i + 1], items[i + 2])).ids) == s[items[i + 3]])
+            j = (i + 1) % (len(items) - 3)                          # shift the window → successor must shift
+            cfollow += (serve_decide(port, tok.encode(fmt(items[j], items[j + 1], items[j + 2])).ids) == s[items[j + 3]])
+            trials += 1
+        best = max(best, (det / trials, cfollow / trials), key=lambda t: t[0])
+    return best
 
 
 CAPITALS = [(" France", " Paris"), (" Germany", " Berlin"), (" Japan", " Tokyo"), (" Italy", " Rome"),
