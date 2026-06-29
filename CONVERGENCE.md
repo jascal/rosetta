@@ -119,7 +119,9 @@ corpus sample) before deleting `gram.h`.
   the cascade above, drop the `gram` build dependence. This is "online the rosetta code" made total.
 - **Phase 3 — validate both experts end-to-end** against a held-out set per expert (coverage / precision / abstain;
   the [`ABSTAIN.md`](./ABSTAIN.md) frontier), and confirm no confident-wrong regressions. sgiandubh is now pure
-  server + REPL.
+  server + REPL. **This phase is elevated to the *defining* concern of the build — see [`EXPERTS.md`](./EXPERTS.md):
+  an expert build is a reproducible experiment (corpus design + experimental design + benchmark targets → package +
+  scorecard, hard-fail gated).**
 
 The earlier standalone asks — *fix the truncated logic answers* and *online rosetta* — stop being sgiandubh tasks; they
 become **outcomes** of rosetta becoming the builder (Phase 1 and Phase 2 respectively).
