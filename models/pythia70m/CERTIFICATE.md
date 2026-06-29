@@ -2,11 +2,11 @@
 
 `circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle
 at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from the cached logits (cache-only — no oracle).
-
+`circuits.symbols.dl` is the legible token-string twin (inherits this certificate).
 
 - domain: 300 decision windows (W=8)
 - range: T ∈ [0.7, 1.0], ε = 0.02
-- rules: 300 (n-gram, top-K mean 53.4)
+- rules: 300 (no idioms + 300 n-gram, top-K mean 53.4)
 
 | T | contexts | max TV | verdict |
 |---|---|---|---|

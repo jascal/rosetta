@@ -1,10 +1,11 @@
 // rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at
 // query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.
-// tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) is the distribution at T.
+// Routing: longest-ngram > abstain.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.
 
 .decl mp(inst:number,m:number)
 mp(I,M) :- M = max P : { tok(I,P,_) }.
 .decl ctxlogit(inst:number,token:number,s:float)
+
 .decl gram2d(c0:number,token:number,s:float)
 .decl gram2d_any(inst:number)
 gram2d(2111,273,835.3126220703125).

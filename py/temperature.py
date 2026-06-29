@@ -27,6 +27,37 @@ E = "2.718281828459045"
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+def build_sym(md):
+    """id→glyph for the legible symbols twin: from lexicon.json if present, else decode via the model's bundle tokenizer
+    (so lexicon-less real models — llama/qwen/pythia — still get a twin; byte-fallback / invalid-UTF8 tokens fall back to
+    their raw token form, then control chars render <0xNN> in the emitter). Returns {} if neither is available → no twin."""
+    lex = os.path.join(md, "lexicon.json")
+    if os.path.exists(lex):
+        return {i: t[0] for i, t in enumerate(json.load(open(lex))["tokens"])}
+    tokp = os.path.join(md, "bundle.tokenizer.json")
+    if not os.path.exists(tokp):
+        return {}
+    from tokenizers import Tokenizer
+    tk = Tokenizer.from_file(tokp)
+
+    class _TokSym(dict):                                          # decode lazily + cache; the emitter only hits ids in rules
+        def __bool__(self):                                       # truthy even when unpopulated (a tokenizer IS available) →
+            return True                                           # so emit_T's `if sym:` fires the symbols twin
+
+        def get(self, i, default=None):
+            if i not in self:
+                v = tk.decode([i])
+                if not v or "�" in v:
+                    v = tk.id_to_token(i) or ""
+                dict.__setitem__(self, i, v)
+            return dict.get(self, i) or default
+
+        def __getitem__(self, i):
+            return self.get(i) or f"id{i}"
+
+    return _TokSym()
+
+
 def softmax(ls, T):
     m = max(s for _, s in ls)
     ex = [(v, math.exp((s - m) / T)) for v, s in ls]
@@ -361,8 +392,7 @@ def main():
     T_lo = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5    # T_min (cold end — sizes the grouping)
     name = os.path.basename(md.rstrip("/"))
     whole = os.path.join(md, "whole.dl")
-    lexp = os.path.join(md, "lexicon.json")                    # optional — if present, emit the legible symbols twin
-    sym = {i: t[0] for i, t in enumerate(json.load(open(lexp))["tokens"])} if os.path.exists(lexp) else {}
+    sym = build_sym(md)                                        # legible symbols twin: lexicon.json, else the bundle tokenizer
     serve = os.environ.get("FIELDRUN_SERVE")                   # logits from a resident server (big models) or whole.dl (pure)
     if serve:
         get_lg, src = (lambda ctx: serve_topk(int(serve), ctx)), "a fieldrun --serve /topk server"

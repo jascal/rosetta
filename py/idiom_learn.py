@@ -596,8 +596,8 @@ def main():
     md = a[2] if len(a) > 2 else os.path.join(HERE, "reference", "threx")
     md = md if os.path.isabs(md) else os.path.join(HERE, md)
     name = os.path.basename(md.rstrip("/"))
-    lexp = os.path.join(md, "lexicon.json")                    # optional — large LMs (Llama) decode to token ids
-    sym = {i: t[0] for i, t in enumerate(json.load(open(lexp))["tokens"])} if os.path.exists(lexp) else {}
+    from temperature import build_sym
+    sym = build_sym(md)                                         # lexicon.json, else decode via the bundle tokenizer
     s = lambda t: (sym.get(t, str(t)).strip() or f"[{t}]")
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     insts = instances(ids, n, w)
