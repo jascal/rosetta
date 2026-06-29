@@ -1,7 +1,8 @@
 # The rosetta expert package (schema + runtime protocol)
 
 The package is what rosetta emits and a thin runtime (`py/serve_package.py`, and the future sgiandubh C++) consumes —
-the rosetta→sgiandubh convergence artifact. Two producers, one schema:
+the rosetta→sgiandubh convergence artifact. (For *who builds what* — rosetta is the sole builder, sgiandubh the thin
+server+REPL — see [`CONVERGENCE.md`](./CONVERGENCE.md).) Two producers, one schema:
 
 - **`idiom_learn.py --package` → `emit_expert_package`** (the strong path): causally-confirmed idioms + gated n-grams.
 - **`abstain_emit.py`** (the observational path): gated n-grams only (a flat manifest; backward-compatible).
