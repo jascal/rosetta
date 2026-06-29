@@ -8,6 +8,8 @@ import os
 import re
 import sys
 
+import pytest
+
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, "py"))
 
@@ -78,3 +80,13 @@ def test_build_expert_cover_orchestration(tmp_path, monkeypatch):
     assert (out / "knowledge.tsv").exists()                                    # grounding (citation) wired
     assert (out / "package" / "manifest.json").exists()                        # cover wired
     assert not (out / "gram").exists()                                         # still no bare gram tier
+
+
+def test_distill_requires_explicit_fieldrun(tmp_path, monkeypatch):
+    """A distilled build must NAME the extractor: no fieldrun=… and no $FIELDRUN → clear error, never a hard-coded path."""
+    from pack import build_expert
+    monkeypatch.delenv("FIELDRUN", raising=False)
+    q = tmp_path / "q.txt"
+    q.write_text("What is a tautology?\n")
+    with pytest.raises(ValueError, match="fieldrun not specified"):
+        build_expert(str(tmp_path / "pkg"), bundle="dummy", questions=str(q), dim=0)

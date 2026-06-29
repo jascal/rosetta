@@ -10,15 +10,21 @@ interface to the thin sgiandubh runtime.
 """
 import argparse
 import os
-import shutil
 import subprocess
 
 from . import answers, cover as cover_mod, grounding
 from .adapters import normrules
 
 
-def _fieldrun_bin():
-    return shutil.which("fieldrun") or os.path.expanduser("~/code/fieldrun/target/release/fieldrun")
+def _fieldrun_bin(explicit=None):
+    """Resolve the fieldrun extractor binary explicitly: the `fieldrun` arg (--fieldrun), else $FIELDRUN. No hard-coded
+    path / no PATH auto-discovery — the extractor must be named, so a build is reproducible and never picks up a stray binary."""
+    fr = explicit or os.environ.get("FIELDRUN")
+    if not fr:
+        raise ValueError("fieldrun not specified — pass fieldrun=… (--fieldrun) or set $FIELDRUN (no hard-coded default)")
+    if not os.path.exists(fr):
+        raise FileNotFoundError(f"fieldrun not found at '{fr}'")
+    return fr
 
 
 def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, citation="",
@@ -43,9 +49,7 @@ def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, ci
         print(f"[adapter:normrules] {n} rules -> {os.path.basename(rules_txt)}")
     elif bundle and questions:
         export = os.path.join(out, "_export")
-        fr = fieldrun or _fieldrun_bin()
-        if not os.path.exists(fr):
-            raise FileNotFoundError(f"fieldrun not found at '{fr}' — set fieldrun=…")
+        fr = _fieldrun_bin(fieldrun)
         print(f"[distill] fieldrun --export-logic-corpus (--steps {steps}) — the heavy step (EOS-stopping, avoids truncation)")
         subprocess.run([fr, "--bundle", bundle, "--export-logic-corpus", questions,
                         "--steps", str(steps), "--out", export], check=True)
@@ -91,7 +95,8 @@ def main():
     ap.add_argument("--cover", action="store_true", help="extract the cover, the smart tier (needs --bundle)")
     ap.add_argument("--minsupp", type=int, default=3)
     ap.add_argument("--mindet", type=float, default=1.0)
-    ap.add_argument("--fieldrun")
+    ap.add_argument("--fieldrun", help="path to the fieldrun extractor binary (required for distill/--cover; "
+                    "else set $FIELDRUN). No hard-coded default.")
     a = ap.parse_args()
     build_expert(a.out, corpus=a.corpus, bundle=a.bundle, questions=a.questions, steps=a.steps,
                  citation=a.citation, model=a.model, adapter=a.adapter, adapter_source=a.adapter_source,
