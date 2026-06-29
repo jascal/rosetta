@@ -5,7 +5,7 @@ The convergence (rosetta = builder, sgiandubh = thin runtime): rosetta emits the
 see py/abstain_emit.py); a runtime consumes it. This reference consumer proves the package is servable **host-side with NO
 souffle and NO model** — the manifest IS the compiled cover (a decision table). It does exactly what sgiandubh's runtime will:
 
-    tokenize(query)  →  longest-suffix-match over the manifest  →  {answer, citation, confidence}  or  ABSTAIN
+    tokenize(query)  →  TRUSTED idioms (frame-match) → GATED n-grams (longest suffix) → {answer, tier, basis, citation}  or  ABSTAIN
 
 The RUNTIME loads only manifest.json (load_package + serve) — no corpus, no souffle, no model. The corpus is used only by the
 BUILDER (make_package, = py/abstain_emit) and by the held-out scorecard (eval), kept separate from serving.
@@ -41,28 +41,60 @@ def make_package(md, W, minsupp, mindet):
     return hold
 
 
+def _cite(r):
+    return r["citation"] if r.get("citation") else (f"corpus@{r['cite'][:3]}" if r.get("cite") else "")
+
+
 def load_package(manifest_path):
-    """THE THIN RUNTIME state: load rules from manifest.json ONLY (no corpus, no souffle, no model). Returns
-    (rules, manifest) where rules[k][suffix_tuple] = (out, support, determinism, citation_str). This dict (a length-indexed
-    suffix→decision table) is the structure a C++ runtime would build from the same manifest.json."""
+    """THE THIN RUNTIME state from manifest.json ONLY (no corpus, no souffle, no model). Handles the TIERED package
+    (idiom_learn --package: causal idioms + gated n-grams) and is backward-compatible with the flat n-gram manifest
+    (abstain_emit: a rule with no 'kind' is an n-gram). Returns (idioms, ngrams, manifest):
+      idioms = ordered TRUSTED rules (gate/compose), kept in priority order — all host-side matchable;
+      ngrams[k][suffix] = (out, basis, cite) — the GATED tier (= 'fire only if confident', NOT gating inside the n-gram).
+    JSON keys are strings; normalized to ints here so a C++ porter sees the same shape."""
     m = json.load(open(manifest_path))
-    rules = defaultdict(dict)
+    idioms, ngrams = [], defaultdict(dict)
     for r in m["rules"]:
-        ctx = tuple(r["ctx"])
-        cite = r["citation"] if r.get("citation") else f"corpus@{r['cite'][:3]}"
-        rules[len(ctx)][ctx] = (r["out"], r["support"], r["determinism"], cite)
-    return rules, m
+        kind = r.get("kind", "ngram")
+        if kind == "ngram":
+            ctx = tuple(r["ctx"])
+            ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r))
+        elif kind == "gate":
+            idioms.append({"kind": "gate", "id": r["id"], "cite": _cite(r),
+                           "frame": {int(o): int(t) for o, t in r["frame"].items()}, "slot": r["slot"],
+                           "table": {int(k): int(v) for k, v in r["table"].items()}})
+        elif kind == "compose":
+            idioms.append({"kind": "compose", "id": r["id"], "cite": _cite(r),
+                           "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
+                           "valmap": {int(t): int(v) for t, v in r["valmap"].items()},
+                           "sum": {int(s): int(o) for s, o in r["sum"].items()}})
+    return idioms, ngrams, m
 
 
-def serve(ctx, rules, W):
-    """The runtime decision: longest matching suffix in the (already confidence-filtered) manifest wins → answer +
-    citation + confidence; else ABSTAIN. Host-side, no souffle. (No min_det here: the manifest contains only confident
-    rules — gating happened at build time in confident_rules; the runtime just looks up.)"""
-    for k in range(min(len(ctx), W), 0, -1):
+def serve(ctx, idioms, ngrams, W):
+    """The runtime decision: TRUSTED idioms (frame-matched, in priority order) → GATED n-grams (longest matching suffix)
+    → ABSTAIN. Host-side, no souffle — even the idioms (gate = frame + slot→table; compose = frame + operands→value-sum→
+    output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
+    only confident rules — gating happened at build.)"""
+    for r in idioms:                                            # trusted tier (causal), first
+        fr = r["frame"]
+        if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
+            continue
+        if r["kind"] == "gate":
+            k = r["slot"]
+            if len(ctx) >= k and ctx[-k] in r["table"]:
+                return {"answer": r["table"][ctx[-k]], "tier": "trusted", "basis": "causal", "citation": r["cite"], "rule": r["id"]}
+        else:  # compose
+            k1, k2 = r["operands"]
+            if len(ctx) >= max(k1, k2) and ctx[-k1] in r["valmap"] and ctx[-k2] in r["valmap"]:
+                ssum = r["valmap"][ctx[-k1]] + r["valmap"][ctx[-k2]]
+                if ssum in r["sum"]:
+                    return {"answer": r["sum"][ssum], "tier": "trusted", "basis": "causal", "citation": r["cite"], "rule": r["id"]}
+    for k in range(min(len(ctx), W), 0, -1):                    # gated n-gram tier (longest suffix wins)
         s = tuple(ctx[-k:])
-        if s in rules[k]:
-            out, sup, det, cite = rules[k][s]
-            return {"answer": out, "citation": cite, "support": sup, "determinism": det, "k": k}
+        if s in ngrams[k]:
+            out, basis, cite = ngrams[k][s]
+            return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
     return None  # ABSTAIN
 
 
@@ -74,13 +106,13 @@ def main():
     mindet = float(sys.argv[4]) if len(sys.argv) > 4 else 1.0
     name = os.path.basename(md)
     hold = make_package(md, W, minsupp, mindet)                  # builder: corpus → package (circuits.abstain.dl + manifest.json)
-    rules, manifest = load_package(os.path.join(md, "manifest.json"))  # RUNTIME: load manifest.json only
+    idioms, ngrams, manifest = load_package(os.path.join(md, "manifest.json"))  # RUNTIME: load manifest.json only
     meta_on = any("citation" in r for r in manifest["rules"][:50])
     print(f"=== serve_package · {name} · loaded {manifest['n_rules']} rules from manifest.json "
           f"(thin runtime: no corpus/souffle/model){' · citations ✓' if meta_on else ''} ===")
     ans = cor = 0
     for ctx, o, _ in hold:                                       # held-out scorecard (eval only; uses the corpus)
-        r = serve(ctx, rules, W)
+        r = serve(ctx, idioms, ngrams, W)
         if r is not None:
             ans += 1; cor += (r["answer"] == o)
     H = len(hold)
@@ -97,10 +129,10 @@ def main():
     shown_ans = shown_ab = 0
     print("sample served decisions (answer → citation, or abstain):")
     for ctx, o, _ in hold:
-        r = serve(ctx, rules, W)
+        r = serve(ctx, idioms, ngrams, W)
         if r is not None and shown_ans < 3:
             mark = "✓" if r["answer"] == o else "✗"
-            print(f"  ANSWER {dec(r['answer'])} {mark}  (k={r['k']} support={r['support']} det={r['determinism']:.2f})  cite: {r['citation']}")
+            print(f"  ANSWER {dec(r['answer'])} {mark}  [{r['tier']}/{r['basis']}]  cite: {r['citation']}")
             shown_ans += 1
         elif r is None and shown_ab < 2:
             print("  ABSTAIN (no confident rule) — would defer to backstop / refuse")
@@ -111,7 +143,7 @@ def main():
         print("NL-query path (tokenize → serve) — the token-space bridge sgiandubh's runtime needs:")
         for q in ["The United States of America", "xylophone quantum tariff zzzqq"]:
             ctx = tok.encode(q, add_special_tokens=False).ids[-W:]
-            r = serve(ctx, rules, W)
+            r = serve(ctx, idioms, ngrams, W)
             print(f"  query {q!r} → " + (f"answer {dec(r['answer'])} (cite {r['citation']})" if r else "ABSTAIN"))
     else:
         print("(no bundle.tokenizer.json — NL path skipped; this model serves token contexts only)")

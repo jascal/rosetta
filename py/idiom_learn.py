@@ -503,7 +503,10 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
         c = comp_cov(b); covered |= set(c)
         man.append({"id": rid, "kind": "compose", "tier": "trusted", "basis": "causal", "causal": round(b.get("causal", 0), 3),
                     "extrapolate": (None if b.get("extrap") is None else round(b["extrap"], 3)), "support": len(c),
-                    "frame": {int(k): int(v) for k, v in b["frame"].items()}, "operands": [b["k1"], b["k2"]], "cite": c[:5]}); rid += 1
+                    "frame": {int(k): int(v) for k, v in b["frame"].items()}, "operands": [b["k1"], b["k2"]],
+                    "valmap": {int(t): int(v) for t, v in b["lab"].items()},      # token → operand value
+                    "sum": {int(s): int(o) for s, o in b["bysum"].items()},        # value-sum → output token (so a consumer can evaluate it)
+                    "cite": c[:5]}); rid += 1
     for b in real:                                                     # select-gate idioms — TRUSTED (causal)
         c = gate_cov(b); covered |= set(c)
         man.append({"id": rid, "kind": "gate", "tier": "trusted", "basis": "causal", "causal": round(b.get("causal", 0), 3),
