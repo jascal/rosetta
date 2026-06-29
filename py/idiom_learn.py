@@ -474,6 +474,66 @@ def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, 
     return finalize(md, insts, logmap, lidx, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
 
 
+def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0):
+    """The bounded-EXPERT package (rosetta→sgiandubh convergence): CAUSALLY-CONFIRMED idioms as the TRUSTED (ungated) tier
+    + a GATED n-gram backfill (support/determinism → abstain on weak suffixes) + a manifest that distinguishes causal
+    idioms from observational n-grams (with provenance). The strengthening over the corpus-only abstain_emit path: the
+    bounded expert is built from CONFIRMED computation (the causal idioms), not just corpus correlation. Reuses
+    emit_circuits (idiom > gated-ngram > induction(OOD) > abstain — abstain is automatic where no rule fires). Writes the
+    package to md/package/ (circuits.expert.dl + run.dl + manifest.json)."""
+    from abstain_emit import build_tab, confident_rules
+    pkg = os.path.join(md, "package"); os.makedirs(pkg, exist_ok=True)
+
+    def gate_cov(b):
+        return [i for i in idxs if all(len(insts[i]) >= m and insts[i][-m] == v for m, v in b["frame"].items())
+                and len(insts[i]) >= b["k"] and insts[i][-b["k"]] in b["table"] and refs[i] == b["table"][insts[i][-b["k"]]]]
+
+    def comp_cov(b):
+        out = []
+        for i in idxs:
+            ctx = insts[i]
+            if all(len(ctx) >= m and ctx[-m] == v for m, v in b["frame"].items()) and len(ctx) >= max(b["k1"], b["k2"]):
+                a, bb = ctx[-b["k1"]], ctx[-b["k2"]]
+                if a in b["lab"] and bb in b["lab"] and refs[i] == b["bysum"].get(b["lab"][a] + b["lab"][bb]):
+                    out.append(i)
+        return out
+
+    covered, man, rid = set(), [], 0
+    for b in real_c:                                                   # compose idioms — TRUSTED (causal)
+        c = comp_cov(b); covered |= set(c)
+        man.append({"id": rid, "kind": "compose", "tier": "trusted", "basis": "causal", "causal": round(b.get("causal", 0), 3),
+                    "extrapolate": (None if b.get("extrap") is None else round(b["extrap"], 3)), "support": len(c),
+                    "frame": {int(k): int(v) for k, v in b["frame"].items()}, "operands": [b["k1"], b["k2"]], "cite": c[:5]}); rid += 1
+    for b in real:                                                     # select-gate idioms — TRUSTED (causal)
+        c = gate_cov(b); covered |= set(c)
+        man.append({"id": rid, "kind": "gate", "tier": "trusted", "basis": "causal", "causal": round(b.get("causal", 0), 3),
+                    "support": len(c), "frame": {int(k): int(v) for k, v in b["frame"].items()}, "slot": b["k"],
+                    "table": {int(k): int(v) for k, v in b["table"].items()}, "cite": c[:5]}); rid += 1
+    residual = [i for i in idxs if i not in covered]                  # GATED n-gram backfill on what idioms didn't cover
+    tab, cites = build_tab([(tuple(insts[i]), refs[i], i) for i in residual], w)
+    conf = confident_rules(tab, cites, w, minsupp, mindet)
+    ngram_rules = {}
+    for k in conf:
+        for s, (o, sup, det, cite) in conf[k].items():
+            ngram_rules[s] = o
+            man.append({"id": rid, "kind": "ngram", "tier": "gated", "basis": "observational", "ctx": list(s),
+                        "out": o, "support": sup, "determinism": round(det, 3), "cite": cite}); rid += 1
+    out = os.path.join(pkg, "circuits.expert.dl")
+    emit_circuits(out, real, real_c, rels_real, ngram_rules, w, name)  # idiom > gated-ngram > induction(OOD) > abstain
+    json.dump({"model": name, "trusted_idioms": len(real) + len(real_c), "gated_ngrams": len(ngram_rules),
+               "induction_ood": len(rels_real), "minsupp": minsupp, "mindet": mindet, "rules": man},
+              open(os.path.join(pkg, "manifest.json"), "w"))
+    ngcov = sum(1 for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1)))
+    H = len(idxs)
+    print(f"\n=== EXPERT PACKAGE (bounded, causal-confirmed) → {pkg}/ ===")
+    print(f"  TRUSTED idioms (causal): {len(real_c)} compose + {len(real)} gate → cover {len(covered)}/{H} = {len(covered)/H:.0%}")
+    print(f"  GATED n-grams (supp>={minsupp},det>={mindet}): {len(ngram_rules)} rules → cover {ngcov}/{H} = {ngcov/H:.0%} of residual")
+    cov = (len(covered) + ngcov) / H
+    print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%} = answer {cov:.0%}, abstain {1-cov:.0%}")
+    print(f"  manifest.json: {len(man)} rules tagged causal(trusted) vs observational(gated) + provenance — the audit of what the expert knows")
+    return out, os.path.join(pkg, "manifest.json")
+
+
 def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
     """The reframed learner: learn every family on TRAIN (causal-soundness = the gate), then GREEDILY admit the family
     with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
@@ -676,6 +736,12 @@ def main():
     for b in sorted(real_sk, key=lambda b: -len(b["members"]))[:8]:
         skd = " ".join("O" if t == OCONTENT else s(t) for t in b["sk"])
         print(f"  [content-invariant {b['inv']:.0%}] covers {len(b['members'])} ({b['ncontent']} contents)  [{skd}] → {s(b['out'])}")
+
+    if "--package" in sys.argv:                                   # bounded-EXPERT package: causal idioms (trusted) + gated n-grams
+        rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]
+        ms = next((int(x.split("=")[1]) for x in sys.argv if x.startswith("--minsupp=")), 3)
+        mdv = next((float(x.split("=")[1]) for x in sys.argv if x.startswith("--mindet=")), 1.0)
+        emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, ms, mdv)
 
     if emit or cert:
         rels_real = [r for r in rels if r["causal"] >= 0.8 and r["obs"] >= 0.5]   # induction → OOD fallback (below n-grams)
