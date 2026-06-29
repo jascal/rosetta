@@ -44,8 +44,94 @@ Feature idioms compress the entity reasoning that's legible; the forge-tax resid
 that reaches entity-level structure. A feature plays the same semiring role as an MLP hidden unit (activation ⊗
 decoder-direction ⊕-summed into the residual), so it drops into `whole.dl`'s sum-product graph as a fact.
 
-## Next phase (the bridge proper — not yet built)
+## Build plan (reviewed & refined — design of record)
 
-- fieldrun exports a **late-layer residual** (layer 8–11) as facts; rosetta applies the SAE encode (numpy: `TopK(W_enc·(x−b_dec)+b_enc)`) → `feat(inst, pos, feature, act)`.
-- the cover admits **feature-keyed idioms** under the existing discipline: detect + **causal = ablate the feature → output follows** + certify (TV<ε); cover-ordering feature-idiom > token-idiom > n-gram > backstop.
-- caveats: one SAE per layer (pick the resolution layer); SAE is lossy (ε-certified, never exact → backstop keeps "no floor" literal); SAE quality gates the result. pythia-160m is small + NeoX-IOI-weak — a stronger model with per-layer SAEs (Gemma Scope) would sharpen, but the effect is already clear here.
+Four phases, risk-managed (Phase 1 is non-destructive). The two architectural calls below were settled by external
+review: a **hybrid runtime tiering** (keep the token-level artifact pure-souffle; features are a parallel, optional tier)
+and a **compositional certificate** (state faithfulness at the SAE-layer interface).
+
+- **Phase 1 — feature export (non-destructive).** `fieldrun --export-residual --layer L` dumps the layer-L residual
+  (read-only slice); rosetta applies the SAE encode in numpy (`TopK(W_enc·(x−b_dec)+b_enc)`) → `feat(inst,pos,feature,act)`
+  facts. This is a *derived* relation — it never appears in a forward-pass rule, so logits are byte-identical and the
+  existing certificate is untouched. Ships first: a lossless feature-labeled view, zero risk to current certificates.
+- **Phase 2 — feature ablation (the causal gate).** `fieldrun --inject-residual` runs with `resid' = resid − act·W_dec[f]`
+  and resumes → the causal test. A feature-keyed rule is admitted only if ablation moves the output as the rule predicts.
+- **Phase 3 — feature-keyed idioms in the cover.** Learn rules keyed on active features (generalize across surface
+  tokens), emit + certify (TV<ε), cover-ordering **feature-idiom > token-idiom > n-gram > backstop**.
+- **Phase 4 (stretch) — feature→feature transition circuits.** SAEs at multiple layers; `feature(L)→feature(L+k)` rules
+  replace the blocks between — the only path to real compute compression (see Decision 4).
+
+### Settled decisions (post-review)
+
+1. **Runtime independence — HYBRID TIERING.** The primary runtime artifact stays the token-level `circuits.dl` (token in →
+   distribution out, pure souffle, no model binary). Features are a **parallel, optional `feature_circuits.dl`** that
+   assumes `feat(...)` facts are present, produced by the documented companion path (`--export-residual` + numpy SAE
+   encode, or a precomputed fact file for a fixed corpus). A pruned Datalog forward-prefix (embed + blocks 0..L + SAE) is
+   pursued only for early-layer/tiny-model experiments; for the entity layers (8–11/12) feature idioms are a legibility +
+   analysis tier in the near term. This ships certified feature idioms without compromising the token runtime.
+2. **Forge tax — accept WITH measurement.** Track an auxiliary metric: *% of predictions on entity-heavy windows resolved
+   by a feature idiom vs. falling through to n-gram/backstop*, plus end-to-end TV stays controlled. Justified: a few
+   high-quality generalizing circuits move the needle (cf. threx: one idiom → 88% holdout vs 38% n-gram-only at scale).
+3. **SAE — keep PLUGGABLE.** Narrow interface: a feature dictionary (id → optional decoder vector / metadata) + encode/decode
+   callables (the TopK sparse code already used). Start on the validated EleutherAI pythia-70m/160m SAEs; add Gemma Scope
+   and our own lm-sae / sae-forge loaders later. The detect+causal+certify gate is the filter — a bad SAE simply fails to
+   produce passing rules; we measure the model *via* its features, not any one SAE.
+4. **Late layer ⇒ little compute saved — legibility is a FIRST-CLASS deliverable.** Rosetta's value is certified,
+   human-auditable, substrate-transferable transcription, not inference speedup. A late single SAE still buys entity-level
+   vocabulary + dropping the unembed (~20% of params) for those rules. Real parameter reduction / early-exit needs Phase 4.
+5. **Certificate — COMPOSITIONAL (stated precisely, which strengthens it).** *"`feature_circuits.dl` reproduces the model's
+   output within max TV < ε **given the model's own layer-L features**. The prefix (embedding + blocks 0..L + SAE encode) is
+   exact by construction — it is the model plus the SAE it was analyzed with. When features are obtained from the model at
+   inference/analysis time, the end-to-end system is ε-faithful (exact at T=0 where the rules support it)."* This is
+   compositional verification at the natural interface, and it future-proofs Phase 4 (transitions certified at their own boundaries).
+
+### Schema sketch (Datalog)
+
+```prolog
+// feature facts — companion path: `fieldrun --export-residual --layer L` | numpy TopK SAE encode
+.decl feat(inst:number, pos:number, feature:number, act:float)
+.input feat
+
+// feature-GATE idiom (analogue of the token gate): a feature active at the decision position → output distribution
+.decl fgate0_tab(f:number, token:number, sc:float)            // feature → top-K logits (incidence), carries the distribution
+fgate0_ctxlogit(I,Tk,SC) :- mp(I,P), feat(I,P,F,A), A>thresh, fgate0_tab(F,Tk,SC).
+fgate0_any(I) :- fgate0_ctxlogit(I,_,_).
+
+// feature-relative COPY (the entity case token-induction can't express): copy the token at the position where
+// the entity-feature F first fired — content-relative pointer in FEATURE space, not token space.
+// cover routing (priority via negation guards): feature-idiom > token-idiom > longest n-gram > backstop
+ctxlogit(I,Tk,S) :- fgate0_ctxlogit(I,Tk,S).                  // highest tier
+// ... token idioms guarded by !fgate*_any(I); n-gram guarded by all idiom _any; then softmax(logits/T) as today.
+```
+
+### Success / failure criteria
+
+- **Success (shippable):** ≥1 family of feature-keyed idioms (coreference / entity-copy / name-mover) passes
+  detect + causal + certify (TV<ε) on a corpus that exercises it; the idioms generalize across surface tokens (one rule,
+  many entity surface forms); a measurable win vs the pure token cover (entity-window coverage ↑ or backstop reliance ↓);
+  a clear compositional certificate + feature-frontend docs.
+- **Kill signal:** no feature-keyed rule survives the full pipeline on entity-stressing text despite Phase-0 patching
+  showing causal signal → the cover's discipline is too strict for current feature quality (a useful negative result).
+
+### Immediate next steps
+
+1. Phase 1 (non-destructive): `fieldrun --export-residual --layer L` (its own branch+PR) + numpy TopK encode → `feat`
+   facts; verify byte-identical logits. Land first.
+2. Curate an evaluation corpus stressing controlled entity tracking (IOI variants + longer coreference chains where the
+   surface tokens are deliberately uninformative).
+3. Prototype the Phase-2 causal gate on the high-activation feature sets from the Phase-0 layers (highest leverage).
+4. Sketch `dl/` schema + `py/idiom_learn.py` feature-gate / feature-compose primitives (analogues of the token ones).
+
+### Caveats
+
+One SAE per layer (pick the resolution layer); SAE is lossy (ε-certified, never exact → backstop keeps "no floor"
+literal); SAE quality gates the result. pythia-160m is small + NeoX-IOI-weak — a stronger model with per-layer SAEs
+(Gemma Scope) would sharpen, but the effect is already clear here.
+
+### Ecosystem synergy
+
+Feature idioms discovered here are candidates for encoding as verified quantum circuits in `polygram` (MPS rung-1/2) or as
+feature-transition blocks in `n-orca`; `sae-forge` is a natural SAE source for Decision 3. Rosetta is the symbolic,
+certified *target*; the sibling tools provide implementation and scaling paths.
+
+*(Plan refined via external review; the five tensions above are the load-bearing design decisions.)*
