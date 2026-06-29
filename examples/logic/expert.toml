@@ -1,6 +1,7 @@
 # examples/logic — the Open Logic Project expert (model-distilled). See ../../EXPERTS.md.
-# Build:  FIELDRUN=… BUNDLE=…/gemma-4-e4b-it-int4/gemma-4-e4b-it-int4 \
-#         .venv/bin/python -m pack.build examples/logic/expert.toml
+# Build (the cover step also needs a gemma `fieldrun --serve` on $FIELDRUN_SERVE):
+#   FIELDRUN=… FIELDRUN_SERVE=PORT BUNDLE=…/gemma-4-e4b-it-int4/gemma-4-e4b-it-int4 \
+#     .venv/bin/python build_expert.py examples/logic/expert.toml
 
 [corpus]                                       # CORPUS DESIGN — paths are relative to THIS spec file
 text      = "logic_kb.txt"                     # OLP knowledge base (1200 passages)
