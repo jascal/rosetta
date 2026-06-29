@@ -1,0 +1,20 @@
+# examples/logic — the Open Logic Project expert (model-distilled). See ../../EXPERTS.md.
+# Build:  FIELDRUN=… BUNDLE=…/gemma-4-e4b-it-int4/gemma-4-e4b-it-int4 \
+#         .venv/bin/python -m pack.build examples/logic/expert.toml
+
+[corpus]                                       # CORPUS DESIGN
+text      = "examples/logic/logic_kb.txt"      # OLP knowledge base (1200 passages)
+questions = "examples/logic/logic_questions.txt"
+citation  = "Open Logic Project (CC BY 4.0)"
+
+[model]                                        # gemma first; scorecard-driven swap if depth is thin
+bundle    = "$BUNDLE"                          # gemma-4-e4b-it; convert via fieldrun (gitignored, ~GB)
+fieldrun  = "$FIELDRUN"                        # the extractor — named, no hard-coded path
+
+[experiment]                                   # EXPERIMENTAL DESIGN
+holdout    = 0.2                               # auto in-domain split (baseline)
+off_domain = "examples/probes/negatives.txt"   # leak/abstain measurement
+
+[gate]                                         # HARD-FAIL thresholds
+min_precision = 0.90
+max_leak      = 0.05

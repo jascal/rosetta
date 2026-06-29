@@ -1,0 +1,22 @@
+# examples/riscv — the RISC-V ISA expert (model-distilled: cover + grounding). See ../../EXPERTS.md.
+# Build:  FIELDRUN=… .venv/bin/python -m pack.build examples/riscv/expert.toml
+
+[corpus]                                       # CORPUS DESIGN
+# norm-rule passages (have); manual PROSE (definitions like "machine mode") — TODO: source from
+# riscv-isa-manual (CC BY 4.0); the norm-rules are normative statements, the prose is what makes
+# "what is X?" answerable. (corpus.text will become a list once prose lands.)
+text      = "examples/riscv/rules.txt"         # 3258 normative rules as citable passages
+questions = "examples/riscv/questions.txt"      # 416 common RISC-V questions (curated seed + test)
+citation  = "RISC-V ISA Manual (CC BY 4.0)"
+
+[model]                                        # llama-3.2-1b — chosen for a DENSER cover (more idioms/n-grams)
+bundle    = "models/llama32_1b/bundle"         # convert via fieldrun (gitignored, ~1.2 GB)
+fieldrun  = "$FIELDRUN"
+
+[experiment]                                   # EXPERIMENTAL DESIGN
+holdout    = 0.2
+off_domain = "examples/probes/negatives.txt"
+
+[gate]                                         # HARD-FAIL thresholds
+min_precision = 0.90
+max_leak      = 0.05
