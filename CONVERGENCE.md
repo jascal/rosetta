@@ -107,6 +107,11 @@ The separate **`gram` tier retires** — the cover already carries gated n-grams
 richer than `build_gram`'s bare n-grams. `open`: verify coverage parity (cover n-grams ⊇ build_gram n-grams over a
 corpus sample) before deleting `gram.h`.
 
+**Reasoning source varies by expert** (no universal law, chosen by measurement): a model-distilled expert reasons via
+the *extracted cover*; a model-free expert can opt into an *authored-deductive* tier (ergo's verified rules + curated
+facts → forward-closure → cited derived facts) — see [`REASONING.md`](./REASONING.md). The cascade above is unchanged
+either way; authored reasoning just adds more cited facts to retrieve.
+
 ## Phased plan
 
 - **Phase 0 — this doc.** Anchor the principle + the boundary before any code moves. (PR for review.)
