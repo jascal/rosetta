@@ -25,3 +25,6 @@ bundle.tokenizer.json
 # bounded-expert package output (reproducible via idiom_learn --package)
 models/*/package/
 reference/*/package/
+# examples/ build outputs (reproducible via `pack.build <expert.toml>`) — never the committed corpora/specs
+examples/*/package/
+examples/*/corpus.json
