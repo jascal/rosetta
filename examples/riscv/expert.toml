@@ -17,6 +17,9 @@ citation   = "RISC-V ISA Manual (CC BY 4.0)"
 
 # no [model] — model-free (the measured call above)
 
+[grounding]                                     # one passage per normative rule (don't sentence-split the rules)
+no_split = true
+
 [experiment]                                    # EXPERIMENTAL DESIGN
 off_domain = "../probes/negatives.txt"          # no holdout: no cover/curated to hold out; retrieval/n-grams over the spec
 
