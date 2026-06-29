@@ -18,6 +18,7 @@ models/*/*.fieldrun.json
 models/*/*.fieldrun.bin
 reference/*/logit_cache.json
 models/*/logit_cache.json
-# abstaining-cover demo output (reproducible via py/abstain_emit.py; params-dependent)
+# abstaining-cover / expert-package output (reproducible via py/abstain_emit.py; params-dependent)
 models/*/circuits.abstain.dl
+models/*/manifest.json
 bundle.tokenizer.json

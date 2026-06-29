@@ -59,3 +59,23 @@ reaches ~1% at ~84% abstain — and emits to a runnable artifact.
 - This demo is **n-gram only** (stories has no causal idioms); on a model with idioms (threx/llama) the idiom tier is the
   trusted, ungated unit and lifts the confident-coverage. Wiring the gate into the canonical `temperature.py`/`idiom_learn`
   emit (and an explicit `ABSTAIN` softmax element / per-decision margin gate) is the remaining integration.
+
+## Stage 1 of the rosetta → sgiandubh convergence: the expert package
+
+Goal: **rosetta is the builder/emitter, sgiandubh is the thin runtime** that loads a rosetta package (sgiandubh sheds its
+own `tools/` builder + `engine.dl`). The one gap was **rule-level citations**; Stage 1 closes it. `py/abstain_emit.py` now
+emits a sgiandubh-consumable package:
+
+- `circuits.abstain.dl` — decode + confident rules; each `gramN(ctx…, token, ruleid)` carries a **ruleid**, and the cover
+  emits `cprov(inst, ruleid)` at runtime (the fired rule) alongside `cdecide`. No confident rule → no `cdecide`/`cprov` = abstain.
+- `manifest.json` — `ruleid → {ctx, out, support, determinism, cite}`. `cite` = supporting corpus positions (provenance);
+  with an optional `corpus_meta.json` (offset ranges → citation strings) they resolve to **human citations** (passage/section).
+
+So the runtime cites an answer by: `answer → cprov ruleid → manifest → citation`. Verified faithful in souffle: on
+stories110M, `cdecide` matches the Python cover and `cprov` names the right rule **with 0 mismatch / 400** (336 abstained),
+and a synthetic passage-map resolved `cite=[21468,19200,18066] → ['stories §1','§2','§3']`.
+
+This makes rosetta's emit the **shared package** (rules + contrib/softmax-at-T + carried confidence + citation + the
+certificate) that both runtimes consume — rosetta's pure-souffle `run.dl` and sgiandubh's OpenAI server. Remaining stages:
+(2) a sgiandubh "rosetta-package" load mode (tokenize query → run cover → cite/abstain); (3) validate on a real expert
+(RISC-V / logic textbook) vs the current per-item package; (4) deprecate `sgiandubh/tools/`.
