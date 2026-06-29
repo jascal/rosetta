@@ -8,9 +8,9 @@
 #
 # Build:  .venv/bin/python -m pack.build examples/riscv/expert.toml      (no model, no fieldrun)
 
-[corpus]                                        # CORPUS DESIGN
-text       = "examples/riscv/rules.txt"         # 3258 normative rules as citable passages (grounding/citation)
-text_plain = "examples/riscv/rules_plain.txt"   # the same text without [norm:…] markup — the gated-n-gram corpus
+[corpus]                                        # CORPUS DESIGN — paths are relative to THIS spec file
+text       = "rules.txt"                         # 3258 normative rules as citable passages (grounding/citation)
+text_plain = "rules_plain.txt"                   # the same text without [norm:…] markup — the gated-n-gram corpus
 # TODO (the "more content" lever, now the PRIMARY answer source): add the manual PROSE (definitions/explanations) from
 # riscv-isa-manual (CC BY 4.0) — the norm-rules are statements, the prose is what makes "what is machine mode?" answerable.
 citation   = "RISC-V ISA Manual (CC BY 4.0)"
@@ -18,7 +18,7 @@ citation   = "RISC-V ISA Manual (CC BY 4.0)"
 # no [model] — model-free (the measured call above)
 
 [experiment]                                    # EXPERIMENTAL DESIGN
-off_domain = "examples/probes/negatives.txt"    # no holdout: no cover/curated to hold out; retrieval/n-grams over the spec
+off_domain = "../probes/negatives.txt"          # no holdout: no cover/curated to hold out; retrieval/n-grams over the spec
 
 [gate]                                          # HARD-FAIL thresholds
 max_leak = 0.05                                 # verbatim retrieval → gate on off-domain leak (precision is retrieval-bound)
