@@ -82,6 +82,19 @@ def test_build_expert_cover_orchestration(tmp_path, monkeypatch):
     assert not (out / "gram").exists()                                         # still no bare gram tier
 
 
+def test_normrules_rejects_malformed_source(tmp_path):
+    """The adapter fails with a clear error on a source missing normative_rules / yielding no usable rules."""
+    from pack.adapters import normrules
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps({"rules": []}))                                   # wrong top-level key
+    with pytest.raises(ValueError, match="normative_rules"):
+        normrules.to_corpus(str(bad), str(tmp_path / "o1"))
+    empty = tmp_path / "empty.json"
+    empty.write_text(json.dumps({"normative_rules": [{"chapter_name": "X"}]}))  # no name/text → 0 usable
+    with pytest.raises(ValueError, match="0 usable"):
+        normrules.to_corpus(str(empty), str(tmp_path / "o2"))
+
+
 def test_distill_requires_explicit_fieldrun(tmp_path, monkeypatch):
     """A distilled build must NAME the extractor: no fieldrun=… and no $FIELDRUN → clear error, never a hard-coded path."""
     from pack import build_expert

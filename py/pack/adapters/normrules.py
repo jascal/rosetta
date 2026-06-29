@@ -15,7 +15,13 @@ import re
 def to_corpus(norm_rules_path, out, *, model="rosetta-expert-spec"):
     """norm-rules.json → <out>/rules.txt + <out>/rules_plain.txt. Returns (rules_txt, rules_plain, n)."""
     os.makedirs(out, exist_ok=True)
-    d = json.load(open(norm_rules_path))
+    try:
+        d = json.load(open(norm_rules_path))
+    except (OSError, json.JSONDecodeError) as e:
+        raise ValueError(f"normrules adapter: cannot read {norm_rules_path} — {e}")
+    if not isinstance(d, dict) or not isinstance(d.get("normative_rules"), list):
+        raise ValueError(f"normrules adapter: {norm_rules_path} has no \"normative_rules\" list "
+                         f"(top-level keys: {sorted(d)[:8] if isinstance(d, dict) else type(d).__name__})")
     rules = d["normative_rules"]
     rules_txt = os.path.join(out, "rules.txt")
     rules_plain = os.path.join(out, "rules_plain.txt")
@@ -31,4 +37,7 @@ def to_corpus(norm_rules_path, out, *, model="rosetta-expert-spec"):
             ft.write(f"[norm:{name} · {chap}] {text}\n")
             fp.write(text + "\n")
             n += 1
+    if n == 0:
+        raise ValueError(f"normrules adapter: {norm_rules_path} yielded 0 usable rules "
+                         f"(each needs a \"name\" and non-empty \"tags[].text\")")
     return rules_txt, rules_plain, n

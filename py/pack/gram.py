@@ -6,8 +6,11 @@ out-of-corpus context has no continuation → abstain). Built from corpus text a
 
 Emits into <out>/: grams.tsv (`prev <TAB> next <TAB> count`, orders 1..N) + vocab.txt (the in-domain bound).
 
-NOTE (CONVERGENCE.md): this tier is slated to RETIRE into the cover's gated n-grams once the coverage-parity gate
-passes. Ported faithfully for now so `build_expert` reproduces the current experts; do not extend it.
+DEPRECATED / TRANSIENT — slated for DELETION (CONVERGENCE.md + EXPERTS.md gram-parity). `build_expert` does NOT ship a
+gram tier; this module exists ONLY to run the coverage-parity check against the cover's gated n-grams.
+DELETION CRITERIA: once that check passes over a held-out corpus sample — recall(cover ⊇ gram) ≈ 1.0 AND no confident
+disagreement (the cover may abstain-with-cause where gram fired, never contradict) — delete this file and the check.
+Do not extend it; do not wire it into `build_expert`.
 """
 import collections
 import os
