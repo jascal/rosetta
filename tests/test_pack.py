@@ -73,11 +73,21 @@ def test_build_expert_cover_orchestration(tmp_path, monkeypatch):
         return os.path.join(pk, "manifest.json")
     monkeypatch.setattr(B.cover_mod, "build", fake_cover)
 
+    made = {}
+
+    def fake_make_corpus(o, text_file, bundle):                                 # the cover-corpus wiring (no real tokenizer)
+        json.dump({"ids": [1, 2, 3]}, open(os.path.join(o, "corpus.json"), "w"))
+        made["called"] = (text_file, bundle)
+        return 3
+    monkeypatch.setattr(B, "_make_corpus", fake_make_corpus)
+
     B.build_expert(str(out), corpus=str(corpus), bundle="dummy", questions=str(questions),
                    fieldrun=sys.executable, dim=0, cover=True, model="m")        # fieldrun=existing path; run() stubbed
 
     assert (out / "index.json").exists()                                       # curated answers wired
     assert (out / "knowledge.tsv").exists()                                    # grounding (citation) wired
+    assert (out / "corpus.json").exists() and made["called"]                    # cover SCOPED to the corpus (the gap fix)
+    assert made["called"][0] == str(corpus)                                     # …over the user's corpus, not a generic one
     assert (out / "package" / "manifest.json").exists()                        # cover wired
     assert not (out / "gram").exists()                                         # still no bare gram tier
 
@@ -103,3 +113,63 @@ def test_distill_requires_explicit_fieldrun(tmp_path, monkeypatch):
     q.write_text("What is a tautology?\n")
     with pytest.raises(ValueError, match="fieldrun not specified"):
         build_expert(str(tmp_path / "pkg"), bundle="dummy", questions=str(q), dim=0)
+
+
+def test_spec_load_and_kwargs(tmp_path, monkeypatch):
+    """expert.toml → build kwargs: $ENV resolved, relative paths based, a [model] ⇒ cover=True, [grounding].dim honored."""
+    from pack import spec as spec_mod
+    monkeypatch.setenv("TESTBUNDLE", "/bundles/m")
+    monkeypatch.setenv("TESTFR", "/bin/fieldrun")
+    (tmp_path / "expert.toml").write_text(
+        '[corpus]\ntext="kb.txt"\nquestions="q.txt"\ncitation="T (CC BY)"\n'
+        '[model]\nbundle="$TESTBUNDLE"\nfieldrun="$TESTFR"\n'
+        '[grounding]\ndim=0\n'
+        '[experiment]\noff_domain="neg.txt"\n[gate]\nmin_precision=0.9\nmax_leak=0.05\n'
+        '[reasoning]\nrules="ergo:core"\n')
+    s = spec_mod.load_spec(str(tmp_path / "expert.toml"))
+    assert s["model"]["bundle"] == "/bundles/m"                 # $ENV expanded
+    assert s["reasoning"]["rules"] == "ergo:core"               # opt-in tier parsed (rosetta is aware of it)
+    kw = spec_mod.to_build_kwargs(s, base=str(tmp_path))
+    assert kw["corpus"] == os.path.join(str(tmp_path), "kb.txt")  # relative path based
+    assert kw["bundle"] == "/bundles/m" and kw["cover"] is True   # a model ⇒ build a cover
+    assert kw["dim"] == 0 and kw["citation"] == "T (CC BY)"
+
+
+def _manifest(tmp_path):
+    m = {"n_rules": 2, "rules": [
+        {"kind": "ngram", "ctx": [11, 12], "out": 99, "basis": "observational", "cite": [1]},
+        {"kind": "ngram", "ctx": [12], "out": 88, "basis": "observational", "cite": [2]}]}
+    p = tmp_path / "manifest.json"
+    json.dump(m, open(p, "w"))
+    return str(p)
+
+
+def test_eval_score_and_gate(tmp_path):
+    """The scorecard grades a package by serving it; the gate hard-fails below thresholds."""
+    from pack import eval as scorer
+    mp = _manifest(tmp_path)
+    holdout = [((0, 11, 12), 99), ((0, 9, 12), 88), ((5, 6, 7), 1)]   # 2 covered (both correct), 1 abstain
+    off_domain = [(500, 501)]                                          # no rule → abstain → no leak
+    sc = scorer.score(mp, holdout, off_domain)
+    assert abs(sc["coverage"] - 2 / 3) < 1e-9 and sc["precision"] == 1.0
+    assert sc["off_domain_leak"] == 0.0 and sc["confident_wrong"] == 0.0
+    assert scorer.gate(sc, min_precision=0.9, max_leak=0.05) == (True, [])
+
+    bad = scorer.score(mp, [((0, 11, 12), 77)], off_domain)           # answers 99 ≠ gold 77 → precision 0
+    ok, reasons = scorer.gate(bad, min_precision=0.9, max_leak=0.05)
+    assert ok is False and any("precision" in r for r in reasons)     # HARD-FAIL below the floor
+
+
+def test_build_from_spec_model_free(tmp_path):
+    """build_from_spec on a model-free [corpus]-only spec (dim=0, hermetic) → package built; no manifest ⇒ gate skipped."""
+    import pack.build as B
+    (tmp_path / "kb.txt").write_text("A tautology is always true. An argument is valid if the form preserves truth.\n")
+    (tmp_path / "neg.txt").write_text("What is the capital of France?\n")
+    (tmp_path / "expert.toml").write_text(
+        '[corpus]\ntext="kb.txt"\ncitation="T (CC BY)"\n'
+        '[grounding]\ndim=0\n'
+        '[experiment]\noff_domain="neg.txt"\n[gate]\nmax_leak=0.05\n')          # gate set, but no manifest → skipped, no crash
+    out = B.build_from_spec(str(tmp_path / "expert.toml"))
+    assert os.path.exists(os.path.join(out, "index.json"))                       # empty index (model-free)
+    assert os.path.exists(os.path.join(out, "knowledge.tsv"))                    # grounding (citation)
+    assert not os.path.exists(os.path.join(out, "manifest.json"))                # no cover (model-free)

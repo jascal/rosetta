@@ -9,7 +9,9 @@ Emits the *package*; does NOT build the runtime binary — the builder produces 
 interface to the thin sgiandubh runtime.
 """
 import argparse
+import json
 import os
+import shutil
 import subprocess
 
 from . import answers, cover as cover_mod, grounding
@@ -25,6 +27,19 @@ def _fieldrun_bin(explicit=None):
     if not os.path.exists(fr):
         raise FileNotFoundError(f"fieldrun not found at '{fr}'")
     return fr
+
+
+def _make_corpus(out, text_file, bundle):
+    """Scope the cover to the USER's corpus: tokenize `text_file` with the bundle's tokenizer → out/corpus.json, and
+    drop out/bundle.tokenizer.json — the inputs the core's cover extraction (idiom_learn) reads. This is the fix for the
+    cover-over-the-selected-corpus gap (without it the cover would extract over a generic/absent corpus)."""
+    from tokenizers import Tokenizer
+    tok_path = bundle + ".tokenizer.json"
+    tok = Tokenizer.from_file(tok_path)
+    ids = tok.encode(open(text_file, encoding="utf-8").read()).ids
+    json.dump({"ids": ids}, open(os.path.join(out, "corpus.json"), "w"))
+    shutil.copyfile(tok_path, os.path.join(out, "bundle.tokenizer.json"))
+    return len(ids)
 
 
 def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, citation="",
@@ -65,10 +80,15 @@ def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, ci
                                          no_split=ground_no_split)
         print(f"[grounding] {npass} passages, {nvec} vectors x {k}d (citation-first)")
 
-    # 3. cover — the SMART tier (model-distilled only; extracted from the model, not asserted)
+    # 3. cover — the SMART tier (model-distilled only; extracted from the model OVER THE USER'S CORPUS, not asserted)
     if cover:
         if not bundle:
             raise ValueError("cover=True needs a model (bundle) — the cover is extracted from the model")
+        cover_corpus = corpus or questions
+        if not cover_corpus:
+            raise ValueError("cover=True needs a corpus to extract over (corpus= or questions=)")
+        ntok = _make_corpus(out, cover_corpus, bundle)            # scope the cover to the selected corpus (the gap fix)
+        print(f"[cover] corpus.json: {ntok} tokens from {os.path.basename(cover_corpus)} (scoped to the selected corpus)")
         mpath = cover_mod.build(out, minsupp=minsupp, mindet=mindet)
         print(f"[cover] manifest -> {mpath}")
 
@@ -77,9 +97,81 @@ def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, ci
     return out
 
 
+def build_from_spec(spec_path):
+    """Build (and, if [gate] is set, score) an expert from a declarative expert.toml (EXPERTS.md). Output →
+    <spec_dir>/package/ (or [build].out). Recognizes the opt-in [reasoning] tier (REASONING.md) but does not wire it."""
+    from . import spec as spec_mod
+    s = spec_mod.load_spec(spec_path)
+    base = os.path.dirname(os.path.abspath(spec_path))
+    kw = spec_mod.to_build_kwargs(s, base=base)
+    out = (s.get("build", {}) or {}).get("out") or os.path.join(base, "package")
+    out = out if os.path.isabs(out) else os.path.join(base, out)
+    if s.get("reasoning"):                                        # "rosetta is aware of it" — opt-in, wiring takes care
+        print("[reasoning] authored-deductive tier present in spec (opt-in) — recognized; "
+              "wiring is a deliberate separate step (see REASONING.md)")
+    build_expert(out, **kw)
+    _score_if_gated(out, s, base)
+    return out
+
+
+def _score_if_gated(out, spec, base):
+    """If [gate] is set and a manifest was produced, grade the package and HARD-FAIL on a miss (EXPERTS.md)."""
+    g = spec.get("gate")
+    if not g:
+        return
+    from . import eval as scorer
+    mpath = next((p for p in (os.path.join(out, "manifest.json"), os.path.join(out, "package", "manifest.json"))
+                  if os.path.exists(p)), None)
+    if not mpath:
+        print("[scorecard] no manifest (model-free grounding-only build) — gate skipped (see the model-free n-gram open item)")
+        return
+    holdout, off_domain = _eval_sets(out, spec, base)
+    if not holdout:
+        print("[scorecard] no holdout derivable (no tokenizer/corpus) — gate skipped")
+        return
+    sc = scorer.score(mpath, holdout, off_domain)
+    scorer.write_scorecard(sc, os.path.join(out, "scorecard.json"))
+    print(f"[scorecard] coverage {sc['coverage']:.0%}  precision {sc['precision']:.0%}  "
+          f"abstain {sc['abstain']:.0%}  leak {sc['off_domain_leak']:.0%}  (n={sc['holdout_n']})")
+    ok, reasons = scorer.gate(sc, min_precision=g.get("min_precision"), max_leak=g.get("max_leak"),
+                              benchmarks=spec.get("benchmark"))
+    if not ok:
+        raise SystemExit("[gate] FAIL — no shippable package: " + "; ".join(reasons))
+    print("[gate] PASS")
+
+
+def _eval_sets(out, spec, base, W=8, frac=0.3):
+    """Held-out (ctx, gold) pairs + off-domain contexts for the scorecard, tokenized with the built package's tokenizer.
+    NOTE: a held-out *tail* of the same corpus the cover was built on has leakage — proper train/hold isolation (build
+    the cover on TRAIN only) is the EXPERTS.md open item; this is the plumbed baseline."""
+    tok_path = os.path.join(out, "bundle.tokenizer.json")
+    text = (spec.get("corpus", {}) or {}).get("text")
+    if not (os.path.exists(tok_path) and text):
+        return [], []
+    from tokenizers import Tokenizer
+    tok = Tokenizer.from_file(tok_path)
+    text = text if os.path.isabs(text) else os.path.join(base, text)
+    ids = tok.encode(open(text, encoding="utf-8").read()).ids
+    wins = [(tuple(ids[i - W:i]), ids[i]) for i in range(W, len(ids))]
+    hold = wins[int(len(wins) * (1 - frac)):]
+    od = []
+    odf = (spec.get("experiment", {}) or {}).get("off_domain")
+    if odf:
+        odf = odf if os.path.isabs(odf) else os.path.join(base, odf)
+        if os.path.exists(odf):
+            oids = tok.encode(open(odf, encoding="utf-8").read()).ids
+            od = [tuple(oids[i - W:i]) for i in range(W, len(oids))]
+    return hold, od
+
+
 def main():
+    import sys
+    if len(sys.argv) == 2 and sys.argv[1].endswith(".toml"):     # rosetta build-expert expert.toml
+        build_from_spec(sys.argv[1])
+        return
     ap = argparse.ArgumentParser(prog="rosetta build-expert",
-                                 description="assemble a deployable bounded-expert package (cover-first)")
+                                 description="assemble a deployable bounded-expert package (cover-first); "
+                                             "pass an expert.toml for the declarative form")
     ap.add_argument("out")
     ap.add_argument("--corpus", help="grounding corpus (knowledge passages)")
     ap.add_argument("--bundle", help="model bundle stem (enables distilled answers + --cover)")

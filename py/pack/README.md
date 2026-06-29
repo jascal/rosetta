@@ -5,8 +5,18 @@ sgiandubh runtime to serve. rosetta is the sole builder; sgiandubh builds nothin
 [`../../CONVERGENCE.md`](../../CONVERGENCE.md)). This layer **depends on** the minimization core (`py/`, via `cover.py`);
 the core never imports `pack` (enforced by `tests/test_pack.py`).
 
-## Use `build_expert()`, not the modules directly
+## Two entries: a declarative spec, or `build_expert()`
 
+**Declarative (preferred)** — a reproducible experiment from an `expert.toml` (see [`../../EXPERTS.md`](../../EXPERTS.md)):
+```bash
+.venv/bin/python -m pack.build examples/logic/expert.toml
+```
+`pack.spec` loads `[corpus] [model] [adapter] [grounding] [experiment] [[benchmark]] [gate] [reasoning]` (`$ENV`
+resolved), builds the package into `<spec_dir>/package/`, then — if `[gate]` is set — `pack.eval` **scores** it
+(serves a held-out + off-domain set: coverage / precision / abstain / leak) and **hard-fails** the build below the gate.
+The opt-in `[reasoning]` tier (REASONING.md) is *recognized* but deliberately not auto-wired.
+
+**Programmatic** —
 ```python
 from pack import build_expert
 build_expert(out, *, corpus=…, bundle=…, questions=…, adapter=…, cover=…, fieldrun=…, …)
