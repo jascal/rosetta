@@ -1,0 +1,5 @@
+# Optional deps for the SAE/feature-bridge investigation (py/sae_bridge.py) — NOT needed for the core rosetta pipeline.
+# CPU torch is fine: pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch
+transformers
+safetensors
