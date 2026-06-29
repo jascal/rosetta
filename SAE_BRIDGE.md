@@ -135,3 +135,27 @@ feature-transition blocks in `n-orca`; `sae-forge` is a natural SAE source for D
 certified *target*; the sibling tools provide implementation and scaling paths.
 
 *(Plan refined via external review; the five tensions above are the load-bearing design decisions.)*
+
+## Phase 1.5 result — idiom EXTRACTION on pythia-160m: substrate-limited (honest negative)
+
+Before building the fieldrun feature-export plumbing, tested the kill signal directly (`py/feat_idiom.py`): can a
+feature-keyed *idiom* (a generalizing rule) be extracted from SAE features and clear the cover's detect + causal gate?
+
+- **IOI (feature-relative copy pointer).** The simplest feature idiom — "copy the name an indirect-object feature marks"
+  — does **not** clear the gate: best ~65% vs truth / ~54% vs model / 7% causal (cover needs ≥80%). Phase-0 showed the
+  features *carry* the entity info (63–81% patchable), but it is **not cleanly extractable as a generalizing rule** — the
+  forge tax / "doesn't factor through features," concretized. And IOI is **token-structural** anyway (the answer is the
+  non-duplicated name = a duplicate-token primitive, already token-relative), so it doesn't *need* features.
+- **Semantic gender-binding (the genuinely feature-needing case** — answer selected by an in-context gender assignment,
+  both names symmetric in position so position/duplication can't pick it). **pythia-160m gets it 21%** (below the 50%
+  two-name chance; it mostly predicts punctuation/articles, not names). No capability → nothing to extract.
+
+**Conclusion: the bottleneck is the model, not the bridge or the SAE.** On pythia-160m there is no task that is *both*
+genuinely-semantic *and* within the model's ability — it does the token-structural entity tasks (IOI 77%, but those are
+token-doable and features don't cleanly extract them) and fails the semantic ones (gender-binding 21%; cf. `CROSS_ARCH.md`:
+capital 0%, antonym 8%, coreference 15% at 160m). This is the *earned* trigger for the substrate pivot.
+
+**Next: stand up Gemma Scope** (per-layer SAEs on Gemma-2-2b/9b — a model that actually does semantic entity binding *and*
+has SAEs at every layer). Re-run this exact harness there; the kill signal is only a real kill if a feature idiom fails on
+a substrate where the phenomenon is present. pythia was necessary to validate that features carry the signal (phase 0) and
+to find that simple extraction + small models don't suffice (phase 1.5); Gemma Scope is where the bridge gets a fair test.
