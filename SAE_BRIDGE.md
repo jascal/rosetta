@@ -159,3 +159,32 @@ capital 0%, antonym 8%, coreference 15% at 160m). This is the *earned* trigger f
 has SAEs at every layer). Re-run this exact harness there; the kill signal is only a real kill if a feature idiom fails on
 a substrate where the phenomenon is present. pythia was necessary to validate that features carry the signal (phase 0) and
 to find that simple extraction + small models don't suffice (phase 1.5); Gemma Scope is where the bridge gets a fair test.
+
+## Phase 1.6 result — Gemma Scope (capable substrate): the simple idiom STILL fails (`py/gemma_feat.py`)
+
+Stood up gemma-2-2b + `google/gemma-scope-2b-pt-res` (JumpReLU SAEs, width_16k; SAE `layer_L` ≈ `hidden_states[L+1]`,
+reconstruction cos ~0.94 — normal for Gemma Scope 16k). The fair test:
+
+- **gemma-2-2b DOES semantic gender-binding: 90%** — it picks the in-context male name, *overriding name-gender priors*
+  ("Sara is a man … the man is called" → Sara). vs pythia-160m's 21%. So the substrate is genuinely capable.
+- **The simple feature-relative-pointer idiom still gets ~65%** vs truth (60% vs model) on gemma — the *same* ~65% as on
+  pythia. It does **not** clear the cover's detect ≥ 80% gate, even on a model that demonstrably does the task.
+
+**This removes the substrate excuse.** Across a clean-SAE weak model (pythia, token-structural IOI) and a capable model on
+a genuine semantic task (gemma, 90%), the simple feature idiom lands at ~65%. Entity selection is the *distributed*
+name-mover computation (phase-0: the causal signal is at END, not the name slot), and it **does not factor into a sparse,
+generalizing rule** — even though features *carry* it (phase-0 patching 63–81%). This is the forge tax / "composition
+doesn't factor through features," now demonstrated on the cover-extraction task itself, on a capable substrate.
+
+### Verdict for the bridge
+
+- **NEGATIVE for the simple certified COVER idiom** (pointer/gate shape): does not clear detect+causal on either substrate.
+- **Features remain valuable** as (a) the **non-destructive labeling layer** (Phase 1 — lossless, exact, an interpretability
+  view that runs) and (b) patching-level causal analysis (Phase 0). Those are real and don't depend on extraction.
+- A **certified, generalizing feature COVER** would need the richer **feature→feature circuit form** (Phase 4) — a large
+  build with uncertain payoff given the forge tax. Not justified on current evidence.
+
+So the disciplined call (measure-before-build, paid off *before* the fieldrun plumbing): **don't build the feature-cover
+plumbing.** Keep the feature work as the labeling/analysis tier; the certified runtime cover stays token-level. Revisit
+only if a richer feature-circuit form shows the entity computation factoring (Phase 4 research), or for a specific
+high-value family where a feature idiom *does* clear the gate.
