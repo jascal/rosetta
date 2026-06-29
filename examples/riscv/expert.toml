@@ -6,7 +6,7 @@
 # retrieval over the spec (cited) + gated corpus n-grams + abstain. (Contrast: examples/logic is model-distilled —
 # logic is a reasoning domain where the cover carries real idioms.)
 #
-# Build:  .venv/bin/python -m pack.build examples/riscv/expert.toml      (no model, no fieldrun)
+# Build:  .venv/bin/python build_expert.py examples/riscv/expert.toml      (no model, no fieldrun)
 
 [corpus]                                        # CORPUS DESIGN — paths are relative to THIS spec file
 text       = "rules.txt"                         # 3258 normative rules as citable passages (grounding/citation)

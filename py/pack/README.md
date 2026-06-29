@@ -9,7 +9,7 @@ the core never imports `pack` (enforced by `tests/test_pack.py`).
 
 **Declarative (preferred)** — a reproducible experiment from an `expert.toml` (see [`../../EXPERTS.md`](../../EXPERTS.md)):
 ```bash
-.venv/bin/python -m pack.build examples/logic/expert.toml
+.venv/bin/python build_expert.py examples/logic/expert.toml   # repo-root launcher (puts py/ on the path)
 ```
 `pack.spec` loads `[corpus] [model] [adapter] [grounding] [experiment] [[benchmark]] [gate] [reasoning]` (`$ENV`
 resolved), builds the package into `<spec_dir>/package/`, then — if `[gate]` is set — `pack.eval` **scores** it
