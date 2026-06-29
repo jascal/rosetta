@@ -7,55 +7,62 @@ souffle and NO model** — the manifest IS the compiled cover (a decision table)
 
     tokenize(query)  →  longest-suffix-match over the manifest  →  {answer, citation, confidence}  or  ABSTAIN
 
-KEY FINDING surfaced here (matters for sgiandubh): the cover is in the model's BPE-TOKEN space, so the runtime must
-tokenize the query with the model's tokenizer (bundle.tokenizer.json). sgiandubh is currently word/text-based, so consuming
-the rosetta cover requires a BPE tokenizer in its C++ runtime — the real Stage-2 dependency (this script is the port spec).
+The RUNTIME loads only manifest.json (load_package + serve) — no corpus, no souffle, no model. The corpus is used only by the
+BUILDER (make_package, = py/abstain_emit) and by the held-out scorecard (eval), kept separate from serving.
 
-Demonstrates: the bounded-expert scorecard on held-out token contexts + sample cited answers + abstentions, and (if a
-tokenizer is present) an NL-query path. Deps: requirements-sae.txt has tokenizers (for the NL path).
-Usage: .venv/bin/python py/serve_package.py [model_dir] [W] [minsupp] [mindet]
+KEY FINDING surfaced here (matters for sgiandubh): the cover is in the model's BPE-TOKEN space, so the runtime must tokenize
+the query with the model's tokenizer (bundle.tokenizer.json). sgiandubh is currently word/text-based, so consuming the rosetta
+cover requires a BPE tokenizer in its C++ runtime — the real Stage-2 dependency (this script is the port spec).
+
+Deps: tokenizers (for the NL-query path). Usage: .venv/bin/python py/serve_package.py [model_dir] [W] [minsupp] [mindet]
 """
 import json, os, sys, random
+from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from abstain_emit import build_tab, confident_rules
+from abstain_emit import build_tab, confident_rules, emit, emit_manifest
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def build_manifest(md, W, minsupp, mindet):
-    """Build the in-memory package (the manifest = ruleid → {ctx, out, support, det, cite}) the way abstain_emit emits it,
-    + a longest-suffix index for serving. (A deployed runtime loads manifest.json instead — same structure.)"""
+def make_package(md, W, minsupp, mindet):
+    """BUILDER side (= py/abstain_emit): build the cover from corpus.json, emit circuits.abstain.dl + manifest.json.
+    Returns the held-out windows (for the eval scorecard only — NOT used by the runtime)."""
     ids = json.load(open(os.path.join(md, "corpus.json")))["ids"]
     N = min(len(ids) - 1, 40000)
     wins = [(tuple(ids[i - W:i]), ids[i], i) for i in range(W, N)]
     random.Random(0).shuffle(wins)
     cut = int(len(wins) * 0.7); train, hold = wins[:cut], wins[cut:]
     tab, cites = build_tab(train, W)
-    rules = confident_rules(tab, cites, W, minsupp, mindet)      # {k: {suffix: (out, support, det, cite)}}
+    rules = confident_rules(tab, cites, W, minsupp, mindet)
+    ridmap = emit(os.path.join(md, "circuits.abstain.dl"), rules, W, minsupp, mindet)
     meta_p = os.path.join(md, "corpus_meta.json")
     meta = json.load(open(meta_p)) if os.path.exists(meta_p) else None
-    return rules, hold, meta
+    emit_manifest(os.path.join(md, "manifest.json"), ridmap, os.path.basename(md), W, minsupp, mindet, meta)
+    return hold
 
 
-def cite_str(cite, meta):
-    if not meta:
-        return f"corpus@{cite[:3]}"                              # raw provenance offsets
-    hits = []
-    for p in cite:
-        for m in meta:
-            if m["start"] <= p < m["end"]:
-                hits.append(m["citation"]); break
-    return ", ".join(sorted(set(hits))) or f"corpus@{cite[:3]}"
+def load_package(manifest_path):
+    """THE THIN RUNTIME state: load rules from manifest.json ONLY (no corpus, no souffle, no model). Returns
+    (rules, manifest) where rules[k][suffix_tuple] = (out, support, determinism, citation_str). This dict (a length-indexed
+    suffix→decision table) is the structure a C++ runtime would build from the same manifest.json."""
+    m = json.load(open(manifest_path))
+    rules = defaultdict(dict)
+    for r in m["rules"]:
+        ctx = tuple(r["ctx"])
+        cite = r["citation"] if r.get("citation") else f"corpus@{r['cite'][:3]}"
+        rules[len(ctx)][ctx] = (r["out"], r["support"], r["determinism"], cite)
+    return rules, m
 
 
-def serve(ctx, rules, W, meta, min_det=0.0):
-    """The runtime decision: longest confident suffix wins → answer + citation + confidence; else ABSTAIN. Host-side, no souffle."""
+def serve(ctx, rules, W):
+    """The runtime decision: longest matching suffix in the (already confidence-filtered) manifest wins → answer +
+    citation + confidence; else ABSTAIN. Host-side, no souffle. (No min_det here: the manifest contains only confident
+    rules — gating happened at build time in confident_rules; the runtime just looks up.)"""
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in rules[k]:
             out, sup, det, cite = rules[k][s]
-            if det >= min_det:
-                return {"answer": out, "citation": cite_str(cite, meta), "support": sup, "determinism": det, "k": k}
+            return {"answer": out, "citation": cite, "support": sup, "determinism": det, "k": k}
     return None  # ABSTAIN
 
 
@@ -66,18 +73,18 @@ def main():
     minsupp = int(sys.argv[3]) if len(sys.argv) > 3 else 3
     mindet = float(sys.argv[4]) if len(sys.argv) > 4 else 1.0
     name = os.path.basename(md)
-    rules, hold, meta = build_manifest(md, W, minsupp, mindet)
-    nrules = sum(len(rules[k]) for k in rules)
-    print(f"=== serve_package · {name} · {nrules} rules · host-side (no souffle, no model){' · corpus_meta ✓' if meta else ''} ===")
-    # bounded-expert scorecard on held-out token contexts
+    hold = make_package(md, W, minsupp, mindet)                  # builder: corpus → package (circuits.abstain.dl + manifest.json)
+    rules, manifest = load_package(os.path.join(md, "manifest.json"))  # RUNTIME: load manifest.json only
+    meta_on = any("citation" in r for r in manifest["rules"][:50])
+    print(f"=== serve_package · {name} · loaded {manifest['n_rules']} rules from manifest.json "
+          f"(thin runtime: no corpus/souffle/model){' · citations ✓' if meta_on else ''} ===")
     ans = cor = 0
-    for ctx, o, _ in hold:
-        r = serve(ctx, rules, W, meta)
+    for ctx, o, _ in hold:                                       # held-out scorecard (eval only; uses the corpus)
+        r = serve(ctx, rules, W)
         if r is not None:
             ans += 1; cor += (r["answer"] == o)
     H = len(hold)
     print(f"scorecard: coverage {ans/H:.0%}  precision {cor/ans if ans else 0:.0%}  abstain {1-ans/H:.0%}  (n={H})")
-    # sample served decisions (answers with citations, and abstentions)
     dec = lambda t: f"id{t}"
     tok = None
     tp = os.path.join(md, "bundle.tokenizer.json")
@@ -88,27 +95,30 @@ def main():
         except Exception:
             pass
     shown_ans = shown_ab = 0
-    print("sample served decisions:")
+    print("sample served decisions (answer → citation, or abstain):")
     for ctx, o, _ in hold:
-        r = serve(ctx, rules, W, meta)
+        r = serve(ctx, rules, W)
         if r is not None and shown_ans < 3:
             mark = "✓" if r["answer"] == o else "✗"
             print(f"  ANSWER {dec(r['answer'])} {mark}  (k={r['k']} support={r['support']} det={r['determinism']:.2f})  cite: {r['citation']}")
             shown_ans += 1
         elif r is None and shown_ab < 2:
-            print(f"  ABSTAIN (no confident rule) — would defer to backstop / refuse")
+            print("  ABSTAIN (no confident rule) — would defer to backstop / refuse")
             shown_ab += 1
         if shown_ans >= 3 and shown_ab >= 2:
             break
-    # the NL-query path (the token-space bridge sgiandubh needs)
     if tok is not None:
         print("NL-query path (tokenize → serve) — the token-space bridge sgiandubh's runtime needs:")
         for q in ["The United States of America", "xylophone quantum tariff zzzqq"]:
             ctx = tok.encode(q, add_special_tokens=False).ids[-W:]
-            r = serve(ctx, rules, W, meta)
+            r = serve(ctx, rules, W)
             print(f"  query {q!r} → " + (f"answer {dec(r['answer'])} (cite {r['citation']})" if r else "ABSTAIN"))
     else:
         print("(no bundle.tokenizer.json — NL path skipped; this model serves token contexts only)")
+    # manifest shape, for C++ porters
+    s0 = manifest["rules"][0]
+    print(f"manifest.json rule shape (for the C++ runtime): {{id, ctx:[token ids], out, support, determinism, cite[, citation]}}")
+    print(f"  e.g. {json.dumps({k: s0[k] for k in ('id', 'ctx', 'out', 'support', 'determinism') if k in s0})}")
 
 
 if __name__ == "__main__":
