@@ -47,7 +47,7 @@ text      = "corpora/logic_kb.txt"
 questions = "corpora/logic_questions.txt"
 citation  = "Open Logic Project (CC BY 4.0)"
 
-[model]                               # the substrate (omit → model-free expert)
+[model]                               # the substrate (omit + use [adapter] instead → model-free expert)
 bundle    = "$BUNDLE"                 # named, never hard-coded
 fieldrun  = "$FIELDRUN"               # the extractor, named (no PATH discovery)
 
@@ -69,6 +69,24 @@ max_leak      = 0.05
 `rosetta build-expert expert.toml` → the **package** + **`scorecard.json`** (+ a per-benchmark report). It **exits
 non-zero with no shippable package** if the scorecard misses `[gate]` or a benchmark `target`.
 
+A **model-free** expert (a frozen spec) omits `[model]` and uses `[adapter]` — no cover, no curated answers, retrieval-only:
+
+```toml
+# riscv.toml — a model-free expert (retrieval over a structured source, no model)
+[corpus]
+citation = "RISC-V ISA Manual (CC BY 4.0)"
+
+[adapter]                             # structured-source → citable passages (no model, no fieldrun)
+name   = "normrules"
+source = "norm-rules.json"
+
+[experiment]
+off_domain = "probes/negatives.txt"   # no holdout split — there's no cover/curated tier to hold out
+
+[gate]
+max_leak = 0.05                        # no min_precision: rules are returned verbatim; gate on leak/citation
+```
+
 ## The scorecard (the result)
 
 Graded on the experimental design, over the deployable package's *whole* cascade (not just the cover):
@@ -83,7 +101,31 @@ Graded on the experimental design, over the deployable package's *whole* cascade
 | **benchmark score(s)** | per `[[benchmark]]`, vs its `target` | `empirical` |
 
 Per-tier attribution is required: every answer is tagged with the tier that produced it, so a failure localizes to a
-tier (and thus to a builder) rather than being a single opaque number.
+tier (and thus to a builder) rather than being a single opaque number. This is where the **cover-first composition**
+([`CONVERGENCE.md`](./CONVERGENCE.md)) meets the scorecard: each tier carries its own coverage/precision, and the
+**cover tier additionally carries a `proved` faithfulness row** (its `dl/equiv.dl` certificate) — so "smart tier
+generalizes faithfully" is an artifact, not an assertion.
+
+A `scorecard.json` (illustrative values):
+
+```json
+{
+  "model": "rosetta-expert-logic",
+  "domain": "Open Logic Project",
+  "tiers": {
+    "curated":   { "coverage": 0.41, "precision": 0.98, "n": 16 },
+    "cover":     { "coverage": 0.33, "precision": 0.95, "faithful": "proved", "equiv": "nmiss=0 nuncov=0" },
+    "retrieval": { "coverage": 0.11, "precision": 0.82 }
+  },
+  "abstain": 0.15,
+  "confident_wrong": 0.01,
+  "off_domain_leak": 0.02,
+  "gram_parity": { "recall": 1.0, "confident_disagree": 0 },
+  "benchmarks": [ { "name": "olp-qa", "score": 0.86, "target": 0.85, "pass": true } ],
+  "gate": { "min_precision": 0.90, "max_leak": 0.05, "pass": true },
+  "testset": "auto-baseline"
+}
+```
 
 ## Test-set construction (decided)
 
@@ -97,6 +139,11 @@ So:
 
 The baseline catches gross regressions; the owner set substantiates the claim. Both must be **held out** from everything
 the build trains on (cover, curated, retrieval) — leakage would inflate the claim.
+
+**Off-domain probes** (the negative set) are **versioned alongside the spec** (referenced by `[experiment].off_domain`,
+committed with the expert), and must be genuinely *outside* the domain — a fixed generic negative set (general-knowledge
+/ other-domain queries), not adversarial paraphrases of in-domain content. What counts as a *fair* generic negative set
+is tracked in Open Questions.
 
 ## Gate (decided)
 
