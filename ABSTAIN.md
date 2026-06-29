@@ -79,3 +79,20 @@ This makes rosetta's emit the **shared package** (rules + contrib/softmax-at-T +
 certificate) that both runtimes consume — rosetta's pure-souffle `run.dl` and sgiandubh's OpenAI server. Remaining stages:
 (2) a sgiandubh "rosetta-package" load mode (tokenize query → run cover → cite/abstain); (3) validate on a real expert
 (RISC-V / logic textbook) vs the current per-item package; (4) deprecate `sgiandubh/tools/`.
+
+### Causal-idiom package (`idiom_learn.py --package` → `emit_expert_package`)
+
+The decisive strengthening over the corpus-only path: the bounded expert should be built from **confirmed computation**, not
+corpus correlation. The two extraction paths differ in *kind* — `idiom_learn` causally confirms idioms (perturb the frame via
+the fieldrun/whole.dl oracle → does the output follow?), whereas the n-gram tier is purely observational (support/determinism).
+A backstop-less bounded expert can't afford a confidently-wrong correlational rule, so the causal idioms are the **safe** tier.
+
+`emit_expert_package` emits `package/{circuits.expert.dl, run.dl, manifest.json}`:
+- **TRUSTED tier** — the causally-confirmed idioms (compose/select-gate), ungated; routed first.
+- **GATED tier** — n-gram backfill on the residual, kept only by support/determinism (abstain on weak suffixes).
+- **manifest.json** — every rule tagged `tier: trusted|gated` + `basis: causal|observational` (+ causal score / support+det +
+  provenance) — the audit of *what the expert knows and why it's trusted*.
+
+On threx: **1 compose + 2 select-gate (causal, trusted) cover 27%, gated n-grams cover 33%, abstain 40%** — `circuits.expert.dl`
+runs in souffle and abstains by construction where no trusted/gated rule fires. So the bounded expert answers a quarter from
+*causally-confirmed structure*, a third from *gated corpus statistics*, and *refuses the rest*.

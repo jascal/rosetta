@@ -23,11 +23,11 @@ def test_package_load_roundtrip_and_scorecard(tmp_path):
     W, minsupp, mindet = 8, 3, 1.0
     hold = make_package(str(md), W, minsupp, mindet)                      # builder: corpus → package
     assert (md / "manifest.json").exists() and (md / "circuits.abstain.dl").exists()
-    rules, manifest = load_package(str(md / "manifest.json"))             # runtime: load manifest only
-    assert sum(len(rules[k]) for k in rules) == manifest["n_rules"] > 0    # load roundtrip
+    idioms, ngrams, manifest = load_package(str(md / "manifest.json"))    # runtime: load manifest only (abstain_emit = n-gram only)
+    assert idioms == [] and sum(len(ngrams[k]) for k in ngrams) == manifest["n_rules"] > 0   # load roundtrip (all gated n-grams)
     ans = cor = 0
     for ctx, o, _ in hold:
-        r = serve(ctx, rules, W)
+        r = serve(ctx, idioms, ngrams, W)
         if r is not None:
             ans += 1
             cor += (r["answer"] == o)

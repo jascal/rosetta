@@ -22,3 +22,6 @@ models/*/logit_cache.json
 models/*/circuits.abstain.dl
 models/*/manifest.json
 bundle.tokenizer.json
+# bounded-expert package output (reproducible via idiom_learn --package)
+models/*/package/
+reference/*/package/
