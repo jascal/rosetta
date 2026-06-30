@@ -1,0 +1,9 @@
+# examples/pedagogy — the pedagogy template expert (model-free; ergo selects the template). No model, no GloVe needed.
+[corpus]
+citation = "pedagogy templates"
+[adapter]
+name   = "pedagogy"
+source = "templates.toml"
+prefix = "pedagogy"
+[grounding]
+dim = 0                        # selection is via the strategy route (exact), not cosine → lexical grounding suffices

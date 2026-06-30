@@ -141,6 +141,7 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
         defines = list(extraction.defines) if (extraction and extraction.defines) else \
             (reasoning.extract_defines(prose) if prose else [])
         statements = list(extraction.statements) if extraction else []
+        gen_answers = list(extraction.answers) if extraction else []   # generic strategy rows (any intent, e.g. pedagogy)
         mat = None
         if items:                                            # count/list aggregates → cited passages appended to corpus
             mat = reasoning.materialize(items, _resolve_rules(reasoning_rules))
@@ -151,12 +152,13 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
                     f.write(f"[{sec}] {text}\n")
             ground_corpus = aug
             print(f"[reasoning] inventory: {mat['total']} distinct {inventory_label}s across {len(mat['groups'])} groups")
-        if mat or defines or statements:
+        if mat or defines or statements or gen_answers:
             sdl = _resolve_rules("ergo:strategy")
             _t, ncue, nans = reasoning.strategy_tables(sdl, os.path.join(out, "strategy.tsv"), mat=mat,
-                                                       label=inventory_label, defines=defines, theorems=statements)
+                                                       label=inventory_label, defines=defines, theorems=statements,
+                                                       answers=gen_answers)
             print(f"[reasoning] strategy: {ncue} cues, {nans} answer rows "
-                  f"({len(defines)} define, {len(statements)} theorem) → strategy.tsv")
+                  f"({len(defines)} define, {len(statements)} theorem, {len(gen_answers)} other) → strategy.tsv")
 
     # 2. grounding — CITATION-first (the runtime hard-gates retrieval-as-answer; see CONVERGENCE.md)
     if ground_corpus:
