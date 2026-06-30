@@ -61,18 +61,19 @@ def materialize(items, rules_dl):
         }
 
 
-def inventory_passages(mat, *, label="instruction", prefix="riscv:inventory"):
+def inventory_passages(mat, *, label="instruction", prefix="riscv:inventory", collection="the collection"):
     """Materialized counts/list → cited KB passages, section = "id · Facet" (so cite-as-handle + /lookup work). One
-    'total' passage + one per group (carrying the enumerated names — the count ships with what it counted)."""
+    'total' passage + one per group (carrying the enumerated names — the count ships with what it counted). Domain-
+    neutral wording (`collection` names the whole, e.g. "the RISC-V ISA" / "the catalog") so the same ergo aggregate
+    serves any inventory — instructions, documents, anything."""
     out = [(f"{prefix}:total · {label.capitalize()} inventory",
-            f"There are {mat['total']} distinct RISC-V {label}s across the indexed extensions "
-            f"(closed-world: counted from the spec rules at build time).")]
+            f"There are {mat['total']} distinct {label}s in {collection} (closed-world: counted at build time).")]
     by_group = {}
     for name, g in mat["items"]:
         by_group.setdefault(g, set()).add(name)
     for g, n in sorted(mat["groups"].items()):
         names = ", ".join(sorted(by_group.get(g, ())))
-        out.append((f"{prefix}:{g} · {g}", f"The {g} defines {n} {label}s: {names}."))
+        out.append((f"{prefix}:{g} · {g}", f"{g} contains {n} {label}s: {names}."))
     return out
 
 

@@ -35,6 +35,8 @@ class _LaTeXMLParser(HTMLParser):
         self._mode = None                             # None | "para" | "title" | ("block", kind)
         self._skip_depth = 0                          # >0 while inside <math> (skip its MathML children)
         self._n = 0
+        self.title = ""                               # document title (ltx_title_document) — for the librarian card
+        self.section_list = []                        # ordered section titles — for the card's "Sections:" line
 
     # --- helpers ---
     def _flush_para(self):
@@ -70,7 +72,11 @@ class _LaTeXMLParser(HTMLParser):
             return
         if self._skip_depth:
             return
-        if "ltx_theorem" in cls:
+        if "ltx_title_document" in cls and not self.title:
+            self._flush_para()
+            self._mode = "doctitle"
+            self._buf = []
+        elif "ltx_theorem" in cls:
             self._flush_para()
             m = _CLASS.search(cls)
             self._mode = ("block", m.group(1) if m else "theorem")
@@ -91,8 +97,14 @@ class _LaTeXMLParser(HTMLParser):
         if isinstance(self._mode, tuple) and tag == "div":
             self._flush_block(self._mode[1])
             self._mode = None
+        elif self._mode == "doctitle" and tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
+            self.title = _WS.sub(" ", "".join(self._buf)).strip()[:160]
+            self._buf = []
+            self._mode = None
         elif self._mode == "title" and tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
             self.section = _WS.sub(" ", "".join(self._buf)).strip()[:80] or self.prefix
+            if self.section and self.section not in self.section_list:
+                self.section_list.append(self.section)
             self._buf = []
             self._mode = None
         elif self._mode == "para" and tag in ("p", "div"):
@@ -108,8 +120,13 @@ class _LaTeXMLParser(HTMLParser):
 def adapt(source, *, prefix="paper", citation="arXiv (LaTeXML HTML)", **_):
     """A LaTeXML HTML file (arXiv/ar5iv) → Extraction: sectioned paragraphs + theorem/definition blocks (+ named
     statements/defines where present). `source` is a path to the .html file."""
+    raw = open(source, encoding="utf-8", errors="replace").read()
     p = _LaTeXMLParser(prefix)
-    p.feed(open(source, encoding="utf-8", errors="replace").read())
+    p.feed(raw)
     if not p.passages:
         raise ValueError(f"latexml adapter: 0 passages from {source} — is this a LaTeXML (arXiv/ar5iv) HTML file?")
-    return Extraction(p.passages, defines=p.defines, statements=p.statements, citation=citation)
+    am = re.search(r'<div[^>]*\bclass="ltx_abstract".*?</div>', raw, re.S)   # the abstract block → the card summary
+    summary = _WS.sub(" ", re.sub(r"<[^>]+>", " ", html.unescape(am.group(0)))).strip() if am else ""
+    summary = re.sub(r"^\s*Abstract\.?\s*", "", summary)[:600]
+    card = {"handle": prefix, "title": p.title or prefix, "summary": summary, "sections": p.section_list[:12]}
+    return Extraction(p.passages, defines=p.defines, statements=p.statements, citation=citation, cards=[card])
