@@ -66,7 +66,7 @@ def test_build_model_free_expert(tmp_path):
 
     idx = json.load(open(out / "index.json"))
     assert idx["model"] == "test-spec" and idx["items"] == []   # model-free → no curated items
-    assert (out / "rules.txt").exists()                         # adapter passages
+    assert (out / "corpus.txt").exists()                        # the adapter's Extraction → canonical corpus
     kn = (out / "knowledge.tsv").read_text()                    # grounding (citation)
     assert "ecall" in kn and "x0" in kn
     assert not (out / "gram").exists()                          # cover-first: NO bare gram tier (CONVERGENCE.md)
@@ -288,7 +288,7 @@ def test_strategy_tables_uniform(tmp_path):
     sdl.write_text(_STRAT_DL)
     mat = {"total": 4, "groups": {"RV32I": 2, "M Extension": 3}, "items": []}
     out = tmp_path / "strategy.tsv"
-    _p, ncue, nans = reasoning.strategy_tables(str(sdl), str(out), mat, label="instruction",
+    _p, ncue, nans = reasoning.strategy_tables(str(sdl), str(out), mat=mat, label="instruction",
                                                defines=[("manual:intro_17", "hart")])
     rows = [ln.split("\t") for ln in out.read_text().splitlines()]
     cues = [r for r in rows if r[0] == "cue"]
@@ -319,3 +319,34 @@ def test_extract_defines_parenthesized_only(tmp_path):
     assert byterm["mcause"] == "manual:m_213"
     assert "cause" not in byterm and "machine" not in byterm and "core" not in byterm   # no ordinary-word entities
     assert "register" not in byterm and "terminology" not in byterm
+
+
+def test_adapter_system_registry_and_contract(tmp_path):
+    """The document-adapter system: all sources are registered instances of the one Extraction contract."""
+    from pack import adapters
+    assert set(adapters.names()) >= {"normrules", "riscv_prose", "pretext", "latexml"}
+
+    # normrules instance → passages + the insn inventory items, as an Extraction
+    src = tmp_path / "norm.json"
+    json.dump({"normative_rules": [
+        {"name": "m1", "chapter_name": "M Extension", "tags": [{"text": "The insn:mul[] instruction multiplies."}]},
+    ]}, open(src, "w"))
+    ext = adapters.get("normrules")(str(src))
+    assert ext.passages and ("mul", "M Extension") in ext.items     # items feed count/list
+    corpus = ext.write_corpus(str(tmp_path / "c.txt"))
+    assert "[norm:m1 · M Extension]" in open(corpus).read()         # citable handle preserved
+
+    # latexml instance → a LaTeXML HTML snippet yields sectioned passages + a named definition/theorem
+    htm = tmp_path / "paper.html"
+    htm.write_text(
+        '<h2 class="ltx_title ltx_title_section">Preliminaries</h2>'
+        '<div class="ltx_para"><p class="ltx_p">We work over a field '
+        '<math alttext="\\mathbb{F}">MATHML</math> throughout this paper.</p></div>'
+        '<div class="ltx_theorem ltx_theorem_theorem"><p class="ltx_p">Theorem 1 (Euler). '
+        'For coprime a and n, a power phi of n is one mod n.</p></div>')
+    ext = adapters.get("latexml")(str(htm), prefix="px")
+    assert any("field" in t for _s, t in ext.passages)             # prose extracted
+    assert any("\\mathbb{F}" in t for _s, t in ext.passages)       # math kept as LaTeX (alttext), MathML dropped
+    assert "MATHML" not in " ".join(t for _s, t in ext.passages)   # MathML subtree skipped
+    assert ("px:theorem2", "euler") in [(p, n) for p, n in ext.statements] or \
+           any(n == "euler" for _p, n in ext.statements)           # named theorem captured

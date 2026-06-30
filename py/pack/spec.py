@@ -61,6 +61,7 @@ def to_build_kwargs(spec, base="."):
         "cover": bool(bundle),                                   # a model present ⇒ build a cover (the smart tier)
         "adapter": a.get("name"),
         "adapter_source": p(a.get("source")) if a.get("source") else None,
+        "adapter_opts": {k: v for k, v in a.items() if k not in ("name", "source")},   # e.g. prefix, chapters
         "dim": gr.get("dim", 300),                              # grounding embedding dim (0 = lexical, no download)
         "corpus_vectors": gr.get("corpus_vectors", False),
         "no_split": gr.get("no_split", False),

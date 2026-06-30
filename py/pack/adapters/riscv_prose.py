@@ -18,6 +18,8 @@ retrieval-leak surface. Pass `chapters=` to override.
 import os
 import re
 
+from .base import Extraction, register
+
 # the conceptual chapters where the definitions live (paths relative to the manual's src/). The prefaces are excluded
 # deliberately: they are version-changelog text ("Made the mstatus.mpp field WARL…"), not definitional prose — pure
 # retrieval-leak surface.
@@ -143,28 +145,43 @@ def _slug(chapter_file):
     return os.path.splitext(os.path.basename(chapter_file))[0].replace("-", "_")
 
 
+def _passages(manual_src, chapters=None):
+    """Yield (section, text) prose passages — section = "manual:<file>_<n> · <Chapter › Section>"."""
+    for chap in (chapters or DEFAULT_CHAPTERS):
+        path = os.path.join(manual_src, chap)
+        if not os.path.exists(path):
+            print(f"[riscv_prose] skip (absent): {chap}")
+            continue
+        base = _slug(chap)
+        title = base.replace("_", " ").title()
+        for suffix, section, text in chapter_to_passages(path, title):
+            yield f"manual:{base}_{suffix} · {section}", text
+
+
+@register("riscv_prose")
+def adapt(source, *, chapters=None, citation="RISC-V ISA Manual (CC BY 4.0)", **_):
+    """manual src/ → Extraction: explanatory-prose passages + defines (the structural parenthesized-abbrev extractor)."""
+    from .. import reasoning
+    passages = list(_passages(source, chapters))
+    if not passages:
+        raise ValueError(f"riscv_prose adapter: extracted 0 passages from {source} (is this the manual's src/ dir?)")
+    return Extraction(passages, defines=reasoning.extract_defines(passages), citation=citation)
+
+
 def to_corpus(manual_src, out, *, chapters=None, citation="RISC-V ISA Manual (CC BY 4.0)"):
-    """manual src/ dir → <out>/prose.txt + <out>/prose_plain.txt. Returns (prose_txt, prose_plain, n_passages)."""
+    """Back-compat: write <out>/prose.txt + prose_plain.txt. Returns (prose_txt, prose_plain, n_passages)."""
     os.makedirs(out, exist_ok=True)
-    chapters = chapters or DEFAULT_CHAPTERS
     prose_txt = os.path.join(out, "prose.txt")
     prose_plain = os.path.join(out, "prose_plain.txt")
     total = 0
     with open(prose_txt, "w", encoding="utf-8") as ft, open(prose_plain, "w", encoding="utf-8") as fp:
-        for chap in chapters:
-            path = os.path.join(manual_src, chap)
-            if not os.path.exists(path):
-                print(f"[riscv_prose] skip (absent): {chap}")
-                continue
-            base = _slug(chap)
-            title = base.replace("_", " ").title()
-            for suffix, section, text in chapter_to_passages(path, title):
-                ft.write(f"[manual:{base}_{suffix} · {section}] {text}\n")
-                fp.write(text + "\n")
-                total += 1
+        for section, text in _passages(manual_src, chapters):
+            ft.write(f"[{section}] {text}\n")
+            fp.write(text + "\n")
+            total += 1
     if total == 0:
         raise ValueError(f"riscv_prose adapter: extracted 0 passages from {manual_src} "
-                         f"(checked {len(chapters)} chapters — is this the manual's src/ dir?)")
+                         f"(checked chapters — is this the manual's src/ dir?)")
     return prose_txt, prose_plain, total
 
 

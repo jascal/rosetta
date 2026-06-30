@@ -1,0 +1,15 @@
+# examples/pretext/fcla — A First Course in Linear Algebra (Beezer, GFDL). See README.md.
+# Clone the book first, then:  FCLA_SRC=…/fcla/src .venv/bin/python build_expert.py examples/pretext/fcla.toml
+[corpus]
+citation = "A First Course in Linear Algebra (Beezer, GFDL)"
+
+[adapter]                       # any document SOURCE is a registered adapter (pack.adapters)
+name   = "pretext"
+source = "$FCLA_SRC"             # path to the cloned book's src/ dir (GFDL — not committed)
+prefix = "fcla"                  # citation namespace for this book's passages
+
+[experiment]
+off_domain = "../probes/negatives.txt"
+
+[gate]
+max_leak = 0.05
