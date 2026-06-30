@@ -457,3 +457,22 @@ def test_librarian_catalog(tmp_path):
     assert "There are 2 distinct papers in the catalog" in cat        # the catalog is an inventory (ergo count)
     strat = (out / "strategy.tsv").read_text()
     assert "answer\tcount\tpaper\tlib:catalog:total" in strat         # count/list routed via ergo strategy.dl
+
+
+def test_pedagogy_templates_as_expert(tmp_path):
+    """Pedagogy templates are a model-free expert: each template → a passage + a generic ('pedagogy', entity, passage)
+    strategy row, so selection ('socratic intro') routes via the uniform table (ergo). No model."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (strategy tier)")
+    from pack import build_expert
+    (tmp_path / "t.toml").write_text(
+        '[[template]]\nname="socratic-tutor"\nstyle="socratic"\nlevel="intro"\nsystem="You are a Socratic tutor for {scope}."\n'
+        '[[template]]\nname="examiner"\nstyle="quiz"\nlevel="any"\nsystem="You are an examiner for {scope}."\n')
+    out = tmp_path / "pkg"
+    build_expert(str(out), dim=0, model="pedagogy",
+                 documents=[{"adapter": "pedagogy", "source": str(tmp_path / "t.toml"), "opts": {"prefix": "ped"}}])
+    kn = (out / "knowledge.tsv").read_text()
+    assert "ped:socratic-tutor" in kn and "Socratic tutor" in kn          # template is a citable passage
+    strat = (out / "strategy.tsv").read_text()
+    assert "answer\tpedagogy\tsocratic intro\tped:socratic-tutor" in strat  # ergo-routed selection by style+level
+    assert "answer\tpedagogy\tquiz\tped:examiner" in strat

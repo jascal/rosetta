@@ -14,6 +14,6 @@ Add a source type = write `adapt(source, **opts) -> Extraction` and `@register("
 from .base import Extraction, get, names, register
 
 # import the adapter modules so their @register(...) runs (the registry is populated as a side effect)
-from . import normrules, riscv_prose, pretext, latexml  # noqa: E402,F401
+from . import normrules, riscv_prose, pretext, latexml, pedagogy  # noqa: E402,F401
 
 __all__ = ["Extraction", "get", "names", "register"]

@@ -117,7 +117,7 @@ def extract_defines(corpus, *, min_len=3):
 
 
 def strategy_tables(strategy_dl, out_tsv, *, mat=None, label="instruction", prefix="riscv:inventory",
-                    defines=None, theorems=None):
+                    defines=None, theorems=None, answers=None):
     """Materialize the package's strategy.tsv — the UNIFORM (intent, entity, passage) table the thin runtime applies
     (no runtime engine; build-time only). One row shape for every strategy — count/list/define/theorem are just
     different intents, never special cases:
@@ -150,6 +150,8 @@ def strategy_tables(strategy_dl, out_tsv, *, mat=None, label="instruction", pref
             rows.append(("answer", "list", g.lower(), f"{prefix}:{g}"))
     for pid, name in (theorems or []):                              # theorem rows: a named statement → its passage
         rows.append(("answer", "theorem", name, pid))
+    for intent, entity, pid in (answers or []):                    # generic rows for ANY intent (e.g. pedagogy → template)
+        rows.append(("answer", intent, entity, pid))
     with open(out_tsv, "w", encoding="utf-8") as f:
         for w, i in cues:
             f.write(f"cue\t{w}\t{i}\n")
