@@ -35,7 +35,7 @@ def _ask(port, q):
     r = urllib.request.urlopen(urllib.request.Request(
         f"http://127.0.0.1:{port}/v1/chat/completions", body, {"content-type": "application/json"}), timeout=20)
     d = json.loads(json.load(r)["choices"][0]["message"]["content"])
-    return d.get("answer", ""), d.get("kind", "")
+    return d.get("answer", ""), d.get("kind", ""), d.get("citation_id", "")
 
 
 def score(package, testset, bin_path, *, cov=0.6, cos=0.5, margin=0.2, port=8155):
@@ -44,14 +44,16 @@ def score(package, testset, bin_path, *, cov=0.6, cos=0.5, margin=0.2, port=8155
     try:
         ind = ind_hit = ind_prec_n = ind_prec_ok = off = off_leak = 0
         for r in rows:
-            ans, kind = _ask(port, r["q"])
+            ans, kind, cite = _ask(port, r["q"])
             answered = kind != "abstain" and not ans.startswith("That isn't")
             if r["expect"] == "answer":
                 ind += 1
                 ind_hit += answered
-                if answered and r.get("contains"):
+                if answered and (r.get("contains") or r.get("cite_prefix")):
                     ind_prec_n += 1
-                    ind_prec_ok += all(c.lower() in ans.lower() for c in r["contains"])
+                    ok = all(c.lower() in ans.lower() for c in r.get("contains", []))
+                    ok = ok and (not r.get("cite_prefix") or cite.startswith(r["cite_prefix"]))
+                    ind_prec_ok += ok
             else:
                 off += 1
                 off_leak += answered

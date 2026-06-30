@@ -16,3 +16,11 @@
 {"q": "What is the boiling point of water?", "expect": "abstain"}
 {"q": "What causes earthquakes?", "expect": "abstain"}
 {"q": "What is photosynthesis?", "expect": "abstain"}
+{"q": "What is a hart?", "expect": "answer", "contains": ["hart"], "cite_prefix": "manual:"}
+{"q": "What is a core?", "expect": "answer", "contains": ["core"], "cite_prefix": "manual:"}
+{"q": "What is an execution environment?", "expect": "answer", "contains": ["execution environment"], "cite_prefix": "manual:"}
+{"q": "What is the satp register?", "expect": "answer", "contains": ["satp"], "cite_prefix": "manual:"}
+{"q": "What is a WARL field?", "expect": "answer", "contains": ["WARL"], "cite_prefix": "manual:"}
+{"q": "What is supervisor mode?", "expect": "answer", "contains": ["supervisor"]}
+{"q": "What is machine mode?", "expect": "answer", "contains": ["machine"]}
+{"q": "What is the misa register?", "expect": "answer", "contains": ["misa"]}

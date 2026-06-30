@@ -215,3 +215,53 @@ def test_build_from_spec_model_free(tmp_path):
     assert os.path.exists(os.path.join(out, "index.json"))                       # empty index (model-free)
     assert os.path.exists(os.path.join(out, "knowledge.tsv"))                    # grounding (citation)
     assert not os.path.exists(os.path.join(out, "manifest.json"))                # no cover (model-free)
+
+
+def test_riscv_prose_adapter(tmp_path):
+    """The prose adapter cleans AsciiDoc → citable passages: macros decoded, markup stripped, prose kept, junk dropped."""
+    from pack.adapters import riscv_prose
+
+    src = tmp_path / "src" / "unpriv"
+    src.mkdir(parents=True)
+    (src / "intro.adoc").write_text(
+        "== Introduction\n\n"
+        "(((hart, definition)))\n"
+        "A component is termed a _core_ if it contains an instruction fetch unit, supporting multiple harts.\n\n"
+        "The insn:mret[] instruction returns from a trap, and csr:mstatus[mpp] holds the previous mode here.\n\n"
+        "[NOTE]\n====\n"
+        "See <<chapter2, the next chapter>> and cite:[ref2020] for the full rationale on this design point.\n"
+        "====\n\n"
+        "|===\n| col | col\n| 1 | 2\n|===\n\n"        # a table → must be skipped
+        "short\n",                                     # too short → dropped
+        encoding="utf-8")
+
+    prose_txt, _plain, n = riscv_prose.to_corpus(str(tmp_path / "src"), str(tmp_path / "out"),
+                                                 chapters=["unpriv/intro.adoc"])
+    body = open(prose_txt, encoding="utf-8").read()
+    assert n >= 2
+    assert "termed a core" in body and "_core_" not in body          # _italic_ stripped
+    assert "MRET" in body and "insn:mret[]" not in body              # macro decoded
+    assert "mstatus.mpp" in body                                     # csr:NAME[field] → NAME.field
+    assert "(((" not in body and "cite:" not in body                 # index + cite macros gone
+    assert "the next chapter" in body and "<<" not in body           # xref → display text; NOTE prose kept
+    assert "| col |" not in body                                     # table skipped
+    assert "] short" not in body                                     # too-short fragment dropped
+    assert "[manual:intro_" in body                                  # citable handle (prose namespace)
+
+
+def test_build_concats_prose_into_grounding(tmp_path):
+    """[corpus] prose= concatenates extra citable passages into the grounding corpus (rules + prose, both no-split)."""
+    from pack import build_expert
+
+    src = tmp_path / "norm.json"
+    json.dump({"normative_rules": [
+        {"name": "x0_zero", "chapter_name": "ISA", "tags": [{"text": "Register x0 is hardwired to zero."}]},
+    ]}, open(src, "w"))
+    prose = tmp_path / "prose.txt"
+    prose.write_text("[manual:intro_0 · Intro] A hart is a resource that fetches and executes instructions.\n")
+    out = tmp_path / "pkg"
+    build_expert(str(out), adapter="normrules", adapter_source=str(src), prose=str(prose), dim=0, model="t")
+
+    kn = (out / "knowledge.tsv").read_text()
+    assert "x0 is hardwired" in kn and "hart is a resource" in kn    # BOTH rules and prose grounded
+    assert "manual:intro_0" in kn                                    # prose citation handle present
