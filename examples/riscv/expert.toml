@@ -20,6 +20,11 @@ citation   = "RISC-V ISA Manual (CC BY 4.0)"
 [grounding]                                     # one passage per normative rule (don't sentence-split the rules)
 no_split = true
 
+[reasoning]                                     # count/list via ergo aggregates (build-time, closed-world) — so
+inventory = true                                #   "how many instructions / list the M instructions" is answerable,
+rules     = "ergo:aggregate"                    #   materialized as cited KB passages (riscv:inventory:*), no runtime engine
+label     = "instruction"
+
 [experiment]                                    # EXPERIMENTAL DESIGN
 off_domain = "../probes/negatives.txt"          # no holdout: no cover/curated to hold out; retrieval/n-grams over the spec
 

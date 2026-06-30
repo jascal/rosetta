@@ -42,10 +42,23 @@ def _make_corpus(out, text_file, bundle):
     return len(ids)
 
 
+def _resolve_rules(spec_rules):
+    """Resolve a reasoning-rules ref to a .dl path: an explicit path, or 'ergo:<name>' → ../ergo/<name>.dl."""
+    if spec_rules and os.path.exists(spec_rules):
+        return spec_rules
+    name = (spec_rules or "ergo:aggregate").split(":")[-1]
+    repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # rosetta repo root
+    cand = os.path.join(os.path.dirname(repo), "ergo", name + ".dl")                      # ../ergo/<name>.dl
+    if not os.path.exists(cand):
+        raise FileNotFoundError(f"reasoning rules not found: {spec_rules!r} (looked for {cand})")
+    return cand
+
+
 def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, citation="",
                  model="rosetta-expert", adapter=None, adapter_source=None,
                  dim=300, corpus_vectors=False, no_split=False,
-                 cover=False, minsupp=3, mindet=1.0, fieldrun=None):
+                 cover=False, minsupp=3, mindet=1.0, fieldrun=None,
+                 inventory=False, inventory_label="instruction", reasoning_rules=None):
     """Assemble a package at `out`. Three shapes:
       * model-free adapter  (adapter=…, adapter_source=…)  → citable passages + grounding, no curated items, no cover.
       * model-distilled     (bundle=…, questions=…)        → curated answers (+ optional cover with cover=True).
@@ -73,6 +86,18 @@ def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, ci
         ground_corpus = corpus or questions
     else:
         answers.empty_index(out, model=model)
+
+    # 1b. authored-reasoning aggregates (REASONING.md, opt-in): extract an inventory, run ergo's count/list Datalog
+    # over it (souffle, build-time), and append the materialized counts as CITED passages so retrieval answers
+    # "how many / list all X". Closed-world (the count is over the extracted inventory). Must precede grounding so the
+    # count passages get embedded alongside the rules.
+    if inventory and ground_corpus:
+        from . import reasoning
+        rdl = _resolve_rules(reasoning_rules)
+        aug = os.path.join(out, "_corpus_with_inventory.txt")
+        ground_corpus, npx, mat = reasoning.augment_corpus_with_inventory(ground_corpus, rdl, aug, label=inventory_label)
+        print(f"[reasoning] inventory via {os.path.basename(rdl)}: {mat['total']} distinct {inventory_label}s across "
+              f"{len(mat['groups'])} groups → {npx} cited count passages (closed-world)")
 
     # 2. grounding — CITATION-first (the runtime hard-gates retrieval-as-answer; see CONVERGENCE.md)
     if ground_corpus:
