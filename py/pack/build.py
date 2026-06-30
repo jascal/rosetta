@@ -67,7 +67,7 @@ def _concat_corpus(out, *parts):
 
 
 def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, steps=256, citation="",
-                 model="rosetta-expert", adapter=None, adapter_source=None, adapter_opts=None,
+                 model="rosetta-expert", adapter=None, adapter_source=None, adapter_opts=None, documents=None,
                  dim=300, corpus_vectors=False, no_split=False,
                  cover=False, minsupp=3, mindet=1.0, fieldrun=None,
                  inventory=False, inventory_label="instruction", reasoning_rules=None):
@@ -82,16 +82,34 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
     ground_corpus, ground_no_split = corpus, no_split
     extraction = None
 
-    # 1. the grounding corpus — from a document adapter (any registered source), a distilled model, or a raw corpus
-    if adapter:
+    # 1. the grounding corpus — from N document adapters (any registered sources), a distilled model, or a raw corpus.
+    # `documents` (N docs of M adapter types) is the general form; a single [adapter] is the one-document shorthand.
+    docs = documents or ([{"adapter": adapter, "source": adapter_source, "opts": adapter_opts or {}}] if adapter else [])
+    if docs:
         from . import adapters as _adp
-        if not adapter_source:
-            raise ValueError(f"adapter={adapter!r} needs adapter_source (the document source path)")
-        extraction = _adp.get(adapter)(adapter_source, **(adapter_opts or {}))
+        exts, failed = [], []
+        for i, d in enumerate(docs):
+            fn = _adp.get(d["adapter"])               # unknown adapter NAME → hard fail (config error, not a bad doc)
+            try:                                       # a bad SOURCE (missing/unparseable) at N=100 skips, doesn't abort
+                if not d.get("source"):
+                    raise ValueError("no source path")
+                ext = fn(d["source"], **(d.get("opts") or {}))
+            except Exception as e:                     # noqa: BLE001 — adapters raise varied errors; isolate the doc
+                failed.append(f"#{i} (adapter={d['adapter']!r}, source={d.get('source')!r}): {e}")
+                print(f"[document {i + 1}/{len(docs)}: {d['adapter']}] SKIPPED — {e}")
+                continue
+            print(f"[document {i + 1}/{len(docs)}: {d['adapter']}] {ext.summary()}")
+            exts.append(ext)
+        if not exts:
+            raise ValueError("no documents could be built:\n  " + "\n  ".join(failed))
+        if failed:
+            print(f"[documents] WARNING: skipped {len(failed)}/{len(docs)} document(s) that failed to build")
+        extraction = exts[0] if len(exts) == 1 else _adp.Extraction.merge(exts)
         ground_corpus = extraction.write_corpus(os.path.join(out, "corpus.txt"))
         ground_no_split = True
         answers.empty_index(out, model=model)                 # model-free: served by retrieval/strategy, no curated items
-        print(f"[adapter:{adapter}] {extraction.summary()}")
+        if len(exts) > 1:
+            print(f"[documents] merged {len(exts)} → {extraction.summary()}")
     elif bundle and questions:
         export = os.path.join(out, "_export")
         fr = _fieldrun_bin(fieldrun)

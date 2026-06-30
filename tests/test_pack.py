@@ -384,3 +384,50 @@ def test_adapter_source_envvar_expands(tmp_path, monkeypatch):
     kw = spec_mod.to_build_kwargs(spec_mod.load_spec(str(tmp_path / "e.toml")), base=str(tmp_path))
     assert kw["adapter"] == "pretext" and kw["adapter_source"] == "/clones/aata/src"   # $VAR expanded, absolute kept
     assert kw["adapter_opts"] == {"prefix": "aata"}
+
+
+def test_multi_document_build(tmp_path):
+    """N documents of M adapter types compose into ONE expert: a normrules spec + a PreTeXt book → merged Extraction
+    (passages namespaced, defines/items combined). [[document]] in the spec; build merges."""
+    from pack import build_expert
+    # doc 1: a normrules spec (items)
+    norm = tmp_path / "norm.json"
+    json.dump({"normative_rules": [
+        {"name": "m1", "chapter_name": "M Extension", "tags": [{"text": "The insn:mul[] instruction multiplies."}]},
+    ]}, open(norm, "w"))
+    # doc 2: a tiny PreTeXt book (defines)
+    bk = tmp_path / "bk"
+    bk.mkdir()
+    (bk / "c.xml").write_text(
+        '<section><title>Sets</title><definition xml:id="d-set"><title>Set</title>'
+        '<p>A <term>set</term> is an unordered collection of objects in this book.</p></definition></section>',
+        encoding="utf-8")
+    out = tmp_path / "pkg"
+    build_expert(str(out), dim=0, model="multi",
+                 documents=[{"adapter": "normrules", "source": str(norm)},
+                            {"adapter": "pretext", "source": str(bk), "opts": {"prefix": "bk"}}])
+    kn = (out / "knowledge.tsv").read_text()
+    assert "norm:m1" in kn and "bk:definition:d-set" in kn          # BOTH documents' passages, namespaced, no collision
+    strat = (out / "strategy.tsv").read_text()
+    assert "\tset\tbk:definition:d-set" in strat                    # the book's define
+    assert "\tmul\t" in strat or "answer\tcount\t" in strat         # the spec's inventory (count/list)
+
+
+def test_multi_document_skips_bad_source(tmp_path, capsys):
+    """At N-document scale, one unbuildable document is SKIPPED (with a warning), not fatal — the build proceeds on the
+    rest. An unknown adapter NAME, by contrast, is a config error and fails hard."""
+    from pack import build_expert
+    good = tmp_path / "g.json"
+    json.dump({"normative_rules": [{"name": "r1", "chapter_name": "C", "tags": [{"text": "x0 is hardwired to zero."}]}]},
+              open(good, "w"))
+    out = tmp_path / "pkg"
+    build_expert(str(out), dim=0, model="m", documents=[
+        {"adapter": "normrules", "source": str(good)},
+        {"adapter": "normrules", "source": str(tmp_path / "missing.json")},   # bad source → skipped, not fatal
+    ])
+    assert "SKIPPED" in capsys.readouterr().out
+    assert "x0 is hardwired" in (out / "knowledge.tsv").read_text()           # the good document still built
+    # unknown adapter name is a hard config error
+    import pytest as _pt
+    with _pt.raises(KeyError):
+        build_expert(str(tmp_path / "p2"), dim=0, documents=[{"adapter": "nope", "source": str(good)}])
