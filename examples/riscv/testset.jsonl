@@ -21,8 +21,9 @@
 {"q": "What is a hart?", "expect": "answer", "contains": ["hart"]}
 {"q": "What is a core?", "expect": "answer", "contains": ["core"]}
 {"q": "What is an execution environment?", "expect": "answer", "contains": ["execution environment"]}
-{"q": "What is the satp register?", "expect": "answer", "contains": ["satp"]}
+{"q": "What is the satp register?", "expect": "answer", "contains": ["satp"], "cite_prefix": "manual:"}
+{"q": "What is mcause?", "expect": "answer", "contains": ["mcause"], "cite_prefix": "manual:"}
 {"q": "What is a WARL field?", "expect": "answer", "contains": ["WARL"]}
 {"q": "What is supervisor mode?", "expect": "answer", "contains": ["supervisor"]}
 {"q": "What is machine mode?", "expect": "answer", "contains": ["machine"]}
-{"q": "What is the misa register?", "expect": "answer", "contains": ["misa"]}
+{"q": "What is the misa register?", "expect": "answer", "contains": ["misa"], "cite_prefix": "manual:"}

@@ -122,9 +122,11 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
         # the generic STRATEGY tables (ergo/strategy.dl): cue lexicon + intent→strategy routes, so the thin runtime
         # routes "how many / list" to these aggregates declaratively (no query heuristics in the server) — REASONING.md.
         sdl = _resolve_rules("ergo:strategy")
+        dfs = reasoning.extract_defines(prose) if prose else None    # structural term→defining-passage (definition strategy)
         _stsv, ncue, nans = reasoning.strategy_tables(sdl, os.path.join(out, "strategy.tsv"), mat,
-                                                      label=inventory_label)
-        print(f"[reasoning] strategy via {os.path.basename(sdl)}: {ncue} intent cues, {nans} answer rows → strategy.tsv")
+                                                      label=inventory_label, defines=dfs)
+        print(f"[reasoning] strategy via {os.path.basename(sdl)}: {ncue} intent cues, {nans} answer rows "
+              f"({len(dfs) if dfs else 0} from defines) → strategy.tsv")
 
     # 2. grounding — CITATION-first (the runtime hard-gates retrieval-as-answer; see CONVERGENCE.md)
     if ground_corpus:

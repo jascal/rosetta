@@ -76,6 +76,40 @@ def inventory_passages(mat, *, label="instruction", prefix="riscv:inventory"):
     return out
 
 
+_HEAD = re.compile(r'^\[([^\]]+)\]')                               # leading "[id · Chapter › Section]" on a corpus line
+_PAREN = re.compile(r'\(([a-z][a-z0-9.]{2,})\)')                   # a parenthesized heading abbrev (≥3 chars), e.g. "(misa)"
+
+
+def extract_defines(corpus_txt, *, min_len=3):
+    """Build-time `defines(passage_id, term)` from the spec's OWN canonical markup: a parenthesized abbreviation in a
+    section title names what that section defines — "Machine ISA (misa) Register" → misa. These are unique technical
+    identifiers (misa, satp, mstatus, mcause, …), so as match entities they neither collide with each other nor with
+    off-domain queries. The defining passage is the section's FIRST passage (its topic sentence); first occurrence wins.
+
+    Deliberately NOT used: distinctive heading *content words* (hart, cause, …). They are ordinary English, so they
+    match unrelated queries ("cause" → "what causes earthquakes", "mode" → any "...mode" query) — a precision/leak
+    source. Conceptual terms with no parenthesized abbrev are left to ordinary retrieval. Returns [(passage_id, term)]."""
+    out, seen_term, seen_title = [], set(), set()
+    for line in open(corpus_txt, encoding="utf-8"):
+        m = _HEAD.match(line)
+        if not m:
+            continue
+        head = m.group(1)
+        dot = head.find("·")
+        if dot < 0:
+            continue
+        cid = head[:dot].strip()
+        title = head[dot + 1:].split("›")[-1].strip().lower()
+        if title in seen_title:                                    # only the FIRST passage of each section (its intro)
+            continue
+        seen_title.add(title)
+        for ab in _PAREN.findall(title):
+            if len(ab) >= min_len and ab not in seen_term:
+                seen_term.add(ab)
+                out.append((cid, ab))
+    return out
+
+
 def strategy_tables(strategy_dl, out_tsv, mat, *, label="instruction", prefix="riscv:inventory", defines=None):
     """Materialize the package's strategy.tsv — the UNIFORM (intent, entity, passage) table the thin runtime applies
     (no runtime engine; build-time only). One row shape for every strategy — count/list/define are just different

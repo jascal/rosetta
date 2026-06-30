@@ -300,3 +300,22 @@ def test_strategy_tables_uniform(tmp_path):
     assert ["answer", "list", "m extension", "riscv:inventory:M Extension"] in ans      # list → group name
     assert ["answer", "define", "hart", "manual:intro_17"] in ans                       # define → term (from defines)
     assert nans == len(ans) == 4                                                        # 1 count + 2 groups + 1 define
+
+
+def test_extract_defines_parenthesized_only(tmp_path):
+    """The build-time defines extractor takes a section's parenthesized abbreviation (the spec's canonical id) as the
+    term its FIRST passage defines — and does NOT turn ordinary heading words ("cause", "mode") into entities (those
+    would match unrelated queries like "what causes earthquakes")."""
+    from pack import reasoning
+    corpus = tmp_path / "prose.txt"
+    corpus.write_text(
+        "[manual:m_2 · Machine › Machine ISA (misa) Register] The misa CSR is a WARL register.\n"
+        "[manual:m_9 · Machine › Machine ISA (misa) Register] The e bit is read-only.\n"   # same section, not first
+        "[manual:m_213 · Machine › Machine Cause (mcause) Register] The mcause register holds the trap cause.\n"
+        "[manual:i_7 · Intro › RISC-V Hardware Platform Terminology] A component is termed a core.\n")
+    d = reasoning.extract_defines(str(corpus))
+    byterm = {t: cid for cid, t in d}
+    assert byterm["misa"] == "manual:m_2"            # parenthesized id → the section's FIRST passage
+    assert byterm["mcause"] == "manual:m_213"
+    assert "cause" not in byterm and "machine" not in byterm and "core" not in byterm   # no ordinary-word entities
+    assert "register" not in byterm and "terminology" not in byterm

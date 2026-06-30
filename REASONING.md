@@ -114,11 +114,17 @@ Count, list, and define are **not special cases** — they are rows of `answer` 
 |--------|-----------------------------------|---------|
 | count  | the inventory label (`instruction`) | the grand-total count passage |
 | list   | each group name (`m extension`)     | that group's enumeration passage |
-| define | each defined term (`hart`)          | the passage that defines it |
+| define | each CSR id (`misa`, `satp`, `mcause`) | the passage that defines it |
 
 - **Build-time → tables.** ergo emits the cue lexicon + the `answer` rows into the package (`strategy.tsv`); count/list
-  rows come from `aggregate.dl`'s totals/groups (bound by the builder, which knows the passage ids), define rows from a
-  `defines` source. No Datalog at runtime.
+  rows come from `aggregate.dl`'s totals/groups (bound by the builder, which knows the passage ids), define rows from
+  `pack.reasoning.extract_defines`. No Datalog at runtime.
+- **The `defines` source is STRUCTURAL.** `extract_defines` takes a section title's *parenthesized abbreviation* — the
+  spec's own canonical id ("Machine ISA (misa) Register" → `misa`) — as the term its first passage defines. These are
+  unique technical identifiers, so as match entities they never collide with each other or with off-domain queries.
+  Ordinary heading *content words* (`cause`, `mode`) are deliberately NOT used: they are common English and would match
+  unrelated queries ("cause" → "what causes earthquakes"). Concepts with no parenthesized abbrev (hart, core) are left
+  to ordinary retrieval — answered, just not definition-routed.
 - **Intent = both.** The caller (an orchestrating LLM) may supply the intent; else it is inferred from the cue lexicon
   (`cue(word, intent)`) — natural language as *editable data*, the only language in play, never server code.
 - **The entity-must-appear check IS the domain gate.** "how many planets" names no known entity → no row matches → it
