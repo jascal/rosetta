@@ -76,6 +76,87 @@ def inventory_passages(mat, *, label="instruction", prefix="riscv:inventory"):
     return out
 
 
+_HEAD = re.compile(r'^\[([^\]]+)\]')                               # leading "[id · Chapter › Section]" on a corpus line
+_PAREN = re.compile(r'\(([a-z][a-z0-9.]{2,})\)')                   # a parenthesized heading abbrev (≥3 chars), e.g. "(misa)"
+
+
+def _sections(corpus):
+    """Yield (passage_id, section_title_lc) from either a corpus FILE path or an iterable of (section, text) passages."""
+    if isinstance(corpus, str):
+        rows = (_HEAD.match(ln).group(1) for ln in open(corpus, encoding="utf-8") if _HEAD.match(ln))
+    else:
+        rows = (sec for sec, _text in corpus)
+    for head in rows:
+        dot = head.find("·")
+        if dot < 0:
+            continue
+        yield head[:dot].strip(), head[dot + 1:].split("›")[-1].strip().lower()
+
+
+def extract_defines(corpus, *, min_len=3):
+    """Build-time `defines(passage_id, term)` from a source's OWN canonical markup: a parenthesized abbreviation in a
+    section title names what that section defines — "Machine ISA (misa) Register" → misa. These are unique technical
+    identifiers (misa, satp, mstatus, mcause, …), so as match entities they neither collide with each other nor with
+    off-domain queries. The defining passage is the section's FIRST passage (its topic sentence); first occurrence wins.
+    `corpus` is a corpus file path OR an iterable of (section, text) passages (the adapter Extraction).
+
+    Deliberately NOT used: distinctive heading *content words* (hart, cause, …). They are ordinary English, so they
+    match unrelated queries ("cause" → "what causes earthquakes", "mode" → any "...mode" query) — a precision/leak
+    source. Conceptual terms with no parenthesized abbrev are left to ordinary retrieval. Returns [(passage_id, term)]."""
+    out, seen_term, seen_title = [], set(), set()
+    for cid, title in _sections(corpus):
+        if title in seen_title:                                    # only the FIRST passage of each section (its intro)
+            continue
+        seen_title.add(title)
+        for ab in _PAREN.findall(title):
+            if len(ab) >= min_len and ab not in seen_term:
+                seen_term.add(ab)
+                out.append((cid, ab))
+    return out
+
+
+def strategy_tables(strategy_dl, out_tsv, *, mat=None, label="instruction", prefix="riscv:inventory",
+                    defines=None, theorems=None):
+    """Materialize the package's strategy.tsv — the UNIFORM (intent, entity, passage) table the thin runtime applies
+    (no runtime engine; build-time only). One row shape for every strategy — count/list/define/theorem are just
+    different intents, never special cases:
+        cue    <word>   <intent>             the i18n-able intent lexicon (from ergo/strategy.dl — language as DATA)
+        answer <intent> <entity> <passage>   a query of <intent> that NAMES <entity> is answered by <passage>
+    count → entity = the inventory label; list → each group name; define → each defined term; theorem → each named
+    statement. The runtime returns the answer whose entity the query names — so entity-must-appear IS the domain gate.
+    A NEW intent (theorem) needs NO runtime change — only rows here + a cue word in ergo. Returns (out, n_cues, n_ans)."""
+    souffle = shutil.which("souffle")
+    if not souffle:
+        raise RuntimeError("souffle not found — the strategy tier needs souffle at build time")
+    with tempfile.TemporaryDirectory() as d:
+        fdir, odir = os.path.join(d, "facts"), os.path.join(d, "out")
+        os.makedirs(fdir)
+        os.makedirs(odir)
+        with open(os.path.join(fdir, "defines.facts"), "w", encoding="utf-8") as f:
+            for section, term in (defines or []):                     # term -> defining passage (define rows via ergo)
+                f.write(f"{section}\t{term}\n")
+        subprocess.run([souffle, strategy_dl, "-F", fdir, "-D", odir], check=True)
+
+        def rd(rel):
+            p = os.path.join(odir, rel + ".csv")
+            return [ln.rstrip("\n").split("\t") for ln in open(p, encoding="utf-8")] if os.path.exists(p) else []
+
+        cues, ans = rd("cue"), rd("answer")                          # answer holds the ergo-derived define rows
+    rows = [("answer",) + tuple(a) for a in ans]                     # define rows: (answer, "define", term, section)
+    if mat:                                                          # inventory present → count/list rows
+        rows.append(("answer", "count", label, f"{prefix}:total"))
+        for g in sorted(mat.get("groups", {})):
+            rows.append(("answer", "list", g.lower(), f"{prefix}:{g}"))
+    for pid, name in (theorems or []):                              # theorem rows: a named statement → its passage
+        rows.append(("answer", "theorem", name, pid))
+    with open(out_tsv, "w", encoding="utf-8") as f:
+        for w, i in cues:
+            f.write(f"cue\t{w}\t{i}\n")
+        for r in rows:
+            f.write("\t".join(r) + "\n")
+    return out_tsv, len(cues), len(rows)
+
+
 def augment_corpus_with_inventory(corpus_txt, rules_dl, out_txt, *, label="instruction", prefix="riscv:inventory"):
     """Append cited inventory/count passages (computed by the ergo aggregates) to a COPY of the corpus at out_txt, so
     grounding embeds them alongside the rules. Returns (out_txt, n_passages, materialized)."""

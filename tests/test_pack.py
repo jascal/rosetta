@@ -11,6 +11,17 @@ import sys
 
 import pytest
 
+_STRAT_DL = """
+.decl cue(word:symbol, intent:symbol)
+cue("many","count"). cue("list","list"). cue("what","define").
+.output cue
+.decl answer(intent:symbol, entity:symbol, section:symbol)
+.decl defines(section:symbol, term:symbol)
+.input defines
+answer("define", T, S) :- defines(S, T).
+.output answer
+"""
+
 _AGG_DL = """
 .decl item(name:symbol, group:symbol)
 .input item
@@ -55,7 +66,7 @@ def test_build_model_free_expert(tmp_path):
 
     idx = json.load(open(out / "index.json"))
     assert idx["model"] == "test-spec" and idx["items"] == []   # model-free → no curated items
-    assert (out / "rules.txt").exists()                         # adapter passages
+    assert (out / "corpus.txt").exists()                        # the adapter's Extraction → canonical corpus
     kn = (out / "knowledge.tsv").read_text()                    # grounding (citation)
     assert "ecall" in kn and "x0" in kn
     assert not (out / "gram").exists()                          # cover-first: NO bare gram tier (CONVERGENCE.md)
@@ -265,3 +276,111 @@ def test_build_concats_prose_into_grounding(tmp_path):
     kn = (out / "knowledge.tsv").read_text()
     assert "x0 is hardwired" in kn and "hart is a resource" in kn    # BOTH rules and prose grounded
     assert "manual:intro_0" in kn                                    # prose citation handle present
+
+
+def test_strategy_tables_uniform(tmp_path):
+    """The UNIFORM strategy table: count/list/define are all `answer <intent> <entity> <passage>` rows — one shape,
+    no per-kind special-casing. The entity is what the query must NAME (the domain gate)."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (build-time strategy tier)")
+    from pack import reasoning
+    sdl = tmp_path / "strategy.dl"
+    sdl.write_text(_STRAT_DL)
+    mat = {"total": 4, "groups": {"RV32I": 2, "M Extension": 3}, "items": []}
+    out = tmp_path / "strategy.tsv"
+    _p, ncue, nans = reasoning.strategy_tables(str(sdl), str(out), mat=mat, label="instruction",
+                                               defines=[("manual:intro_17", "hart")])
+    rows = [ln.split("\t") for ln in out.read_text().splitlines()]
+    cues = [r for r in rows if r[0] == "cue"]
+    ans = [r for r in rows if r[0] == "answer"]
+    assert len(cues) == ncue == 3
+    # every answer row is the same shape: answer <intent> <entity> <passage>
+    assert all(len(r) == 4 for r in ans)
+    assert ["answer", "count", "instruction", "riscv:inventory:total"] in ans          # count → label names it
+    assert ["answer", "list", "m extension", "riscv:inventory:M Extension"] in ans      # list → group name
+    assert ["answer", "define", "hart", "manual:intro_17"] in ans                       # define → term (from defines)
+    assert nans == len(ans) == 4                                                        # 1 count + 2 groups + 1 define
+
+
+def test_extract_defines_parenthesized_only(tmp_path):
+    """The build-time defines extractor takes a section's parenthesized abbreviation (the spec's canonical id) as the
+    term its FIRST passage defines — and does NOT turn ordinary heading words ("cause", "mode") into entities (those
+    would match unrelated queries like "what causes earthquakes")."""
+    from pack import reasoning
+    corpus = tmp_path / "prose.txt"
+    corpus.write_text(
+        "[manual:m_2 · Machine › Machine ISA (misa) Register] The misa CSR is a WARL register.\n"
+        "[manual:m_9 · Machine › Machine ISA (misa) Register] The e bit is read-only.\n"   # same section, not first
+        "[manual:m_213 · Machine › Machine Cause (mcause) Register] The mcause register holds the trap cause.\n"
+        "[manual:i_7 · Intro › RISC-V Hardware Platform Terminology] A component is termed a core.\n")
+    d = reasoning.extract_defines(str(corpus))
+    byterm = {t: cid for cid, t in d}
+    assert byterm["misa"] == "manual:m_2"            # parenthesized id → the section's FIRST passage
+    assert byterm["mcause"] == "manual:m_213"
+    assert "cause" not in byterm and "machine" not in byterm and "core" not in byterm   # no ordinary-word entities
+    assert "register" not in byterm and "terminology" not in byterm
+
+
+def test_adapter_system_registry_and_contract(tmp_path):
+    """The document-adapter system: all sources are registered instances of the one Extraction contract."""
+    from pack import adapters
+    assert set(adapters.names()) >= {"normrules", "riscv_prose", "pretext", "latexml"}
+
+    # normrules instance → passages + the insn inventory items, as an Extraction
+    src = tmp_path / "norm.json"
+    json.dump({"normative_rules": [
+        {"name": "m1", "chapter_name": "M Extension", "tags": [{"text": "The insn:mul[] instruction multiplies."}]},
+    ]}, open(src, "w"))
+    ext = adapters.get("normrules")(str(src))
+    assert ext.passages and ("mul", "M Extension") in ext.items     # items feed count/list
+    corpus = ext.write_corpus(str(tmp_path / "c.txt"))
+    assert "[norm:m1 · M Extension]" in open(corpus).read()         # citable handle preserved
+
+    # latexml instance → a LaTeXML HTML snippet yields sectioned passages + a named definition/theorem
+    htm = tmp_path / "paper.html"
+    htm.write_text(
+        '<h2 class="ltx_title ltx_title_section">Preliminaries</h2>'
+        '<div class="ltx_para"><p class="ltx_p">We work over a field '
+        '<math alttext="\\mathbb{F}">MATHML</math> throughout this paper.</p></div>'
+        '<div class="ltx_theorem ltx_theorem_theorem"><p class="ltx_p">Theorem 1 (Euler). '
+        'For coprime a and n, a power phi of n is one mod n.</p></div>')
+    ext = adapters.get("latexml")(str(htm), prefix="px")
+    assert any("field" in t for _s, t in ext.passages)             # prose extracted
+    assert any("\\mathbb{F}" in t for _s, t in ext.passages)       # math kept as LaTeX (alttext), MathML dropped
+    assert "MATHML" not in " ".join(t for _s, t in ext.passages)   # MathML subtree skipped
+    assert ("px:theorem2", "euler") in [(p, n) for p, n in ext.statements] or \
+           any(n == "euler" for _p, n in ext.statements)           # named theorem captured
+
+
+def test_pretext_adapter_extraction(tmp_path):
+    """The PreTeXt adapter (ElementTree) extracts: a <definition>'s title + inline <term> as exact defines, a titled
+    <theorem> as a named statement, prose <p> as passages, and <m> math as inline LaTeX. Covers both tag dialects."""
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "groups.xml").write_text(
+        '<chapter xml:id="grp"><title>Groups</title>'
+        '<section><title>Definitions</title>'
+        '<definition xml:id="def-group"><title>Group</title>'
+        '<p>A <term>group</term> is a set with an associative binary operation and inverses.</p></definition>'
+        '<theorem xml:id="thm-lagrange"><title>Lagrange</title>'
+        '<statement><p>For a finite group, <m>|H|</m> divides <m>|G|</m>.</p></statement></theorem>'
+        '<p>This running paragraph introduces the notion of a <define>subgroup</define> informally for the reader.</p>'
+        '</section></chapter>', encoding="utf-8")
+    from pack.adapters import pretext
+    passages, defines, statements = pretext.extract(str(src), "bk")
+    by = {t: pid for pid, t in defines}
+    assert by["group"] == "bk:definition:def-group"          # definition title → exact define
+    assert "subgroup" in by                                   # inline <define> in prose → define
+    assert ("bk:theorem:thm-lagrange", "lagrange") in statements   # titled theorem → named statement
+    body = dict((s.split(" · ")[0], t) for s, t in passages)
+    assert "|H|" in body["bk:theorem:thm-lagrange"] and "|G|" in body["bk:theorem:thm-lagrange"]  # <m> LaTeX kept
+
+
+def test_adapter_source_envvar_expands(tmp_path, monkeypatch):
+    """[adapter] source = "$VAR" is expanded by the spec loader so clone-and-build (AATA_SRC=…) works."""
+    from pack import spec as spec_mod
+    monkeypatch.setenv("BOOK_SRC", "/clones/aata/src")
+    (tmp_path / "e.toml").write_text('[adapter]\nname="pretext"\nsource="$BOOK_SRC"\nprefix="aata"\n')
+    kw = spec_mod.to_build_kwargs(spec_mod.load_spec(str(tmp_path / "e.toml")), base=str(tmp_path))
+    assert kw["adapter"] == "pretext" and kw["adapter_source"] == "/clones/aata/src"   # $VAR expanded, absolute kept
+    assert kw["adapter_opts"] == {"prefix": "aata"}

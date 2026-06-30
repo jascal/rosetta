@@ -1,0 +1,15 @@
+# examples/pretext/aata — Abstract Algebra: Theory and Applications (Judson, GFDL). See README.md.
+# Clone the book first, then:  AATA_SRC=…/aata/src .venv/bin/python build_expert.py examples/pretext/aata.toml
+[corpus]
+citation = "Abstract Algebra: Theory and Applications (Judson, GFDL)"
+
+[adapter]                       # any document SOURCE is a registered adapter (pack.adapters)
+name   = "pretext"
+source = "$AATA_SRC"             # path to the cloned book's src/ dir (GFDL — not committed)
+prefix = "aata"                  # citation namespace for this book's passages
+
+[experiment]
+off_domain = "../probes/negatives.txt"
+
+[gate]
+max_leak = 0.05

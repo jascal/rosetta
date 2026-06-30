@@ -15,7 +15,6 @@ import shutil
 import subprocess
 
 from . import answers, cover as cover_mod, grounding
-from .adapters import normrules
 
 
 def _fieldrun_bin(explicit=None):
@@ -68,26 +67,31 @@ def _concat_corpus(out, *parts):
 
 
 def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, steps=256, citation="",
-                 model="rosetta-expert", adapter=None, adapter_source=None,
+                 model="rosetta-expert", adapter=None, adapter_source=None, adapter_opts=None,
                  dim=300, corpus_vectors=False, no_split=False,
                  cover=False, minsupp=3, mindet=1.0, fieldrun=None,
                  inventory=False, inventory_label="instruction", reasoning_rules=None):
     """Assemble a package at `out`. Three shapes:
-      * model-free adapter  (adapter=…, adapter_source=…)  → citable passages + grounding, no curated items, no cover.
+      * document adapter    (adapter=…, adapter_source=…)  → an Extraction (passages + defines/statements/items) → a
+                                                             grounding corpus + the uniform strategy table. No cover.
       * model-distilled     (bundle=…, questions=…)        → curated answers (+ optional cover with cover=True).
       * corpus-only         (corpus=…)                      → grounding + empty index.
+    Any document SOURCE (spec, PreTeXt book, arXiv/LaTeXML paper, …) is just a registered adapter — see pack.adapters.
     Returns the package dir."""
     os.makedirs(out, exist_ok=True)
     ground_corpus, ground_no_split = corpus, no_split
+    extraction = None
 
-    # 1. items + the grounding corpus
-    if adapter == "normrules":
+    # 1. the grounding corpus — from a document adapter (any registered source), a distilled model, or a raw corpus
+    if adapter:
+        from . import adapters as _adp
         if not adapter_source:
-            raise ValueError("adapter=normrules needs adapter_source (norm-rules.json)")
-        rules_txt, _rules_plain, n = normrules.to_corpus(adapter_source, out, model=model)
-        answers.empty_index(out, model=model)                 # model-free: served by cover/retrieval, no curated items
-        ground_corpus, ground_no_split = rules_txt, True      # one passage per rule
-        print(f"[adapter:normrules] {n} rules -> {os.path.basename(rules_txt)}")
+            raise ValueError(f"adapter={adapter!r} needs adapter_source (the document source path)")
+        extraction = _adp.get(adapter)(adapter_source, **(adapter_opts or {}))
+        ground_corpus = extraction.write_corpus(os.path.join(out, "corpus.txt"))
+        ground_no_split = True
+        answers.empty_index(out, model=model)                 # model-free: served by retrieval/strategy, no curated items
+        print(f"[adapter:{adapter}] {extraction.summary()}")
     elif bundle and questions:
         export = os.path.join(out, "_export")
         fr = _fieldrun_bin(fieldrun)
@@ -108,17 +112,33 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
         print(f"[prose] +{sum(1 for _ in open(prose, encoding='utf-8'))} passages from {os.path.basename(prose)} "
               f"into the grounding corpus")
 
-    # 1b. authored-reasoning aggregates (REASONING.md, opt-in): extract an inventory, run ergo's count/list Datalog
-    # over it (souffle, build-time), and append the materialized counts as CITED passages so retrieval answers
-    # "how many / list all X". Closed-world (the count is over the extracted inventory). Must precede grounding so the
-    # count passages get embedded alongside the rules.
-    if inventory and ground_corpus:
+    # 1b. authored reasoning → the UNIFORM strategy table (REASONING.md). Gather the strategy facts from the adapter's
+    # Extraction (defines/statements/items), or — for the committed-corpus path — derive them (inventory from the
+    # corpus when [reasoning] is on; defines from prose). Materialize count/list aggregates (ergo, souffle, build-time)
+    # into cited passages, then emit strategy.tsv. Build-time only; the runtime stays engine-free.
+    if ground_corpus:
         from . import reasoning
-        rdl = _resolve_rules(reasoning_rules)
-        aug = os.path.join(out, "_corpus_with_inventory.txt")
-        ground_corpus, npx, mat = reasoning.augment_corpus_with_inventory(ground_corpus, rdl, aug, label=inventory_label)
-        print(f"[reasoning] inventory via {os.path.basename(rdl)}: {mat['total']} distinct {inventory_label}s across "
-              f"{len(mat['groups'])} groups → {npx} cited count passages (closed-world)")
+        items = list(extraction.items) if (extraction and extraction.items) else \
+            (reasoning.instruction_inventory(ground_corpus) if inventory else [])
+        defines = list(extraction.defines) if (extraction and extraction.defines) else \
+            (reasoning.extract_defines(prose) if prose else [])
+        statements = list(extraction.statements) if extraction else []
+        mat = None
+        if items:                                            # count/list aggregates → cited passages appended to corpus
+            mat = reasoning.materialize(items, _resolve_rules(reasoning_rules))
+            aug = os.path.join(out, "_corpus_with_inventory.txt")
+            shutil.copyfile(ground_corpus, aug)
+            with open(aug, "a", encoding="utf-8") as f:
+                for sec, text in reasoning.inventory_passages(mat, label=inventory_label):
+                    f.write(f"[{sec}] {text}\n")
+            ground_corpus = aug
+            print(f"[reasoning] inventory: {mat['total']} distinct {inventory_label}s across {len(mat['groups'])} groups")
+        if mat or defines or statements:
+            sdl = _resolve_rules("ergo:strategy")
+            _t, ncue, nans = reasoning.strategy_tables(sdl, os.path.join(out, "strategy.tsv"), mat=mat,
+                                                       label=inventory_label, defines=defines, theorems=statements)
+            print(f"[reasoning] strategy: {ncue} cues, {nans} answer rows "
+                  f"({len(defines)} define, {len(statements)} theorem) → strategy.tsv")
 
     # 2. grounding — CITATION-first (the runtime hard-gates retrieval-as-answer; see CONVERGENCE.md)
     if ground_corpus:

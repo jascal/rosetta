@@ -38,7 +38,7 @@ def _ask(port, q):
     return d.get("answer", ""), d.get("kind", ""), d.get("citation_id", "")
 
 
-def score(package, testset, bin_path, *, cov=0.6, cos=0.5, margin=0.2, port=8155):
+def score(package, testset, bin_path, *, cov=0.6, cos=0.70, margin=0.30, port=8155):
     rows = [json.loads(ln) for ln in open(testset, encoding="utf-8") if ln.strip()]
     proc = _serve(bin_path, package, port, cov=cov, cos=cos, margin=margin)
     try:
@@ -74,8 +74,8 @@ def main():
     ap.add_argument("testset")
     ap.add_argument("--serve-bin", required=True, help="path to the sgiandubh binary")
     ap.add_argument("--cov", type=float, default=0.6)
-    ap.add_argument("--cos", type=float, default=0.5)
-    ap.add_argument("--margin", type=float, default=0.2)
+    ap.add_argument("--cos", type=float, default=0.70)
+    ap.add_argument("--margin", type=float, default=0.30)
     ap.add_argument("--port", type=int, default=8155)
     a = ap.parse_args()
     sc = score(a.package, a.testset, a.serve_bin, cov=a.cov, cos=a.cos, margin=a.margin, port=a.port)

@@ -93,6 +93,47 @@ model. The riscv measurement disproved that premise for model-free domains. So e
 authored-reasoning library for model-free experts. rosetta-as-builder picks the reasoning source **per domain, by
 measurement** — extracted cover, authored deduction, or none.
 
+## Query handling as ONE uniform rule (not query heuristics in the runtime)
+
+A model-free expert also has to *route* a query to the right kind of answer: "how many X" wants a count, "list the X
+in G" wants an enumeration, "what is X" wants a definition. The wrong way to do this is intent-classification by
+hand-coded phrase lists in the server (brittle, English-only, and the wrong layer). The right way is the same as all the
+other reasoning here: **authored Datalog over a known vocabulary, materialized to tables at build time, applied by a
+thin uniform runtime.**
+
+It collapses to a single relation and a single rule (`ergo/strategy.dl`):
+
+```
+answer(Intent, Entity, Section)        a query of purpose Intent that NAMES Entity is answered by passage Section
+reply(S) :- q_intent(I), answer(I, E, S), q_names(E)      # the query names E (E occurs in the query text)
+```
+
+Count, list, and define are **not special cases** — they are rows of `answer` with different intents:
+
+| intent | entity (what the query must name) | passage |
+|--------|-----------------------------------|---------|
+| count  | the inventory label (`instruction`) | the grand-total count passage |
+| list   | each group name (`m extension`)     | that group's enumeration passage |
+| define | each CSR id (`misa`, `satp`, `mcause`) | the passage that defines it |
+
+- **Build-time → tables.** ergo emits the cue lexicon + the `answer` rows into the package (`strategy.tsv`); count/list
+  rows come from `aggregate.dl`'s totals/groups (bound by the builder, which knows the passage ids), define rows from
+  `pack.reasoning.extract_defines`. No Datalog at runtime.
+- **The `defines` source is STRUCTURAL.** `extract_defines` takes a section title's *parenthesized abbreviation* — the
+  spec's own canonical id ("Machine ISA (misa) Register" → `misa`) — as the term its first passage defines. These are
+  unique technical identifiers, so as match entities they never collide with each other or with off-domain queries.
+  Ordinary heading *content words* (`cause`, `mode`) are deliberately NOT used: they are common English and would match
+  unrelated queries ("cause" → "what causes earthquakes"). Concepts with no parenthesized abbrev (hart, core) are left
+  to ordinary retrieval — answered, just not definition-routed.
+- **Intent = both.** The caller (an orchestrating LLM) may supply the intent; else it is inferred from the cue lexicon
+  (`cue(word, intent)`) — natural language as *editable data*, the only language in play, never server code.
+- **The entity-must-appear check IS the domain gate.** "how many planets" names no known entity → no row matches → it
+  falls through to ordinary retrieval → abstain. No separate domain-gating, no per-kind branches: adding a strategy is
+  adding rows, never code. The runtime is one lookup (most-specific named entity wins).
+
+Measured (riscv, `pack.score_retrieval`, 28 q): count/list answer from the table, off-domain count abstains; 100%
+in-domain recall + precision, 0% off-domain leak.
+
 ## Open questions / non-goals
 
 - `open` **fact sourcing** — hand-curate first (the ~40 riscv extensions + inheritance + key is-a is small and
