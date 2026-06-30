@@ -40,7 +40,9 @@ class Extraction:
     def merge(exts: list["Extraction"]) -> "Extraction":
         """Combine N documents (of any adapter types) into ONE expert. Passage ids are adapter/document-namespaced so
         they never collide; defines/statements are deduped by entity (first document wins on a shared term — a cross-
-        document tie-break refinement is a follow-up); items accumulate (count/list aggregates dedupe at materialize)."""
+        document tie-break refinement is a follow-up); items accumulate (count/list aggregates dedupe at materialize).
+        Output order is DOCUMENT ENCOUNTER ORDER (deterministic for a fixed document list); no downstream step depends
+        on passage order, so it isn't sorted."""
         passages, defines, statements, items = [], [], [], []
         seen_def, seen_stmt = set(), set()
         for e in exts:

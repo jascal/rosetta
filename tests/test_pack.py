@@ -411,3 +411,23 @@ def test_multi_document_build(tmp_path):
     strat = (out / "strategy.tsv").read_text()
     assert "\tset\tbk:definition:d-set" in strat                    # the book's define
     assert "\tmul\t" in strat or "answer\tcount\t" in strat         # the spec's inventory (count/list)
+
+
+def test_multi_document_skips_bad_source(tmp_path, capsys):
+    """At N-document scale, one unbuildable document is SKIPPED (with a warning), not fatal — the build proceeds on the
+    rest. An unknown adapter NAME, by contrast, is a config error and fails hard."""
+    from pack import build_expert
+    good = tmp_path / "g.json"
+    json.dump({"normative_rules": [{"name": "r1", "chapter_name": "C", "tags": [{"text": "x0 is hardwired to zero."}]}]},
+              open(good, "w"))
+    out = tmp_path / "pkg"
+    build_expert(str(out), dim=0, model="m", documents=[
+        {"adapter": "normrules", "source": str(good)},
+        {"adapter": "normrules", "source": str(tmp_path / "missing.json")},   # bad source → skipped, not fatal
+    ])
+    assert "SKIPPED" in capsys.readouterr().out
+    assert "x0 is hardwired" in (out / "knowledge.tsv").read_text()           # the good document still built
+    # unknown adapter name is a hard config error
+    import pytest as _pt
+    with _pt.raises(KeyError):
+        build_expert(str(tmp_path / "p2"), dim=0, documents=[{"adapter": "nope", "source": str(good)}])

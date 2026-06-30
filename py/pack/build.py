@@ -87,13 +87,23 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
     docs = documents or ([{"adapter": adapter, "source": adapter_source, "opts": adapter_opts or {}}] if adapter else [])
     if docs:
         from . import adapters as _adp
-        exts = []
+        exts, failed = [], []
         for i, d in enumerate(docs):
-            if not d.get("source"):
-                raise ValueError(f"document #{i} (adapter={d.get('adapter')!r}) needs a source path")
-            ext = _adp.get(d["adapter"])(d["source"], **(d.get("opts") or {}))
+            fn = _adp.get(d["adapter"])               # unknown adapter NAME → hard fail (config error, not a bad doc)
+            try:                                       # a bad SOURCE (missing/unparseable) at N=100 skips, doesn't abort
+                if not d.get("source"):
+                    raise ValueError("no source path")
+                ext = fn(d["source"], **(d.get("opts") or {}))
+            except Exception as e:                     # noqa: BLE001 — adapters raise varied errors; isolate the doc
+                failed.append(f"#{i} (adapter={d['adapter']!r}, source={d.get('source')!r}): {e}")
+                print(f"[document {i + 1}/{len(docs)}: {d['adapter']}] SKIPPED — {e}")
+                continue
             print(f"[document {i + 1}/{len(docs)}: {d['adapter']}] {ext.summary()}")
             exts.append(ext)
+        if not exts:
+            raise ValueError("no documents could be built:\n  " + "\n  ".join(failed))
+        if failed:
+            print(f"[documents] WARNING: skipped {len(failed)}/{len(docs)} document(s) that failed to build")
         extraction = exts[0] if len(exts) == 1 else _adp.Extraction.merge(exts)
         ground_corpus = extraction.write_corpus(os.path.join(out, "corpus.txt"))
         ground_no_split = True
