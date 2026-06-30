@@ -1,0 +1,18 @@
+{"q": "What does the FENCE instruction do?", "expect": "answer"}
+{"q": "What do the aq and rl bits do?", "expect": "answer", "contains": ["aq", "rl"]}
+{"q": "How does RISC-V handle misaligned memory accesses?", "expect": "answer", "contains": ["misaligned"]}
+{"q": "What is the role of register x0?", "expect": "answer"}
+{"q": "What is a WARL register?", "expect": "answer", "contains": ["WARL"]}
+{"q": "What does the ECALL instruction do?", "expect": "answer"}
+{"q": "What does the EBREAK instruction do?", "expect": "answer"}
+{"q": "What is the RVWMO memory model?", "expect": "answer"}
+{"q": "What does the LR instruction do?", "expect": "answer"}
+{"q": "What does the SC instruction do?", "expect": "answer"}
+{"q": "How many RISC-V instructions are there?", "expect": "answer", "contains": ["instructions"]}
+{"q": "What is mstatus?", "expect": "answer", "contains": ["mstatus"]}
+{"q": "What is the capital of France?", "expect": "abstain"}
+{"q": "How do I bake sourdough bread?", "expect": "abstain"}
+{"q": "Who wrote Hamlet?", "expect": "abstain"}
+{"q": "What is the boiling point of water?", "expect": "abstain"}
+{"q": "What causes earthquakes?", "expect": "abstain"}
+{"q": "What is photosynthesis?", "expect": "abstain"}
