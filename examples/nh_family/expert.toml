@@ -1,0 +1,42 @@
+# examples/nh_family — NH FAMILY LAW expert (TEMPLATE). See ../../EXPERTS.md + SOURCES.md (sourcing + cite-id scheme).
+#
+# STATUS: template. The corpus (RSA family-law chapters + NH Supreme Court family opinions) and the `nh_legal` adapter
+# are sourced/built per SOURCES.md — this spec is NOT buildable until then. It documents the intended build.
+#
+# Mode: MODEL-FREE (like riscv, by the same reasoning — an authoritative legal corpus is a LOOKUP domain; a small model
+# carries no reliable NH-specific legal reasoning, and hallucinated law is dangerous). Retrieval over the verbatim text
+# (cited) + abstain. NO cover, NO curated answers. Optionally an OPT-IN authored statutory-reasoning tier (cross-refs /
+# definitions / supersession — ergo), which is far safer than letting an LLM "reason" about law.
+#
+# NOT LEGAL ADVICE: this is an informational retrieval tool over public-domain primary sources. Every answer is the
+# verbatim statute/opinion text with its citation; it abstains rather than inventing law. Verify against the official
+# source (the citation_id resolves via /lookup), and note currency (law changes — this is a build-time snapshot).
+
+[corpus]                                         # CORPUS DESIGN — paths relative to this spec
+text       = "statutes.txt"                      # RSA family-law sections, one citable passage per section (see adapter)
+text_plain = "statutes_plain.txt"                # markup-free text (if an n-gram tier is ever added)
+# + caselaw.txt — NH Supreme Court family-law opinions, chunked (TODO; see SOURCES.md). Case law is the larger, the
+#   freshness-sensitive, and the lower-precision half — add after statutes validate.
+citation   = "NH RSA Title XLIII / NH Supreme Court (public domain)"
+
+[adapter]                                        # structured legal source → citable passages (no model). See SOURCES.md.
+name   = "nh_legal"                              # TODO: pack/adapters/nh_legal.py — parses RSA + opinions into the cite-id scheme
+source = "raw/"                                  # raw RSA chapters + opinion text (sourced per SOURCES.md)
+
+[grounding]                                      # one passage per statute section / per opinion chunk
+no_split = true
+dim      = 300                                   # GloVe baseline; legal language wants a real embedding model or BM25 —
+                                                 # see SOURCES.md "retrieval at legal scale/quality".
+
+[experiment]                                     # EXPERIMENTAL DESIGN — grade before shipping (EXPERTS.md)
+off_domain = "../probes/negatives.txt"           # must abstain on non-family-law queries
+# testset = "testset.jsonl"                       # owner set: real family-law questions + expected statute/case (recommended)
+
+[gate]                                           # HARD-FAIL thresholds — legal demands high precision / low leak
+min_precision = 0.95
+max_leak      = 0.02
+
+# [reasoning]                                    # OPT-IN authored statutory deduction (REASONING.md) — wiring takes care
+# rules  = "ergo:legal"                          #   cross-reference / definition / supersession Horn rules (sound, verified)
+# facts  = "nh_family_facts.dl"                  #   curated: "RSA 461-A defines parental rights and responsibilities", x-refs, …
+# closure = "unbounded"
