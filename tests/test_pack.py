@@ -6,9 +6,26 @@ import glob
 import json
 import os
 import re
+import shutil
 import sys
 
 import pytest
+
+_AGG_DL = """
+.decl item(name:symbol, group:symbol)
+.input item
+.decl group(g:symbol)
+group(G) :- item(_, G).
+.decl uitem(name:symbol)
+uitem(I) :- item(I, _).
+.decl group_count(group:symbol, n:number)
+group_count(G, N) :- group(G), N = count : { item(_, G) }.
+.output group_count
+.decl total_count(n:number)
+total_count(N) :- N = count : { uitem(_) }.
+.output total_count
+.output item
+"""
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, "py"))
@@ -158,6 +175,31 @@ def test_eval_score_and_gate(tmp_path):
     bad = scorer.score(mp, [((0, 11, 12), 77)], off_domain)           # answers 99 ≠ gold 77 → precision 0
     ok, reasons = scorer.gate(bad, min_precision=0.9, max_leak=0.05)
     assert ok is False and any("precision" in r for r in reasons)     # HARD-FAIL below the floor
+
+
+def test_inventory_aggregates(tmp_path):
+    """ergo count/list aggregates over an extracted instruction inventory → materialized count + cited KB passages."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (build-time aggregate tier)")
+    from pack import reasoning
+    corpus = tmp_path / "rules.txt"
+    corpus.write_text(
+        "[norm:a1 · RV32I] The insn:add[] and insn:sub[] instructions compute.\n"
+        "[norm:m1 · M Extension] The insn:mul[] instruction; see also insn:add[].\n"
+        "[norm:m2 · M Extension] insn:mulh[] gives the high bits.\n")
+    inv = reasoning.instruction_inventory(str(corpus))
+    assert ("add", "RV32I") in inv and ("mul", "M Extension") in inv and len(inv) == 5   # add,sub,mul,add(M),mulh
+
+    rules = tmp_path / "aggregate.dl"
+    rules.write_text(_AGG_DL)
+    mat = reasoning.materialize(inv, str(rules))
+    assert mat["total"] == 4                                       # DISTINCT: add, sub, mul, mulh (add deduped)
+    assert mat["groups"]["RV32I"] == 2 and mat["groups"]["M Extension"] == 3
+
+    passages = reasoning.inventory_passages(mat)
+    assert any("4 distinct" in t for _, t in passages)            # the total, stated + cited
+    aug, npx, _ = reasoning.augment_corpus_with_inventory(str(corpus), str(rules), str(tmp_path / "aug.txt"))
+    assert npx >= 3 and "riscv:inventory:total" in open(aug).read()  # count passages appended (cited handles)
 
 
 def test_build_from_spec_model_free(tmp_path):

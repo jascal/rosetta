@@ -48,6 +48,7 @@ def to_build_kwargs(spec, base="."):
         return os.path.join(base, v) if v and not os.path.isabs(v) else v
 
     gr = spec.get("grounding", {})
+    rs = spec.get("reasoning", {})                              # opt-in authored-reasoning tier (REASONING.md)
     bundle = m.get("bundle") or None
     return {
         "corpus": p(c.get("text")),
@@ -62,4 +63,7 @@ def to_build_kwargs(spec, base="."):
         "dim": gr.get("dim", 300),                              # grounding embedding dim (0 = lexical, no download)
         "corpus_vectors": gr.get("corpus_vectors", False),
         "no_split": gr.get("no_split", False),
+        "inventory": bool(rs.get("inventory", False)),          # [reasoning] inventory = true → count/list aggregates
+        "inventory_label": rs.get("label", "instruction"),
+        "reasoning_rules": rs.get("rules"),                     # e.g. "ergo:aggregate" → ../ergo/aggregate.dl
     }
