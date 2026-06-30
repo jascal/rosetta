@@ -2,7 +2,7 @@
 
 An expert build is a reproducible experiment; the spec captures corpus + experimental design + targets so a build is
 re-runnable, not buried in a shell invocation. Sections:
-  [corpus]      text, questions, citation                       (CORPUS DESIGN)
+  [corpus]      text, prose, questions, citation                (CORPUS DESIGN; prose = extra citable passages)
   [model]       bundle, fieldrun                                (omit + [adapter] → model-free)
   [adapter]     name, source                                    (model-free structured source)
   [experiment]  holdout, off_domain, testset                    (EXPERIMENTAL DESIGN)
@@ -52,6 +52,7 @@ def to_build_kwargs(spec, base="."):
     bundle = m.get("bundle") or None
     return {
         "corpus": p(c.get("text")),
+        "prose": p(c.get("prose")) if c.get("prose") else None,   # extra citable passages concatenated into grounding
         "questions": p(c.get("questions")),
         "citation": c.get("citation", ""),
         "model": spec.get("name") or "rosetta-expert",

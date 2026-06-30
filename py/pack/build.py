@@ -54,7 +54,20 @@ def _resolve_rules(spec_rules):
     return cand
 
 
-def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, citation="",
+def _concat_corpus(out, *parts):
+    """Concatenate corpus files (each `[id · chapter] text` one-per-line) into out/_corpus_combined.txt. Used to add
+    a prose corpus alongside the rules corpus — both are no-split citable passages, so this is a straight append."""
+    combined = os.path.join(out, "_corpus_combined.txt")
+    with open(combined, "w", encoding="utf-8") as w:
+        for src in parts:
+            if not (src and os.path.exists(src)):
+                continue
+            text = open(src, encoding="utf-8").read()
+            w.write(text if text.endswith("\n") else text + "\n")
+    return combined
+
+
+def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, steps=256, citation="",
                  model="rosetta-expert", adapter=None, adapter_source=None,
                  dim=300, corpus_vectors=False, no_split=False,
                  cover=False, minsupp=3, mindet=1.0, fieldrun=None,
@@ -86,6 +99,14 @@ def build_expert(out, *, corpus=None, bundle=None, questions=None, steps=256, ci
         ground_corpus = corpus or questions
     else:
         answers.empty_index(out, model=model)
+
+    # 1a. extra PROSE passages (riscv_prose adapter): definitional/conceptual paragraphs the rules corpus lacks, so
+    # "what is a hart?" retrieves a definition instead of abstaining. Same no-split citable shape → straight concat.
+    if prose:
+        ground_corpus = _concat_corpus(out, ground_corpus, prose)
+        ground_no_split = True
+        print(f"[prose] +{sum(1 for _ in open(prose, encoding='utf-8'))} passages from {os.path.basename(prose)} "
+              f"into the grounding corpus")
 
     # 1b. authored-reasoning aggregates (REASONING.md, opt-in): extract an inventory, run ergo's count/list Datalog
     # over it (souffle, build-time), and append the materialized counts as CITED passages so retrieval answers
@@ -199,6 +220,7 @@ def main():
                                              "pass an expert.toml for the declarative form")
     ap.add_argument("out")
     ap.add_argument("--corpus", help="grounding corpus (knowledge passages)")
+    ap.add_argument("--prose", help="extra citable passages concatenated into the grounding corpus (e.g. prose.txt)")
     ap.add_argument("--bundle", help="model bundle stem (enables distilled answers + --cover)")
     ap.add_argument("--questions", help="question file for distilled curated answers")
     ap.add_argument("--steps", type=int, default=256, help="distill depth (EOS-stopping; 256 avoids truncation)")
@@ -215,7 +237,7 @@ def main():
     ap.add_argument("--fieldrun", help="path to the fieldrun extractor binary (required for distill/--cover; "
                     "else set $FIELDRUN). No hard-coded default.")
     a = ap.parse_args()
-    build_expert(a.out, corpus=a.corpus, bundle=a.bundle, questions=a.questions, steps=a.steps,
+    build_expert(a.out, corpus=a.corpus, prose=a.prose, bundle=a.bundle, questions=a.questions, steps=a.steps,
                  citation=a.citation, model=a.model, adapter=a.adapter, adapter_source=a.adapter_source,
                  dim=a.dim, corpus_vectors=a.corpus_vectors, no_split=a.no_split,
                  cover=a.cover, minsupp=a.minsupp, mindet=a.mindet, fieldrun=a.fieldrun)
