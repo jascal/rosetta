@@ -10,7 +10,6 @@ Usage: .venv/bin/python -m pack.score_retrieval <package_dir> <testset.jsonl> --
 """
 import argparse
 import json
-import os
 import subprocess
 import time
 import urllib.request
