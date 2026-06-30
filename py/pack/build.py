@@ -41,15 +41,39 @@ def _make_corpus(out, text_file, bundle):
     return len(ids)
 
 
+ERGO_REPO = "https://github.com/jascal/ergo"   # ergo is a PUBLISHED Apache-2.0 dependency (not a hard sibling-dir)
+ERGO_REF = "v0.1.0"                             # pinned release of the reasoning rules → reproducible builds
+
+
+def _ergo_dir():
+    """Locate the ergo Datalog rules, pinned as a published git dependency. Resolution order:
+      1. $ERGO_DIR              — explicit override (vendored / offline / a specific checkout)
+      2. a sibling ../ergo      — a local dev checkout (the workspace layout) → live edits picked up
+      3. a cached clone of the PINNED tag (ERGO_REF) — reproducible/deployed builds with no sibling present
+    This removes the hard sibling-directory assumption: a build elsewhere fetches the pinned release once into a cache."""
+    env = os.environ.get("ERGO_DIR")
+    if env:
+        return env
+    repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # rosetta repo root
+    sibling = os.path.join(os.path.dirname(repo), "ergo")                                 # ../ergo (dev)
+    if os.path.isdir(sibling):
+        return sibling
+    cache = os.path.join(os.path.expanduser("~/.cache/rosetta/ergo"), ERGO_REF)           # pinned, fetched once
+    if not os.path.isdir(cache):
+        os.makedirs(os.path.dirname(cache), exist_ok=True)
+        print(f"[ergo] fetching pinned rules {ERGO_REPO}@{ERGO_REF} → {cache}")
+        subprocess.run(["git", "clone", "--depth", "1", "--branch", ERGO_REF, ERGO_REPO, cache], check=True)
+    return cache
+
+
 def _resolve_rules(spec_rules):
-    """Resolve a reasoning-rules ref to a .dl path: an explicit path, or 'ergo:<name>' → ../ergo/<name>.dl."""
+    """Resolve a reasoning-rules ref to a .dl path: an explicit path, or 'ergo:<name>' → the pinned ergo dep (_ergo_dir)."""
     if spec_rules and os.path.exists(spec_rules):
         return spec_rules
     name = (spec_rules or "ergo:aggregate").split(":")[-1]
-    repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # rosetta repo root
-    cand = os.path.join(os.path.dirname(repo), "ergo", name + ".dl")                      # ../ergo/<name>.dl
+    cand = os.path.join(_ergo_dir(), name + ".dl")
     if not os.path.exists(cand):
-        raise FileNotFoundError(f"reasoning rules not found: {spec_rules!r} (looked for {cand})")
+        raise FileNotFoundError(f"reasoning rules not found: {spec_rules!r} (looked for {cand}; ergo {ERGO_REF})")
     return cand
 
 

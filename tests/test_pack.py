@@ -476,3 +476,12 @@ def test_pedagogy_templates_as_expert(tmp_path):
     strat = (out / "strategy.tsv").read_text()
     assert "answer\tpedagogy\tsocratic intro\tped:socratic-tutor" in strat  # ergo-routed selection by style+level
     assert "answer\tpedagogy\tquiz\tped:examiner" in strat
+
+
+def test_ergo_pinned_dependency_resolution(tmp_path, monkeypatch):
+    """ergo is a pinned PUBLISHED dependency, not a hard sibling-dir: $ERGO_DIR overrides; a recorded pin (repo@ref)
+    lets a build elsewhere fetch the rules. (The sibling-dev path + the pinned fetch aren't exercised here.)"""
+    import pack.build as B
+    monkeypatch.setenv("ERGO_DIR", str(tmp_path))
+    assert B._ergo_dir() == str(tmp_path)                         # explicit override wins
+    assert B.ERGO_REPO.endswith("/ergo") and B.ERGO_REF          # the pin is recorded (reproducible/deployed builds)
