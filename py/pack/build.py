@@ -181,6 +181,74 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
     return out
 
 
+def _card_passage(card, target):
+    """A document card → one citable CATALOG passage. The citation handle encodes (target expert, document) so a
+    librarian answer points INTO the content expert: cite "lib:<target>:<handle>" → resolve via that expert's spoke."""
+    handle, title = card.get("handle", ""), (card.get("title") or card.get("handle") or "document")
+    summary, sections = card.get("summary", ""), card.get("sections") or []
+    cid = f"lib:{target}:{handle}" if target else f"lib:{handle}"
+    text = f"{title}. {summary}".strip()
+    if sections:
+        text += " Sections: " + "; ".join(sections) + "."
+    return f"{cid} · {title[:70]}", _re_ws(text)
+
+
+def _re_ws(s):
+    return " ".join(s.split())
+
+
+def build_librarian(out, *, documents, target="", dim=300, model="rosetta-librarian", extra_cards=None, label="document"):
+    """Build a LIBRARIAN: a model-free CATALOG expert over a document collection. Runs each document's adapter, takes its
+    card (or synthesizes one from its passages), and grounds the cards as citable passages — so "which document covers
+    X?" retrieves a card whose handle (lib:<target>:<doc>) points INTO the content expert (`target`). The catalog is
+    ALSO an inventory, so "how many documents / list the collection" route through ergo's aggregate.dl + strategy.dl
+    (the same authored rules as any expert). `extra_cards` adds EXPERT-level cards (cross-hub granularity). No model."""
+    from . import adapters as _adp, reasoning
+    os.makedirs(out, exist_ok=True)
+    cards = list(extra_cards or [])
+    for i, d in enumerate(documents):
+        fn = _adp.get(d["adapter"])
+        try:
+            ext = fn(d["source"], **(d.get("opts") or {}))
+        except Exception as e:                                    # noqa: BLE001 — one bad doc skips, doesn't abort
+            print(f"[librarian {i + 1}/{len(documents)}: {d['adapter']}] SKIPPED — {e}")
+            continue
+        if ext.cards:
+            cards.extend(ext.cards)
+        else:                                                    # adapter has no native card → synthesize from structure
+            handle = (d.get("opts") or {}).get("prefix") or f"doc{i}"
+            facets = []
+            for sec, _t in ext.passages:                         # distinct section facets (after the "·")
+                f = sec.split("·", 1)[1].strip() if "·" in sec else ""
+                if f and f not in facets:
+                    facets.append(f)
+            cards.append({"handle": handle, "title": handle,
+                          "summary": ext.passages[0][1][:300] if ext.passages else "", "sections": facets[:12]})
+    if not cards:
+        raise ValueError("librarian: no document cards could be built")
+    catalog = os.path.join(out, "catalog.txt")
+    with open(catalog, "w", encoding="utf-8") as f:
+        for c in cards:
+            sec, text = _card_passage(c, target)
+            f.write(f"[{sec}] {text}\n")
+    # the catalog IS an inventory → count/list via ergo aggregate.dl + strategy.dl (same authored rules as any expert),
+    # so "how many <label>s / list the <label>s" route declaratively. group = label+"s" so the list intent's entity
+    # ("documents") matches the natural query.
+    items = [(c.get("title") or c.get("handle") or "untitled", label + "s") for c in cards]
+    mat = reasoning.materialize(items, _resolve_rules("ergo:aggregate"))
+    with open(catalog, "a", encoding="utf-8") as f:
+        for sec, text in reasoning.inventory_passages(mat, label=label, prefix="lib:catalog", collection="the catalog"):
+            f.write(f"[{sec}] {text}\n")
+    reasoning.strategy_tables(_resolve_rules("ergo:strategy"), os.path.join(out, "strategy.tsv"),
+                              mat=mat, label=label, prefix="lib:catalog")   # match the inventory passage ids
+    answers.empty_index(out, model=model)
+    npass, nvec, k = grounding.build(catalog, out, dim=dim, no_split=True)
+    print(f"[librarian] {len(cards)} cards over target={target!r}, {mat['total']} {label}s catalogued (count/list via "
+          f"ergo) → {npass} passages, {nvec} vectors x {k}d")
+    print(f"package -> {out}")
+    return out
+
+
 def build_from_spec(spec_path):
     """Build (and, if [gate] is set, score) an expert from a declarative expert.toml (EXPERTS.md). Output →
     <spec_dir>/package/ (or [build].out). Recognizes the opt-in [reasoning] tier (REASONING.md) but does not wire it."""

@@ -431,3 +431,29 @@ def test_multi_document_skips_bad_source(tmp_path, capsys):
     import pytest as _pt
     with _pt.raises(KeyError):
         build_expert(str(tmp_path / "p2"), dim=0, documents=[{"adapter": "nope", "source": str(good)}])
+
+
+def test_librarian_catalog(tmp_path):
+    """A LIBRARIAN is a model-free catalog expert: each document → a card whose handle points INTO the content expert
+    (lib:<target>:<doc>); the catalog is also an inventory (count/list via ergo). No model."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (the catalog inventory uses ergo aggregates)")
+    from pack.build import build_librarian
+    d = tmp_path / "docs"
+    d.mkdir()
+    for i, (pid, title) in enumerate([("p1", "Attention and Transformers"), ("p2", "Graph Coloring Bounds")]):
+        (d / f"{pid}.html").write_text(
+            f'<h1 class="ltx_title ltx_title_document">{title}</h1>'
+            f'<div class="ltx_abstract"><p class="ltx_p">We study {title.lower()} in depth here.</p></div>'
+            f'<div class="ltx_para"><p class="ltx_p">{title}: a long enough body paragraph to be a real passage here.</p></div>',
+            encoding="utf-8")
+    out = tmp_path / "lib"
+    build_librarian(str(out), dim=0, target="arxiv", label="paper", documents=[
+        {"adapter": "latexml", "source": str(d / "p1.html"), "opts": {"prefix": "p1"}},
+        {"adapter": "latexml", "source": str(d / "p2.html"), "opts": {"prefix": "p2"}},
+    ])
+    cat = (out / "catalog.txt").read_text()
+    assert "[lib:arxiv:p1 · Attention and Transformers]" in cat       # card cites INTO the content expert (target:doc)
+    assert "There are 2 distinct papers in the catalog" in cat        # the catalog is an inventory (ergo count)
+    strat = (out / "strategy.tsv").read_text()
+    assert "answer\tcount\tpaper\tlib:catalog:total" in strat         # count/list routed via ergo strategy.dl

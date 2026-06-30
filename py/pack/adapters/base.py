@@ -23,6 +23,7 @@ class Extraction:
     defines: list[Pair] = field(default_factory=list)    # (passage_id, term)  → the define strategy (term → its passage)
     statements: list[Pair] = field(default_factory=list)  # (passage_id, name) → the theorem strategy (named statement)
     items: list[Pair] = field(default_factory=list)      # (name, group)       → count/list aggregates (the inventory)
+    cards: list = field(default_factory=list)            # [{handle,title,summary,sections}] → the LIBRARIAN catalog
     citation: str = ""                                   # default source label (per-passage section overrides it)
 
     def write_corpus(self, path):
@@ -43,11 +44,12 @@ class Extraction:
         document tie-break refinement is a follow-up); items accumulate (count/list aggregates dedupe at materialize).
         Output order is DOCUMENT ENCOUNTER ORDER (deterministic for a fixed document list); no downstream step depends
         on passage order, so it isn't sorted."""
-        passages, defines, statements, items = [], [], [], []
+        passages, defines, statements, items, cards = [], [], [], [], []
         seen_def, seen_stmt = set(), set()
         for e in exts:
             passages.extend(e.passages)
             items.extend(e.items)
+            cards.extend(e.cards)
             for pid, term in e.defines:
                 if term not in seen_def:
                     seen_def.add(term)
@@ -56,7 +58,7 @@ class Extraction:
                 if name not in seen_stmt:
                     seen_stmt.add(name)
                     statements.append((pid, name))
-        return Extraction(passages, defines=defines, statements=statements, items=items)
+        return Extraction(passages, defines=defines, statements=statements, items=items, cards=cards)
 
 
 _REGISTRY = {}
