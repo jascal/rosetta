@@ -6,7 +6,11 @@ source type — a spec, a PreTeXt book, a glossary, an arXiv/LaTeXML paper, a PD
 adapter. The builder and runtime never change.
 
 An adapter is a callable `adapt(source, **opts) -> Extraction` registered under a name via @register("name")."""
+from __future__ import annotations
+
 from dataclasses import dataclass, field
+
+Pair = tuple[str, str]
 
 
 @dataclass
@@ -15,11 +19,11 @@ class Extraction:
     strategy tables when the source supports them (a spec has items; a textbook has defines + statements; plain prose
     has neither). `section` is "<id> · <facet>" so the id before the middle dot is the citation handle.
     """
-    passages: list                                   # [(section, text)]      citable knowledge → the grounding corpus
-    defines: list = field(default_factory=list)      # [(passage_id, term)]   → the define strategy (term → its passage)
-    statements: list = field(default_factory=list)   # [(passage_id, name)]   → the theorem strategy (named statement)
-    items: list = field(default_factory=list)        # [(name, group)]        → count/list aggregates (the inventory)
-    citation: str = ""                               # default source label (per-passage section overrides it)
+    passages: list[Pair]                                 # (section, text)     citable knowledge → the grounding corpus
+    defines: list[Pair] = field(default_factory=list)    # (passage_id, term)  → the define strategy (term → its passage)
+    statements: list[Pair] = field(default_factory=list)  # (passage_id, name) → the theorem strategy (named statement)
+    items: list[Pair] = field(default_factory=list)      # (name, group)       → count/list aggregates (the inventory)
+    citation: str = ""                                   # default source label (per-passage section overrides it)
 
     def write_corpus(self, path):
         """Write the passages as `[section] text` lines — the no-split grounding corpus the rest of pack reads."""

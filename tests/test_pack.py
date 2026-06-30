@@ -350,3 +350,37 @@ def test_adapter_system_registry_and_contract(tmp_path):
     assert "MATHML" not in " ".join(t for _s, t in ext.passages)   # MathML subtree skipped
     assert ("px:theorem2", "euler") in [(p, n) for p, n in ext.statements] or \
            any(n == "euler" for _p, n in ext.statements)           # named theorem captured
+
+
+def test_pretext_adapter_extraction(tmp_path):
+    """The PreTeXt adapter (ElementTree) extracts: a <definition>'s title + inline <term> as exact defines, a titled
+    <theorem> as a named statement, prose <p> as passages, and <m> math as inline LaTeX. Covers both tag dialects."""
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "groups.xml").write_text(
+        '<chapter xml:id="grp"><title>Groups</title>'
+        '<section><title>Definitions</title>'
+        '<definition xml:id="def-group"><title>Group</title>'
+        '<p>A <term>group</term> is a set with an associative binary operation and inverses.</p></definition>'
+        '<theorem xml:id="thm-lagrange"><title>Lagrange</title>'
+        '<statement><p>For a finite group, <m>|H|</m> divides <m>|G|</m>.</p></statement></theorem>'
+        '<p>This running paragraph introduces the notion of a <define>subgroup</define> informally for the reader.</p>'
+        '</section></chapter>', encoding="utf-8")
+    from pack.adapters import pretext
+    passages, defines, statements = pretext.extract(str(src), "bk")
+    by = {t: pid for pid, t in defines}
+    assert by["group"] == "bk:definition:def-group"          # definition title → exact define
+    assert "subgroup" in by                                   # inline <define> in prose → define
+    assert ("bk:theorem:thm-lagrange", "lagrange") in statements   # titled theorem → named statement
+    body = dict((s.split(" · ")[0], t) for s, t in passages)
+    assert "|H|" in body["bk:theorem:thm-lagrange"] and "|G|" in body["bk:theorem:thm-lagrange"]  # <m> LaTeX kept
+
+
+def test_adapter_source_envvar_expands(tmp_path, monkeypatch):
+    """[adapter] source = "$VAR" is expanded by the spec loader so clone-and-build (AATA_SRC=…) works."""
+    from pack import spec as spec_mod
+    monkeypatch.setenv("BOOK_SRC", "/clones/aata/src")
+    (tmp_path / "e.toml").write_text('[adapter]\nname="pretext"\nsource="$BOOK_SRC"\nprefix="aata"\n')
+    kw = spec_mod.to_build_kwargs(spec_mod.load_spec(str(tmp_path / "e.toml")), base=str(tmp_path))
+    assert kw["adapter"] == "pretext" and kw["adapter_source"] == "/clones/aata/src"   # $VAR expanded, absolute kept
+    assert kw["adapter_opts"] == {"prefix": "aata"}
