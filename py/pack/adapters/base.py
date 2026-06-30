@@ -36,6 +36,26 @@ class Extraction:
         return (f"{len(self.passages)} passages, {len(self.defines)} defines, "
                 f"{len(self.statements)} statements, {len(self.items)} items")
 
+    @staticmethod
+    def merge(exts: list["Extraction"]) -> "Extraction":
+        """Combine N documents (of any adapter types) into ONE expert. Passage ids are adapter/document-namespaced so
+        they never collide; defines/statements are deduped by entity (first document wins on a shared term — a cross-
+        document tie-break refinement is a follow-up); items accumulate (count/list aggregates dedupe at materialize)."""
+        passages, defines, statements, items = [], [], [], []
+        seen_def, seen_stmt = set(), set()
+        for e in exts:
+            passages.extend(e.passages)
+            items.extend(e.items)
+            for pid, term in e.defines:
+                if term not in seen_def:
+                    seen_def.add(term)
+                    defines.append((pid, term))
+            for pid, name in e.statements:
+                if name not in seen_stmt:
+                    seen_stmt.add(name)
+                    statements.append((pid, name))
+        return Extraction(passages, defines=defines, statements=statements, items=items)
+
 
 _REGISTRY = {}
 

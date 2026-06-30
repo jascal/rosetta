@@ -1,0 +1,19 @@
+# examples/pretext/math — ONE expert over TWO PreTeXt books (N documents of the same adapter type). See README.md.
+#   AATA_SRC=…/aata/src FCLA_SRC=…/fcla/src .venv/bin/python build_expert.py examples/pretext/math.toml
+[corpus]
+citation = "Open mathematics textbooks (GFDL)"
+
+[[document]]                    # N documents of M adapter types → ONE expert; the build merges their Extractions
+adapter = "pretext"
+source  = "$AATA_SRC"
+prefix  = "aata"
+
+[[document]]
+adapter = "pretext"
+source  = "$FCLA_SRC"
+prefix  = "fcla"
+
+[experiment]
+off_domain = "../probes/negatives.txt"
+[gate]
+max_leak = 0.05

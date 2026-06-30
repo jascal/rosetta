@@ -4,7 +4,8 @@ An expert build is a reproducible experiment; the spec captures corpus + experim
 re-runnable, not buried in a shell invocation. Sections:
   [corpus]      text, prose, questions, citation                (CORPUS DESIGN; prose = extra citable passages)
   [model]       bundle, fieldrun                                (omit + [adapter] → model-free)
-  [adapter]     name, source                                    (model-free structured source)
+  [adapter]     name, source                                    (model-free structured source — single document)
+  [[document]]  adapter, source, …opts                          (N documents of M adapter types → ONE expert)
   [experiment]  holdout, off_domain, testset                    (EXPERIMENTAL DESIGN)
   [[benchmark]] name, set, target                               (targets; first-class slot)
   [gate]        min_precision, max_leak                         (HARD-FAIL thresholds)
@@ -32,8 +33,8 @@ def load_spec(path):
             spec = tomllib.load(f)
     except (OSError, tomllib.TOMLDecodeError) as e:
         raise ValueError(f"expert spec: cannot read {path} — {e}")
-    if "corpus" not in spec and "adapter" not in spec:
-        raise ValueError(f"expert spec: {path} has neither [corpus] nor [adapter] — nothing to build from")
+    if not any(k in spec for k in ("corpus", "adapter", "document")):
+        raise ValueError(f"expert spec: {path} has no [corpus]/[adapter]/[[document]] — nothing to build from")
     return _expand(spec)
 
 
@@ -50,7 +51,16 @@ def to_build_kwargs(spec, base="."):
     gr = spec.get("grounding", {})
     rs = spec.get("reasoning", {})                              # opt-in authored-reasoning tier (REASONING.md)
     bundle = m.get("bundle") or None
+
+    # [[document]] — N documents of M adapter types composed into one expert (build merges their Extractions).
+    docs = spec.get("document", [])
+    documents = [{"adapter": d.get("adapter") or d.get("name"),
+                  "source": p(d.get("source")),
+                  "opts": {k: v for k, v in d.items() if k not in ("adapter", "name", "source")}}
+                 for d in docs] or None
+
     return {
+        "documents": documents,
         "corpus": p(c.get("text")),
         "prose": p(c.get("prose")) if c.get("prose") else None,   # extra citable passages concatenated into grounding
         "questions": p(c.get("questions")),
