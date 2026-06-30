@@ -119,6 +119,12 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
         ground_corpus, npx, mat = reasoning.augment_corpus_with_inventory(ground_corpus, rdl, aug, label=inventory_label)
         print(f"[reasoning] inventory via {os.path.basename(rdl)}: {mat['total']} distinct {inventory_label}s across "
               f"{len(mat['groups'])} groups → {npx} cited count passages (closed-world)")
+        # the generic STRATEGY tables (ergo/strategy.dl): cue lexicon + intent→strategy routes, so the thin runtime
+        # routes "how many / list" to these aggregates declaratively (no query heuristics in the server) — REASONING.md.
+        sdl = _resolve_rules("ergo:strategy")
+        _stsv, ncue, nans = reasoning.strategy_tables(sdl, os.path.join(out, "strategy.tsv"), mat,
+                                                      label=inventory_label)
+        print(f"[reasoning] strategy via {os.path.basename(sdl)}: {ncue} intent cues, {nans} answer rows → strategy.tsv")
 
     # 2. grounding — CITATION-first (the runtime hard-gates retrieval-as-answer; see CONVERGENCE.md)
     if ground_corpus:

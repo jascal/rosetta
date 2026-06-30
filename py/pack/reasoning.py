@@ -76,6 +76,44 @@ def inventory_passages(mat, *, label="instruction", prefix="riscv:inventory"):
     return out
 
 
+def strategy_tables(strategy_dl, out_tsv, mat, *, label="instruction", prefix="riscv:inventory", defines=None):
+    """Materialize the package's strategy.tsv — the UNIFORM (intent, entity, passage) table the thin runtime applies
+    (no runtime engine; build-time only). One row shape for every strategy — count/list/define are just different
+    intents, never special cases:
+        cue    <word>   <intent>             the i18n-able intent lexicon (from ergo/strategy.dl — language as DATA)
+        answer <intent> <entity> <passage>   a query of <intent> that NAMES <entity> is answered by <passage>
+    Count → entity = the inventory label ("instruction"); list → entity = each group name; define → entity = each
+    defined term (from `defines`, a corpus source). The runtime returns the answer whose entity the query names — so
+    the entity-must-appear check IS the domain gate (no separate gating). Returns (out_tsv, n_cues, n_answers)."""
+    souffle = shutil.which("souffle")
+    if not souffle:
+        raise RuntimeError("souffle not found — the strategy tier needs souffle at build time")
+    with tempfile.TemporaryDirectory() as d:
+        fdir, odir = os.path.join(d, "facts"), os.path.join(d, "out")
+        os.makedirs(fdir)
+        os.makedirs(odir)
+        with open(os.path.join(fdir, "defines.facts"), "w", encoding="utf-8") as f:
+            for section, term in (defines or []):                     # term -> defining passage (define rows)
+                f.write(f"{section}\t{term}\n")
+        subprocess.run([souffle, strategy_dl, "-F", fdir, "-D", odir], check=True)
+
+        def rd(rel):
+            p = os.path.join(odir, rel + ".csv")
+            return [ln.rstrip("\n").split("\t") for ln in open(p, encoding="utf-8")] if os.path.exists(p) else []
+
+        cues, ans = rd("cue"), rd("answer")                          # answer holds the ergo-derived define rows
+    rows = [("answer",) + tuple(a) for a in ans]                     # define rows: (answer, "define", term, section)
+    rows.append(("answer", "count", label, f"{prefix}:total"))       # count → the grand-total passage, named by the label
+    for g in sorted(mat.get("groups", {})):                          # list → each group, named by the group name
+        rows.append(("answer", "list", g.lower(), f"{prefix}:{g}"))
+    with open(out_tsv, "w", encoding="utf-8") as f:
+        for w, i in cues:
+            f.write(f"cue\t{w}\t{i}\n")
+        for r in rows:
+            f.write("\t".join(r) + "\n")
+    return out_tsv, len(cues), len(rows)
+
+
 def augment_corpus_with_inventory(corpus_txt, rules_dl, out_txt, *, label="instruction", prefix="riscv:inventory"):
     """Append cited inventory/count passages (computed by the ergo aggregates) to a COPY of the corpus at out_txt, so
     grounding embeds them alongside the rules. Returns (out_txt, n_passages, materialized)."""

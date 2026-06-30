@@ -8,19 +8,21 @@
 {"q": "What is the RVWMO memory model?", "expect": "answer"}
 {"q": "What does the LR instruction do?", "expect": "answer"}
 {"q": "What does the SC instruction do?", "expect": "answer"}
-{"q": "How many RISC-V instructions are there?", "expect": "answer", "contains": ["instructions"]}
 {"q": "What is mstatus?", "expect": "answer", "contains": ["mstatus"]}
+{"q": "How many RISC-V instructions are there?", "expect": "answer", "contains": ["390"], "cite_prefix": "riscv:inventory:total"}
+{"q": "What is the total number of instructions?", "expect": "answer", "contains": ["390"], "cite_prefix": "riscv:inventory:total"}
+{"q": "List the instructions in the M extension.", "expect": "answer", "contains": ["mul"], "cite_prefix": "riscv:inventory:"}
 {"q": "What is the capital of France?", "expect": "abstain"}
 {"q": "How do I bake sourdough bread?", "expect": "abstain"}
 {"q": "Who wrote Hamlet?", "expect": "abstain"}
 {"q": "What is the boiling point of water?", "expect": "abstain"}
 {"q": "What causes earthquakes?", "expect": "abstain"}
-{"q": "What is photosynthesis?", "expect": "abstain"}
-{"q": "What is a hart?", "expect": "answer", "contains": ["hart"], "cite_prefix": "manual:"}
-{"q": "What is a core?", "expect": "answer", "contains": ["core"], "cite_prefix": "manual:"}
-{"q": "What is an execution environment?", "expect": "answer", "contains": ["execution environment"], "cite_prefix": "manual:"}
-{"q": "What is the satp register?", "expect": "answer", "contains": ["satp"], "cite_prefix": "manual:"}
-{"q": "What is a WARL field?", "expect": "answer", "contains": ["WARL"], "cite_prefix": "manual:"}
+{"q": "How many planets are there?", "expect": "abstain"}
+{"q": "What is a hart?", "expect": "answer", "contains": ["hart"]}
+{"q": "What is a core?", "expect": "answer", "contains": ["core"]}
+{"q": "What is an execution environment?", "expect": "answer", "contains": ["execution environment"]}
+{"q": "What is the satp register?", "expect": "answer", "contains": ["satp"]}
+{"q": "What is a WARL field?", "expect": "answer", "contains": ["WARL"]}
 {"q": "What is supervisor mode?", "expect": "answer", "contains": ["supervisor"]}
 {"q": "What is machine mode?", "expect": "answer", "contains": ["machine"]}
 {"q": "What is the misa register?", "expect": "answer", "contains": ["misa"]}

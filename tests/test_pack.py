@@ -11,6 +11,17 @@ import sys
 
 import pytest
 
+_STRAT_DL = """
+.decl cue(word:symbol, intent:symbol)
+cue("many","count"). cue("list","list"). cue("what","define").
+.output cue
+.decl answer(intent:symbol, entity:symbol, section:symbol)
+.decl defines(section:symbol, term:symbol)
+.input defines
+answer("define", T, S) :- defines(S, T).
+.output answer
+"""
+
 _AGG_DL = """
 .decl item(name:symbol, group:symbol)
 .input item
@@ -265,3 +276,27 @@ def test_build_concats_prose_into_grounding(tmp_path):
     kn = (out / "knowledge.tsv").read_text()
     assert "x0 is hardwired" in kn and "hart is a resource" in kn    # BOTH rules and prose grounded
     assert "manual:intro_0" in kn                                    # prose citation handle present
+
+
+def test_strategy_tables_uniform(tmp_path):
+    """The UNIFORM strategy table: count/list/define are all `answer <intent> <entity> <passage>` rows — one shape,
+    no per-kind special-casing. The entity is what the query must NAME (the domain gate)."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (build-time strategy tier)")
+    from pack import reasoning
+    sdl = tmp_path / "strategy.dl"
+    sdl.write_text(_STRAT_DL)
+    mat = {"total": 4, "groups": {"RV32I": 2, "M Extension": 3}, "items": []}
+    out = tmp_path / "strategy.tsv"
+    _p, ncue, nans = reasoning.strategy_tables(str(sdl), str(out), mat, label="instruction",
+                                               defines=[("manual:intro_17", "hart")])
+    rows = [ln.split("\t") for ln in out.read_text().splitlines()]
+    cues = [r for r in rows if r[0] == "cue"]
+    ans = [r for r in rows if r[0] == "answer"]
+    assert len(cues) == ncue == 3
+    # every answer row is the same shape: answer <intent> <entity> <passage>
+    assert all(len(r) == 4 for r in ans)
+    assert ["answer", "count", "instruction", "riscv:inventory:total"] in ans          # count → label names it
+    assert ["answer", "list", "m extension", "riscv:inventory:M Extension"] in ans      # list → group name
+    assert ["answer", "define", "hart", "manual:intro_17"] in ans                       # define → term (from defines)
+    assert nans == len(ans) == 4                                                        # 1 count + 2 groups + 1 define
