@@ -478,6 +478,39 @@ def test_pedagogy_templates_as_expert(tmp_path):
     assert "answer\tpedagogy\tquiz\tped:examiner" in strat
 
 
+def test_pedagogy_opener_and_scope_restriction(tmp_path):
+    """A template may carry an `opening` scaffold (the kickoff, so the tutor speaks first) and a scope restriction
+    (`applies_to`/`subject`). Both ride after the [[TUTOR_META]] sentinel as a JSON tail so they travel with the
+    template in ONE citable passage (the hub splits the tail off). The opener is authored in the template, never the
+    binary. No souffle/model needed for the emit itself."""
+    import json as _json
+
+    from pack.adapters import pedagogy
+    (tmp_path / "t.toml").write_text(
+        '[[template]]\nname="code-mentor"\nstyle="mentor"\nlevel="any"\n'
+        'applies_to=["riscv","logic"]\nsubject="programming code"\n'
+        'system="You are a code mentor for {scope}."\n'
+        'opening="Ask the learner to paste the code they want reviewed."\n'
+        'suggest="Propose three next prompts the learner could send."\n'
+        '[[template]]\nname="plain"\nstyle="advisory"\nlevel="expert"\n'
+        'system="You are an advisor for {scope}."\n')
+    ext = pedagogy.adapt(str(tmp_path / "t.toml"), prefix="ped")
+    bodies = {sec.split("·", 1)[0].strip(): text for sec, text in ext.passages}
+
+    cm = bodies["ped:code-mentor"]
+    assert pedagogy.META_MARK in cm                                  # opener + suggest + restriction ride after sentinel
+    sys_part, tail = cm.split(pedagogy.META_MARK, 1)
+    assert "code mentor" in sys_part and pedagogy.META_MARK not in sys_part
+    meta = _json.loads(tail)
+    assert meta["opening"].startswith("Ask the learner")            # opener authored in the template
+    assert meta["suggest"].startswith("Propose three")             # suggested-next-prompts scaffold
+    assert meta["applies_to"] == ["riscv", "logic"]
+    assert "programming" in meta["subject"]
+
+    # a template with neither opener nor restriction stays a flat passage (no tail — backward-compatible).
+    assert pedagogy.META_MARK not in bodies["ped:plain"]
+
+
 def test_ergo_pinned_dependency_resolution(tmp_path, monkeypatch):
     """ergo is a pinned PUBLISHED dependency, not a hard sibling-dir: $ERGO_DIR overrides; a recorded pin (repo@ref)
     lets a build elsewhere fetch the rules. (The sibling-dev path + the pinned fetch aren't exercised here.)"""
