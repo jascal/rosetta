@@ -1,0 +1,58 @@
+{
+  "model": "llama32_1b",
+  "n_ngram_rules": 256,
+  "natural_instances": 300,
+  "circuit_instances": 644,
+  "domain": 944,
+  "ncover": 944,
+  "nmiss": 0,
+  "nuncov": 0,
+  "certified": true,
+  "per_circuit": {
+    "induction": {
+      "emit": "induction",
+      "stimuli": 168,
+      "certified_instances": 136
+    },
+    "succession": {
+      "emit": "succession",
+      "stimuli": 23,
+      "certified_instances": 23
+    },
+    "ioi": {
+      "emit": "once_appearing",
+      "stimuli": 120,
+      "certified_instances": 119
+    },
+    "transitivity": {
+      "emit": "once_appearing",
+      "stimuli": 100,
+      "certified_instances": 0
+    },
+    "modus_ponens": {
+      "emit": "once_appearing",
+      "stimuli": 100,
+      "certified_instances": 70
+    },
+    "temporal": {
+      "emit": "once_appearing",
+      "stimuli": 100,
+      "certified_instances": 99
+    },
+    "spatial": {
+      "emit": "once_appearing",
+      "stimuli": 100,
+      "certified_instances": 97
+    },
+    "syllogism": {
+      "emit": "once_appearing",
+      "stimuli": 100,
+      "certified_instances": 100
+    }
+  },
+  "emitted_kinds": [
+    "induction",
+    "once_appearing",
+    "succession"
+  ]
+}

@@ -1,0 +1,315 @@
+// rosetta · circuits.full.symbols.dl — legible twin (token STRINGS) of the n-gram cover; inherits the certificate.
+// NOTE: this model also carries STRUCTURAL circuits (induction, once_appearing, succession) — computations over token identity/
+// order/ordinal, not token lookups, so they are not representable as symbol facts; see circuits.full.dl.
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+.decl gram2(c0:symbol,t:symbol)
+.decl gram2_hit(inst:number,t:symbol)
+.decl gram2_any(inst:number)
+gram2("from","Ġdatetime").
+gram2("classes","Ġimport").
+gram2("Ġimport","Ġdata").
+gram2("@","data").
+gram2("data","class").
+gram2("Ġowner",":").
+gram2("Ġstr","Ċ").
+gram2("Ġbalance",":").
+gram2(".","0").
+gram2("Ġdeposit","(self").
+gram2("(self",",").
+gram2("Ġ<=","Ġ").
+gram2("ĠĠĠĠĠĠĠĠĠĠĠ","Ġraise").
+gram2("Ġraise","ĠValueError").
+gram2("ĠValueError","(\"").
+gram2("amount","Ġmust").
+gram2("Ġmust","Ġbe").
+gram2("Ġbe","Ġa").
+gram2("Ġpositive","\")ĊĊ").
+gram2("\")Ċ","ĠĠĠĠĠĠĠ").
+gram2("Ġ+=","Ġamount").
+gram2("Ġwithdraw","(self").
+gram2("Ġ>","Ġ").
+gram2("ins","ufficient").
+gram2("ufficient","Ġfunds").
+gram2("Ġfunds","\")Ċ").
+gram2("Ġ-=","Ġamount").
+gram2("Ġtransfer","_money").
+gram2("(src",",").
+gram2("ĠNone",":Ċ").
+gram2("Ġsrc","Ġ=").
+gram2(".with","in").
+gram2("draw","()Ċ").
+gram2(".de","posit").
+gram2(")ĊĊĊ","def").
+gram2("Ġfib","(n").
+gram2("(n","):Ċ").
+gram2("Ġ_","Ġin").
+gram2("Ġrange","(n").
+gram2("):Ċ","ĠĠĠĠĠĠĠ").
+gram2("Ġ+","Ġb").
+gram2("accounts","Ġ=").
+gram2("Ġ{","1").
+gram2("name",":").
+gram2("(name",")").
+gram2("Ġname","Ġin").
+gram2("Ġ[\"","Alice").
+gram2("\",","Ġ\"").
+gram2("car","ol").
+gram2("ol","\",").
+gram2("\"]}Ċ","ĠĠĠ").
+gram2("for","Ġuser").
+gram2("():Ċ","ĠĠĠ").
+gram2("(","1").
+gram2("transfer","(").
+gram2("(accounts","[").
+gram2("\"],","Ġaccounts").
+gram2("2","0").
+gram2("5","0").
+gram2("print","(\"").
+gram2("(sum","_of").
+gram2("(a",",").
+gram2("()))ĊĊ","#").
+gram2("//","Ġ").
+gram2("Ġ----------","ĊĊ").
+gram2("ĠJavaScript","Ġ----------").
+gram2("Ġ----------Ċ","//").
+gram2("const","Ġvalues").
+gram2("Ġnew","ĠMap").
+gram2("ĠMap","();ĊĊ").
+gram2("();ĊĊ","function").
+gram2("function","Ġfibonacci").
+gram2("Ġmemo","ize").
+gram2("ize","(fn").
+gram2("(fn",")").
+gram2("Ġfunction","(...").
+gram2("Ġ(...","args").
+gram2("args",")").
+gram2("Ġkey","Ġ=").
+gram2("ĠJSON",".stringify").
+gram2(".stringify","(obj").
+gram2("(args",");Ċ").
+gram2(");Ċ","ĠĠĠ").
+gram2("Ġ(","args").
+gram2("cache","Key").
+gram2(".has","(key").
+gram2("))","Ġ{Ċ").
+gram2(".get","(key").
+gram2("Ġfn","(value").
+gram2(".apply","(this").
+gram2("(this",",").
+gram2("Ġargs",");Ċ").
+gram2(".set","(key").
+gram2(";Ċ","Ġ").
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+.decl gram3(c0:symbol,c1:symbol,t:symbol)
+.decl gram3_hit(inst:number,t:symbol)
+.decl gram3_any(inst:number)
+gram3("from","Ġdata","classes").
+gram3("Ġimport","Ġdata","class").
+gram3("Ġdata","class","Ċ").
+gram3("class","ĊĊ","@").
+gram3("data","class","Ċ").
+gram3("class","Ċ","class").
+gram3("Ċ","class","ĠPerson").
+gram3("class","ĠAccount",":Ċ").
+gram3("ĠAccount",":Ċ","ĠĠĠ").
+gram3("Ġowner",":","Ġstr").
+gram3("Ġstr","Ċ","ĠĠĠ").
+gram3("Ġbalance",":","Ġfloat").
+gram3("Ġfloat","Ġ=","Ġ").
+gram3("Ġ=","Ġ","0").
+gram3("0","ĊĊ","ĠĠĠ").
+gram3("ĊĊ","ĠĠĠ","Ġdef").
+gram3("(self",",","Ġamount").
+gram3("Ġfloat",")","Ġ->").
+gram3("Ġ->","Ġfloat",":Ċ").
+gram3("Ġfloat",":Ċ","ĠĠĠĠĠĠĠ").
+gram3(":Ċ","ĠĠĠĠĠĠĠ","Ġreturn").
+gram3("ĠĠĠĠĠĠĠ","Ġif","Ġx").
+gram3("Ġif","Ġamount","Ġ<=").
+gram3("Ġ<=","Ġ","0").
+gram3("0",":Ċ","ĠĠĠĠĠĠĠĠĠĠĠ").
+gram3("\")Ċ","ĠĠĠĠĠĠĠ","Ġself").
+gram3("Ġ+=","Ġamount","Ċ").
+gram3("Ġamount","Ċ","ĠĠĠĠĠĠĠ").
+gram3("ĠĠĠĠĠĠĠ","Ġreturn","Ġself").
+gram3("Ġreturn","Ġself",".balance").
+gram3(".balance","ĊĊ","ĠĠĠ").
+gram3("Ġ>","Ġself",".balance").
+gram3(".balance",":Ċ","ĠĠĠĠĠĠĠĠĠĠĠ").
+gram3("Ġ-=","Ġamount","Ċ").
+gram3(".balance","ĊĊĊ","class").
+gram3("ĊĊĊ","def","Ġmain").
+gram3("(src",":","ĠAccount").
+gram3(",","Ġdst",":").
+gram3("Ġdst",":","ĠAccount").
+gram3("ĠNone",":Ċ","ĠĠĠĠĠĠĠ").
+gram3("draw","(amount",")ĊĊ").
+gram3("(amount",")Ċ","ĠĠĠ").
+gram3(")Ċ","ĠĠĠ","Ġdest").
+gram3("ĠĠĠ","Ġdst",".de").
+gram3("posit","(amount",")Ċ").
+gram3(")ĊĊĊ","def","Ġwithdraw").
+gram3("(n",":","Ġint").
+gram3(":","Ġint",")").
+gram3("Ġint",")","Ġ->").
+gram3("Ġ->","Ġint",":Ċ").
+gram3("Ġint",":Ċ","ĠĠĠ").
+gram3("ĠĠĠ","Ġa","Ġ=").
+gram3("Ġa",",","Ġb").
+gram3(",","Ġb","Ġ=").
+gram3("0",",","Ġ").
+gram3(",","Ġ","1").
+gram3("Ġ","1","Ċ").
+gram3("1","Ċ","b").
+gram3("ĠĠĠ","Ġfor","Ġi").
+gram3("Ġ_","Ġin","Ġrange").
+gram3("):Ċ","ĠĠĠĠĠĠĠ","Ġ#").
+gram3("ĠĠĠĠĠĠĠ","Ġa",",").
+gram3("Ġ=","Ġb",",").
+gram3("Ġb",",","Ġa").
+gram3(",","Ġa","Ġ+").
+gram3("Ġ+","Ġb","Ċ").
+gram3("Ġb","Ċ","ĠĠĠ").
+gram3("Ġreturn","Ġa","Ġ+").
+gram3("Ġa","ĊĊĊ","def").
+gram3("accounts","Ġ=","Ġ[").
+gram3("name",":","Ġ[").
+gram3("(name",")","Ġfor").
+gram3(")","Ġfor","Ġname").
+gram3("Ġname","Ġin","Ġnames").
+gram3("Ġ[\"","alice","\",").
+gram3("Ġ\"","bob","\",").
+gram3("for","Ġacct","Ġin").
+gram3("Ġacct","Ġin","Ġaccounts").
+gram3("():Ċ","ĠĠĠ","Ġacct").
+gram3("ĠĠĠ","Ġacct","['").
+gram3("(","1","0").
+gram3("1","0","0").
+gram3("0","0","0").
+gram3("(accounts","[\"","Alice").
+gram3("[\"","alice","\"],").
+gram3("\"],","Ġaccounts","[\"").
+gram3("Ġaccounts","[\"","bob").
+gram3("[\"","bob","\"],").
+gram3("\"],","Ġ","1").
+gram3("(a",".balance","Ġfor").
+gram3(".balance","Ġfor","Ġa").
+gram3("Ġfor","Ġa","Ġin").
+gram3("Ġa","Ġin","Ġaccounts").
+gram3("const","Ġcache","Ġ=").
+gram3("Ġcache","Ġ=","Ġnew").
+gram3("(fn",")","Ġ{Ċ").
+gram3("Ġ{Ċ","Ġ","Ġconst").
+gram3("Ġ","Ġreturn","Ġfunction").
+gram3("args",")","Ġ{Ċ").
+gram3("Ġ{Ċ","ĠĠĠ","Ġconst").
+gram3("Ġkey","Ġ=","Ġargs").
+gram3("ĠĠĠ","Ġif","Ġ(").
+gram3(".has","(key","))").
+gram3("))","Ġreturn","Ġcache").
+gram3("Ġreturn","Ġcache",".get").
+gram3(".get","(key",");Ċ").
+gram3("Ġconst","Ġresult","Ġ=").
+gram3("Ġresult","Ġ=","Ġawait").
+gram3("(this",",","Ġargs").
+gram3("ĠĠĠ","Ġcache","[args").
+gram3(".set","(key",",").
+gram3("(key",",","Ġresult").
+gram3(",","Ġresult",");Ċ").
+gram3("Ġreturn","Ġresult",";Ċ").
+gram3(";Ċ","Ġ","Ġ}ĊĊ").
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+.decl gram4(c0:symbol,c1:symbol,c2:symbol,t:symbol)
+.decl gram4_hit(inst:number,t:symbol)
+.decl gram4_any(inst:number)
+gram4("ĠAccount",":Ċ","ĠĠĠ","Ġid").
+gram4("Ġstr","Ċ","ĠĠĠ","Ġbalance").
+gram4("Ġbalance",":","Ġfloat","Ċ").
+gram4("(self",",","Ġamount","):Ċ").
+gram4("Ġamount",":","Ġfloat",")").
+gram4("Ġfloat",")","Ġ->","ĠNone").
+gram4("Ġ<=","Ġ","0",":Ċ").
+gram4("Ġreturn","Ġself",".balance","ĊĊ").
+gram4("Ġ>","Ġself",".balance",":Ċ").
+gram4("(src",":","ĠAccount",",").
+gram4("Ġdst",":","ĠAccount",",").
+gram4("ĠAccount",",","Ġamount",":").
+gram4("ĠNone",":Ċ","ĠĠĠ","Ġself").
+gram4("Ġdst",".de","posit","(amount").
+gram4("Ġint",")","Ġ->","Ġint").
+gram4("Ġint",":Ċ","ĠĠĠ","Ġreturn").
+gram4("1","Ċ","ĠĠĠ","Ġfor").
+gram4("Ġb","Ċ","ĠĠĠ","Ġreturn").
+gram4("Ċ","ĠĠĠ","Ġreturn","Ġa").
+gram4("name",":","ĠAccount","(name").
+gram4("alice","\",","Ġ\"","bob").
+gram4("bob","\",","Ġ\"","char").
+gram4("Ġacct","Ġin","Ġaccounts",":Ċ").
+gram4("Ġacct",".de","posit","(").
+gram4("5",".","0",")Ċ").
+gram4("Ġa","Ġin","Ġaccounts","))").
+gram4("(fn",")","Ġ{Ċ","Ġ").
+gram4("args",")","Ġ{Ċ","ĠĠĠ").
+gram4("Ġ{Ċ","ĠĠĠ","Ġconst","Ġcache").
+gram4("(args",");Ċ","ĠĠĠ","Ġif").
+gram4("(key",");Ċ","ĠĠĠ","Ġlet").
+gram4(");Ċ","ĠĠĠ","Ġconst","Ġvalue").
+gram4("Ġargs",");Ċ","ĠĠĠ","Ġreturn").
+gram4("Ġresult",");Ċ","ĠĠĠ","Ġreturn").
+gram4(");Ċ","ĠĠĠ","Ġreturn","Ġresult").
+gram4_hit(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, gram4(C0,C1,C2,T).
+gram4_any(I) :- gram4_hit(I,_).
+.decl gram5(c0:symbol,c1:symbol,c2:symbol,c3:symbol,t:symbol)
+.decl gram5_hit(inst:number,t:symbol)
+.decl gram5_any(inst:number)
+gram5("Ġfloat","Ġ=","Ġ","0",".").
+gram5("Ġ","0",".","0",",Ċ").
+gram5("0","ĊĊ","ĠĠĠ","Ġdef","Ġ__").
+gram5("Ġpositive","\")Ċ","ĠĠĠĠĠĠĠ","Ġself",".amount").
+gram5("Ġ+=","Ġamount","Ċ","ĠĠĠĠĠĠĠ","Ġprint").
+gram5(".balance","ĊĊ","ĠĠĠ","Ġdef","Ġdeposit").
+gram5("Ġfunds","\")Ċ","ĠĠĠĠĠĠĠ","Ġself",".balance").
+gram5("Ġ-=","Ġamount","Ċ","ĠĠĠĠĠĠĠ","Ġself").
+gram5("(src",":","ĠAccount",",","Ġdst").
+gram5("Ġdst",":","ĠAccount",",","Ġamount").
+gram5("ĠAccount",",","Ġamount",":","Ġu").
+gram5("Ġb","Ġ=","Ġ","0",",").
+gram5("Ġacct","Ġin","Ġaccounts",".values","():Ċ").
+gram5("0","0",".","0","0").
+gram5("0",".","0",")Ċ","``").
+gram5("5",".","0",")Ċ","ĠĠĠĠĠĠĠ").
+gram5("Ġa","Ġin","Ġaccounts",".values","()))").
+gram5_hit(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, gram5(C0,C1,C2,C3,T).
+gram5_any(I) :- gram5_hit(I,_).
+.decl gram6(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,t:symbol)
+.decl gram6_hit(inst:number,t:symbol)
+.decl gram6_any(inst:number)
+gram6("Ġdeposit","(self",",","Ġamount",":","Ġfloat").
+gram6("Ġpositive","\")Ċ","ĠĠĠĠĠĠĠ","Ġself",".balance","Ġ=").
+gram6("Ġwithdraw","(self",",","Ġamount",":","Ġint").
+gram6("Ġfunds","\")Ċ","ĠĠĠĠĠĠĠ","Ġself",".balance","Ġ-=").
+gram6("ĠĠĠ","Ġa",",","Ġb","Ġ=","Ġ").
+gram6("ĠĠĠĠĠĠĠ","Ġa",",","Ġb","Ġ=","Ġmap").
+gram6_hit(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, gram6(C0,C1,C2,C3,C4,T).
+gram6_any(I) :- gram6_hit(I,_).
+.decl gram7(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,t:symbol)
+.decl gram7_hit(inst:number,t:symbol)
+.decl gram7_any(inst:number)
+gram7("0",":Ċ","ĠĠĠĠĠĠĠĠĠĠĠ","Ġraise","ĠValueError","(\"","The").
+gram7(".balance",":Ċ","ĠĠĠĠĠĠĠĠĠĠĠ","Ġraise","ĠValueError","(\"","Ins").
+gram7_hit(I,T) :- mp(I,P), tok(I,P5,C0), tok(I,P4,C1), tok(I,P3,C2), tok(I,P2,C3), tok(I,P1,C4), tok(I,P,C5), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, gram7(C0,C1,C2,C3,C4,C5,T).
+gram7_any(I) :- gram7_hit(I,_).
+cdecide(I,T) :- gram2_hit(I,T), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram3_hit(I,T), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram4_hit(I,T), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram5_hit(I,T), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram6_hit(I,T), !gram7_any(I).
+cdecide(I,T) :- gram7_hit(I,T).
