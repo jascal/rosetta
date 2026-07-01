@@ -683,7 +683,16 @@ def _emit_full_symbols(ngram_rules, sym, admitted):
 
 
 def emit_full_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8):
-    """Wire ALL admitted circuits into circuits.full.dl (+ symbols twin), certify over natural ∪ circuit-behavior stimuli."""
+    """Wire ALL admitted circuits into circuits.full.dl (+ symbols twin), certify over natural ∪ circuit-behavior stimuli.
+
+    SCOPE OF THE CERTIFICATE (read this): the stated domain is the natural windows PLUS the circuit stimuli where (a) the
+    natural n-gram cover ABSTAINS and (b) the cover's routed decision == the model. Because routing is n-gram-FIRST, a
+    stimulus whose template suffix collides with a natural n-gram rule (e.g. transitivity ends in the ultra-common ' a',
+    for which the cover already has a rule) is EXCLUDED — the cover would return the n-gram's (possibly wrong) answer
+    there, and that instance is outside the certificate, not certified against. So the per-circuit `certified_instances`
+    count is domain-dependent (a circuit can recover+admit in the measurement yet contribute 0 here if its template
+    collides with the natural cover — e.g. transitivity on llama, modus_ponens on pythia). The clean per-circuit
+    CAPABILITY measure is the RECOVERY+ADMISSION run (`run()`), not this count."""
     from oracle import run_equiv
     name = os.path.basename(md.rstrip("/"))
     # 1. natural-corpus n-gram cover (the memoization backstop the circuits sit above)
