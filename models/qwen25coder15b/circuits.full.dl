@@ -1,0 +1,465 @@
+// rosetta · circuits.full.dl — natural-corpus n-gram cover + admitted STRUCTURAL circuits as souffle rules:
+//   copy/induction · once-appearing/name-mover (IOI + reasoning) · ordinal succession.
+// Routing: longest n-gram wins; else the circuits fire as OOD fallbacks (novel content the cover can't memorize).
+// Runtime: souffle only. tok(inst,pos,id) is provided by the includer (run.dl / equiv.dl).
+
+.decl mp(inst:number,m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number,out:number)
+
+.decl gram2(c0:number,t:number)
+.decl gram2_hit(inst:number,t:number)
+.decl gram2_any(inst:number)
+gram2(1499,8874).
+gram2(8855,1159).
+gram2(1159,821).
+gram2(31,691).
+gram2(691,1040).
+gram2(6372,25).
+gram2(607,198).
+gram2(8172,25).
+gram2(13,15).
+gram2(16539,1193).
+gram2(1193,11).
+gram2(2651,220).
+gram2(310,4828).
+gram2(4828,15402).
+gram2(15402,445).
+gram2(6045,1969).
+gram2(1969,387).
+gram2(387,264).
+gram2(6785,5130).
+gram2(1138,286).
+gram2(1421,3311).
+gram2(14798,1193).
+gram2(861,220).
+gram2(1330,26683).
+gram2(26683,10514).
+gram2(10514,1138).
+gram2(5982,3311).
+gram2(8317,34065).
+gram2(14705,11).
+gram2(2240,510).
+gram2(2286,284).
+gram2(18164,258).
+gram2(7633,741).
+gram2(2285,2724).
+gram2(3623,750).
+gram2(15801,1445).
+gram2(1445,982).
+gram2(716,304).
+gram2(2088,1445).
+gram2(982,286).
+gram2(488,293).
+gram2(26206,284).
+gram2(314,16).
+gram2(606,25).
+gram2(3153,8).
+gram2(829,304).
+gram2(4383,61686).
+gram2(497,330).
+gram2(6918,337).
+gram2(337,497).
+gram2(92010,262).
+gram2(1958,1196).
+gram2(3932,262).
+gram2(7,16).
+gram2(24188,7).
+gram2(91868,58).
+gram2(7914,9618).
+gram2(17,15).
+gram2(20,15).
+gram2(1350,445).
+gram2(19713,3575).
+gram2(2877,11).
+gram2(49962,2).
+gram2(322,220).
+gram2(43789,271).
+gram2(12914,43789).
+gram2(30323,322).
+gram2(1024,2750).
+gram2(501,5027).
+gram2(5027,1428).
+gram2(1428,1688).
+gram2(1688,75698).
+gram2(21438,551).
+gram2(551,24008).
+gram2(24008,8).
+gram2(729,18850).
+gram2(48967,2116).
+gram2(2116,8).
+gram2(1376,284).
+gram2(4718,10052).
+gram2(10052,6779).
+gram2(7356,317).
+gram2(317,262).
+gram2(320,2116).
+gram2(9360,1592).
+gram2(6858,4857).
+gram2(593,341).
+gram2(670,4857).
+gram2(5168,3679).
+gram2(13045,1394).
+gram2(1394,11).
+gram2(2827,317).
+gram2(980,4857).
+gram2(280,220).
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+.decl gram3(c0:number,c1:number,t:number)
+.decl gram3_hit(inst:number,t:number)
+.decl gram3_any(inst:number)
+gram3(1499,821,8855).
+gram3(1159,821,1040).
+gram3(821,1040,198).
+gram3(1040,271,31).
+gram3(691,1040,198).
+gram3(1040,198,1040).
+gram3(198,1040,7357).
+gram3(1040,8615,510).
+gram3(8615,510,262).
+gram3(6372,25,607).
+gram3(607,198,262).
+gram3(8172,25,2224).
+gram3(2224,284,220).
+gram3(284,220,15).
+gram3(15,271,262).
+gram3(271,262,707).
+gram3(1193,11,3311).
+gram3(2224,8,1464).
+gram3(1464,2224,510).
+gram3(2224,510,286).
+gram3(510,286,470).
+gram3(286,421,856).
+gram3(421,3311,2651).
+gram3(2651,220,15).
+gram3(15,510,310).
+gram3(1138,286,656).
+gram3(1421,3311,198).
+gram3(3311,198,286).
+gram3(286,470,656).
+gram3(470,656,39078).
+gram3(39078,271,262).
+gram3(861,656,39078).
+gram3(39078,510,310).
+gram3(5982,3311,198).
+gram3(39078,1406,1040).
+gram3(1406,750,1887).
+gram3(14705,25,8615).
+gram3(11,10648,25).
+gram3(10648,25,8615).
+gram3(2240,510,286).
+gram3(7633,33989,692).
+gram3(33989,340,262).
+gram3(340,262,3201).
+gram3(262,10648,2285).
+gram3(2724,33989,340).
+gram3(3623,750,14798).
+gram3(1445,25,526).
+gram3(25,526,8).
+gram3(526,8,1464).
+gram3(1464,526,510).
+gram3(526,510,262).
+gram3(262,264,284).
+gram3(264,11,293).
+gram3(11,293,284).
+gram3(15,11,220).
+gram3(11,220,16).
+gram3(220,16,198).
+gram3(16,198,65).
+gram3(262,369,600).
+gram3(716,304,2088).
+gram3(982,286,671).
+gram3(286,264,11).
+gram3(284,293,11).
+gram3(293,11,264).
+gram3(11,264,488).
+gram3(488,293,198).
+gram3(293,198,262).
+gram3(470,264,488).
+gram3(264,1406,750).
+gram3(26206,284,508).
+gram3(606,25,508).
+gram3(3153,8,369).
+gram3(8,369,829).
+gram3(829,304,5036).
+gram3(4383,63195,497).
+gram3(330,47086,497).
+gram3(1958,88567,304).
+gram3(88567,304,9618).
+gram3(3932,262,88567).
+gram3(262,88567,677).
+gram3(7,16,15).
+gram3(16,15,15).
+gram3(15,15,15).
+gram3(91868,1183,61686).
+gram3(1183,63195,7914).
+gram3(7914,9618,1183).
+gram3(9618,1183,47086).
+gram3(1183,47086,7914).
+gram3(7914,220,16).
+gram3(2877,39078,369).
+gram3(39078,369,264).
+gram3(369,264,304).
+gram3(264,304,9618).
+gram3(1024,6500,284).
+gram3(6500,284,501).
+gram3(24008,8,341).
+gram3(341,220,733).
+gram3(220,470,729).
+gram3(2116,8,341).
+gram3(341,262,733).
+gram3(1376,284,2827).
+gram3(262,421,320).
+gram3(6858,4857,593).
+gram3(593,470,6500).
+gram3(470,6500,670).
+gram3(670,4857,317).
+gram3(733,1102,284).
+gram3(1102,284,2535).
+gram3(1394,11,2827).
+gram3(262,6500,91638).
+gram3(980,4857,11).
+gram3(4857,11,1102).
+gram3(11,1102,317).
+gram3(470,1102,280).
+gram3(280,220,555).
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+.decl gram4(c0:number,c1:number,c2:number,t:number)
+.decl gram4_hit(inst:number,t:number)
+.decl gram4_any(inst:number)
+gram4(8615,510,262,877).
+gram4(607,198,262,8172).
+gram4(8172,25,2224,198).
+gram4(1193,11,3311,982).
+gram4(3311,25,2224,8).
+gram4(2224,8,1464,2240).
+gram4(2651,220,15,510).
+gram4(470,656,39078,271).
+gram4(861,656,39078,510).
+gram4(14705,25,8615,11).
+gram4(10648,25,8615,11).
+gram4(8615,11,3311,25).
+gram4(2240,510,262,656).
+gram4(10648,2285,2724,33989).
+gram4(526,8,1464,526).
+gram4(526,510,262,470).
+gram4(16,198,262,369).
+gram4(293,198,262,470).
+gram4(198,262,470,264).
+gram4(606,25,8615,3153).
+gram4(63195,497,330,47086).
+gram4(47086,497,330,1762).
+gram4(88567,304,9618,510).
+gram4(88567,2285,2724,7).
+gram4(20,13,15,340).
+gram4(264,304,9618,593).
+gram4(24008,8,341,220).
+gram4(2116,8,341,262).
+gram4(341,262,733,6500).
+gram4(7356,317,262,421).
+gram4(4857,317,262,1077).
+gram4(317,262,733,897).
+gram4(2827,317,262,470).
+gram4(1102,317,262,470).
+gram4(317,262,470,1102).
+gram4_hit(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, gram4(C0,C1,C2,T).
+gram4_any(I) :- gram4_hit(I,_).
+.decl gram5(c0:number,c1:number,c2:number,c3:number,t:number)
+.decl gram5_hit(inst:number,t:number)
+.decl gram5_any(inst:number)
+gram5(2224,284,220,15,13).
+gram5(220,15,13,15,345).
+gram5(15,271,262,707,1304).
+gram5(6785,1138,286,656,25276).
+gram5(1421,3311,198,286,1173).
+gram5(39078,271,262,707,16539).
+gram5(10514,1138,286,656,39078).
+gram5(5982,3311,198,286,656).
+gram5(14705,25,8615,11,10648).
+gram5(10648,25,8615,11,3311).
+gram5(8615,11,3311,25,575).
+gram5(293,284,220,15,11).
+gram5(88567,304,9618,10656,3932).
+gram5(15,15,13,15,15).
+gram5(15,13,15,340,13874).
+gram5(20,13,15,340,286).
+gram5(264,304,9618,10656,10131).
+gram5_hit(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, gram5(C0,C1,C2,C3,T).
+gram5_any(I) :- gram5_hit(I,_).
+.decl gram6(c0:number,c1:number,c2:number,c3:number,c4:number,t:number)
+.decl gram6_hit(inst:number,t:number)
+.decl gram6_any(inst:number)
+gram6(16539,1193,11,3311,25,2224).
+gram6(6785,1138,286,656,39078,284).
+gram6(14798,1193,11,3311,25,526).
+gram6(10514,1138,286,656,39078,5982).
+gram6(262,264,11,293,284,220).
+gram6(286,264,11,293,284,2415).
+gram6_hit(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, gram6(C0,C1,C2,C3,C4,T).
+gram6_any(I) :- gram6_hit(I,_).
+.decl gram7(c0:number,c1:number,c2:number,c3:number,c4:number,c5:number,t:number)
+.decl gram7_hit(inst:number,t:number)
+.decl gram7_any(inst:number)
+gram7(15,510,310,4828,15402,445,785).
+gram7(39078,510,310,4828,15402,445,15474).
+gram7_hit(I,T) :- mp(I,P), tok(I,P5,C0), tok(I,P4,C1), tok(I,P3,C2), tok(I,P2,C3), tok(I,P1,C4), tok(I,P,C5), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, gram7(C0,C1,C2,C3,C4,C5,T).
+gram7_any(I) :- gram7_hit(I,_).
+
+.decl ind1_pj(inst:number,j:number)
+ind1_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.
+.decl ind1_last(inst:number,j:number)
+ind1_last(I,J) :- ind1_pj(I,_), J = max JJ : { ind1_pj(I,JJ) }.
+.decl ind1(inst:number,out:number)
+ind1(I,OUT) :- ind1_last(I,J), tok(I,J+1,OUT).
+.decl ind1_any(inst:number)
+ind1_any(I) :- ind1(I,_).
+
+.decl entity(id:number)
+entity(1803).
+entity(2409).
+entity(2518).
+entity(2588).
+entity(2613).
+entity(2805).
+entity(3100).
+entity(3753).
+entity(3757).
+entity(4017).
+entity(4389).
+entity(4778).
+entity(4916).
+entity(5562).
+entity(6176).
+entity(6303).
+entity(6774).
+entity(6798).
+entity(6898).
+entity(6946).
+entity(7640).
+entity(7801).
+entity(8205).
+entity(8251).
+entity(8364).
+entity(8397).
+entity(8413).
+entity(8644).
+entity(8811).
+entity(9255).
+entity(10063).
+entity(10244).
+entity(10876).
+entity(11044).
+entity(11268).
+entity(11340).
+entity(11477).
+entity(11722).
+entity(11958).
+entity(15223).
+entity(15328).
+entity(16217).
+entity(17232).
+entity(17361).
+entity(17599).
+entity(23223).
+entity(29201).
+entity(29405).
+entity(29828).
+entity(31912).
+entity(34236).
+entity(34935).
+entity(35985).
+entity(36542).
+entity(39032).
+entity(39294).
+entity(42920).
+entity(44070).
+entity(53292).
+entity(59881).
+.decl ent_present(inst:number,id:number)
+ent_present(I,X) :- tok(I,_,X), entity(X).
+.decl ent_count(inst:number,id:number,n:number)
+ent_count(I,X,N) :- ent_present(I,X), N = count : { tok(I,P,X) }.
+.decl once_ent(inst:number,id:number)
+once_ent(I,X) :- ent_count(I,X,1).
+.decl once_ct(inst:number,n:number)
+once_ct(I,N) :- mp(I,_), N = count : { once_ent(I,X) }.
+.decl once_app(inst:number,out:number)
+once_app(I,OUT) :- once_ent(I,OUT), once_ct(I,1).
+.decl once_app_any(inst:number)
+once_app_any(I) :- once_app(I,_).
+
+.decl lord(id:number,ordv:number)
+lord(328,18).
+lord(350,19).
+lord(356,2).
+lord(358,8).
+lord(362,0).
+lord(386,12).
+lord(393,15).
+lord(422,3).
+lord(425,1).
+lord(431,17).
+lord(434,5).
+lord(444,11).
+lord(451,13).
+lord(467,22).
+lord(468,4).
+lord(472,7).
+lord(479,6).
+lord(506,14).
+lord(547,20).
+lord(619,9).
+lord(647,21).
+lord(730,10).
+lord(809,24).
+lord(1207,16).
+lord(1599,23).
+lord(1863,25).
+.decl lat(ordv:number,id:number)
+lat(0,362).
+lat(1,425).
+lat(2,356).
+lat(3,422).
+lat(4,468).
+lat(5,434).
+lat(6,479).
+lat(7,472).
+lat(8,358).
+lat(9,619).
+lat(10,730).
+lat(11,444).
+lat(12,386).
+lat(13,451).
+lat(14,506).
+lat(15,393).
+lat(16,1207).
+lat(17,431).
+lat(18,328).
+lat(19,350).
+lat(20,547).
+lat(21,647).
+lat(22,467).
+lat(23,1599).
+lat(24,809).
+lat(25,1863).
+.decl lpres(inst:number,ordv:number)
+lpres(I,O) :- tok(I,_,X), lord(X,O).
+.decl lmax(inst:number,ordv:number)
+lmax(I,O) :- lpres(I,_), O = max OO : { lpres(I,OO) }.
+.decl succ(inst:number,out:number)
+succ(I,OUT) :- lmax(I,O), Om1=O-1, lpres(I,Om1), Om2=O-2, lpres(I,Om2), Op1=O+1, lat(Op1,OUT).
+.decl succ_any(inst:number)
+succ_any(I) :- succ(I,_).
+
+// routing: longest n-gram > once-appearing > succession > induction > abstain
+cdecide(I,T) :- gram2_hit(I,T), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram3_hit(I,T), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram4_hit(I,T), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram5_hit(I,T), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- gram6_hit(I,T), !gram7_any(I).
+cdecide(I,T) :- gram7_hit(I,T).
+cdecide(I,T) :- once_app(I,T), !gram2_any(I), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I).
+cdecide(I,T) :- succ(I,T), !gram2_any(I), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I), !once_app_any(I).
+cdecide(I,T) :- ind1(I,T), !gram2_any(I), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I), !once_app_any(I), !succ_any(I).

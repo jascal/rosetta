@@ -138,3 +138,93 @@ genuinely irreducible. (The minimal-suffix cover in `minimize.py` is already tha
 A **learned, certified, per-model idiom library** — and across models, the idioms that *recur* are the universal circuits
 (the substrate-free algorithm); the ones that don't are model-specific. Holdout loss → 0 means the real algorithm is
 captured (substrate-transferable), not just a lookup table. `proved`/`empirical`/`open` tags gate every learned rule.
+
+## Exercise-then-Confirm — validating idioms on REAL models (`py/exercise_confirm.py`)
+
+The learner only ever produced a *surviving* idiom on synthetic threx. Two threats to validity explained the real-model
+zeros: (1) a silently-dead causal oracle scores every idiom `causal=0` — a FALSE "no idioms" indistinguishable from a
+genuinely n-gram model (now blocked by `assert_oracle_live`, which aborts unless the live oracle reproduces known refs);
+(2) a model's **natural corpus MASKS circuits it demonstrably has** — pythia-160m induction is causal **2%** on its own
+corpus but **84–90%** on novel-repeat stimuli (same model, same oracle). So we validate on stimuli that *exercise* the
+circuit, with two bars:
+
+- **RECOVERY** (`empirical`) — detect (argmax = the circuit's answer) **and** causal (perturb the operand → the output
+  follows), both ≥ τ = 0.8. (Induction additionally reports the exercise-vs-natural gap = the mask.)
+- **ADMISSION** (`empirical`) — on a held-out region of NOVEL content (novel to the n-gram *cover*, not necessarily to the
+  model's pretraining), the circuit RULE matches the model on strictly more instances than a minimal-suffix n-gram cover
+  built on the train split: **`admits ⇔ circuit_match > ngram_match`**, both scored against the model's argmax. No tuned
+  threshold — a strict count. Robust because on novel content the n-gram cover scores ~0 (for IOI it forms *zero* rules —
+  the answer isn't a function of any suffix), so deltas are large (+50…+100pp). Admission is a coarse "beats memorization"
+  screen; the emitted cover's real guarantee is the `equiv.dl` certificate below.
+
+### The unifying finding — reasoning-as-binding (`empirical`; certified over stated domains, **behavioral not mechanistic**)
+
+The 8 admittable families reduce to **three token-level mechanisms**: copy (induction), ordinal (succession), and
+**once-appearing / name-mover binding** (output = the entity appearing exactly once among the entity set). Six "reasoning"
+families — IOI, transitivity, modus ponens, temporal, spatial, syllogism — are all served by the ONE `once_app` rule.
+This is established **behaviorally**: a single Datalog rule reproduces the model's argmax on all six, PROVEN by `equiv.dl`
+(`nmiss=0` over the stated domain) — *not* by attention-head patching/ablation, and it is **not** a claim of mechanistic
+identity (rosetta certifies computed behavior, per the behavior≡algorithm thesis).
+
+Scope + counterexamples (why it is *not* "all binding"): it holds only where the model's answer IS the structurally-unique
+token. Binding tasks whose answer is **not** the once-appearing token do NOT reduce to it and stay recovery-only —
+**coreference** (both names appear once; bound by semantic gender) and **set-membership** (both names once; bound by a
+co-occurring item). Semantic recall (antonym, capital, analogy) has no structural rule at all. And within the six,
+instances where the model diverges from once-appearing (llama MP detect 80%, spatial 96%) are excluded from the
+certificate, not certified against.
+
+### Which circuits are admitted (emitted) vs recovery-only
+
+| class | families |
+|---|---|
+| **STRUCTURAL — admitted + emitted** (a token rule → cover rule) | induction · succession · IOI · transitivity · modus ponens · temporal · spatial · syllogism |
+| **SEMANTIC / RECALL — recovery-only** (no structural rule → not emittable) | coreference · antonym · capital · analogy · set · defeasible · causal |
+
+Capability (RECOVERY / ADMISSION) on the capable model **llama-3.2-1B** (detect/causal; Δ = admission vs n-gram):
+
+| family | detect | causal | admits | | family | detect | causal | admits |
+|---|---|---|---|---|---|---|---|---|
+| succession | 100% | 100% | +100pp | | capital | 100% | 100% | recall (N/A) |
+| IOI | 99% | 98% | +98pp | | analogy | 100% | 100% | recall (N/A) |
+| transitivity | 100% | 100% | +100pp | | antonym | 71% | 93% | N/A |
+| temporal | 100% | 100% | +98pp | | coreference | 73% | 22% | N/A (never confirmed) |
+| syllogism | 100% | 98% | +100pp | | defeasible | 60% | 80% | N/A |
+| spatial | 96% | 98% | +98pp | | set | 40% | 36% | N/A (hardest) |
+| modus ponens | 80% | 88% | +60pp | | causal do/see | ctrl 0% | interv 100% | N/A |
+
+(Induction measured on pythia-160m: causal 82/84/86% at L=1/2/3, +81pp admission; llama induction not run — the 1B novel-repeat sweep exceeds the serve-run budget.)
+
+### The emitted cover + its certificate (`proved` over a stated domain)
+
+`emit_full_cover` writes `circuits.full.dl` = the natural-corpus n-gram cover + the three mechanisms as OOD fallbacks
+(routing: **longest n-gram > once-appearing > succession > induction > abstain** — succession is above induction because a
+comma-separated run ends in a repeated punctuation token, on which the copy head fires spuriously) + a
+`circuits.full.symbols.dl` legible twin, then certifies via `equiv.dl` over natural ∪ circuit-behavior stimuli:
+
+| model | arch · scale | domain (inst) | verdict |
+|---|---|---|---|
+| pythia160m | NeoX · 160M | 693 | `nmiss=0 ∧ nuncov=0` — CERTIFIED |
+| llama32_1b | RoPE · 1B | 944 | CERTIFIED |
+| qwen25coder15b | Qwen · 1.5B | 1061 | CERTIFIED |
+
+Per-circuit **certified instances** in the emitted cover (`circuits.full.CERT.json`):
+
+| circuit | mech | pythia160m | llama32_1b | qwen25coder15b |
+|---|---|---|---|---|
+| induction | copy | 135 | 136 | 133 |
+| succession | ordinal | 13 | 23 | 23 |
+| IOI | once-app | 69 | 119 | 119 |
+| transitivity | once-app | 34 | **0 †** | 100 |
+| modus ponens | once-app | **0 †** | 70 | 100 |
+| temporal | once-app | 69 | 99 | 86 |
+| spatial | once-app | 67 | 97 | 100 |
+| syllogism | once-app | 6 | 100 | 100 |
+
+**DOMAIN CAVEAT (`open`).** The certificate is over the *stated domain* only. Because routing is n-gram-**first**, a
+stimulus whose template suffix collides with a natural n-gram rule is EXCLUDED — the cover would return the n-gram's
+(possibly wrong) answer there, and that instance is outside the certificate, not certified against. So `certified_instances`
+per circuit is **domain-dependent, not a capability measure**: the **†** cells are 0 not for lack of capability (both
+recover + admit in the measurement) but because the template suffix collides with the natural cover (transitivity ends in
+the ultra-common `' a'`; modus ponens' tail collides on pythia). A cover that routes these to the circuit rather than the
+pre-empting n-gram is achievable-**open** (precedence tension: routing circuits above n-grams risks spurious firing on
+natural text). The clean per-circuit *capability* signal is the RECOVERY/ADMISSION table above, not the certified count.

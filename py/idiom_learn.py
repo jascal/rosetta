@@ -27,6 +27,36 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MINCOV, MAXF = 4, 4
 
 
+class OracleUnavailable(RuntimeError):
+    """Raised when the causal oracle can't reproduce known refs — we refuse to emit a false 'no idioms'."""
+
+
+def assert_oracle_live(decide_fn, insts, refs, idxs, label="", nprobe=8, thresh=0.75):
+    """Preflight guard for the CAUSAL phase. Confirmation compares decide_fn(perturbed) against a table; if the
+    oracle is dead/misconfigured it returns None for every call, so every idiom scores causal=0 and the run
+    SILENTLY reports 'no idioms' — byte-indistinguishable from a genuinely n-gram model. This probes the live
+    oracle on instances whose refs are already known (from cache) and ABORTS LOUDLY unless it reproduces them,
+    so a reported zero means the model, not the plumbing. (emit-only paths take pre-confirmed idioms and need
+    no oracle, so they are not guarded here.)"""
+    tag = f" · {label}" if label else ""
+    known = [i for i in idxs if refs[i] is not None][:nprobe]
+    if not known:
+        raise OracleUnavailable(
+            f"[oracle preflight{tag}] no known refs to probe — the refs oracle produced nothing, so causal "
+            f"confirmation cannot run. Set FIELDRUN_BIN=<fieldrun binary>, or bring up `fieldrun --serve <port>` "
+            f"and export FIELDRUN_SERVE=<port>. Refusing to run (would emit a false 'no idioms').")
+    got = [decide_fn(insts[i]) for i in known]
+    agree = sum(g is not None and g == refs[i] for g, i in zip(got, known))
+    if agree < thresh * len(known):
+        nnone = sum(g is None for g in got)
+        raise OracleUnavailable(
+            f"[oracle preflight{tag}] CAUSAL ORACLE NOT LIVE: reproduces only {agree}/{len(known)} known refs "
+            f"({nnone} returned no answer). Every idiom would be silently rejected (causal=0) → a FALSE 'no idioms'. "
+            f"Refusing to run. Fix the oracle: FIELDRUN_BIN=<binary>, or `fieldrun --serve <port>` + FIELDRUN_SERVE=<port>.")
+    print(f"[oracle preflight{tag}] live — reproduced {agree}/{len(known)} known refs; causal confirmation trustworthy.")
+    return agree, len(known)
+
+
 def tableof(insts, refs, sub, k):
     vm = defaultdict(set)
     for i in sub:
@@ -541,6 +571,7 @@ def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
     """The reframed learner: learn every family on TRAIN (causal-soundness = the gate), then GREEDILY admit the family
     with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
     IDIOM_LEARNER objective). Reports the residual floor (what no family captures = the model, not us)."""
+    assert_oracle_live(decide_fn, insts, refs, idxs, label="select_cover")   # a dead oracle → false 'no idioms'
     import random as _r
     sh = idxs[:]; _r.Random(0).shuffle(sh)
     cut = int(len(sh) * (1 - hold))
@@ -687,6 +718,7 @@ def main():
         select_cover(insts, refs, idxs, w, decide_fn, fill=fill, s=s)
         return
 
+    assert_oracle_live(decide_fn, insts, refs, idxs, label=name)   # abort loudly if causal can't reproduce known refs
     gates = learn_gates(insts, refs, idxs, w, decide_fn, max_confirm=(cb or 40), ntest=(6 if cb else 14), fill=fill)
     real = [b for b in gates if not b["viol"] and b["causal"] >= 0.8]
     print(f"frame-conditioned GATEs (select family) — {len(real)} REAL (faithful + causally confirmed) of {len(gates)} mined:\n")

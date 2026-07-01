@@ -1,0 +1,314 @@
+// rosetta · circuits.full.symbols.dl — legible twin (token STRINGS) of the n-gram cover; inherits the certificate.
+// NOTE: this model also carries STRUCTURAL circuits (induction, once_appearing, succession) — computations over token identity/
+// order/ordinal, not token lookups, so they are not representable as symbol facts; see circuits.full.dl.
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+.decl gram2(c0:symbol,t:symbol)
+.decl gram2_hit(inst:number,t:symbol)
+.decl gram2_any(inst:number)
+gram2("Ġpopulation","Ġof").
+gram2("ĠA","Ġis").
+gram2("100","0").
+gram2("200","0").
+gram2("10","Ġtimes").
+gram2("Ġtimes","Ġthe").
+gram2("ĠTo","h").
+gram2("ĠIn","Ġthe").
+gram2("19","th").
+gram2("th","Ġcentury").
+gram2("Ġcentury",",").
+gram2("ĠUnited","ĠStates").
+gram2("Ġnation","Ġof").
+gram2("ĠThis","Ġis").
+gram2("Ġsaying",",").
+gram2("ĠWh","oso").
+gram2("oso","ever").
+gram2("ever","Ġshall").
+gram2("Ġshall","Ġnot").
+gram2("Ġhe","Ġhad").
+gram2("Ġhad","Ġgone").
+gram2("Ġsal","uted").
+gram2("uted","Ġthem").
+gram2("ĠJesus","Ġsaid").
+gram2("Ġsaid",",").
+gram2("Ġunto","Ġhim").
+gram2("ĠGo","Ġthy").
+gram2(";","Ġthy").
+gram2("Ġfaith","Ġhath").
+gram2("Ġhath","Ġmade").
+gram2("Ġmade","Ġthee").
+gram2("Ġwhole",".").
+gram2("Ġgone",",").
+gram2("Ġforth",",").
+gram2("Ġinto","Ġthe").
+gram2("Ġthere","Ġwas").
+gram2("Ġcame","Ġa").
+gram2("ĠAn","an").
+gram2("So",",").
+gram2("C","Ġis").
+gram2("Ġonly","Ġone").
+gram2("Ġsame","Ġis").
+gram2("Ġthing","Ġhappened").
+gram2("Ġhappening","Ġin").
+gram2("Ġin","Ġthe").
+gram2("Ġwhere","Ġthe").
+gram2("Ġnumber","Ġof").
+gram2("Ġwho","Ġhave").
+gram2("Ġcovered","Ġby").
+gram2("Ġby","Ġthe").
+gram2("Ġhealth","Ġinsurance").
+gram2("Ġinsurance",".").
+gram2("Ġgrowing",".").
+gram2("Ġuninsured","ĠAmericans").
+gram2("Ġnow","Ġ").
+gram2("46",".").
+gram2("ĠHowever",",").
+gram2("Ġlargest","Ġand").
+gram2("Ġthree",",").
+gram2("Ġdisappointment",".").
+gram2("Ġstory","Ġis").
+gram2("Ġmess",",").
+gram2("Ġacting","Ġis").
+gram2("Ġup","Ġto").
+gram2("Ġpar",".").
+gram2("Ġnew","Ġinformation").
+gram2("Ġreleased",",").
+gram2("Ġbe","Ġreleased").
+gram2("Ġsold","Ġin").
+gram2("Ġbecause","Ġthey").
+gram2("Ġcapital","Ġgoods").
+gram2("capital","ĠIt").
+gram2("Ġcity","Ċ").
+gram2("Ġland","Ġof").
+gram2("ĠPhil","ist").
+gram2("ist","ines").
+gram2("ines",",").
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+.decl gram3(c0:symbol,c1:symbol,t:symbol)
+.decl gram3_hit(inst:number,t:symbol)
+.decl gram3_any(inst:number)
+gram3("Ġthe","Ġworld","ĠB").
+gram3("ĠB",".","ĠThe").
+gram3("ĠA","Ġis","Ġ").
+gram3("100","Ġmillion",",").
+gram3("Ġmillion","Ġand","Ġworld").
+gram3("ĠB","Ġis","Ġ").
+gram3("200","Ġmillion",".").
+gram3("Ġmillion",".","ĠThe").
+gram3("Ġtimes","Ġthe","Ġsize").
+gram3("Ġpopulation","<|begin_of_text|>","Question").
+gram3("ĠTo","Ġpopular","ize").
+gram3("ĠIn","Ġthe","ĠUnited").
+gram3("Ġthe","Ġ","201").
+gram3("Ġcentury",",","Ġthe").
+gram3("Ġwas","Ġa","Ġcountry").
+gram3("Ġnation","Ġof","Ġimmigrants").
+gram3("Ġimmigrants",".","ĠThe").
+gram3("Ġwas","<|begin_of_text|>","Question").
+gram3("ĠThis","ĠWhen","Ġthe").
+gram3("ĠWhen","<|begin_of_text|>","def").
+gram3("ĠBut","Ġcommand","Ġline").
+gram3("Ġcommand","Ġway","Ġto").
+gram3("Ġway",",","Ġand").
+gram3("Ġand","Ġcommand","Ġthe").
+gram3("Ġcommand","Ġthe","Ġpeople").
+gram3("Ġthe","Ġpeople","Ġto").
+gram3("Ġpeople",",","Ġand").
+gram3("Ġsaying",",","ĠâĢľ").
+gram3("Ġshall","Ġsalute","Ġthee").
+gram3("Ġsalute","Ġthee","Ġshall").
+gram3("Ġthee",",","Ġsay").
+gram3(",","Ġsalute","Ġme").
+gram3("Ġsalute","Ġhim","Ġthat").
+gram3("Ġhim",".","ĠAnd").
+gram3("uted","Ġhim",",").
+gram3("Ġunto","Ġhim",",").
+gram3("ĠGo","Ġthy","Ġway").
+gram3("Ġthy","Ġway",";").
+gram3(";","Ġthy","Ġfaith").
+gram3("Ġmade","Ġthee","Ġfree").
+gram3("Ġwhole",".","Ġ").
+gram3("Ġhe","Ġwas","Ġcome").
+gram3("Ġinto","Ġthe","Ġwilderness").
+gram3("Ġthe","Ġway","Ġof").
+gram3("Ġcame","Ġone","Ġof").
+gram3("Ġone","<|begin_of_text|>","Question").
+gram3("C","Ġis","Ġa").
+gram3("Ġnot","Ġthe","Ġonly").
+gram3("Ġonly","Ġone",".").
+gram3("Ġone",".","ĠThe").
+gram3("Ġthing","Ġis","Ġtrue").
+gram3("ĠUS",",","Ġwhere").
+gram3("Ġwhere","Ġthe","Ġgovernment").
+gram3("Ġnumber","Ġof","Ġpeople").
+gram3("Ġare","Ġnot","Ġin").
+gram3("Ġinsurance","Ġis","Ġa").
+gram3("Ġgrowing",".","ĠThe").
+gram3("Ġuninsured","Ġpeople","Ġin").
+gram3("ĠUS","Ġis","Ġ").
+gram3("Ġnow","Ġ","50").
+gram3("46","Ġmillion",",").
+gram3("Ġmillion",",","Ġand").
+gram3("Ġby","<|begin_of_text|>","Ċ").
+gram3("<|begin_of_text|>","Ġmovie","Ġtheaters").
+gram3("Ġlargest","Ġof","Ġthe").
+gram3("Ġthree",",","Ġthe").
+gram3("Ġthe","Ġmovie","Ġis").
+gram3("Ġmovie","Ġis","Ġa").
+gram3("Ġis","Ġa","Ġbit").
+gram3("Ġbit","Ġof","Ġa").
+gram3("Ġof","Ġa","Ġmess").
+gram3("Ġdisappointment",".","ĠThe").
+gram3("Ġstory","Ġis","Ġa").
+gram3("Ġmess",",","Ġbut").
+gram3("Ġacting","Ġis","Ġso").
+gram3("Ġup","Ġto","Ġpar").
+gram3("Ġpar",".","ĠThe").
+gram3("ĠThe","Ġmovie","Ġis").
+gram3("Ġof","<|begin_of_text|>","Question").
+gram3("<|begin_of_text|>","Ġpopular","Ġculture").
+gram3("Ġpopular","ĠWhen","Ġthe").
+gram3("Ġnew","Ġproducts","Ġare").
+gram3("Ġreleased",",","Ġthe").
+gram3("Ġfirst","Ġto","Ġbe").
+gram3("Ġsold","Ġare","Ġthe").
+gram3("Ġare","Ġthe","Ġmost").
+gram3("Ġmost","Ġpopular",".").
+gram3("Ġpopular",".","ĠThe").
+gram3("ĠThis","Ġis","Ġbecause").
+gram3("Ġbecause","Ġthe","Ġmajority").
+gram3("Ġfirst","Ġproducts","Ġwere").
+gram3("Ġthe","<|begin_of_text|>","Question").
+gram3("Ġcapital","ĠIt","Ġis").
+gram3("capital","ĠIt","Ġcountry").
+gram3("ĠIt","<|begin_of_text|>","def").
+gram3("<|begin_of_text|>","ĠAnd","orra").
+gram3("Ġland","Ġof","Ġthe").
+gram3("ines",",","Ġand").
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+.decl gram4(c0:symbol,c1:symbol,c2:symbol,t:symbol)
+.decl gram4_hit(inst:number,t:symbol)
+.decl gram4_any(inst:number)
+gram4("Ġcountry","Ġin","Ġthe","Ġworld").
+gram4("Ġthe","Ġworld","ĠB","Ġis").
+gram4("ĠA","Ġis","Ġ","100").
+gram4("Ġmillion","Ġand","Ġthe","Ġpopulation").
+gram4("ĠB","Ġis","Ġ","10").
+gram4("Ġmillion",".","ĠThe","Ġpopulation").
+gram4("Ġcentury",",","Ġthe","Ġterm").
+gram4("Ġthe","ĠUnited","ĠStates","Ġwas").
+gram4("Ġimmigrants",".","ĠThe","ĠUnited").
+gram4("ĠThe","ĠUnited","ĠStates","Ġis").
+gram4("ĠThis","ĠWhen","ĠWhen","Ġthe").
+gram4("ĠWhen","<|begin_of_text|>","ĠBut","ĠNot").
+gram4("Ġway",",","Ġand","Ġthe").
+gram4("Ġhim",".","ĠAnd","Ġthe").
+gram4("uted","Ġhim",",","Ġhe").
+gram4("Ġunto","Ġhim",",","ĠI").
+gram4("Ġwhole",".","ĠAnd","ĠI").
+gram4("Ġone","<|begin_of_text|>","ĠBut","Ġthe").
+gram4("C","Ġis","Ġnot","Ġa").
+gram4("Ġone",".","ĠThe","Ġother").
+gram4("Ġhappening","Ġin","Ġthe","ĠUnited").
+gram4("Ġgrowing",".","ĠThe","Ġnumber").
+gram4("Ġpeople","Ġin","Ġthe","ĠUnited").
+gram4("Ġmillion",",","Ġand","Ġthe").
+gram4("Ġlargest","Ġof","Ġthe","Ġthree").
+gram4("Ġthree",",","Ġthe","Ġ").
+gram4("Ġdisappointment",".","ĠThe","Ġgame").
+gram4("Ġmess",",","Ġand","ĠI").
+gram4("Ġacting","Ġis","Ġnot","Ġup").
+gram4("Ġpar",".","ĠThe","Ġactor").
+gram4("Ġnew","Ġproducts","Ġare","Ġreleased").
+gram4("Ġreleased",",","Ġthe","Ġcompany").
+gram4(",","Ġthe","Ġfirst","Ġto").
+gram4("Ġbecause","Ġthe","Ġfirst","Ġtwo").
+gram4("Ġfirst","Ġproducts","Ġare","Ġthe").
+gram4("Ġcapital","ĠIt","Ġcountry",",").
+gram4("capital","ĠIt","Ġcountry","Ċ").
+gram4("Ġcity","Ġin","Ġthe","ĠUnited").
+gram4(",","Ġin","Ġthe","Ġdays").
+gram4_hit(I,T) :- mp(I,P), tok(I,P2,C0), tok(I,P1,C1), tok(I,P,C2), P1=P-1, P2=P-2, gram4(C0,C1,C2,T).
+gram4_any(I) :- gram4_hit(I,_).
+.decl gram5(c0:symbol,c1:symbol,c2:symbol,c3:symbol,t:symbol)
+.decl gram5_hit(inst:number,t:symbol)
+.decl gram5_any(inst:number)
+gram5("Ġand","Ġthe","Ġpopulation","Ġof","Ġthe").
+gram5("Ġtimes","Ġthe","Ġpopulation","Ġof","ĠB").
+gram5("Ġthe","ĠUnited","ĠStates","Ġwas","Ġthe").
+gram5("ĠThe","ĠUnited","ĠStates","Ġwas","Ġfounded").
+gram5("ĠThis","ĠWhen","ĠWhen","ĠWhen","ĠWhen").
+gram5("Ġhim",".","ĠAnd","Ġwhen","Ġhe").
+gram5("Ġwhole",".","ĠAnd","Ġwhen","Ġthou").
+gram5("Ġhappening","Ġin","Ġthe","ĠUS",".").
+gram5("Ġpeople","Ġin","Ġthe","ĠUS","Ġis").
+gram5("Ġmillion",",","Ġand","Ġthe","Ġnumber").
+gram5("Ġstory","Ġis","Ġa","Ġbit","Ġtoo").
+gram5("Ġmess",",","Ġand","Ġthe","Ġonly").
+gram5("Ġsold","Ġare","Ġthe","Ġmost","Ġlikely").
+gram5("Ġproducts","Ġare","Ġthe","Ġmost","Ġimportant").
+gram5("Ġcapital","ĠIt","Ġcountry","Ċ","The").
+gram5("capital","ĠIt","Ġcountry","Ċ","capital").
+gram5_hit(I,T) :- mp(I,P), tok(I,P3,C0), tok(I,P2,C1), tok(I,P1,C2), tok(I,P,C3), P1=P-1, P2=P-2, P3=P-3, gram5(C0,C1,C2,C3,T).
+gram5_any(I) :- gram5_hit(I,_).
+.decl gram6(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,t:symbol)
+.decl gram6_hit(inst:number,t:symbol)
+.decl gram6_any(inst:number)
+gram6("Ġthe","Ġworld","ĠB",".","ĠThe","Ġcountry").
+gram6("Ġand","Ġthe","Ġpopulation","Ġof","Ġworld","Ġis").
+gram6("Ġmillion",".","ĠThe","Ġpopulation","Ġof","Ġthe").
+gram6("Ġtimes","Ġthe","Ġpopulation","Ġof","Ġworld","'s").
+gram6("Ġof","Ġworld","ĠB",".","ĠThe","Ġpopulation").
+gram6("ĠThis","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen").
+gram6("Ġwhere","Ġthe","Ġnumber","Ġof","Ġpeople","Ġwith").
+gram6("Ġand","Ġthe","Ġnumber","Ġof","Ġpeople","Ġwho").
+gram6("Ġthe","Ġmovie","Ġis","Ġa","Ġbit","Ġof").
+gram6("ĠThe","Ġmovie","Ġis","Ġa","Ġbit","Ġslow").
+gram6_hit(I,T) :- mp(I,P), tok(I,P4,C0), tok(I,P3,C1), tok(I,P2,C2), tok(I,P1,C3), tok(I,P,C4), P1=P-1, P2=P-2, P3=P-3, P4=P-4, gram6(C0,C1,C2,C3,C4,T).
+gram6_any(I) :- gram6_hit(I,_).
+.decl gram7(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,t:symbol)
+.decl gram7_hit(inst:number,t:symbol)
+.decl gram7_any(inst:number)
+gram7("ĠB",".","ĠThe","Ġpopulation","Ġof","Ġworld","ĠB").
+gram7("Ġand","Ġthe","Ġpopulation","Ġof","Ġworld","ĠB","Ġis").
+gram7("Ġmillion",".","ĠThe","Ġpopulation","Ġof","Ġworld","Ġis").
+gram7("Ġtimes","Ġthe","Ġpopulation","Ġof","Ġworld","ĠB",".").
+gram7("ĠThis","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen").
+gram7("Ġcity","Ġin","Ġthe","Ġland","Ġof","Ġthe","ĠPhil").
+gram7(",","Ġin","Ġthe","Ġland","Ġof","Ġthe","ĠAm").
+gram7_hit(I,T) :- mp(I,P), tok(I,P5,C0), tok(I,P4,C1), tok(I,P3,C2), tok(I,P2,C3), tok(I,P1,C4), tok(I,P,C5), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, gram7(C0,C1,C2,C3,C4,C5,T).
+gram7_any(I) :- gram7_hit(I,_).
+.decl gram8(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,c6:symbol,t:symbol)
+.decl gram8_hit(inst:number,t:symbol)
+.decl gram8_any(inst:number)
+gram8("Ġthe","Ġworld","ĠB",".","ĠThe","Ġpopulation","Ġof","Ġthe").
+gram8("Ġof","Ġworld","ĠB",".","ĠThe","Ġpopulation","Ġof","Ġworld").
+gram8("ĠThis","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen").
+gram8("Ġwhere","Ġthe","Ġnumber","Ġof","Ġpeople","Ġwho","Ġare","Ġnot").
+gram8("Ġand","Ġthe","Ġnumber","Ġof","Ġpeople","Ġwho","Ġare","Ġin").
+gram8_hit(I,T) :- mp(I,P), tok(I,P6,C0), tok(I,P5,C1), tok(I,P4,C2), tok(I,P3,C3), tok(I,P2,C4), tok(I,P1,C5), tok(I,P,C6), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, gram8(C0,C1,C2,C3,C4,C5,C6,T).
+gram8_any(I) :- gram8_hit(I,_).
+.decl gram9(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,c6:symbol,c7:symbol,t:symbol)
+.decl gram9_hit(inst:number,t:symbol)
+.decl gram9_any(inst:number)
+gram9("Ġthe","ĠUnited","ĠStates","Ġwas","Ġa","Ġnation","Ġof","Ġimmigrants",".").
+gram9("ĠThe","ĠUnited","ĠStates","Ġwas","Ġa","Ġnation","Ġof","Ġimmigrants",",").
+gram9("ĠThis","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen").
+gram9("ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","ĠWhen","Ġthe").
+gram9_hit(I,T) :- mp(I,P), tok(I,P7,C0), tok(I,P6,C1), tok(I,P5,C2), tok(I,P4,C3), tok(I,P3,C4), tok(I,P2,C5), tok(I,P1,C6), tok(I,P,C7), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, P7=P-7, gram9(C0,C1,C2,C3,C4,C5,C6,C7,T).
+gram9_any(I) :- gram9_hit(I,_).
+cdecide(I,T) :- gram2_hit(I,T), !gram3_any(I), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram3_hit(I,T), !gram4_any(I), !gram5_any(I), !gram6_any(I), !gram7_any(I), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram4_hit(I,T), !gram5_any(I), !gram6_any(I), !gram7_any(I), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram5_hit(I,T), !gram6_any(I), !gram7_any(I), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram6_hit(I,T), !gram7_any(I), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram7_hit(I,T), !gram8_any(I), !gram9_any(I).
+cdecide(I,T) :- gram8_hit(I,T), !gram9_any(I).
+cdecide(I,T) :- gram9_hit(I,T).
