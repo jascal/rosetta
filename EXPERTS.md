@@ -175,11 +175,21 @@ while fully preserving the FAQ (verbatim 10/10, paraphrase 11/12). τ≈0.40 tra
 answers for honest abstention — the bounded-expert bias — and is the recommended default for a distilled-FAQ expert
 (the analogue of the riscv cos/margin calibration; the server default lives in sgiandubh).
 
-**Caveats (state the domain):** (1) the document baseline here is a **raw PDF-to-text dump** with no section/citation
-handles — a *weak* retrieval baseline; the fair "model tier vs a **cleanly-adapted** OLP corpus (section handles +
-definitional passages, like riscv's prose adapter)" comparison is **untested** and is the natural follow-up, so the
-claim is "model tier > raw-dump retrieval," not "> document tier in general." (2) `topical` is a lenient any-key proxy
-corrected by manual reads above. (3) One model, one corpus, 50 rows — `empirical` over exactly that.
+**The fair-baseline follow-up (P1-b) — the win is robust.** The document tier above was the **raw** OLP dump, so
+"model tier > raw-dump retrieval" left open whether a *cleanly-adapted* corpus would close the gap. Tested it:
+[`clean_kb.py`](./examples/logic/clean_kb.py) filters TOC/boilerplate and attaches `[OLP §N.N]` section handles (1200
+→ 1048 citable passages), and [`run_clean_baseline.py`](./examples/logic/run_clean_baseline.py) re-grades curated vs
+raw-doc vs clean-doc ([`scorecard_clean.json`](./examples/logic/scorecard_clean.json)). The clean corpus fixes the
+*citation* problem — under `--require-citation` it now answers **25/34** (raw answered 0/34) — but **not** the
+*relevance* problem: it is on-target only **7/25** and still leaks **3/16**, versus curated's **29/31** on-target and
+**0** leak. So the document tier's failure was never just missing citation handles — passage-retrieval (GloVe cosine +
+lexical coverage) returns a passage that *mentions the query words*, not one that *answers the question*, for these
+"what is X" definitional queries. **The model-distilled tier earns its place even against a cleaned, citeable document
+baseline.** (Residual axis: a stronger retriever — BM25 / sentence-embeddings / a reranker — is untested; the claim is
+bounded to sgiandubh's as-shipped retrieval.)
+
+**Caveats (state the domain):** (1) `topical` is a lenient any-key proxy corrected by manual reads above. (2) One
+model (gemma-4-e4b-it), one corpus (OLP), 50 rows — `empirical` over exactly that.
 
 ## Test-set construction (decided)
 
