@@ -40,3 +40,20 @@ def test_serve_package_consumes_tiered_package(tmp_path):
     r2 = serve([13, 99, 98], idioms, ngrams, 8)                  # residual → GATED/observational n-gram
     assert r2 and r2["answer"] == 50 and r2["tier"] == "gated" and r2["basis"] == "observational"
     assert serve([7, 7, 7], idioms, ngrams, 8) is None           # nothing fires → ABSTAIN
+
+
+def test_induction_circuit_wired_into_package(tmp_path):
+    # a causally-confirmed induction rel → a first-class `induction` manifest rule, served OOD (after n-grams).
+    from serve_package import load_package, serve
+    insts = [[5, 9, 5]]                                          # [… A B … A] → B: last tok 5, prev-occ successor = 9
+    refs = [9]
+    rels = [{"L": 1, "causal": 1.0, "obs": 1.0}]
+    _, man = emit_expert_package(str(tmp_path), insts, refs, [0], [], [], rels, 8, "test", minsupp=3, mindet=1.0)
+    m = json.load(open(man))
+    assert m["induction_ood"] == 1 and m["induction_cover"] == 1   # induction counted, not a silent OOD limb
+    ir = next(r for r in m["rules"] if r["kind"] == "induction")
+    assert ir["tier"] == "trusted" and ir["basis"] == "causal" and ir["routing"] == "ood" and ir["L"] == 1
+    idioms, ngrams, _ = load_package(man)
+    r = serve([5, 9, 5], idioms, ngrams, 8)                       # induction fires (no n-gram at support 1) → copies 9
+    assert r and r["answer"] == 9 and r["tier"] == "trusted" and r["circuit"] == "induction"
+    assert serve([1, 2, 3], idioms, ngrams, 8) is None           # no recurring suffix → induction can't fire → ABSTAIN

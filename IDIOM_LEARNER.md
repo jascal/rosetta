@@ -228,3 +228,55 @@ recover + admit in the measurement) but because the template suffix collides wit
 the ultra-common `' a'`; modus ponens' tail collides on pythia). A cover that routes these to the circuit rather than the
 pre-empting n-gram is achievable-**open** (precedence tension: routing circuits above n-grams risks spurious firing on
 natural text). The clean per-circuit *capability* signal is the RECOVERY/ADMISSION table above, not the certified count.
+
+## Induction wired into an EXPERT PACKAGE (`py/induction_package.py`) · `empirical`
+
+The work above emits induction into the souffle `circuits.dl` (the minimization arm). The bounded-**expert** builder
+(`emit_expert_package`, the rosetta→sgiandubh serving path) was a different story: it counted only gate/compose idioms
+as the trusted tier and dropped induction into the souffle twin as an **uncounted OOD limb** — so the served
+`manifest.json` never carried it. That was the "induction never emitted to the package" gap. Now `emit_expert_package`
+counts induction coverage and emits a first-class `induction` manifest rule, and `serve_package` serves it host-side
+(routed OOD, after n-grams: `[… A B … A] → B`, copy the successor of the current suffix's previous occurrence).
+
+Measured on **pythia-160m** (resident `fieldrun --serve` oracle; 30 train + 30 **disjoint** held-out novel-repeat
+sequences S+S, seqlen 20):
+
+| set | gate/compose | n-grams | induction (causal) | package coverage | precision | abstain |
+|---|---|---|---|---|---|---|
+| train | 0 | 0 (novel tokens) | L=2 (80%) + L=3 (91%) admitted | — | — | — |
+| **held-out · WITH induction** | 0 | 0 | 2 rules | **94% (510/540)** | **84%** | 6% |
+| **held-out · n-gram only** | 0 | 0 | — | **0%** | — | **100%** |
+
+So on held-out novel tokens — where the n-gram cache has **no support** — the induction rule is the *entire*
+load-bearing tier and it **generalizes** (94% vs 0%). Precision 84% tracks the model's own induction consistency
+(obs ~82%), not a rule defect: the served rule is as faithful as the head. Manifest: `trusted_idioms=0,
+induction_ood=2` — 0 gate/compose idioms (the natural-corpus finding restated) but induction now carried and served.
+
+This is the **circuit-tier mirror** of the logic-expert answer-tier ablation ([`EXPERTS.md`](./EXPERTS.md)): on a
+lookup domain the model's *circuit* tier is empty (0 idioms) and the distilled *answer* tier carries the expert; on
+induction stimuli the *circuit* tier is everything (94% vs 0%) and there is no answer tier. Reproduce (needs the
+bundle): `.venv/bin/python py/induction_package.py models/pythia160m/bundle 30 20`.
+
+**Which tier is load-bearing, by regime** — the combined #27 (answer tier) + #28 (circuit tier) picture:
+
+| domain regime | reusable n-grams / gate-compose | induction circuit | load-bearing served tier |
+|---|---|---|---|
+| **lookup** (logic / OLP, [`EXPERTS.md`](./EXPERTS.md)) | present (a memorized FAQ) | absent (0 idioms) | distilled **ANSWER** tier |
+| **inductive** (novel-repeat, this section) | absent (no support on novel tokens) | present (94% held-out) | **CIRCUIT** tier |
+
+The two forms of model-derived expertise are **complementary**, and each dominates exactly where the other is empty.
+
+**Detection & L-precedence** (for readers of `serve_package`): an induction rule of order L fires when the current
+L-token suffix recurs earlier in the context; it copies the successor of the **most recent** earlier occurrence
+(`max j`). When several L's are admitted, the runtime tries the **longest first** (a longer repeated context is a
+more specific, higher-confidence match). On clean single-repeat stimuli every admitted L points to the same successor,
+so precedence doesn't move the pythia-160m numbers; it matters on general text with multiple/overlapping repeats.
+The induction pass is reached **only after an n-gram miss**, so it is free on the hot path (and skipped entirely by a
+package with no induction rules).
+
+**Generalization (`open`).** The wiring pattern — *count the circuit's coverage → emit a
+`{tier:trusted, basis:causal, routing:ood}` manifest rule → serve it after the n-gram cache* — is generic, not
+induction-specific. The souffle twin already routes the other exercise-then-confirm families (succession, the
+once-appearing / name-mover binding rule) OOD the same way; feeding those confirmed families into
+`emit_expert_package` (today it takes only gates/composes/rels) would register them host-side by the identical
+mechanism. Induction is simply the first OOD circuit across the manifest boundary.

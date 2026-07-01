@@ -551,18 +551,40 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
             ngram_rules[s] = o
             man.append({"id": rid, "kind": "ngram", "tier": "gated", "basis": "observational", "ctx": list(s),
                         "out": o, "support": sup, "determinism": round(det, 3), "cite": cite}); rid += 1
+    ng_covered = {i for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1))}
+    # copy/induction — the causally-confirmed COPY circuit, wired in as a first-class rule (was souffle-only OOD before).
+    # Routes as OOD (below n-grams, matching emit_circuits), so it covers only what n-grams didn't: the novel-repeat tail.
+    ind_cov = set()
+    for r in rels_real:
+        L, c = r["L"], set()
+        for i in residual:
+            if i in ng_covered:
+                continue
+            ctx = insts[i]
+            if len(ctx) > L:
+                suf = tuple(ctx[-L:])
+                js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+                if js and max(js) + L < len(ctx) and ctx[max(js) + L] == refs[i]:
+                    c.add(i)
+        ind_cov |= c
+        man.append({"id": rid, "kind": "induction", "tier": "trusted", "basis": "causal", "routing": "ood",
+                    "causal": round(r.get("causal", 0), 3), "L": L, "support": len(c), "cite": sorted(c)[:5]})
+        rid += 1
     out = os.path.join(pkg, "circuits.expert.dl")
     emit_circuits(out, real, real_c, rels_real, ngram_rules, w, name)  # idiom > gated-ngram > induction(OOD) > abstain
     json.dump({"model": name, "trusted_idioms": len(real) + len(real_c), "gated_ngrams": len(ngram_rules),
-               "induction_ood": len(rels_real), "minsupp": minsupp, "mindet": mindet, "rules": man},
+               "induction_ood": len(rels_real), "induction_cover": len(ind_cov),
+               "minsupp": minsupp, "mindet": mindet, "rules": man},
               open(os.path.join(pkg, "manifest.json"), "w"))
-    ngcov = sum(1 for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1)))
-    H = len(idxs)
+    ngcov, indcov, H = len(ng_covered), len(ind_cov), len(idxs)
     print(f"\n=== EXPERT PACKAGE (bounded, causal-confirmed) → {pkg}/ ===")
     print(f"  TRUSTED idioms (causal): {len(real_c)} compose + {len(real)} gate → cover {len(covered)}/{H} = {len(covered)/H:.0%}")
     print(f"  GATED n-grams (supp>={minsupp},det>={mindet}): {len(ngram_rules)} rules → cover {ngcov}/{H} = {ngcov/H:.0%} of residual")
-    cov = (len(covered) + ngcov) / H
-    print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%} = answer {cov:.0%}, abstain {1-cov:.0%}")
+    if rels_real:
+        print(f"  INDUCTION (causal, OOD): {len(rels_real)} rule(s) → cover {indcov}/{H} = {indcov/H:.0%} (the n-gram tail)")
+    cov = (len(covered) + ngcov + indcov) / H
+    print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%}"
+          f"{f' + induction {indcov/H:.0%}' if rels_real else ''} = answer {cov:.0%}, abstain {1 - cov:.0%}")
     print(f"  manifest.json: {len(man)} rules tagged causal(trusted) vs observational(gated) + provenance — the audit of what the expert knows")
     return out, os.path.join(pkg, "manifest.json")
 

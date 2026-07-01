@@ -68,6 +68,8 @@ def load_package(manifest_path):
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
                            "valmap": {int(t): int(v) for t, v in r["valmap"].items()},
                            "sum": {int(s): int(o) for s, o in r["sum"].items()}})
+        elif kind == "induction":                                # causal COPY circuit, routed OOD (after n-grams)
+            idioms.append({"kind": "induction", "id": r["id"], "cite": _cite(r), "L": int(r["L"])})
     return idioms, ngrams, m
 
 
@@ -76,7 +78,9 @@ def serve(ctx, idioms, ngrams, W):
     → ABSTAIN. Host-side, no souffle — even the idioms (gate = frame + slot→table; compose = frame + operands→value-sum→
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
-    for r in idioms:                                            # trusted tier (causal), first
+    for r in idioms:                                            # trusted tier (causal), first — gate/compose only
+        if r["kind"] == "induction":                            # induction routes OOD (below n-grams) — handled last
+            continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
             continue
@@ -95,6 +99,19 @@ def serve(ctx, idioms, ngrams, W):
         if s in ngrams[k]:
             out, basis, cite = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
+    # induction (causal COPY), OOD fallback — reached ONLY after an n-gram miss, so it costs nothing on the hot path
+    # (a package with no induction rules skips this loop entirely). Fires where no n-gram matched: find the previous
+    # occurrence of the current L-token suffix and copy its successor ([… A B … A] → B). LONGEST L first — a longer
+    # repeated context is a more specific, higher-confidence match; among several earlier occurrences the MOST RECENT
+    # (max j) is the one copied from.
+    for r in sorted((x for x in idioms if x["kind"] == "induction"), key=lambda x: -x["L"]):
+        L = r["L"]
+        if len(ctx) > L:
+            suf = tuple(ctx[-L:])
+            js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+            if js and max(js) + L < len(ctx):
+                return {"answer": ctx[max(js) + L], "tier": "trusted", "basis": "causal",
+                        "citation": r["cite"], "rule": r["id"], "circuit": "induction"}
     return None  # ABSTAIN
 
 
