@@ -256,3 +256,27 @@ This is the **circuit-tier mirror** of the logic-expert answer-tier ablation ([`
 lookup domain the model's *circuit* tier is empty (0 idioms) and the distilled *answer* tier carries the expert; on
 induction stimuli the *circuit* tier is everything (94% vs 0%) and there is no answer tier. Reproduce (needs the
 bundle): `.venv/bin/python py/induction_package.py models/pythia160m/bundle 30 20`.
+
+**Which tier is load-bearing, by regime** — the combined #27 (answer tier) + #28 (circuit tier) picture:
+
+| domain regime | reusable n-grams / gate-compose | induction circuit | load-bearing served tier |
+|---|---|---|---|
+| **lookup** (logic / OLP, [`EXPERTS.md`](./EXPERTS.md)) | present (a memorized FAQ) | absent (0 idioms) | distilled **ANSWER** tier |
+| **inductive** (novel-repeat, this section) | absent (no support on novel tokens) | present (94% held-out) | **CIRCUIT** tier |
+
+The two forms of model-derived expertise are **complementary**, and each dominates exactly where the other is empty.
+
+**Detection & L-precedence** (for readers of `serve_package`): an induction rule of order L fires when the current
+L-token suffix recurs earlier in the context; it copies the successor of the **most recent** earlier occurrence
+(`max j`). When several L's are admitted, the runtime tries the **longest first** (a longer repeated context is a
+more specific, higher-confidence match). On clean single-repeat stimuli every admitted L points to the same successor,
+so precedence doesn't move the pythia-160m numbers; it matters on general text with multiple/overlapping repeats.
+The induction pass is reached **only after an n-gram miss**, so it is free on the hot path (and skipped entirely by a
+package with no induction rules).
+
+**Generalization (`open`).** The wiring pattern — *count the circuit's coverage → emit a
+`{tier:trusted, basis:causal, routing:ood}` manifest rule → serve it after the n-gram cache* — is generic, not
+induction-specific. The souffle twin already routes the other exercise-then-confirm families (succession, the
+once-appearing / name-mover binding rule) OOD the same way; feeding those confirmed families into
+`emit_expert_package` (today it takes only gates/composes/rels) would register them host-side by the identical
+mechanism. Induction is simply the first OOD circuit across the manifest boundary.

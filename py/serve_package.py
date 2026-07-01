@@ -99,9 +99,12 @@ def serve(ctx, idioms, ngrams, W):
         if s in ngrams[k]:
             out, basis, cite = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
-    for r in idioms:                                            # induction (causal COPY), OOD fallback: fires where no
-        if r["kind"] != "induction":                            # n-gram matched — copies the token after the previous
-            continue                                            # occurrence of the current L-suffix ([… A B … A] → B)
+    # induction (causal COPY), OOD fallback — reached ONLY after an n-gram miss, so it costs nothing on the hot path
+    # (a package with no induction rules skips this loop entirely). Fires where no n-gram matched: find the previous
+    # occurrence of the current L-token suffix and copy its successor ([… A B … A] → B). LONGEST L first — a longer
+    # repeated context is a more specific, higher-confidence match; among several earlier occurrences the MOST RECENT
+    # (max j) is the one copied from.
+    for r in sorted((x for x in idioms if x["kind"] == "induction"), key=lambda x: -x["L"]):
         L = r["L"]
         if len(ctx) > L:
             suf = tuple(ctx[-L:])
