@@ -1,12 +1,11 @@
-# pythia70m · certificate (T-parameterized — the canonical artifact)
+# pythia70m · certificate (unified — T-distributional n-gram + argmax circuits)
 
-`circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle
-at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from the cached logits (cache-only — no oracle).
-`circuits.symbols.dl` is the legible token-string twin (inherits this certificate).
+`circuits.dl` is ONE cover: the natural-corpus n-gram rules carry top-K logits and the runtime computes
+`softmax(logits/T)` at a queried `.input temp` (certified across the T-range by total-variation distance);
+the structural circuits are frame-gated point-mass rules routed above/below the n-gram (a circuit predicts a
+token, so it is certified at the **argmax** collapse, not by TV). `circuits.symbols.dl` is the legible twin.
 
-- domain: 300 decision windows (W=8)
-- range: T ∈ [0.7, 1.0], ε = 0.02
-- rules: 300 (no idioms + 300 n-gram, top-K mean 53.4)
+## Distributional leg — n-gram cover, T ∈ [0.7, 1.0], ε = 0.02 (300 natural windows, W=8)
 
 | T | contexts | max TV | verdict |
 |---|---|---|---|
@@ -14,4 +13,17 @@ at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from t
 | 0.85 | 300/300 | 0.0073 | CERTIFIED |
 | 1.0 | 300/300 | 0.0100 | CERTIFIED |
 
-**CERTIFIED across the range** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.dl`.
+## Argmax leg — structural circuits (111 circuit-behavior instances)
+
+**111/111 match the model at argmax** → CERTIFIED.
+
+| circuit | mechanism | frame-gated | argmax-certified instances |
+|---|---|---|---|
+| induction | induction | no | 35 |
+| succession | succession | no | 1 |
+| transitivity | once_appearing | yes | 9 |
+| modus_ponens | once_appearing | yes | 2 |
+| temporal | once_appearing | yes | 36 |
+| spatial | once_appearing | yes | 28 |
+
+**CERTIFIED** over the stated domain (natural windows ∪ circuit-behavior stimuli). Runtime: `souffle run.dl`.

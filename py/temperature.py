@@ -187,7 +187,7 @@ def build_threx_compose(insts, logmap, idxs, T_hi, eps):
     return dict(frame=frame, k1=4, k2=5, valmap={b: b - 21 for b in BRG}, csum=csum, covered=set(composed))
 
 
-def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
+def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False, structural_names=None):
     """The legible, RUNNABLE twin of circuits.dl: the SAME distributional rules carrying top-K logits, with token STRINGS
     instead of ids — a self-contained, symbol-typed souffle program that computes softmax(logits/T) at a queried temp.
     A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Select-GATE idioms symbolize (they are
@@ -198,7 +198,8 @@ def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
     q = lambda t: esc(safe(sym[t])) if sym.get(t) else esc(f"id{t}")
     idioms = idioms or []
     symbolizable = [i for i in idioms if i["kind"] == "gate"]
-    omitted = [i["name"] for i in idioms if i["kind"] != "gate"] + (["induction"] if induction else [])
+    omitted = ([i["name"] for i in idioms if i["kind"] != "gate"] + list(structural_names or [])
+               + (["induction"] if induction else []))
     L = [f"// {name} — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).",
          "// Same DISTRIBUTIONAL rules carrying top-K logits (incidence); the runtime computes softmax(logits/T) at a",
          "// queried temp. A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Run on symbol input:",
@@ -206,7 +207,7 @@ def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
          "//   (control-char tokens — tab/newline — render as <0xNN> so the symbol stays TSV-safe; tokenize input the same way.)", "",
          ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
          ".decl temp(t:float)", ".input temp",
-         ".decl mp(inst:number, m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl mp(inst:number, m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number, token:symbol, s:float)"]
     if omitted:
         L.append(f"// NOTE: {', '.join(omitted)} compute over operand VALUES / are structural pointers, not token lookups —")
@@ -250,7 +251,45 @@ def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
     open(path, "w").write("\n".join(L) + "\n")
 
 
-def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
+def _struct_above(structural, anys):
+    """Frame-gated once-appearing families as POINT-MASS ctxlogit rules ABOVE the n-gram. A template frame reaches past
+    the W-window so it never matches natural text (the n-gram's T-distribution cert is untouched) yet fires on its
+    template even where the suffix collides with a natural n-gram rule. Point-mass (logit 0.0) ⇒ certified at ARGMAX."""
+    ent, fams = structural["entity_ids"], structural["families"]
+    L = [".decl entity(id:number)"] + [f"entity({e})." for e in sorted(ent)]
+    L += [".decl ent_present(inst:number,id:number)", "ent_present(I,X) :- tok(I,_,X), entity(X).",
+          ".decl ent_count(inst:number,id:number,n:number)", "ent_count(I,X,N) :- ent_present(I,X), N = count : { tok(I,P,X) }.",
+          ".decl once_ent(inst:number,id:number)", "once_ent(I,X) :- ent_count(I,X,1).",
+          ".decl once_ct(inst:number,n:number)", "once_ct(I,N) :- mp(I,_), N = count : { once_ent(I,X) }.",
+          ".decl once_core(inst:number,out:number)", "once_core(I,OUT) :- once_ent(I,OUT), once_ct(I,1)."]
+    fam_anys = []
+    for fam, frame in fams.items():
+        pm, eqns = _pos(list(frame))
+        atoms = ["mp(I,P)"] + [f"tok(I,{pm[o]},{t})" for o, t in sorted(frame.items())] + eqns + ["once_core(I,OUT)"]
+        L += [f".decl {fam}_pm(inst:number,token:number,s:float)", f"{fam}_pm(I,OUT,0.0) :- {', '.join(atoms)}.",
+              f".decl {fam}_any(inst:number)", f"{fam}_any(I) :- {fam}_pm(I,_,_)."]
+        guard = "".join(f", !{a}(I)" for a in anys + fam_anys)
+        L.append(f"ctxlogit(I,Tk,S) :- {fam}_pm(I,Tk,S){guard}.")
+        fam_anys.append(f"{fam}_any")
+    return L, fam_anys
+
+
+def _struct_below(structural, guard):
+    """Ordinal succession as a POINT-MASS ctxlogit rule BELOW the n-gram (its frame is short, so it must not pre-empt the
+    n-gram's distribution on natural text). next-letter = lat[max letter ordinal present + 1] when a 3-run ends there."""
+    lord, lat = structural["lord"], structural["lat"]
+    L = [".decl lord(id:number,ordv:number)"] + [f"lord({i},{o})." for i, o in sorted(lord.items())]
+    L += [".decl lat(ordv:number,id:number)"] + [f"lat({o},{i})." for o, i in sorted(lat.items())]
+    L += [".decl lpres(inst:number,ordv:number)", "lpres(I,O) :- tok(I,_,X), lord(X,O).",
+          ".decl lmaxo(inst:number,ordv:number)", "lmaxo(I,O) :- lpres(I,_), O = max OO : { lpres(I,OO) }.",
+          ".decl succ_pm(inst:number,token:number,s:float)",
+          "succ_pm(I,OUT,0.0) :- lmaxo(I,O), Om1=O-1, lpres(I,Om1), Om2=O-2, lpres(I,Om2), Op1=O+1, lat(Op1,OUT).",
+          ".decl succ_any(inst:number)", "succ_any(I) :- succ_pm(I,_,_).",
+          f"ctxlogit(I,Tk,S) :- succ_pm(I,Tk,S){guard}."]
+    return L, "succ_any"
+
+
+def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name="", structural=None):
     """Canonical emit: circuits.dl (distributional, ids) + run.dl + — as the FINAL STEP — circuits.symbols.dl (legible twin)
     when a lexicon (sym) is given. Routing (priority via negation guards): the LEARNED idioms (compose/gate carrying top-K
     logits) in order > longest n-gram > induction (OOD point-mass) > abstain; each fires its full distribution into ctxlogit,
@@ -260,7 +299,7 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
     L = ["// rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at",
          "// query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.",
          f"// Routing: {order}.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.",
-         "", ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         "", ".decl mp(inst:number,m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number,token:number,s:float)"]
     anys = []
     for idiom in idioms:                                          # LEARNED idioms carrying distributions, in priority order
@@ -269,7 +308,11 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
         guard = "".join(f", !{a}(I)" for a in anys)              # guarded by all higher-priority idioms
         L.append(f"ctxlogit(I,Tk,S) :- {idiom['name']}_ctxlogit(I,Tk,S){guard}.")
         anys.append(anm)
-    idiom_guard = "".join(f", !{a}(I)" for a in anys)
+    fam_anys = []
+    if structural and structural.get("families"):                     # frame-gated once-appearing circuits ABOVE the n-gram
+        above, fam_anys = _struct_above(structural, anys)
+        L += [""] + above
+    idiom_guard = "".join(f", !{a}(I)" for a in anys + fam_anys)
     bylen = defaultdict(dict)
     for suf, kept in rules.items():
         bylen[len(suf)][suf] = kept
@@ -292,14 +335,19 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
         pull = f"gram{N}d({','.join(f'C{i}' for i in range(n))},Tk,S)"
         guard = "".join(f", !gram{m+1}d_any(I)" for m in lens if m > n)
         L.append(f"ctxlogit(I,Tk,S) :- mp(I,P), {', '.join(toks + eqs + [pull])}{guard}{idiom_guard}.")
+    gram_guard = "".join(f", !gram{m+1}d_any(I)" for m in lens)
+    succ_any = None
+    if structural and structural.get("lord"):                         # ordinal succession — point-mass OOD, below the n-gram
+        below, succ_any = _struct_below(structural, idiom_guard + gram_guard)
+        L += [""] + below
     if induction:                                                     # copy/induction OOD fallback — structural pointer
-        gram_guard = "".join(f", !gram{m+1}d_any(I)" for m in lens)
+        ind_guard = idiom_guard + gram_guard + (f", !{succ_any}(I)" if succ_any else "")
         L += ["", "// copy/induction OOD fallback: a structural pointer, NOT a calibrated distribution → POINT-MASS on the",
-              "// copied token. Fires only where no idiom/n-gram matches, so it never affects the in-domain certificate.",
+              "// copied token. Fires only where no idiom/n-gram/succession matches, so it never affects the T-range certificate.",
               ".decl ind_pj(inst:number,j:number)", "ind_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.",
               ".decl ind_last(inst:number,j:number)", "ind_last(I,J) :- ind_pj(I,_), J = max JJ : { ind_pj(I,JJ) }.",
               ".decl ind_ctxlogit(inst:number,token:number,s:float)",
-              f"ind_ctxlogit(I,OUT,0.0) :- ind_last(I,J), tok(I,J+1,OUT){idiom_guard}{gram_guard}.",
+              f"ind_ctxlogit(I,OUT,0.0) :- ind_last(I,J), tok(I,J+1,OUT){ind_guard}.",
               ".decl ind_any(inst:number)", "ind_any(I) :- ind_ctxlogit(I,_,_).",
               "ctxlogit(I,Tk,S) :- ind_ctxlogit(I,Tk,S)."]
     L += ["", "// --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---",
@@ -315,15 +363,17 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
                          ".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
                          f'#include "{os.path.basename(out_path)}"\n.output cdist\n')
     if sym:                                                       # FINAL STEP of extraction: the legible token-string twin
-        emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name, idioms=idioms, induction=bool(induction))
+        snames = (list((structural or {}).get("families", {})) + (["succession"] if structural and structural.get("lord") else []))
+        emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name,
+                       idioms=idioms, induction=bool(induction), structural_names=snames)
 
 
-def certify_T(out_path, insts, logmap, idxs, T, eps):
-    """run circuits.dl in souffle at T, compare cdist to the model's full softmax; CERTIFIED iff max TV < eps."""
+def _run_cdist(out_path, insts, idxs, T):
+    """Run circuits.dl in souffle at temperature T; return {inst: {token: prob}} = cdist."""
+    import shutil
     with tempfile.TemporaryDirectory() as d:
         ind, outd, inc = os.path.join(d, "in"), os.path.join(d, "out"), os.path.join(d, "inc")
         os.makedirs(ind); os.makedirs(outd); os.makedirs(inc)
-        import shutil
         shutil.copyfile(out_path, os.path.join(inc, os.path.basename(out_path)))
         with open(os.path.join(ind, "tok.facts"), "w") as tf:
             for i in idxs:
@@ -340,10 +390,29 @@ def certify_T(out_path, insts, logmap, idxs, T, eps):
             for ln in open(cp).read().splitlines():
                 i, t, p = ln.split("\t")
                 got[int(i)][int(t)] = float(p)
+    return got
+
+
+def certify_T(out_path, insts, logmap, idxs, T, eps):
+    """run circuits.dl in souffle at T, compare cdist to the model's full softmax; CERTIFIED iff max TV < eps."""
+    got = _run_cdist(out_path, insts, idxs, T)
     worst = 0.0
     for i in idxs:
         worst = max(worst, tv(got.get(i, {}), softmax(logmap[i], T)))
     return worst, len(got)
+
+
+def certify_argmax(out_path, insts, argref, idxs, T):
+    """The circuit (point-mass) certificate: run circuits.dl at T, take argmax(cdist) per inst, compare to the model's
+    argmax (argref[i]). Returns (n_match, n_checked). Point-mass circuits can't pass the T-range TV test (a token isn't
+    the model's softmax at T>0) — they are certified here, at the argmax collapse, over the circuit-behavior domain."""
+    got = _run_cdist(out_path, insts, idxs, T)
+    match = 0
+    for i in idxs:
+        d = got.get(i, {})
+        if d and max(d, key=d.get) == argref.get(i):
+            match += 1
+    return match, len(idxs)
 
 
 def finalize(md, insts, logmap, idxs, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src):

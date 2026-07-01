@@ -70,25 +70,27 @@ def test_succession_admission_generalizes_past_ngram():
     assert ho["admits"] and ho["circuit_match"] > ho["ngram_match"], ho
 
 
-def test_emit_full_cover_souffle_certifies():
-    """The wired cover (n-gram + copy + once-appearing + succession souffle rules) must CERTIFY via equiv.dl over a
-    domain hitting all four routing paths. Souffle required (like test_reference); no model/server."""
+def test_unified_emit_argmax_certifies_all_paths():
+    """The UNIFIED cover (temperature.emit_T: distributional n-gram + structural point-mass circuits) must give the right
+    ARGMAX on every routing path — n-gram, frame-gated once-appearing (ABOVE the n-gram, pre-empting a colliding rule),
+    succession, and induction. Souffle required (like test_reference); no model/server. (The distributional T-leg is
+    exercised on real models; here we lock the argmax collapse across the routing paths.)"""
     import shutil
     import tempfile
     import pytest
     if shutil.which("souffle") is None:
         pytest.skip("souffle not on PATH")
-    from exercise_confirm import _emit_full_souffle  # noqa: E402
-    from oracle import run_equiv  # noqa: E402
-    dl, _lens = _emit_full_souffle({(9,): 8}, {100, 101, 102}, {200: 0, 201: 1, 202: 2, 203: 3},
-                                   {0: 200, 1: 201, 2: 202, 3: 203})
+    from temperature import emit_T, certify_argmax  # noqa: E402
+    ng = {(9,): [(8, 0.0)], (500,): [(42, 0.0)]}   # distributional n-gram (single logit → point mass); (500,)→42 is a collider
+    structural = {"entity_ids": {100, 101, 102}, "families": {"fam": {1: 500, 5: 501}},
+                  "lord": {200: 0, 201: 1, 202: 2, 203: 3}, "lat": {0: 200, 1: 201, 2: 202, 3: 203}}
     d = tempfile.mkdtemp()
-    path = os.path.join(d, "circuits.full.dl")
-    open(path, "w").write(dl)
-    insts = [[7, 9],           # n-gram: last token 9 → 8
-             [50, 51, 50],     # induction: copy after the previous 50 → 51
-             [101, 100, 101],  # once-appearing: 100 appears once → 100
-             [200, 201, 202]]  # succession: ascending ordinals → 203
-    refs = [8, 51, 100, 203]
-    r = run_equiv(path, insts, refs)
-    assert r.get("nmiss") == 0 and r.get("nuncov") == 0 and r.get("ncover") == 4, r
+    out = os.path.join(d, "circuits.dl")
+    emit_T(out, ng, 8, idioms=[], induction=True, sym={}, name="t", structural=structural)
+    insts = [[7, 9],                    # n-gram: (9,) → 8
+             [50, 51, 50],              # induction: copy after the previous 50 → 51
+             [200, 201, 202],           # succession: ascending ordinals → 203
+             [501, 100, 101, 101, 500]]  # frame-gated once-appearing wins OVER the colliding n-gram (500,)→42 → 100
+    refs = {0: 8, 1: 51, 2: 203, 3: 100}
+    m, n = certify_argmax(out, insts, refs, list(range(4)), 0.5)
+    assert m == n == 4, (m, n)
