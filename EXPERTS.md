@@ -127,6 +127,60 @@ A `scorecard.json` (illustrative values):
 }
 ```
 
+## Measured result — the logic expert (the ablation) · `empirical`
+
+The illustrative scorecard above is now backed by a real one. The decisive question for the *whole* model-distilled
+arm — **does the model tier earn its place, or is every working expert really document-derived?** — was run on the
+Open Logic Project expert (gemma-4-e4b-it distilled over 28 questions × ~251 decode steps, in
+[`examples/logic/`](./examples/logic/)). Three package variants that differ **only** in which tiers are present were
+served through the real sgiandubh binary with identical flags and graded on one 50-row testset
+([`testset.jsonl`](./examples/logic/testset.jsonl): 10 verbatim / 11 paraphrase / 12 held-out / 17 off-domain).
+Reproduce: `.venv/bin/python examples/logic/run_ablation.py` → [`scorecard.json`](./examples/logic/scorecard.json).
+
+Answered / n per subset (`ii_document` = retrieval over the **raw** OLP dump; `iii_both` = the shipped cascade):
+
+| variant | verbatim | paraphrase | held-out | off-domain leak |
+|---|---|---|---|---|
+| **require-citation ON** (shipped default) | | | | |
+| i_curated (FAQ only) | 10/10 | 12/12 | 9/12 | 0/16 |
+| ii_document (retrieval only) | **0/10** | **0/12** | **0/12** | 0/16 |
+| iii_both | 10/10 | 12/12 | 9/12 | 0/16 |
+| **require-citation OFF** (raw retrieval capability) | | | | |
+| i_curated | 10/10 (topical 10) | 12/12 (12) | 9/12 (7) | 0/16 |
+| ii_document | 7/10 (**topical 2**) | 9/12 (**2**) | 9/12 (**3**) | **5/16** |
+| iii_both | 10/10 (10) | 12/12 (12) | 10/12 (7) | 5/16 |
+
+**Verdict (bounded): on this domain the model tier decisively earns its place — but strictly as a distilled FAQ, not
+as a generalizing reasoner.** This *refutes* the prior tentative read that "no shipped expert derives value from the
+model." Concretely:
+
+- **In-distribution** (verbatim + paraphrase, n=22): the curated tier answers all 22 with clean, citation-bearing
+  definitional prose (manual read: ~21/22 genuinely correct — the lone miss is a garbled "quantifier" distillation).
+  Retrieval over the **raw dump** cannot cite these under the shipped `--require-citation` policy (0/22), and even
+  uncited it is on-target only ~2/22 (it returns section headers / tangential mentions from the PDF-to-text noise).
+  So the model tier's real contribution is **converting a noisy raw corpus into a clean, cited, leak-free answer set**
+  that raw-dump retrieval cannot match.
+- **Off-domain** (n=16): the curated tier leaks **0** (structural — it only fires on a lexical match to a distilled
+  question, and off-domain queries don't match). Uncited retrieval leaks **5/16** (grabs logic fragments on overlap
+  words — e.g. "chemical formula for salt" hits the corpus word "formula").
+- **Held-out** (n=12, questions never distilled): the curated tier does **not** generalize — it fuzzy-matches to the
+  nearest distilled question and returns that answer (the *Soundness* answer for "completeness", "compactness", and
+  "Löwenheim–Skolem"; the *tautology* answer for "conjunction"). Manual read: only ~2–3/12 genuinely correct; the
+  lenient any-key `topical` metric over-credits the rest. **This is a confident-wrong failure, not coverage.**
+
+That last failure is **calibratable**, and the fix is measured, not asserted: sweeping the curated tier's Jaccard
+threshold (`--tau`) shows that raising it from the 0.25 default to **≈0.40** makes the out-of-FAQ held-out questions
+**abstain** (held-out answered 9/12 → 2/12, and the 2 survivors are a verbatim distill question + a near-paraphrase)
+while fully preserving the FAQ (verbatim 10/10, paraphrase 11/12). τ≈0.40 trades confident-wrong nearest-neighbour
+answers for honest abstention — the bounded-expert bias — and is the recommended default for a distilled-FAQ expert
+(the analogue of the riscv cos/margin calibration; the server default lives in sgiandubh).
+
+**Caveats (state the domain):** (1) the document baseline here is a **raw PDF-to-text dump** with no section/citation
+handles — a *weak* retrieval baseline; the fair "model tier vs a **cleanly-adapted** OLP corpus (section handles +
+definitional passages, like riscv's prose adapter)" comparison is **untested** and is the natural follow-up, so the
+claim is "model tier > raw-dump retrieval," not "> document tier in general." (2) `topical` is a lenient any-key proxy
+corrected by manual reads above. (3) One model, one corpus, 50 rows — `empirical` over exactly that.
+
 ## Test-set construction (decided)
 
 A scorecard is only as honest as the set it's graded on (*"recalibrate on a representative test set, not a toy corpus"*).

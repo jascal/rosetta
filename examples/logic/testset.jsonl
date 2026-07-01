@@ -1,0 +1,50 @@
+{"q": "What is a tautology in propositional logic?", "expect": "answer", "subset": "A_verbatim", "key": ["always true", "true regardless", "true under every"]}
+{"q": "What is a contradiction in propositional logic?", "expect": "answer", "subset": "A_verbatim", "key": ["always false", "never true", "false regardless", "false under every"]}
+{"q": "What is modus ponens?", "expect": "answer", "subset": "A_verbatim", "key": ["antecedent", "consequent", "conditional"]}
+{"q": "What is modus tollens?", "expect": "answer", "subset": "A_verbatim", "key": ["negation", "deny", "consequent", "contrapositive"]}
+{"q": "What is the law of the excluded middle?", "expect": "answer", "subset": "A_verbatim", "key": ["negation", "either true or", "one of the following"]}
+{"q": "What is logical equivalence?", "expect": "answer", "subset": "A_verbatim", "key": ["same truth value", "truth value", "equivalent"]}
+{"q": "What does it mean for an argument to be valid?", "expect": "answer", "subset": "A_verbatim", "key": ["premises", "conclusion"]}
+{"q": "What is a truth table and how is it used?", "expect": "answer", "subset": "A_verbatim", "key": ["truth value", "combinations", "rows"]}
+{"q": "What are the logical connectives in propositional logic?", "expect": "answer", "subset": "A_verbatim", "key": ["conjunction", "disjunction", "negation", "connective"]}
+{"q": "What is a quantifier?", "expect": "answer", "subset": "A_verbatim", "key": ["universal", "existential", "variable"]}
+{"q": "Define a tautology.", "expect": "answer", "subset": "B_paraphrase", "key": ["always true", "true regardless", "true under every"]}
+{"q": "Explain what modus ponens means.", "expect": "answer", "subset": "B_paraphrase", "key": ["antecedent", "consequent", "conditional"]}
+{"q": "What does it mean to call an argument valid?", "expect": "answer", "subset": "B_paraphrase", "key": ["premises", "conclusion"]}
+{"q": "How does a truth table work?", "expect": "answer", "subset": "B_paraphrase", "key": ["truth value", "combinations", "rows"]}
+{"q": "What is the difference between a sound and a valid argument?", "expect": "answer", "subset": "B_paraphrase", "key": ["true premises", "sound", "valid"]}
+{"q": "Describe the law of the excluded middle.", "expect": "answer", "subset": "B_paraphrase", "key": ["negation", "either true or", "one of the following"]}
+{"q": "Which connectives are used in propositional logic?", "expect": "answer", "subset": "B_paraphrase", "key": ["conjunction", "disjunction", "negation", "connective"]}
+{"q": "Define logical equivalence.", "expect": "answer", "subset": "B_paraphrase", "key": ["same truth value", "truth value", "equivalent"]}
+{"q": "What is a predicate in first-order logic?", "expect": "answer", "subset": "B_paraphrase", "key": ["property", "relation", "predicate"]}
+{"q": "What does it mean for a set of formulas to be satisfiable?", "expect": "answer", "subset": "B_paraphrase", "key": ["true", "interpretation", "model", "satisfy"]}
+{"q": "What is the difference between a free variable and a bound variable?", "expect": "answer", "subset": "B_paraphrase", "key": ["quantifier", "bound", "free"]}
+{"q": "What is a term in first-order logic?", "expect": "answer", "subset": "B_paraphrase", "key": ["constant", "variable", "function"]}
+{"q": "What is the completeness theorem?", "expect": "answer", "subset": "C_heldout", "key": ["provable", "valid", "derivable", "consequence"]}
+{"q": "What is the compactness theorem?", "expect": "answer", "subset": "C_heldout", "key": ["finite subset", "satisfiable", "finitely"]}
+{"q": "What is the Lowenheim-Skolem theorem?", "expect": "answer", "subset": "C_heldout", "key": ["countable", "cardinality", "model", "infinite"]}
+{"q": "What is an axiom schema?", "expect": "answer", "subset": "C_heldout", "key": ["infinitely many", "instances", "schema", "pattern"]}
+{"q": "What is the difference between a theory and a model?", "expect": "answer", "subset": "C_heldout", "key": ["sentences", "structure", "satisfies", "axioms"]}
+{"q": "What does it mean for a proof system to be sound and complete?", "expect": "answer", "subset": "C_heldout", "key": ["provable", "valid", "if and only if"]}
+{"q": "What is a well-formed formula?", "expect": "answer", "subset": "C_heldout", "key": ["syntax", "grammar", "formula", "rules"]}
+{"q": "What is the principle of explosion?", "expect": "answer", "subset": "C_heldout", "key": ["contradiction", "anything follows", "ex falso", "everything"]}
+{"q": "What is a conjunction in logic?", "expect": "answer", "subset": "C_heldout", "key": ["and", "both true"]}
+{"q": "What is disjunction?", "expect": "answer", "subset": "C_heldout", "key": ["or", "either", "at least one"]}
+{"q": "What is a derivation in a formal proof system?", "expect": "answer", "subset": "C_heldout", "key": ["rules", "premises", "steps", "inference"]}
+{"q": "What is the natural deduction proof system?", "expect": "answer", "subset": "C_heldout", "key": ["introduction", "elimination", "assumption", "rules"]}
+{"q": "What is the capital of France?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "How do I bake sourdough bread?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the boiling point of water?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "Who won the World Cup in 2018?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the derivative of x squared?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "How does photosynthesis work?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the population of Tokyo?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "Recommend a good pizza topping.", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the chemical formula for table salt?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "Who wrote the play Hamlet?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the current stock price of Apple?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "How tall is Mount Everest?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is a good weekly exercise routine?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What language is spoken in Brazil?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "How do I change a car tire?", "expect": "abstain", "subset": "D_offdomain", "key": []}
+{"q": "What is the speed of light in a vacuum?", "expect": "abstain", "subset": "D_offdomain", "key": []}
