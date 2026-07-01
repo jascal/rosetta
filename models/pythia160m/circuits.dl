@@ -1,10 +1,112 @@
 // rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at
 // query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.
-// Routing: longest-ngram > abstain.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.
+// Routing: longest-ngram > induction(OOD) > abstain.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.
 
 .decl mp(inst:number,m:number)
-mp(I,M) :- M = max P : { tok(I,P,_) }.
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
 .decl ctxlogit(inst:number,token:number,s:float)
+
+.decl entity(id:number)
+entity(1113).
+entity(1355).
+entity(1708).
+entity(1892).
+entity(1943).
+entity(2159).
+entity(2419).
+entity(2502).
+entity(2516).
+entity(2602).
+entity(3511).
+entity(3790).
+entity(4177).
+entity(4370).
+entity(4744).
+entity(4759).
+entity(4797).
+entity(5119).
+entity(5171).
+entity(5202).
+entity(5412).
+entity(5490).
+entity(5536).
+entity(5561).
+entity(5798).
+entity(5890).
+entity(6032).
+entity(6270).
+entity(6393).
+entity(6507).
+entity(6521).
+entity(6773).
+entity(6911).
+entity(6963).
+entity(7107).
+entity(7993).
+entity(8800).
+entity(8815).
+entity(8966).
+entity(9479).
+entity(9735).
+entity(10035).
+entity(10086).
+entity(11216).
+entity(12621).
+entity(16396).
+entity(16543).
+entity(16922).
+entity(20428).
+entity(21960).
+entity(23244).
+entity(23397).
+entity(24112).
+entity(25872).
+entity(25975).
+entity(27261).
+entity(27405).
+entity(27985).
+entity(31336).
+entity(40096).
+.decl ent_present(inst:number,id:number)
+ent_present(I,X) :- tok(I,_,X), entity(X).
+.decl ent_count(inst:number,id:number,n:number)
+ent_count(I,X,N) :- ent_present(I,X), N = count : { tok(I,P,X) }.
+.decl once_ent(inst:number,id:number)
+once_ent(I,X) :- ent_count(I,X,1).
+.decl once_ct(inst:number,n:number)
+once_ct(I,N) :- mp(I,_), N = count : { once_ent(I,X) }.
+.decl once_core(inst:number,out:number)
+once_core(I,OUT) :- once_ent(I,OUT), once_ct(I,1).
+.decl ioi_pm(inst:number,token:number,s:float)
+ioi_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,281), tok(I,Pm1,5484), tok(I,Pm2,247), tok(I,Pm3,3534), tok(I,Pm5,13), tok(I,Pm6,4657), tok(I,Pm7,253), tok(I,Pm8,281), tok(I,Pm9,2427), tok(I,Pm11,285), tok(I,Pm13,3039), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm5=P-5, Pm6=P-6, Pm7=P-7, Pm8=P-8, Pm9=P-9, Pm11=P-11, Pm13=P-13, once_core(I,OUT).
+.decl ioi_any(inst:number)
+ioi_any(I) :- ioi_pm(I,_,_).
+ctxlogit(I,Tk,S) :- ioi_pm(I,Tk,S).
+.decl transitivity_pm(inst:number,token:number,s:float)
+transitivity_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,247), tok(I,Pm1,310), tok(I,Pm3,247), tok(I,Pm4,1893), tok(I,Pm5,15), tok(I,Pm7,247), tok(I,Pm8,310), tok(I,Pm10,329), tok(I,Pm11,15), tok(I,Pm13,247), tok(I,Pm14,310), tok(I,Pm16,34), Pm1=P-1, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm7=P-7, Pm8=P-8, Pm10=P-10, Pm11=P-11, Pm13=P-13, Pm14=P-14, Pm16=P-16, once_core(I,OUT).
+.decl transitivity_any(inst:number)
+transitivity_any(I) :- transitivity_pm(I,_,_).
+ctxlogit(I,Tk,S) :- transitivity_pm(I,Tk,S), !ioi_any(I).
+.decl modus_ponens_pm(inst:number,token:number,s:float)
+modus_ponens_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,310), tok(I,Pm1,436), tok(I,Pm2,1893), tok(I,Pm3,15), tok(I,Pm5,310), tok(I,Pm6,831), tok(I,Pm7,15), tok(I,Pm9,310), tok(I,Pm10,352), tok(I,Pm11,13), tok(I,Pm13,310), tok(I,Pm14,1633), tok(I,Pm15,2042), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm5=P-5, Pm6=P-6, Pm7=P-7, Pm9=P-9, Pm10=P-10, Pm11=P-11, Pm13=P-13, Pm14=P-14, Pm15=P-15, once_core(I,OUT).
+.decl modus_ponens_any(inst:number)
+modus_ponens_any(I) :- modus_ponens_pm(I,_,_).
+ctxlogit(I,Tk,S) :- modus_ponens_pm(I,Tk,S), !ioi_any(I), !transitivity_any(I).
+.decl temporal_pm(inst:number,token:number,s:float)
+temporal_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,1078), tok(I,Pm1,3249), tok(I,Pm3,1893), tok(I,Pm4,15), tok(I,Pm6,1078), tok(I,Pm7,3249), tok(I,Pm9,15), tok(I,Pm11,1078), tok(I,Pm12,3249), Pm1=P-1, Pm3=P-3, Pm4=P-4, Pm6=P-6, Pm7=P-7, Pm9=P-9, Pm11=P-11, Pm12=P-12, once_core(I,OUT).
+.decl temporal_any(inst:number)
+temporal_any(I) :- temporal_pm(I,_,_).
+ctxlogit(I,Tk,S) :- temporal_pm(I,Tk,S), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I).
+.decl spatial_pm(inst:number,token:number,s:float)
+spatial_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,253), tok(I,Pm1,273), tok(I,Pm2,1669), tok(I,Pm3,310), tok(I,Pm5,253), tok(I,Pm6,1893), tok(I,Pm7,15), tok(I,Pm9,253), tok(I,Pm10,273), tok(I,Pm11,1669), tok(I,Pm12,310), tok(I,Pm14,380), tok(I,Pm15,15), tok(I,Pm17,253), tok(I,Pm18,273), tok(I,Pm19,1669), tok(I,Pm20,310), tok(I,Pm22,510), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm5=P-5, Pm6=P-6, Pm7=P-7, Pm9=P-9, Pm10=P-10, Pm11=P-11, Pm12=P-12, Pm14=P-14, Pm15=P-15, Pm17=P-17, Pm18=P-18, Pm19=P-19, Pm20=P-20, Pm22=P-22, once_core(I,OUT).
+.decl spatial_any(inst:number)
+spatial_any(I) :- spatial_pm(I,_,_).
+ctxlogit(I,Tk,S) :- spatial_pm(I,Tk,S), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I).
+.decl syllogism_pm(inst:number,token:number,s:float)
+syllogism_pm(I,OUT,0.0) :- mp(I,P), tok(I,P,310), tok(I,Pm2,1893), tok(I,Pm3,15), tok(I,Pm5,247), tok(I,Pm6,310), tok(I,Pm8,15), tok(I,Pm10,310), tok(I,Pm12,8267), Pm2=P-2, Pm3=P-3, Pm5=P-5, Pm6=P-6, Pm8=P-8, Pm10=P-10, Pm12=P-12, once_core(I,OUT).
+.decl syllogism_any(inst:number)
+syllogism_any(I) :- syllogism_pm(I,_,_).
+ctxlogit(I,Tk,S) :- syllogism_pm(I,Tk,S), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I).
 
 .decl gram2d(c0:number,token:number,s:float)
 .decl gram2d_any(inst:number)
@@ -16230,14 +16332,90 @@ gram9d(642,13,642,13,642,13,642,13,1293,837.053466796875).
 gram9d(642,13,642,13,642,13,642,13,407,837.041015625).
 gram9d(642,13,642,13,642,13,642,13,13,837.0382080078125).
 gram9d_any(I) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,_,_).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I).
-ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,P,C0), gram2d(C0,Tk,S), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm1,C0), tok(I,P,C1), Pm1=P-1, gram3d(C0,C1,Tk,S), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm2,C0), tok(I,Pm1,C1), tok(I,P,C2), Pm1=P-1, Pm2=P-2, gram4d(C0,C1,C2,Tk,S), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm3,C0), tok(I,Pm2,C1), tok(I,Pm1,C2), tok(I,P,C3), Pm1=P-1, Pm2=P-2, Pm3=P-3, gram5d(C0,C1,C2,C3,Tk,S), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm4,C0), tok(I,Pm3,C1), tok(I,Pm2,C2), tok(I,Pm1,C3), tok(I,P,C4), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, gram6d(C0,C1,C2,C3,C4,Tk,S), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm5,C0), tok(I,Pm4,C1), tok(I,Pm3,C2), tok(I,Pm2,C3), tok(I,Pm1,C4), tok(I,P,C5), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, gram7d(C0,C1,C2,C3,C4,C5,Tk,S), !gram8d_any(I), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm6,C0), tok(I,Pm5,C1), tok(I,Pm4,C2), tok(I,Pm3,C3), tok(I,Pm2,C4), tok(I,Pm1,C5), tok(I,P,C6), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, gram8d(C0,C1,C2,C3,C4,C5,C6,Tk,S), !gram9d_any(I), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+ctxlogit(I,Tk,S) :- mp(I,P), tok(I,Pm7,C0), tok(I,Pm6,C1), tok(I,Pm5,C2), tok(I,Pm4,C3), tok(I,Pm3,C4), tok(I,Pm2,C5), tok(I,Pm1,C6), tok(I,P,C7), Pm1=P-1, Pm2=P-2, Pm3=P-3, Pm4=P-4, Pm5=P-5, Pm6=P-6, Pm7=P-7, gram9d(C0,C1,C2,C3,C4,C5,C6,C7,Tk,S), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I).
+
+.decl lord(id:number,ordv:number)
+lord(308,19).
+lord(309,8).
+lord(322,18).
+lord(329,0).
+lord(330,2).
+lord(353,12).
+lord(367,15).
+lord(378,1).
+lord(388,7).
+lord(399,3).
+lord(401,5).
+lord(411,22).
+lord(416,17).
+lord(418,11).
+lord(427,13).
+lord(443,6).
+lord(444,4).
+lord(473,14).
+lord(500,9).
+lord(530,20).
+lord(611,10).
+lord(657,21).
+lord(714,24).
+lord(1165,16).
+lord(1503,25).
+lord(1594,23).
+.decl lat(ordv:number,id:number)
+lat(0,329).
+lat(1,378).
+lat(2,330).
+lat(3,399).
+lat(4,444).
+lat(5,401).
+lat(6,443).
+lat(7,388).
+lat(8,309).
+lat(9,500).
+lat(10,611).
+lat(11,418).
+lat(12,353).
+lat(13,427).
+lat(14,473).
+lat(15,367).
+lat(16,1165).
+lat(17,416).
+lat(18,322).
+lat(19,308).
+lat(20,530).
+lat(21,657).
+lat(22,411).
+lat(23,1594).
+lat(24,714).
+lat(25,1503).
+.decl lpres(inst:number,ordv:number)
+lpres(I,O) :- tok(I,_,X), lord(X,O).
+.decl lmaxo(inst:number,ordv:number)
+lmaxo(I,O) :- lpres(I,_), O = max OO : { lpres(I,OO) }.
+.decl succ_pm(inst:number,token:number,s:float)
+succ_pm(I,OUT,0.0) :- lmaxo(I,O), Om1=O-1, lpres(I,Om1), Om2=O-2, lpres(I,Om2), Op1=O+1, lat(Op1,OUT).
+.decl succ_any(inst:number)
+succ_any(I) :- succ_pm(I,_,_).
+ctxlogit(I,Tk,S) :- succ_pm(I,Tk,S), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I), !gram2d_any(I), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I).
+
+// copy/induction OOD fallback: a structural pointer, NOT a calibrated distribution → POINT-MASS on the
+// copied token. Fires only where no idiom/n-gram/succession matches, so it never affects the T-range certificate.
+.decl ind_pj(inst:number,j:number)
+ind_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.
+.decl ind_last(inst:number,j:number)
+ind_last(I,J) :- ind_pj(I,_), J = max JJ : { ind_pj(I,JJ) }.
+.decl ind_ctxlogit(inst:number,token:number,s:float)
+ind_ctxlogit(I,OUT,0.0) :- ind_last(I,J), tok(I,J+1,OUT), !ioi_any(I), !transitivity_any(I), !modus_ponens_any(I), !temporal_any(I), !spatial_any(I), !syllogism_any(I), !gram2d_any(I), !gram3d_any(I), !gram4d_any(I), !gram5d_any(I), !gram6d_any(I), !gram7d_any(I), !gram8d_any(I), !gram9d_any(I), !succ_any(I).
+.decl ind_any(inst:number)
+ind_any(I) :- ind_ctxlogit(I,_,_).
+ctxlogit(I,Tk,S) :- ind_ctxlogit(I,Tk,S).
 
 // --- softmax at the query temperature (max-shift for stability, exactly as whole.dl) ---
 .decl lmax(inst:number,m:float)

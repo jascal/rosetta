@@ -594,151 +594,56 @@ def py_succ(lord, lat):
     return r
 
 
-def _emit_full_souffle(ngram_rules, entity_ids, lord, lat):
-    from collections import defaultdict
-    L = ["// rosetta · circuits.full.dl — natural-corpus n-gram cover + admitted STRUCTURAL circuits as souffle rules:",
-         "//   copy/induction · once-appearing/name-mover (IOI + reasoning) · ordinal succession.",
-         "// Routing: longest n-gram wins; else the circuits fire as OOD fallbacks (novel content the cover can't memorize).",
-         "// Runtime: souffle only. tok(inst,pos,id) is provided by the includer (run.dl / equiv.dl).", "",
-         ".decl mp(inst:number,m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
-         ".decl cdecide(inst:number,out:number)", ""]
-    bylen = defaultdict(dict)
-    for suf, o in ngram_rules.items():
-        bylen[len(suf)][suf] = o
-    lens = sorted(bylen)
-    for n in lens:                                                     # n-gram cover (token ids)
-        N = n + 1
-        cols = ",".join(f"c{i}:number" for i in range(n))
-        L += [f".decl gram{N}({cols},t:number)", f".decl gram{N}_hit(inst:number,t:number)", f".decl gram{N}_any(inst:number)"]
-        L += [f"gram{N}({','.join(map(str, suf))},{o})." for suf, o in bylen[n].items()]
-        atoms = ["mp(I,P)"] + [f"tok(I,{'P' if i == n - 1 else f'P{n-1-i}'},C{i})" for i in range(n)]
-        atoms += [f"P{k}=P-{k}" for k in range(1, n)] + [f"gram{N}({','.join(f'C{i}' for i in range(n))},T)"]
-        L += [f"gram{N}_hit(I,T) :- {', '.join(atoms)}.", f"gram{N}_any(I) :- gram{N}_hit(I,_)."]
-    L.append("")
-    L += [".decl ind1_pj(inst:number,j:number)", "ind1_pj(I,J) :- mp(I,P), tok(I,P,X), tok(I,J,X), J<P.",
-          ".decl ind1_last(inst:number,j:number)", "ind1_last(I,J) :- ind1_pj(I,_), J = max JJ : { ind1_pj(I,JJ) }.",
-          ".decl ind1(inst:number,out:number)", "ind1(I,OUT) :- ind1_last(I,J), tok(I,J+1,OUT).",
-          ".decl ind1_any(inst:number)", "ind1_any(I) :- ind1(I,_).", ""]
-    if entity_ids:                                                    # once-appearing entity (name-mover / stated consequent)
-        L += [".decl entity(id:number)"] + [f"entity({e})." for e in sorted(entity_ids)]
-        L += [".decl ent_present(inst:number,id:number)", "ent_present(I,X) :- tok(I,_,X), entity(X).",
-              ".decl ent_count(inst:number,id:number,n:number)", "ent_count(I,X,N) :- ent_present(I,X), N = count : { tok(I,P,X) }.",
-              ".decl once_ent(inst:number,id:number)", "once_ent(I,X) :- ent_count(I,X,1).",
-              ".decl once_ct(inst:number,n:number)", "once_ct(I,N) :- mp(I,_), N = count : { once_ent(I,X) }.",
-              ".decl once_app(inst:number,out:number)", "once_app(I,OUT) :- once_ent(I,OUT), once_ct(I,1).",
-              ".decl once_app_any(inst:number)", "once_app_any(I) :- once_app(I,_).", ""]
-    if lord:                                                          # ordinal succession
-        L += [".decl lord(id:number,ordv:number)"] + [f"lord({i},{o})." for i, o in sorted(lord.items())]
-        L += [".decl lat(ordv:number,id:number)"] + [f"lat({o},{i})." for o, i in sorted(lat.items())]
-        L += [".decl lpres(inst:number,ordv:number)", "lpres(I,O) :- tok(I,_,X), lord(X,O).",
-              ".decl lmax(inst:number,ordv:number)", "lmax(I,O) :- lpres(I,_), O = max OO : { lpres(I,OO) }.",
-              ".decl succ(inst:number,out:number)",
-              "succ(I,OUT) :- lmax(I,O), Om1=O-1, lpres(I,Om1), Om2=O-2, lpres(I,Om2), Op1=O+1, lat(Op1,OUT).",
-              ".decl succ_any(inst:number)", "succ_any(I) :- succ(I,_).", ""]
-    # routing: longest n-gram > once-appearing > succession > induction > abstain. Succession is ABOVE induction because
-    # a comma-separated run ends in a repeated punctuation token, on which the copy head would fire spuriously.
-    L.append("// routing: longest n-gram > once-appearing > succession > induction > abstain")
-    for n in lens:
-        guard = "".join(f", !gram{m+1}_any(I)" for m in lens if m > n)
-        L.append(f"cdecide(I,T) :- gram{n+1}_hit(I,T){guard}.")
-    nog = "".join(f", !gram{m+1}_any(I)" for m in lens)
-    if entity_ids:
-        L.append(f"cdecide(I,T) :- once_app(I,T){nog}.")
-    og = nog + (", !once_app_any(I)" if entity_ids else "")
-    if lord:
-        L.append(f"cdecide(I,T) :- succ(I,T){og}.")
-    sg = og + (", !succ_any(I)" if lord else "")
-    L.append(f"cdecide(I,T) :- ind1(I,T){sg}.")
-    return "\n".join(L) + "\n", lens
-
-
-def _emit_full_symbols(ngram_rules, sym, admitted):
-    """The legible twin: n-gram rules with token STRINGS; the circuits are computations (not lookups) so they are
-    described, and carried in circuits.full.dl (same as the composed-circuit note in minimize.emit_symbols)."""
-    from collections import defaultdict
-    esc = lambda s: '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\t", "\\t") + '"'
-    q = lambda t: esc(sym.get(t, f"id{t}"))
-    bylen = defaultdict(dict)
-    for suf, o in ngram_rules.items():
-        bylen[len(suf)][suf] = o
-    lens = sorted(bylen)
-    L = ["// rosetta · circuits.full.symbols.dl — legible twin (token STRINGS) of the n-gram cover; inherits the certificate.",
-         f"// NOTE: this model also carries STRUCTURAL circuits ({', '.join(admitted)}) — computations over token identity/",
-         "// order/ordinal, not token lookups, so they are not representable as symbol facts; see circuits.full.dl.", "",
-         ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
-         ".decl mp(inst:number, m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
-         ".decl cdecide(inst:number, out:symbol)", ".output cdecide"]
-    for n in lens:
-        N = n + 1
-        cols = ",".join(f"c{i}:symbol" for i in range(n))
-        L += [f".decl gram{N}({cols},t:symbol)", f".decl gram{N}_hit(inst:number,t:symbol)", f".decl gram{N}_any(inst:number)"]
-        L += [f"gram{N}({','.join(q(t) for t in suf)},{q(o)})." for suf, o in bylen[n].items()]
-        atoms = ["mp(I,P)"] + [f"tok(I,{'P' if i == n - 1 else f'P{n-1-i}'},C{i})" for i in range(n)]
-        atoms += [f"P{k}=P-{k}" for k in range(1, n)] + [f"gram{N}({','.join(f'C{i}' for i in range(n))},T)"]
-        L += [f"gram{N}_hit(I,T) :- {', '.join(atoms)}.", f"gram{N}_any(I) :- gram{N}_hit(I,_)."]
-    for n in lens:
-        guard = "".join(f", !gram{m+1}_any(I)" for m in lens if m > n)
-        L.append(f"cdecide(I,T) :- gram{n+1}_hit(I,T){guard}.")
-    return "\n".join(L) + "\n"
-
-
-def emit_full_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8):
-    """Wire ALL admitted circuits into circuits.full.dl (+ symbols twin), certify over natural ∪ circuit-behavior stimuli.
-
-    SCOPE OF THE CERTIFICATE (read this): the stated domain is the natural windows PLUS the circuit stimuli where (a) the
-    natural n-gram cover ABSTAINS and (b) the cover's routed decision == the model. Because routing is n-gram-FIRST, a
-    stimulus whose template suffix collides with a natural n-gram rule (e.g. transitivity ends in the ultra-common ' a',
-    for which the cover already has a rule) is EXCLUDED — the cover would return the n-gram's (possibly wrong) answer
-    there, and that instance is outside the certificate, not certified against. So the per-circuit `certified_instances`
-    count is domain-dependent (a circuit can recover+admit in the measurement yet contribute 0 here if its template
-    collides with the natural cover — e.g. transitivity on llama, modus_ponens on pythia). The clean per-circuit
-    CAPABILITY measure is the RECOVERY+ADMISSION run (`run()`), not this count."""
-    from oracle import run_equiv
-    name = os.path.basename(md.rstrip("/"))
-    # 1. natural-corpus n-gram cover (the memoization backstop the circuits sit above)
-    nat = instances(json.load(open(os.path.join(md, "corpus.json")))["ids"], nat_n, nat_w)
-    fill(nat)
-    nat_refs = [dec(c) for c in nat]
-    nat_ok = [i for i in range(len(nat)) if nat_refs[i] is not None]
-    ng = minimal_suffix_cover(nat, nat_refs, nat_ok, nat_w)[0]
-
-    def ng_pred(ctx):
-        for k in range(min(len(ctx), nat_w), 0, -1):
-            o = ng.get(tuple(ctx[-k:]))
-            if o is not None:
-                return o
+def extract_frame(insts):
+    """A family's FRAME = the offsets (1=last) whose token is CONSTANT across all its stimuli — the template's function-word
+    skeleton; the varying offsets are the operands. Requires fixed-length stimuli (single-token operands guarantee it).
+    Returns {offset: token id} or None."""
+    if not insts:
         return None
+    ln = len(insts[0])
+    if any(len(c) != ln for c in insts):
+        return None
+    frame = {}
+    for k in range(1, ln + 1):
+        vals = {c[-k] for c in insts}
+        if len(vals) == 1:
+            frame[k] = next(iter(vals))
+    return frame or None
 
-    # 2. facts for the structural rules
-    entity_ids = set()
-    for w in NAMES + NOUNS + ADJ:
-        ids = tok.encode(w, add_special_tokens=False).ids
-        if len(ids) == 1:
-            entity_ids.add(ids[0])
+
+
+
+def emit_unified_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8, T=1.0, eps=0.02, T_lo=0.7):
+    """THE single canonical circuits.dl: the T-distributional n-gram cover (certified across T via TV) + the frame-gated
+    structural circuits as point-mass rules (certified at argmax). Supersedes the separate circuits.full.* pair — one
+    cover, one symbols twin, one CERTIFICATE.md with both legs. Distributional part reuses temperature.dist_cover/emit_T;
+    circuits reuse this module's frame extraction."""
+    from temperature import build_sym, dist_cover, emit_T, certify_T, certify_argmax, trange
+    from oracle import serve_topk
+    name = os.path.basename(md.rstrip("/"))
+    corpus = json.load(open(os.path.join(md, "corpus.json")))["ids"]
+    nat = instances(corpus, nat_n, nat_w)
+    # 1. natural-corpus logits (cache; fill misses via serve) → distributional n-gram cover
+    cache_p = os.path.join(md, "logit_cache.json")
+    cache = json.load(open(cache_p)) if os.path.exists(cache_p) else {}
+    kf = lambda c: ",".join(map(str, c))
+    serve = os.environ.get("FIELDRUN_SERVE")
+    for c in nat:
+        if kf(c) not in cache and serve:
+            cache[kf(c)] = serve_topk(int(serve), c)
+    json.dump(cache, open(cache_p, "w"))
+    logmap = {i: [(int(v), float(s)) for v, s in cache[kf(nat[i])]] for i in range(len(nat)) if kf(nat[i]) in cache}
+    nat_idx = sorted(logmap)
+    ng_rules, remaining = dist_cover(nat, logmap, nat_idx, T_lo, T, eps, nat_w)
+    # 2. structural facts
+    entity_ids = {tok.encode(w, add_special_tokens=False).ids[0] for w in NAMES + NOUNS + ADJ
+                  if len(tok.encode(w, add_special_tokens=False).ids) == 1}
     lord, lat = {}, {}
-    letters = [c for c in LETTERS if len(tok.encode(c, add_special_tokens=False).ids) == 1]
-    for o, c in enumerate(letters):
-        i = tok.encode(c, add_special_tokens=False).ids[0]
-        lord[i] = o; lat[o] = i
-
-    # 3. gather each admittable circuit's stimuli; keep the instances the COVER (routing-aware, not the isolated rule)
-    #    decides correctly AND the n-gram cover abstains on (novel content) — the stated domain the circuits certify.
+    for o, c in enumerate([c for c in LETTERS if len(tok.encode(c, add_special_tokens=False).ids) == 1]):
+        i = tok.encode(c, add_special_tokens=False).ids[0]; lord[i] = o; lat[o] = i
     once_r, succ_r = py_once(entity_ids), py_succ(lord, lat)
-
-    def cover_decide(ctx):                                              # mirror the souffle routing exactly
-        p = ng_pred(ctx)
-        if p is not None:
-            return p
-        p = once_r(ctx)
-        if p is not None:
-            return p
-        p = succ_r(ctx)
-        if p is not None:
-            return p
-        return py_ind1(ctx)
-
-    dom_ins, dom_ref, per = list(nat), list(nat_refs), {}
-    ind_ins, _s = induction_exercise(vocab, n_seqs=12, seqlen=16)       # induction stimuli inline (skip the costly natural re-measure)
+    # 3. gather circuit stimuli + per-family frames
+    ind_ins, _s = induction_exercise(vocab, n_seqs=12, seqlen=16)
     fill(ind_ins)
     emit_stim = {"induction": ("induction", ind_ins, [dec(c) for c in ind_ins])}
     for cname, spec in CIRCUITS.items():
@@ -747,43 +652,81 @@ def emit_full_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8):
         res = spec["fn"](md, dec, fill, tok, vocab)
         if res and res.get("stimuli"):
             emit_stim[cname] = (spec["emit"], res["stimuli"][0], res["stimuli"][1])
-    for cname, (kind, ins, refs) in emit_stim.items():
-        keep = [k for k in range(len(ins)) if refs[k] is not None and ng_pred(ins[k]) is None and cover_decide(ins[k]) == refs[k]]
-        for k in keep:
-            dom_ins.append(ins[k]); dom_ref.append(refs[k])
-        per[cname] = {"emit": kind, "stimuli": len(ins), "certified_instances": len(keep)}
+    families = {c: extract_frame(ins) for c, (k, ins, _r) in emit_stim.items()
+                if k == "once_appearing" and extract_frame(ins) and max(extract_frame(ins)) > nat_w}
 
-    admitted_kinds = sorted({per[c]["emit"] for c in per if per[c].get("certified_instances", 0) > 0})
-    # 4. emit + certify
-    dl, _lens = _emit_full_souffle(ng, entity_ids if "once_appearing" in admitted_kinds else set(),
-                                   lord if "succession" in admitted_kinds else {},
-                                   lat if "succession" in admitted_kinds else {})
-    out = os.path.join(md, "circuits.full.dl")
-    open(out, "w").write(dl)
-    sym = {}
-    for t in {x for c in ng for x in c} | set(ng.values()):
-        s = tok.id_to_token(t) if hasattr(tok, "id_to_token") else None
-        sym[t] = (s or tok.decode([t]) or f"id{t}")
-    open(os.path.join(md, "circuits.full.symbols.dl"), "w").write(_emit_full_symbols(ng, sym, admitted_kinds or ["none"]))
-    r = run_equiv(out, dom_ins, dom_ref)
-    certified = r.get("nmiss", 1) == 0 and r.get("nuncov", 1) == 0 and r.get("ncover", 0) == len([x for x in dom_ref if x is not None])
-    score = {"model": name, "n_ngram_rules": len(ng), "natural_instances": len(nat_ok),
-             "circuit_instances": len(dom_ins) - len(nat), "domain": len([x for x in dom_ref if x is not None]),
-             "ncover": r.get("ncover"), "nmiss": r.get("nmiss"), "nuncov": r.get("nuncov"),
-             "certified": certified, "per_circuit": per, "emitted_kinds": admitted_kinds}
-    json.dump(score, open(os.path.join(md, "circuits.full.CERT.json"), "w"), indent=2)
-    print(f"\n=== emit_full_cover · {name} ===")
-    print(f"  n-gram cover (natural): {len(ng)} rules over {len(nat_ok)} windows")
+    def ng_argmax(ctx):
+        for k in range(min(len(ctx), nat_w), 0, -1):
+            r = ng_rules.get(tuple(ctx[-k:]))
+            if r is not None:
+                return max(r, key=lambda ts: ts[1])[0]
+        return None
+
+    def cover_decide(ctx):                                             # mirror emit_T routing: families > n-gram > succ > ind
+        for fr in families.values():
+            if len(ctx) >= max(fr) and all(ctx[-k] == v for k, v in fr.items()):
+                r = once_r(ctx)
+                if r is not None:
+                    return r
+        return ng_argmax(ctx) or succ_r(ctx) or py_ind1(ctx)
+
+    # 4. circuit-behavior domain (argmax): stimuli the cover decides == the model
+    dom_circ, per = [], {}
+    for cname, (kind, ins, refs) in emit_stim.items():
+        keep = [k for k in range(len(ins)) if refs[k] is not None and cover_decide(ins[k]) == refs[k]]
+        per[cname] = {"emit": kind, "stimuli": len(ins), "certified_instances": len(keep), "framed": cname in families}
+        dom_circ += [(ins[k], refs[k]) for k in keep]
+    # 5. emit the unified cover + symbols twin
+    out = os.path.join(md, "circuits.dl")
+    structural = {"entity_ids": entity_ids, "families": families, "lord": lord, "lat": lat}
+    emit_T(out, ng_rules, nat_w, idioms=[], induction=True, sym=build_sym(md), name=name, structural=structural)
+    # 6. dual certificate: T-range distributional over natural, argmax over the circuit domain
+    tresults, tok_ok = [], True
+    for q in trange(T_lo, T):
+        worst, ngot = certify_T(out, nat, logmap, nat_idx, q, eps)
+        ok = worst < eps and ngot == len(nat_idx); tok_ok &= ok; tresults.append((q, ngot, worst, ok))
+    cinsts = [ci for ci, _ in dom_circ]
+    amatch, achecked = certify_argmax(out, cinsts, {k: dom_circ[k][1] for k in range(len(dom_circ))},
+                                      list(range(len(cinsts))), T_lo) if cinsts else (0, 0)
+    argmax_ok = amatch == achecked
+    certified = tok_ok and argmax_ok
+    _write_unified_cert(md, name, nat_w, T_lo, T, eps, tresults, per, families, amatch, achecked, certified, remaining)
+    for suffix in ("full.dl", "full.symbols.dl", "full.CERT.json"):    # supersede the old separate pair
+        p = os.path.join(md, "circuits." + suffix)
+        if os.path.exists(p):
+            os.remove(p)
+    print(f"\n=== emit_unified_cover · {name} ===")
+    print(f"  n-gram cover (natural, distributional): {len(ng_rules)} rules over {len(nat_idx)} windows"
+          + (f"; {len(remaining)} uncovered" if remaining else ""))
     for c, d in per.items():
-        if d.get("certified_instances", 0) or d.get("admitted"):
-            print(f"  + {c:13} [{d.get('emit','-')}]: {d.get('certified_instances',0)} certified circuit instances "
-                  f"(admits={d.get('admitted')})")
-    print(f"  emitted structural kinds: {admitted_kinds or '(none)'}")
-    print(f"  CERTIFY (equiv.dl) over natural ∪ circuit stimuli ({score['domain']} inst): "
-          f"ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
-          + ("CERTIFIED — the wired circuits equal the model over the stated domain" if certified else "NOT certified"))
-    print("  wrote circuits.full.dl + circuits.full.symbols.dl + circuits.full.CERT.json")
-    return score
+        if d["certified_instances"]:
+            print(f"  + {c:13} [{d['emit']}{'/framed' if d['framed'] else ''}]: {d['certified_instances']} argmax-certified instances")
+    print("  T-range (n-gram): " + " ".join(f"T={q}:{'ok' if ok else 'FAIL'}(TV{worst:.3f})" for q, _n, worst, ok in tresults))
+    print(f"  argmax (circuits): {amatch}/{achecked} match model")
+    print("  → circuits.dl + circuits.symbols.dl + CERTIFICATE.md — "
+          + ("CERTIFIED (T-range n-gram ∧ argmax circuits)" if certified else "NOT certified"))
+    return {"model": name, "certified": certified, "trange_ok": tok_ok, "argmax": [amatch, achecked], "per_circuit": per}
+
+
+def _write_unified_cert(md, name, w, T_lo, T, eps, tresults, per, families, amatch, achecked, certified, remaining):
+    circ = sum(d["certified_instances"] for d in per.values())
+    lines = [f"# {name} · certificate (unified — T-distributional n-gram + argmax circuits)", "",
+             "`circuits.dl` is ONE cover: the natural-corpus n-gram rules carry top-K logits and the runtime computes",
+             "`softmax(logits/T)` at a queried `.input temp` (certified across the T-range by total-variation distance);",
+             "the structural circuits are frame-gated point-mass rules routed above/below the n-gram (a circuit predicts a",
+             "token, so it is certified at the **argmax** collapse, not by TV). `circuits.symbols.dl` is the legible twin.", "",
+             f"## Distributional leg — n-gram cover, T ∈ [{T_lo}, {T}], ε = {eps} ({tresults[0][1]} natural windows, W={w})", "",
+             "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
+    lines += [f"| {q} | {n}/{tresults[0][1]} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, n, worst, ok in tresults]
+    lines += ["", f"## Argmax leg — structural circuits ({circ} circuit-behavior instances)", "",
+              f"**{amatch}/{achecked} match the model at argmax** → {'CERTIFIED' if amatch == achecked else 'NOT certified'}.", "",
+              "| circuit | mechanism | frame-gated | argmax-certified instances |", "|---|---|---|---|"]
+    lines += [f"| {c} | {d['emit']} | {'yes' if d['framed'] else 'no'} | {d['certified_instances']} |"
+              for c, d in per.items() if d["certified_instances"]]
+    lines += ["", f"**{'CERTIFIED' if certified else 'NOT certified'}** over the stated domain "
+              f"(natural windows ∪ circuit-behavior stimuli). Runtime: `souffle run.dl`."
+              + (f"  ({len(remaining)} natural windows uncovered.)" if remaining else "")]
+    open(os.path.join(md, "CERTIFICATE.md"), "w").write("\n".join(lines) + "\n")
 
 
 def main():
@@ -794,9 +737,8 @@ def main():
     json_out = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--json=")), None)
     if "--emit-cover" in sys.argv:
         dec, fill, _label = make_oracle(md)
-        tokpath = os.path.join(md, "bundle.tokenizer.json")
         from tokenizers import Tokenizer
-        emit_full_cover(md, dec, fill, Tokenizer.from_file(tokpath), vocab_of(md))
+        emit_unified_cover(md, dec, fill, Tokenizer.from_file(os.path.join(md, "bundle.tokenizer.json")), vocab_of(md))
         return
     run(md, only, json_out)
 
