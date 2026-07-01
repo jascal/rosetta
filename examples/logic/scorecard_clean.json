@@ -1,0 +1,191 @@
+{
+ "domain": "Open Logic Project",
+ "question": "does the model-tier win survive a cleaned doc baseline?",
+ "grids": {
+  "require_citation_on": {
+   "curated": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "doc_raw": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "doc_clean": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 7,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 7
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 9,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 3,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 3
+    }
+   }
+  },
+  "require_citation_off": {
+   "curated": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "doc_raw": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 7,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 7
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 9,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 5,
+     "topical": 5,
+     "distilled": 0,
+     "retrieved": 5
+    }
+   },
+   "doc_clean": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 7,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 7
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 9,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 3,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 3
+    }
+   }
+  }
+ },
+ "n": 50
+}

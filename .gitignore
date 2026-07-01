@@ -30,3 +30,6 @@ examples/*/package/
 examples/*/corpus.json
 examples/pretext/*/package/
 examples/pretext/package/
+
+# derived by examples/logic/clean_kb.py (regenerable)
+examples/logic/logic_kb_clean.txt

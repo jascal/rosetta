@@ -127,6 +127,102 @@ A `scorecard.json` (illustrative values):
 }
 ```
 
+## Measured result — the logic expert (the ablation) · `empirical`
+
+The illustrative scorecard above is now backed by a real one. The decisive question for the *whole* model-distilled
+arm — **does the model tier earn its place, or is every working expert really document-derived?** — was run on the
+Open Logic Project expert (gemma-4-e4b-it distilled over 28 questions × ~251 decode steps, in
+[`examples/logic/`](./examples/logic/)). Three package variants that differ **only** in which tiers are present were
+served through the real sgiandubh binary with identical flags and graded on one 50-row testset
+([`testset.jsonl`](./examples/logic/testset.jsonl): 10 verbatim / 11 paraphrase / 12 held-out / 17 off-domain).
+Reproduce: `.venv/bin/python examples/logic/run_ablation.py` → [`scorecard.json`](./examples/logic/scorecard.json).
+
+*Provenance of the model tier.* [`curated_faq.json`](./examples/logic/curated_faq.json) is the frozen distilled FAQ:
+`fieldrun --export-logic-corpus` runs **gemma-4-e4b-it** greedily (EOS-stopping, ~251 steps) over each of the 28
+questions, and `pack.answers.from_export` concatenates the predicted tokens into one answer per question — **no human
+review, editing, or reranking**. So the "model tier" being ablated is the model's own raw greedy generation, distilled
+at build and frozen (which is why one answer — "quantifier" — is a garbled self-correction, kept verbatim).
+
+Answered / n per subset (`ii_document` = retrieval over the **raw** OLP dump; `iii_both` = the shipped cascade):
+
+| variant | verbatim | paraphrase | held-out | off-domain leak |
+|---|---|---|---|---|
+| **require-citation ON** (shipped default) | | | | |
+| i_curated (FAQ only) | 10/10 | 12/12 | 9/12 | 0/16 |
+| ii_document (retrieval only) | **0/10** | **0/12** | **0/12** | 0/16 |
+| iii_both | 10/10 | 12/12 | 9/12 | 0/16 |
+| **require-citation OFF** (raw retrieval capability) | | | | |
+| i_curated | 10/10 (topical 10) | 12/12 (12) | 9/12 (7) | 0/16 |
+| ii_document | 7/10 (**topical 2**) | 9/12 (**2**) | 9/12 (**3**) | **5/16** |
+| iii_both | 10/10 (10) | 12/12 (12) | 10/12 (7) | 5/16 |
+
+**Verdict (bounded): on this domain the model tier decisively earns its place — but strictly as a distilled FAQ, not
+as a generalizing reasoner.** This *refutes* the prior tentative read that "no shipped expert derives value from the
+model." Concretely:
+
+- **In-distribution** (verbatim + paraphrase, n=22): the curated tier answers all 22 with clean, citation-bearing
+  definitional prose (manual read: ~21/22 genuinely correct — the lone miss is a garbled "quantifier" distillation).
+  Retrieval over the **raw dump** cannot cite these under the shipped `--require-citation` policy (0/22), and even
+  uncited it is on-target only ~2/22 (it returns section headers / tangential mentions from the PDF-to-text noise).
+  So the model tier's real contribution is **converting a noisy raw corpus into a clean, cited, leak-free answer set**
+  that raw-dump retrieval cannot match.
+- **Off-domain** (n=16): the curated tier leaks **0** (structural — it only fires on a lexical match to a distilled
+  question, and off-domain queries don't match). Uncited retrieval leaks **5/16** (grabs logic fragments on overlap
+  words — e.g. "chemical formula for salt" hits the corpus word "formula").
+- **Held-out** (n=12, questions never distilled): the curated tier does **not** generalize — it fuzzy-matches to the
+  nearest distilled question (shared content words ≥ τ=0.25) and confidently returns *that* answer. The concrete
+  drift, from the served outputs:
+
+  | held-out query | fuzzy-matched distill Q | returned (wrong) answer |
+  |---|---|---|
+  | "What is the **completeness** theorem?" | "…the **soundness** theorem?" | the Soundness Theorem definition |
+  | "What is the **compactness** theorem?" | "…the **soundness** theorem?" | the Soundness Theorem definition |
+  | "What is the **Löwenheim–Skolem** theorem?" | "…the **soundness** theorem?" | the Soundness Theorem definition |
+  | "What is a **conjunction** in logic?" | "What is a **tautology** …?" | the tautology definition |
+  | "…difference between a **theory and a model**?" | "…**valid** vs a **sound** argument?" | the valid-vs-sound answer |
+
+  Manual read: only ~2–3/12 genuinely correct; the lenient any-key `topical` metric over-credits the rest. **This is a
+  confident-wrong failure, not coverage** — the fuzzy matcher accepts a shared noun ("theorem", "argument") as a match.
+
+That last failure is **calibratable**, and the fix is measured, not asserted: sweeping the curated tier's Jaccard
+threshold (`--tau`) shows that raising it from the 0.25 default to **≈0.40** makes the out-of-FAQ held-out questions
+**abstain** (held-out answered 9/12 → 2/12, and the 2 survivors are a verbatim distill question + a near-paraphrase)
+while fully preserving the FAQ (verbatim 10/10, paraphrase 11/12). τ≈0.40 trades confident-wrong nearest-neighbour
+answers for honest abstention — the bounded-expert bias — and is the recommended default for a distilled-FAQ expert
+(the analogue of the riscv cos/margin calibration; the server default lives in sgiandubh).
+
+**The fair-baseline follow-up (P1-b) — the win is robust.** The document tier above was the **raw** OLP dump, so
+"model tier > raw-dump retrieval" left open whether a *cleanly-adapted* corpus would close the gap. Tested it:
+[`clean_kb.py`](./examples/logic/clean_kb.py) filters TOC/boilerplate and attaches `[OLP §N.N]` section handles (1200
+→ 1048 citable passages), and [`run_clean_baseline.py`](./examples/logic/run_clean_baseline.py) re-grades curated vs
+raw-doc vs clean-doc ([`scorecard_clean.json`](./examples/logic/scorecard_clean.json)). The clean corpus fixes the
+*citation* problem — under `--require-citation` it now answers **25/34** (raw answered 0/34) — but **not** the
+*relevance* problem: it is on-target only **7/25** and still leaks **3/16**, versus curated's **29/31** on-target and
+**0** leak. So the document tier's failure was never just missing citation handles — passage-retrieval (GloVe cosine +
+lexical coverage) returns a passage that *mentions the query words*, not one that *answers the question*, for these
+"what is X" definitional queries. **The model-distilled tier earns its place even against a cleaned, citeable document
+baseline.** The raw→clean→curated progression at a glance (require-citation ON, the shipped policy):
+
+| document source | answered (all cited) | on-target | off-domain leak |
+|---|---|---|---|
+| raw OLP dump (no handles) | 0/34 | — | 0/16 |
+| cleaned (+ `[OLP §N.N]` handles) | 25/34 | 7/25 (28%) | 3/16 |
+| **curated (model FAQ)** | **31/34** | **29/31 (94%)** | **0/16** |
+
+Cleaning recovers *answering* (0→25) but not *relevance* (on-target stays ~28%). **The main remaining uncertainty** is
+retriever strength: this uses sgiandubh's as-shipped GloVe-cosine + lexical-coverage retriever, so a stronger dense
+retriever or a reranker could narrow the document-tier gap — that is the natural next baseline, and the one axis on
+which this verdict could still move.
+
+**Connection to the minimization arm.** A high-precision, leak-free, abstaining expert like this is also a clean
+*oracle*: it answers a bounded question set faithfully and refuses elsewhere, so it can seed the circuit work — a
+scoped query set whose model behaviour is worth decompiling, or a source of causally-checkable idioms for `circuits.dl`.
+Putting a real model *circuit* (not just a distilled answer) into a served package — pythia160m induction — is the
+first step across that bridge and is tracked separately.
+
+**Caveats (state the domain):** (1) `topical` is a lenient any-key proxy corrected by manual reads above. (2) One
+model (gemma-4-e4b-it), one corpus (OLP), 50 rows — `empirical` over exactly that.
+
 ## Test-set construction (decided)
 
 A scorecard is only as honest as the set it's graded on (*"recalibrate on a representative test set, not a toy corpus"*).
