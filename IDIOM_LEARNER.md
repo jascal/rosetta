@@ -331,8 +331,12 @@ induction-amenable, as predicted), but **neither is deployable as-built**. (Asid
 strict gates on a few-thousand-token corpus, so the abstain region is nearly everything; a larger corpus lifts n-gram
 coverage but does not change induction's ~40% natural-text precision, which is the deciding number.)
 
-**Implication (answers "keep adding rule types, or tail-chasing?").** Don't add more rule types: the naive circuits
-don't pay off on natural in-domain text. The circuit tier is only viable if **confidence-gated** — e.g. L≥2/3 only, or
-a per-fire threshold — trading most of its firing for precision, and even then the payoff is marginal. The honest next
-step is that calibration (does L-gating recover precision at usable coverage?), not a third family; failing that, the
-distilled **answer** tier ([`EXPERTS.md`](./EXPERTS.md)) remains the model's real contribution to a content expert.
+**Decision (2026-07-02) — park the circuit-tier-into-expert line; the answer tier is the model's contribution.** The
+naive circuits don't pay off on natural in-domain text, and rather than chase the one remaining rescue lever
+(confidence-gating: serve induction only at L≥2/3 or above a per-fire threshold, trading most firing for precision),
+the call is to **stop here**. The distilled **answer** tier ([`EXPERTS.md`](./EXPERTS.md)) is the model's real value
+for a content expert (the #27 verdict). The OOD-circuit work (#28 induction, #29 succession) stands as a **validated
+mechanism** and a **minimization-arm** result (the certified `circuits.dl`) — *not* a served-expert lever: **not**
+adding a third family, **not** wiring the sgiandubh C++ executors. This is a `recipe-plateaus` stop, not an
+impossibility claim — the confidence-gating calibration and structurally-sequential domains remain `open` levers if a
+future need justifies revisiting; the measurement above is why we don't spend on them now.
