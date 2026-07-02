@@ -305,3 +305,34 @@ token-space subtlety that also governs multi-model rule merging: rules live in t
 `exercise_confirm.py:py_once`) — is the natural next one across: it needs a frame + entity-set in the manifest and an
 `entity-count` host executor. Two families in (induction, succession) the pattern is established; a small registry that
 dispatches serve on `kind` becomes justified when the third lands.
+
+### Does the circuit tier actually help on NATURAL in-domain text? The prevalence test (`py/circuit_prevalence.py`) · `empirical`
+
+Before wiring a third family or the sgiandubh C++ executors, the load-bearing question: the #28/#29 wins were on
+*synthetic exercising probes* — does a confirmed circuit help on the natural in-domain text a real expert serves?
+Measured with ONE model (qwen2.5-coder-1.5b, induction confirmed L=1/2/3 causal 95–99%) on two natural corpora (so the
+variable is domain STRUCTURE, not the model): build the n-gram memorization tier on a disjoint train split, then over
+~400 held-out positions measure induction's **marginal** coverage in the region where the n-gram tier ABSTAINS.
+
+| corpus | n-gram covers | abstains | induction fires (of abstains) | induction MATCHES model (of fires) | deployed net (of all holdout) |
+|---|---|---|---|---|---|
+| **code** (CPython `json/__init__.py`) | 4% | 96% | 44% | **43%** | +18% right / **+24% wrong** |
+| **prose** (OLP logic) | 6% | 94% | 35% | **32%** | +10.5% right / **+22.5% wrong** |
+
+**The synthetic-probe faithfulness does NOT transfer — this is a warning, not a win.** Induction is causal 95–99% on
+novel-repeat probes and served 84–100% precision there (#28), but on NATURAL text it fires promiscuously (mostly L=1
+coincidental token recurrences) and reproduces the model's argmax only **~40%** of the time. A naive induction rule
+served on all its firings therefore emits **more confident-WRONG answers than correct ones** — net-harmful as a
+"trusted" tier on natural in-domain text. This quantifies the "masked on natural text" finding at the served-rule
+level: a recurring suffix in prose/code usually does NOT mean the model copies.
+
+Directionally the domain contrast holds (code fires 44% / marginal 18% vs prose 35% / 10.5% — code is more
+induction-amenable, as predicted), but **neither is deployable as-built**. (Aside: the n-gram tier covers only 4–6% at
+strict gates on a few-thousand-token corpus, so the abstain region is nearly everything; a larger corpus lifts n-gram
+coverage but does not change induction's ~40% natural-text precision, which is the deciding number.)
+
+**Implication (answers "keep adding rule types, or tail-chasing?").** Don't add more rule types: the naive circuits
+don't pay off on natural in-domain text. The circuit tier is only viable if **confidence-gated** — e.g. L≥2/3 only, or
+a per-fire threshold — trading most of its firing for precision, and even then the payoff is marginal. The honest next
+step is that calibration (does L-gating recover precision at usable coverage?), not a third family; failing that, the
+distilled **answer** tier ([`EXPERTS.md`](./EXPERTS.md)) remains the model's real contribution to a content expert.
