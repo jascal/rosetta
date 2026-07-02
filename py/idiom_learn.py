@@ -504,7 +504,7 @@ def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, 
     return finalize(md, insts, logmap, lidx, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
 
 
-def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0):
+def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0, succ=None):
     """The bounded-EXPERT package (rosetta→sgiandubh convergence): CAUSALLY-CONFIRMED idioms as the TRUSTED (ungated) tier
     + a GATED n-gram backfill (support/determinism → abstain on weak suffixes) + a manifest that distinguishes causal
     idioms from observational n-grams (with provenance). The strengthening over the corpus-only abstain_emit path: the
@@ -552,13 +552,33 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
             man.append({"id": rid, "kind": "ngram", "tier": "gated", "basis": "observational", "ctx": list(s),
                         "out": o, "support": sup, "determinism": round(det, 3), "cite": cite}); rid += 1
     ng_covered = {i for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1))}
+    # ordinal/succession — the SECOND causally-confirmed OOD circuit across the manifest boundary (same wiring as
+    # induction below: count coverage on the n-gram tail → emit a {trusted,causal,ood} manifest rule → serve host-side).
+    # lord: token→ordinal, lat: ordinal→token; predicts the successor of a >=3-long consecutive ascending run
+    # ([… X X+1 X+2] → X+3). Matches exercise_confirm.py:py_succ (the certified souffle form). Routes ABOVE induction.
+    succ_cov = set()
+    if succ:
+        lord, lat = succ["lord"], succ["lat"]
+        for i in residual:
+            if i in ng_covered:
+                continue
+            pres = {lord[t] for t in insts[i] if t in lord}
+            if pres:
+                o = max(pres)
+                if (o - 1) in pres and (o - 2) in pres and lat.get(o + 1) == refs[i]:
+                    succ_cov.add(i)
+        man.append({"id": rid, "kind": "succession", "tier": "trusted", "basis": "causal", "routing": "ood",
+                    "causal": round(succ.get("causal", 0), 3), "support": len(succ_cov),
+                    "lord": {int(t): int(o) for t, o in lord.items()}, "lat": {int(o): int(t) for o, t in lat.items()},
+                    "cite": sorted(succ_cov)[:5]})
+        rid += 1
     # copy/induction — the causally-confirmed COPY circuit, wired in as a first-class rule (was souffle-only OOD before).
     # Routes as OOD (below n-grams, matching emit_circuits), so it covers only what n-grams didn't: the novel-repeat tail.
     ind_cov = set()
     for r in rels_real:
         L, c = r["L"], set()
         for i in residual:
-            if i in ng_covered:
+            if i in ng_covered or i in succ_cov:
                 continue
             ctx = insts[i]
             if len(ctx) > L:
@@ -574,17 +594,21 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
     emit_circuits(out, real, real_c, rels_real, ngram_rules, w, name)  # idiom > gated-ngram > induction(OOD) > abstain
     json.dump({"model": name, "trusted_idioms": len(real) + len(real_c), "gated_ngrams": len(ngram_rules),
                "induction_ood": len(rels_real), "induction_cover": len(ind_cov),
+               "succession_ood": (1 if succ else 0), "succession_cover": len(succ_cov),
                "minsupp": minsupp, "mindet": mindet, "rules": man},
               open(os.path.join(pkg, "manifest.json"), "w"))
-    ngcov, indcov, H = len(ng_covered), len(ind_cov), len(idxs)
+    ngcov, sccov, indcov, H = len(ng_covered), len(succ_cov), len(ind_cov), len(idxs)
     print(f"\n=== EXPERT PACKAGE (bounded, causal-confirmed) → {pkg}/ ===")
     print(f"  TRUSTED idioms (causal): {len(real_c)} compose + {len(real)} gate → cover {len(covered)}/{H} = {len(covered)/H:.0%}")
     print(f"  GATED n-grams (supp>={minsupp},det>={mindet}): {len(ngram_rules)} rules → cover {ngcov}/{H} = {ngcov/H:.0%} of residual")
+    if succ:
+        print(f"  SUCCESSION (causal, OOD): 1 rule → cover {sccov}/{H} = {sccov/H:.0%} (the ordinal tail)")
     if rels_real:
         print(f"  INDUCTION (causal, OOD): {len(rels_real)} rule(s) → cover {indcov}/{H} = {indcov/H:.0%} (the n-gram tail)")
-    cov = (len(covered) + ngcov + indcov) / H
+    cov = (len(covered) + ngcov + sccov + indcov) / H
     print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%}"
-          f"{f' + induction {indcov/H:.0%}' if rels_real else ''} = answer {cov:.0%}, abstain {1 - cov:.0%}")
+          f"{f' + succession {sccov/H:.0%}' if succ else ''}{f' + induction {indcov/H:.0%}' if rels_real else ''}"
+          f" = answer {cov:.0%}, abstain {1 - cov:.0%}")
     print(f"  manifest.json: {len(man)} rules tagged causal(trusted) vs observational(gated) + provenance — the audit of what the expert knows")
     return out, os.path.join(pkg, "manifest.json")
 
