@@ -57,3 +57,22 @@ def test_induction_circuit_wired_into_package(tmp_path):
     r = serve([5, 9, 5], idioms, ngrams, 8)                       # induction fires (no n-gram at support 1) → copies 9
     assert r and r["answer"] == 9 and r["tier"] == "trusted" and r["circuit"] == "induction"
     assert serve([1, 2, 3], idioms, ngrams, 8) is None           # no recurring suffix → induction can't fire → ABSTAIN
+
+
+def test_succession_circuit_wired_into_package(tmp_path):
+    # a causally-confirmed ordinal alphabet (token 100→ord0, 101→ord1, …) → a first-class `succession` manifest rule.
+    from serve_package import load_package, serve
+    lord = {100 + i: i for i in range(6)}                         # tokens 100..105 = ordinals 0..5
+    lat = {i: 100 + i for i in range(6)}
+    insts = [[100, 101, 102]]                                     # a 3-run 0,1,2 → predict ord 3 = token 103
+    refs = [103]
+    succ = {"lord": lord, "lat": lat, "causal": 1.0}
+    _, man = emit_expert_package(str(tmp_path), insts, refs, [0], [], [], [], 8, "test", minsupp=3, mindet=1.0, succ=succ)
+    m = json.load(open(man))
+    assert m["succession_ood"] == 1 and m["succession_cover"] == 1
+    sr = next(r for r in m["rules"] if r["kind"] == "succession")
+    assert sr["tier"] == "trusted" and sr["basis"] == "causal" and sr["routing"] == "ood"
+    idioms, ngrams, _ = load_package(man)
+    r = serve([100, 101, 102], idioms, ngrams, 8)                 # ascending run → predict the successor
+    assert r and r["answer"] == 103 and r["circuit"] == "succession"
+    assert serve([100, 105, 101], idioms, ngrams, 8) is None      # not a consecutive run → ABSTAIN

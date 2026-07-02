@@ -70,6 +70,10 @@ def load_package(manifest_path):
                            "sum": {int(s): int(o) for s, o in r["sum"].items()}})
         elif kind == "induction":                                # causal COPY circuit, routed OOD (after n-grams)
             idioms.append({"kind": "induction", "id": r["id"], "cite": _cite(r), "L": int(r["L"])})
+        elif kind == "succession":                               # causal ORDINAL circuit, routed OOD (above induction)
+            idioms.append({"kind": "succession", "id": r["id"], "cite": _cite(r),
+                           "lord": {int(t): int(o) for t, o in r["lord"].items()},
+                           "lat": {int(o): int(t) for o, t in r["lat"].items()}})
     return idioms, ngrams, m
 
 
@@ -79,7 +83,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] == "induction":                            # induction routes OOD (below n-grams) — handled last
+        if r["kind"] in ("induction", "succession"):           # OOD circuits route below n-grams — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -99,6 +103,18 @@ def serve(ctx, idioms, ngrams, W):
         if s in ngrams[k]:
             out, basis, cite = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
+    # succession (causal ORDINAL), OOD fallback ABOVE induction — reached only after an n-gram miss. Predicts the
+    # successor of a >=3-long consecutive ascending run of ordinal tokens ([… X X+1 X+2] → X+3); matches py_succ.
+    for r in idioms:
+        if r["kind"] != "succession":
+            continue
+        lord, lat = r["lord"], r["lat"]
+        pres = {lord[t] for t in ctx if t in lord}
+        if pres:
+            o = max(pres)
+            if (o - 1) in pres and (o - 2) in pres and (o + 1) in lat:
+                return {"answer": lat[o + 1], "tier": "trusted", "basis": "causal",
+                        "citation": r["cite"], "rule": r["id"], "circuit": "succession"}
     # induction (causal COPY), OOD fallback — reached ONLY after an n-gram miss, so it costs nothing on the hot path
     # (a package with no induction rules skips this loop entirely). Fires where no n-gram matched: find the previous
     # occurrence of the current L-token suffix and copy its successor ([… A B … A] → B). LONGEST L first — a longer

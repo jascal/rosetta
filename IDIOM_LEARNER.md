@@ -274,9 +274,34 @@ so precedence doesn't move the pythia-160m numbers; it matters on general text w
 The induction pass is reached **only after an n-gram miss**, so it is free on the hot path (and skipped entirely by a
 package with no induction rules).
 
-**Generalization (`open`).** The wiring pattern — *count the circuit's coverage → emit a
+**Generalization — demonstrated, not just claimed.** The wiring pattern — *count the circuit's coverage → emit a
 `{tier:trusted, basis:causal, routing:ood}` manifest rule → serve it after the n-gram cache* — is generic, not
-induction-specific. The souffle twin already routes the other exercise-then-confirm families (succession, the
-once-appearing / name-mover binding rule) OOD the same way; feeding those confirmed families into
-`emit_expert_package` (today it takes only gates/composes/rels) would register them host-side by the identical
-mechanism. Induction is simply the first OOD circuit across the manifest boundary.
+induction-specific, and is now shown for a **second** family:
+
+### Succession wired in — the second OOD circuit across the boundary (`py/succession_package.py`) · `empirical`
+
+`emit_expert_package(succ=…)` now also emits an `succession` rule (ordinal successor: `lord` token→ordinal, `lat`
+ordinal→token; `[… X X+1 X+2] → X+3`, matching `exercise_confirm.py:py_succ`), and `serve_package` serves it host-side
+routed **above** induction (both OOD, after the n-gram cache). Measured on **llama-3.2-1b** (resident oracle, 26-letter
+alphabet split into early-letter train / late-letter held-out runs — the model does succession at detect 100%, causal
+100%):
+
+| held-out late-letter runs (n=11) | coverage | precision | abstain |
+|---|---|---|---|
+| **WITH succession** | **100% (11/11)** | **100%** | 0% |
+| **n-gram only** | **0%** | — | **100%** |
+
+Same shape as induction: on held-out transitions the n-gram cache never saw, the ordinal *rule* is the entire
+load-bearing tier and it **generalizes** (100% vs 0%). Precision 100% (cleaner than induction's 84%) because a
+single-token letter alphabet is deterministic where the model runs the circuit.
+
+**Build-time gotcha (worth recording).** The served rule is tokenizer-free (just id maps), but *building* `lord` must
+enumerate each letter's token **spacing variants** — the same letter is a different token by position (`"A"`=32 after a
+comma vs `" A"`=362 after a space). Keying `lord` on only `" A"` made the rule miss the first letter in the comma
+format and cover **0%**; enumerating variants at build time fixed it to 100%. (This is a small instance of the
+token-space subtlety that also governs multi-model rule merging: rules live in the model's BPE id space.)
+
+**Still `open`.** The third family — the once-appearing / name-mover binding rule (IOI + the reasoning families,
+`exercise_confirm.py:py_once`) — is the natural next one across: it needs a frame + entity-set in the manifest and an
+`entity-count` host executor. Two families in (induction, succession) the pattern is established; a small registry that
+dispatches serve on `kind` becomes justified when the third lands.
