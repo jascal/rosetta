@@ -26,6 +26,7 @@ was present at build). Three rule kinds:
 | `gate` | trusted / causal | `frame:{offset:token}`, `slot:k`, `table:{token:out}`, `causal`, `support` | frame matches (`ctx[-offset]==token` ∀) ∧ `ctx[-slot] in table` → `table[ctx[-slot]]` |
 | `compose` | trusted / causal | `frame`, `operands:[k1,k2]`, `valmap:{token:value}`, `sum:{value-sum:out}`, `causal`, `extrapolate` | frame matches ∧ both operands in `valmap` ∧ `valmap[op1]+valmap[op2] in sum` → `sum[...]` |
 | `ngram` | gated / observational | `ctx:[token ids]`, `out`, `support`, `determinism` | longest suffix where `ctx` matches → `out` |
+| `relation` | trusted / causal | `eq:[[i,j],...]`, `copy:k`, `confidence` | `ctx[-i]==ctx[-j]` ∀ pairs → `ctx[-k]` (routed after n-grams, above succession/induction; the learned repetition rule is `eq=[[1,2]], copy=1`) |
 
 **Offsets are 1-based from the end** (offset 1 = the last context token, offset k = `ctx[-k]`). JSON keys are strings;
 normalize to ints on load.
@@ -38,6 +39,9 @@ normalize to ints on load.
 3. **GATED n-grams** — longest matching suffix wins. Kept at build only by support/determinism ("fire only if confident",
    *not* gating inside an n-gram), so a match is already a confident match.
 4. **ABSTAIN** if nothing fires → defer to a backstop, or refuse (the bounded expert).
+   (Routed OOD circuits fire between 3 and 4, most-specific first: `relation` → `succession` → `induction`.
+   Trusted non-table kinds may ship a `confidence` field (held-out fired-accuracy) so a support-weighted
+   runtime can arbitrate tiers per answer instead of by fixed priority.)
 5. **Cite** the answer: the fired rule's `citation`/`cite`. (`circuits.expert.dl` additionally emits `cprov(inst,ruleid)`
    for the souffle path.)
 

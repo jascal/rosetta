@@ -74,6 +74,10 @@ def load_package(manifest_path):
             idioms.append({"kind": "succession", "id": r["id"], "cite": _cite(r),
                            "lord": {int(t): int(o) for t, o in r["lord"].items()},
                            "lat": {int(o): int(t) for o, t in r["lat"].items()}})
+        elif kind == "relation":                                 # causal EQ-GUARD + COPY (offset-local), routed OOD
+            idioms.append({"kind": "relation", "id": r["id"], "cite": _cite(r),
+                           "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
+                           "conf": r.get("confidence")})
     return idioms, ngrams, m
 
 
@@ -83,7 +87,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] in ("induction", "succession"):           # OOD circuits route below n-grams — handled after
+        if r["kind"] in ("induction", "succession", "relation"):  # OOD circuits route below n-grams — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -103,6 +107,17 @@ def serve(ctx, idioms, ngrams, W):
         if s in ngrams[k]:
             out, basis, cite = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
+    # relation (causal EQ-GUARD + COPY), OOD fallback ABOVE succession/induction — the most specific of the routed
+    # circuits: fires iff ctx[-i] == ctx[-j] for every pair in `eq` (offsets 1-based from the end), then copies
+    # ctx[-copy]. The learned repetition rule is eq=[[1,2]], copy=1. `confidence` (optional, all trusted kinds) is
+    # the rule's held-out fired-accuracy — shipped so a support-weighted runtime can arbitrate tiers per answer.
+    for r in idioms:
+        if r["kind"] != "relation":
+            continue
+        offs = [o for ij in r["eq"] for o in ij] + [r["copy"]]
+        if max(offs) <= len(ctx) and all(ctx[-i] == ctx[-j] for i, j in r["eq"]):
+            return {"answer": ctx[-r["copy"]], "tier": "trusted", "basis": "causal",
+                    "citation": r["cite"], "rule": r["id"], "circuit": "relation"}
     # succession (causal ORDINAL), OOD fallback ABOVE induction — reached only after an n-gram miss. Predicts the
     # successor of a >=3-long consecutive ascending run of ordinal tokens ([… X X+1 X+2] → X+3); matches py_succ.
     for r in idioms:
