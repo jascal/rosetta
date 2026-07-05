@@ -87,7 +87,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] in ("induction", "succession"):           # OOD circuits route below n-grams — handled after
+        if r["kind"] in ("induction", "succession", "relation"):  # OOD circuits route below n-grams — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
