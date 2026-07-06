@@ -42,6 +42,25 @@ normalize to ints on load.
    (Routed OOD circuits fire between 3 and 4, most-specific first: `relation` → `succession` → `induction`.
    Trusted non-table kinds may ship a `confidence` field (held-out fired-accuracy) so a support-weighted
    runtime can arbitrate tiers per answer instead of by fixed priority.)
+
+### The support-weighted cover (`"cover": "support-weighted"`)
+
+A manifest may declare `"cover": "support-weighted"` at the top level. A conforming runtime then
+replaces the fixed tier priority with per-answer ARBITRATION: every applicable rule fires and the
+answer with the highest confidence wins (ties keep the first candidate — idioms in manifest order,
+then n-grams longest-first). Confidences are what the package ships:
+- `ngram` rules carry `confidence` = Laplace-shrunk per-key determinism `c/(t+α)`;
+- `gate` rules carry `confs` = a per-content-key confidence map parallel to `table`;
+- trusted kinds (`relation`, `induction`, …) carry the scalar `confidence` (held-out fired-accuracy).
+
+This is the argmax policy whose dominance over every fixed priority is kernel-checked
+(i-orca `examples/concept_grounding/Arbitration.thy`: `argmax_policy_optimal`), with CALIBRATION as
+the stated premise — the shipped confidences must approximate true per-key accuracy, which is why
+producers Laplace-shrink and support-gate them (`miscalibration_bound` quantifies the cost of
+inflation: within 2ε·total-weight of optimal under ε-miscalibration). Reference implementation:
+`py/serve_package.py` (`serve_sw`/`decide`); C++ port: sgiandubh `src/rosetta_package.h`. First
+producer: pil `wyly_lm_v5` `WYLY_EMIT=1` (served-vs-learner parity verified to 4 decimals on
+11.5k/12k held-out windows per dataset).
 5. **Cite** the answer: the fired rule's `citation`/`cite`. (`circuits.expert.dl` additionally emits `cprov(inst,ruleid)`
    for the souffle path.)
 

@@ -58,18 +58,21 @@ def load_package(manifest_path):
         kind = r.get("kind", "ngram")
         if kind == "ngram":
             ctx = tuple(r["ctx"])
-            ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r))
+            ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r),
+                                     r.get("confidence"))
         elif kind == "gate":
             idioms.append({"kind": "gate", "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "slot": r["slot"],
-                           "table": {int(k): int(v) for k, v in r["table"].items()}})
+                           "table": {int(k): int(v) for k, v in r["table"].items()},
+                           "confs": {int(k): float(c) for k, c in (r.get("confs") or {}).items()}})
         elif kind == "compose":
             idioms.append({"kind": "compose", "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
                            "valmap": {int(t): int(v) for t, v in r["valmap"].items()},
                            "sum": {int(s): int(o) for s, o in r["sum"].items()}})
         elif kind == "induction":                                # causal COPY circuit, routed OOD (after n-grams)
-            idioms.append({"kind": "induction", "id": r["id"], "cite": _cite(r), "L": int(r["L"])})
+            idioms.append({"kind": "induction", "id": r["id"], "cite": _cite(r), "L": int(r["L"]),
+                           "conf": r.get("confidence")})
         elif kind == "succession":                               # causal ORDINAL circuit, routed OOD (above induction)
             idioms.append({"kind": "succession", "id": r["id"], "cite": _cite(r),
                            "lord": {int(t): int(o) for t, o in r["lord"].items()},
@@ -105,7 +108,7 @@ def serve(ctx, idioms, ngrams, W):
     for k in range(min(len(ctx), W), 0, -1):                    # gated n-gram tier (longest suffix wins)
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite = ngrams[k][s]
+            out, basis, cite, _conf = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
     # relation (causal EQ-GUARD + COPY), OOD fallback ABOVE succession/induction — the most specific of the routed
     # circuits: fires iff ctx[-i] == ctx[-j] for every pair in `eq` (offsets 1-based from the end), then copies
@@ -144,6 +147,67 @@ def serve(ctx, idioms, ngrams, W):
                 return {"answer": ctx[max(js) + L], "tier": "trusted", "basis": "causal",
                         "citation": r["cite"], "rule": r["id"], "circuit": "induction"}
     return None  # ABSTAIN
+
+
+def serve_sw(ctx, idioms, ngrams, W):
+    """SUPPORT-WEIGHTED cover (manifest cover: "support-weighted"): every applicable rule fires and
+    the answer with the highest confidence wins -- the argmax policy whose dominance over every
+    fixed priority is the kernel-checked C10 (i-orca Arbitration.thy: argmax_policy_optimal), with
+    calibration as the stated premise. Confidences are what the package ships: per-key
+    Laplace-shrunk determinism for table rules (ngram "confidence", gate "confs"), held-out
+    fired-accuracy for scalar kinds (relation/induction "confidence"). Ties keep the FIRST
+    candidate in manifest order (the learner's admitted order), n-grams after idioms, longest
+    first."""
+    best, bestc = None, float("-inf")
+
+    def consider(ans, c, meta):
+        nonlocal best, bestc
+        if c is not None and c > bestc:
+            best, bestc = dict(meta, answer=ans), float(c)
+
+    for r in idioms:
+        k = r["kind"]
+        if k == "gate":
+            fr = r["frame"]
+            if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
+                continue
+            so = r["slot"]
+            if len(ctx) >= so and ctx[-so] in r["table"]:
+                consider(r["table"][ctx[-so]], r.get("confs", {}).get(ctx[-so], 0.0),
+                         {"tier": "gated", "basis": "observational", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "gate"})
+        elif k == "relation":
+            offs = [o for ij in r["eq"] for o in ij] + [r["copy"]]
+            if max(offs) <= len(ctx) and all(ctx[-i] == ctx[-j] for i, j in r["eq"]):
+                consider(ctx[-r["copy"]], r.get("conf") or 0.0,
+                         {"tier": "trusted", "basis": "causal", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "relation"})
+        elif k == "induction":
+            L = r["L"]
+            if len(ctx) > L:
+                suf = tuple(ctx[-L:])
+                js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+                if js and max(js) + L < len(ctx):
+                    consider(ctx[max(js) + L], r.get("conf") or 0.0,
+                             {"tier": "trusted", "basis": "causal", "citation": r["cite"],
+                              "rule": r["id"], "circuit": "induction"})
+    for k in range(min(len(ctx), W), 0, -1):
+        s = tuple(ctx[-k:])
+        if s in ngrams[k]:
+            out, basis, cite, conf = ngrams[k][s]
+            consider(out, conf if conf is not None else 0.0,
+                     {"tier": "gated", "basis": basis, "citation": cite, "k": k})
+    if best is None:
+        return None  # ABSTAIN
+    best["confidence"] = round(bestc, 4)
+    return best
+
+
+def decide(ctx, idioms, ngrams, m):
+    """Dispatch on the manifest's declared cover semantics."""
+    if m.get("cover") == "support-weighted":
+        return serve_sw(ctx, idioms, ngrams, m.get("W", 1))
+    return serve(ctx, idioms, ngrams, m.get("W", 1))
 
 
 def main():
