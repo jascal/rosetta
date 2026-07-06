@@ -54,6 +54,12 @@ def load_package(manifest_path):
     JSON keys are strings; normalized to ints here so a C++ porter sees the same shape."""
     m = json.load(open(manifest_path))
     idioms, ngrams = [], defaultdict(dict)
+    m["_derived"] = [{"id": d["id"], "kind": d["kind"],
+                      "openers": set(d.get("openers", [])),
+                      "closers": set(d.get("closers", []))}
+                     for d in m.get("derived", [])]
+    m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
+                  for mm in mem}                             # member -> representative
     for r in m["rules"]:
         kind = r.get("kind", "ngram")
         if kind == "ngram":
@@ -77,6 +83,17 @@ def load_package(manifest_path):
             idioms.append({"kind": "succession", "id": r["id"], "cite": _cite(r),
                            "lord": {int(t): int(o) for t, o in r["lord"].items()},
                            "lat": {int(o): int(t) for o, t in r["lat"].items()}})
+        elif kind == "pointer":                                  # generalized copy: (l, lc)-cell scorer
+            idioms.append({"kind": "pointer", "id": r["id"], "cite": _cite(r),
+                           "lmax": int(r.get("lmax", 6)),
+                           "cells": {tuple(int(x) for x in k.split(":")): float(c)
+                                     for k, c in r["cells"].items()}})
+        elif kind == "dgate":                                    # TWO-LAYER: gate over a DERIVED predicate
+            idioms.append({"kind": "dgate", "id": r["id"], "cite": _cite(r), "feature": r["feature"],
+                           "table": {tuple(int(x) for x in k.split(":")): int(v)
+                                     for k, v in r["table"].items()},
+                           "confs": {tuple(int(x) for x in k.split(":")): float(c)
+                                     for k, c in (r.get("confs") or {}).items()}})
         elif kind == "relation":                                 # causal EQ-GUARD + COPY (offset-local), routed OOD
             idioms.append({"kind": "relation", "id": r["id"], "cite": _cite(r),
                            "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
@@ -90,7 +107,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] in ("induction", "succession", "relation"):  # OOD circuits route below n-grams — handled after
+        if r["kind"] in ("induction", "succession", "relation", "dgate", "pointer"):  # OOD/derived route below — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -149,7 +166,7 @@ def serve(ctx, idioms, ngrams, W):
     return None  # ABSTAIN
 
 
-def serve_sw(ctx, idioms, ngrams, W):
+def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
     """SUPPORT-WEIGHTED cover (manifest cover: "support-weighted"): every applicable rule fires and
     the answer with the highest confidence wins -- the argmax policy whose dominance over every
     fixed priority is the kernel-checked C10 (i-orca Arbitration.thy: argmax_policy_optimal), with
@@ -159,15 +176,53 @@ def serve_sw(ctx, idioms, ngrams, W):
     candidate in manifest order (the learner's admitted order), n-grams after idioms, longest
     first."""
     best, bestc = None, float("-inf")
+    feats = {}
+    for d in (m_derived or []):
+        if d["kind"] == "bracket-mate":                        # PROVED extractor (pil wyly_mate_certify:
+            stack = []                                         # tensor == Datalog 256/256): innermost
+            for t in ctx:                                      # UNCLOSED opener via one shared stack
+                if t in d["openers"]:
+                    stack.append(t)
+                elif t in d["closers"] and stack:
+                    stack.pop()
+            feats[d["id"]] = stack[-1] if stack else -1
 
     def consider(ans, c, meta):
         nonlocal best, bestc
         if c is not None and c > bestc:
             best, bestc = dict(meta, answer=ans), float(c)
 
+    cmap = cmap if cmap is not None else {}
     for r in idioms:
         k = r["kind"]
-        if k == "gate":
+        if k == "pointer":
+            lmax, n = r["lmax"], len(ctx)
+            bl = blc = bp = -1
+            for pp in range(1, n):                             # source position: predict ctx[pp]
+                l = lc = 0
+                for j in range(1, lmax + 1):
+                    if pp - j < 0:
+                        break
+                    a, b = ctx[pp - j], ctx[n - j]
+                    if l == j - 1 and a == b:
+                        l = j
+                    if lc == j - 1 and cmap.get(a, a) == cmap.get(b, b):
+                        lc = j
+                    if lc < j:
+                        break
+                if (l >= 1 or lc >= 2) and (l, lc, pp) >= (bl, blc, bp):
+                    bl, blc, bp = l, lc, pp
+            if bp >= 0 and (bl, blc) in r["cells"]:
+                consider(ctx[bp], r["cells"][(bl, blc)],
+                         {"tier": "trusted", "basis": "causal", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "pointer"})
+        elif k == "dgate":
+            f = feats.get(r["feature"], -1)
+            if f >= 0 and (f, ctx[-1]) in r["table"]:
+                consider(r["table"][(f, ctx[-1])], r["confs"].get((f, ctx[-1]), 0.0),
+                         {"tier": "gated", "basis": "observational", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "dgate"})
+        elif k == "gate":
             fr = r["frame"]
             if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
                 continue
@@ -206,7 +261,8 @@ def serve_sw(ctx, idioms, ngrams, W):
 def decide(ctx, idioms, ngrams, m):
     """Dispatch on the manifest's declared cover semantics."""
     if m.get("cover") == "support-weighted":
-        return serve_sw(ctx, idioms, ngrams, m.get("W", 1))
+        return serve_sw(ctx, idioms, ngrams, m.get("W", 1), m_derived=m.get("_derived"),
+                        cmap=m.get("_cmap"))
     return serve(ctx, idioms, ngrams, m.get("W", 1))
 
 
