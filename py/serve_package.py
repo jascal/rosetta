@@ -202,6 +202,14 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
         elif d["kind"] == "bracket-depth":                     # the balance counter (capped)
             depth = sum((t in d["openers"]) - (t in d["closers"]) for t in ctx)
             feats[d["id"]] = min(max(depth, 0), d["cap"])
+        elif d["kind"] == "since-member":                      # DISCOURSE: tokens since last member
+            p_ = -1
+            for i, t in enumerate(ctx):
+                if t in d["members"]:
+                    p_ = i
+            feats[d["id"]] = min(len(ctx) - 1 - p_, d["cap"]) if p_ >= 0 else d["cap"] + 1
+        elif d["kind"] == "member-parity":                     # DISCOURSE: quotation scope
+            feats[d["id"]] = sum(1 for t in ctx if t in d["members"]) % 2
         elif d["kind"] == "prev-occ":                          # CHAINED role: the previous occurrence
             bp = fpos.get(d["of"], -1)                         # of the referenced feature's token --
             q = -1                                             # composed with succ: the entity ECHO

@@ -62,6 +62,12 @@ on real corpus samples — pil `wyly_mate_certify.py` 256/256 and `wyly_derived_
 | `recent-member` | `members` | the most recent token in the member set (e.g. clause openers), −1 if none |
 | `recent-unique` | `members` | the most recent member occurring EXACTLY ONCE in the context (the distinguished-referent role), −1 if none |
 | `bracket-depth` | `openers`, `closers`, `cap` | the balance counter: total depth clamped to [0, cap] |
+| `prev-occ` | `of` (a derived-def id), `succ` | CHAINED role: the previous occurrence of the referenced feature's token; with `succ` the entity ECHO (what followed this referent last time) |
+| `since-member` | `members`, `cap` | DISCOURSE: tokens since the most recent member (sentence enders → position-in-sentence; connectives → position-in-move); cap+1 if none |
+| `member-parity` | `members` | DISCOURSE: count of members mod 2 (quote marks → the inside-quotation / attribution-scope indicator) |
+
+All extractors may carry `succ: k` (role composition — the feature is read at position+k). Defs
+are evaluated in listed order, so a def may reference any earlier def via `of`.
 
 `dgate` rules gate on a derived feature jointly with the last token -- the first rules whose
 guard is a computed ROLE rather than a token pattern (a two-layer program: derive the predicate,
