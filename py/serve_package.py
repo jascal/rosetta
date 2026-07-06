@@ -60,6 +60,7 @@ def load_package(manifest_path):
                       "members": set(d.get("members", [])),
                       "cap": int(d.get("cap", 8)), "succ": int(d.get("succ", 0)),
                       "of": d.get("of"), "of_shift": int(d.get("of_shift", 0)),
+                      "avoid": set(d.get("avoid", [])), "look": int(d.get("look", 3)),
                       "quote_members": set(d.get("quote_members", []))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
@@ -235,7 +236,9 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
             q = -1                                             # composed with succ: the entity ECHO
             if bp >= 0:
                 for i in range(bp):
-                    if ctx[i] == ctx[bp]:
+                    if ctx[i] == ctx[bp] and not any(
+                            t in d["avoid"]
+                            for t in ctx[i + 1:i + 1 + d["look"]]):
                         q = i
             fpos[d["id"]] = q
             p2 = q + d["succ"] if q >= 0 else -1
