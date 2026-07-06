@@ -59,7 +59,7 @@ def load_package(manifest_path):
                       "closers": set(d.get("closers", [])),
                       "members": set(d.get("members", [])),
                       "cap": int(d.get("cap", 8)), "succ": int(d.get("succ", 0)),
-                      "of": d.get("of")}
+                      "of": d.get("of"), "of_shift": int(d.get("of_shift", 0))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
                   for mm in mem}                             # member -> representative
@@ -91,6 +91,13 @@ def load_package(manifest_path):
                            "lmax": int(r.get("lmax", 6)),
                            "cells": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in r["cells"].items()}})
+        elif kind == "dgate2":                                   # PAIR gate: two features jointly
+            idioms.append({"kind": "dgate2", "id": r["id"], "cite": _cite(r),
+                           "fa": r["featureA"], "fb": r["featureB"],
+                           "table": {tuple(int(x) for x in k.split(":")): int(v)
+                                     for k, v in r["table"].items()},
+                           "confs": {tuple(int(x) for x in k.split(":")): float(c)
+                                     for k, c in (r.get("confs") or {}).items()}})
         elif kind == "dgate":                                    # TWO-LAYER: gate over a DERIVED predicate
             idioms.append({"kind": "dgate", "id": r["id"], "cite": _cite(r), "feature": r["feature"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
@@ -110,7 +117,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] in ("induction", "succession", "relation", "dgate", "pointer"):  # OOD/derived route below — handled after
+        if r["kind"] in ("induction", "succession", "relation", "dgate", "dgate2", "pointer"):  # OOD/derived route below — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -212,6 +219,9 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
             feats[d["id"]] = sum(1 for t in ctx if t in d["members"]) % 2
         elif d["kind"] == "prev-occ":                          # CHAINED role: the previous occurrence
             bp = fpos.get(d["of"], -1)                         # of the referenced feature's token --
+            if bp >= 0 and d["of_shift"]:                      # of_shift: e.g. -1 = the CLAIMANT
+                bp = bp + d["of_shift"]                        # before the attribution verb
+                bp = bp if 0 <= bp < len(ctx) else -1
             q = -1                                             # composed with succ: the entity ECHO
             if bp >= 0:
                 for i in range(bp):
@@ -250,6 +260,12 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
                 consider(ctx[bp], r["cells"][(bl, blc)],
                          {"tier": "trusted", "basis": "causal", "citation": r["cite"],
                           "rule": r["id"], "circuit": "pointer"})
+        elif k == "dgate2":
+            fa, fb = feats.get(r["fa"], -1), feats.get(r["fb"], -1)
+            if fa >= 0 and fb >= 0 and (fa, fb) in r["table"]:
+                consider(r["table"][(fa, fb)], r["confs"].get((fa, fb), 0.0),
+                         {"tier": "gated", "basis": "observational", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "dgate2"})
         elif k == "dgate":
             f = feats.get(r["feature"], -1)
             if f >= 0 and (f, ctx[-1]) in r["table"]:
