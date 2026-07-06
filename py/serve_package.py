@@ -56,7 +56,9 @@ def load_package(manifest_path):
     idioms, ngrams = [], defaultdict(dict)
     m["_derived"] = [{"id": d["id"], "kind": d["kind"],
                       "openers": set(d.get("openers", [])),
-                      "closers": set(d.get("closers", []))}
+                      "closers": set(d.get("closers", [])),
+                      "members": set(d.get("members", [])),
+                      "cap": int(d.get("cap", 8))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
                   for mm in mem}                             # member -> representative
@@ -186,6 +188,15 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
                 elif t in d["closers"] and stack:
                     stack.pop()
             feats[d["id"]] = stack[-1] if stack else -1
+        elif d["kind"] in ("recent-member", "recent-unique"):  # most recent member [occurring once]
+            f = -1
+            for t in ctx:
+                if t in d["members"] and (d["kind"] == "recent-member" or ctx.count(t) == 1):
+                    f = t
+            feats[d["id"]] = f
+        elif d["kind"] == "bracket-depth":                     # the balance counter (capped)
+            depth = sum((t in d["openers"]) - (t in d["closers"]) for t in ctx)
+            feats[d["id"]] = min(max(depth, 0), d["cap"])
 
     def consider(ans, c, meta):
         nonlocal best, bestc
