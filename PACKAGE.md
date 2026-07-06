@@ -52,10 +52,16 @@ program over the context, defined extensionally so the package stays host-side a
 "derived": [{"id": "mate0", "kind": "bracket-mate", "openers": [9, 60, ...], "closers": [...]}]
 ```
 
-`bracket-mate` = the innermost UNCLOSED opener (one shared stack; push on opener, pop on closer;
-feature = top of stack, -1 if empty). The extractor's semantics is Soufflé-certified against its
-tensor mirror (pil `experiments/wyly_mate_certify.py`: recursive prefix-depth + stratified
-negation + max aggregate; PROVED window-by-window on the stated domain).
+The extractor REGISTRY (every kind Soufflé-certified against its tensor mirror, window-by-window
+on real corpus samples — pil `wyly_mate_certify.py` 256/256 and `wyly_derived_certify.py`
+192/192 per kind):
+
+| kind | fields | feature value |
+|---|---|---|
+| `bracket-mate` | `openers`, `closers` | the innermost UNCLOSED opener (one shared stack), −1 if none |
+| `recent-member` | `members` | the most recent token in the member set (e.g. clause openers), −1 if none |
+| `recent-unique` | `members` | the most recent member occurring EXACTLY ONCE in the context (the distinguished-referent role), −1 if none |
+| `bracket-depth` | `openers`, `closers`, `cap` | the balance counter: total depth clamped to [0, cap] |
 
 `dgate` rules gate on a derived feature jointly with the last token -- the first rules whose
 guard is a computed ROLE rather than a token pattern (a two-layer program: derive the predicate,
