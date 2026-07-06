@@ -58,7 +58,7 @@ def load_package(manifest_path):
                       "openers": set(d.get("openers", [])),
                       "closers": set(d.get("closers", [])),
                       "members": set(d.get("members", [])),
-                      "cap": int(d.get("cap", 8))}
+                      "cap": int(d.get("cap", 8)), "succ": int(d.get("succ", 0))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
                   for mm in mem}                             # member -> representative
@@ -180,20 +180,22 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
     best, bestc = None, float("-inf")
     feats = {}
     for d in (m_derived or []):
-        if d["kind"] == "bracket-mate":                        # PROVED extractor (pil wyly_mate_certify:
-            stack = []                                         # tensor == Datalog 256/256): innermost
-            for t in ctx:                                      # UNCLOSED opener via one shared stack
-                if t in d["openers"]:
-                    stack.append(t)
+        if d["kind"] == "bracket-mate":                        # PROVED extractor (pil wyly_mate_certify):
+            stack = []                                         # innermost UNCLOSED opener; with "succ"
+            for i, t in enumerate(ctx):                        # the feature is the token at pos+succ
+                if t in d["openers"]:                          # (ROLE COMPOSITION, e.g. after-the-mate)
+                    stack.append(i)
                 elif t in d["closers"] and stack:
                     stack.pop()
-            feats[d["id"]] = stack[-1] if stack else -1
+            p_ = stack[-1] + d["succ"] if stack else -1
+            feats[d["id"]] = ctx[p_] if 0 <= p_ < len(ctx) and stack else -1
         elif d["kind"] in ("recent-member", "recent-unique"):  # most recent member [occurring once]
-            f = -1
-            for t in ctx:
+            p_ = -1
+            for i, t in enumerate(ctx):
                 if t in d["members"] and (d["kind"] == "recent-member" or ctx.count(t) == 1):
-                    f = t
-            feats[d["id"]] = f
+                    p_ = i
+            p2 = p_ + d["succ"] if p_ >= 0 else -1
+            feats[d["id"]] = ctx[p2] if 0 <= p2 < len(ctx) and p_ >= 0 else -1
         elif d["kind"] == "bracket-depth":                     # the balance counter (capped)
             depth = sum((t in d["openers"]) - (t in d["closers"]) for t in ctx)
             feats[d["id"]] = min(max(depth, 0), d["cap"])
