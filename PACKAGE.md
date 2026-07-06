@@ -82,6 +82,15 @@ First producer: pil wyly_lm_v5 (the sleep judge admitted the mate gate on the Is
 where it set the certified-core arc best). Runtimes: `py/serve_package.py` (support-weighted
 cover) + sgiandubh `rosetta_package.h`.
 
+### Strata (labeled trust pools)
+
+Any rule may carry `"stratum": n` (default 1) and the manifest `"strata_tau"` (default 0.35).
+A support-weighted runtime arbitrates stratum 1 first; where its best confidence is below tau,
+stratum-2 candidates may claim the answer (lexicographic (stratum, confidence) fall-through --
+C10 applies per stratum). Stratum 2 holds calibrated non-winners of the admission race
+(fired-accuracy-qualified): answers carry their stratum, so consumers can distinguish
+certified from supported from tentative -- graceful degradation with labeled trust.
+
 ### The support-weighted cover (`"cover": "support-weighted"`)
 
 A manifest may declare `"cover": "support-weighted"` at the top level. A conforming runtime then
