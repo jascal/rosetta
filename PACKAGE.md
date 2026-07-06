@@ -43,6 +43,33 @@ normalize to ints on load.
    Trusted non-table kinds may ship a `confidence` field (held-out fired-accuracy) so a support-weighted
    runtime can arbitrate tiers per answer instead of by fixed priority.)
 
+### Two-layer packages: derived predicates (`derived`) + the `dgate` kind
+
+A manifest may carry a top-level `derived` array of FEATURE EXTRACTORS -- each a certified
+program over the context, defined extensionally so the package stays host-side and exact:
+
+```json
+"derived": [{"id": "mate0", "kind": "bracket-mate", "openers": [9, 60, ...], "closers": [...]}]
+```
+
+`bracket-mate` = the innermost UNCLOSED opener (one shared stack; push on opener, pop on closer;
+feature = top of stack, -1 if empty). The extractor's semantics is Soufflé-certified against its
+tensor mirror (pil `experiments/wyly_mate_certify.py`: recursive prefix-depth + stratified
+negation + max aggregate; PROVED window-by-window on the stated domain).
+
+`dgate` rules gate on a derived feature jointly with the last token -- the first rules whose
+guard is a computed ROLE rather than a token pattern (a two-layer program: derive the predicate,
+gate on it):
+
+```json
+{"kind": "dgate", "feature": "mate0", "table": {"<mateTok>:<lastTok>": out, ...},
+ "confs": {"<mateTok>:<lastTok>": 0.71, ...}}
+```
+
+First producer: pil wyly_lm_v5 (the sleep judge admitted the mate gate on the Isabelle corpus,
+where it set the certified-core arc best). Runtimes: `py/serve_package.py` (support-weighted
+cover) + sgiandubh `rosetta_package.h`.
+
 ### The support-weighted cover (`"cover": "support-weighted"`)
 
 A manifest may declare `"cover": "support-weighted"` at the top level. A conforming runtime then
