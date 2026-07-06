@@ -62,6 +62,10 @@ def load_package(manifest_path):
                       "cap": int(d.get("cap", 8)), "succ": int(d.get("succ", 0)),
                       "of": d.get("of"), "of_shift": int(d.get("of_shift", 0)),
                       "avoid": set(d.get("avoid", [])), "look": int(d.get("look", 3)),
+                      "entity_members": set(d.get("entity_members", [])),
+                      "value_members": set(d.get("value_members", [])),
+                      "within": int(d.get("within", 7)),
+                      "slot": d.get("slot"),
                       "quote_members": set(d.get("quote_members", []))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
@@ -235,6 +239,31 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             feats[d["id"]] = bucket * 2 + par
         elif d["kind"] == "member-parity":                     # DISCOURSE: quotation scope
             feats[d["id"]] = sum(1 for t in ctx if t in d["members"]) % 2
+        elif d["kind"] == "estate":                            # ENTITY-STATE REGISTER (EAV,
+            E, V = d["entity_members"], d["value_members"]     # one attribute per instance):
+            AV, wt = d["avoid"], d["within"]                   # last-writer-wins fold
+            sl = d.get("slot")
+            if sl and (len(ctx) < 2 or ctx[-2] != sl[0] or ctx[-1] != sl[1]):
+                feats[d["id"]] = -1
+                fpos[d["id"]] = -1
+                continue
+            qi = -1
+            for i in range(len(ctx) - 1, -1, -1):
+                if ctx[i] in E:
+                    qi = i
+                    break
+            feat = -1
+            if qi >= 0:
+                qt = ctx[qi]
+                for i in range(qi):
+                    if ctx[i] != qt or any(t in AV for t in ctx[i + 1:i + 4]):
+                        continue
+                    for j in range(i + 1, min(i + 1 + wt, len(ctx))):
+                        if ctx[j] in V:
+                            feat = ctx[j]
+                            break
+            feats[d["id"]] = feat
+            fpos[d["id"]] = qi
         elif d["kind"] == "prev-occ":                          # CHAINED role: the previous occurrence
             bp = fpos.get(d["of"], -1)                         # of the referenced feature's token --
             if bp >= 0 and d["of_shift"]:                      # of_shift: e.g. -1 = the CLAIMANT
