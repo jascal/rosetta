@@ -59,7 +59,8 @@ def load_package(manifest_path):
                       "closers": set(d.get("closers", [])),
                       "members": set(d.get("members", [])),
                       "cap": int(d.get("cap", 8)), "succ": int(d.get("succ", 0)),
-                      "of": d.get("of"), "of_shift": int(d.get("of_shift", 0))}
+                      "of": d.get("of"), "of_shift": int(d.get("of_shift", 0)),
+                      "quote_members": set(d.get("quote_members", []))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
                   for mm in mem}                             # member -> representative
@@ -215,6 +216,15 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
                 if t in d["members"]:
                     p_ = i
             feats[d["id"]] = min(len(ctx) - 1 - p_, d["cap"]) if p_ >= 0 else d["cap"] + 1
+        elif d["kind"] == "dstate":                            # RHETORICAL STATE: bucketed
+            p_ = -1                                            # position-in-sentence x quote parity
+            for i, t in enumerate(ctx):
+                if t in d["members"]:
+                    p_ = i
+            since = min(len(ctx) - 1 - p_, 33) if p_ >= 0 else 34
+            bucket = sum(since > e for e in (2, 6, 14, 32))
+            par = sum(1 for t in ctx if t in d["quote_members"]) % 2
+            feats[d["id"]] = bucket * 2 + par
         elif d["kind"] == "member-parity":                     # DISCOURSE: quotation scope
             feats[d["id"]] = sum(1 for t in ctx if t in d["members"]) % 2
         elif d["kind"] == "prev-occ":                          # CHAINED role: the previous occurrence
