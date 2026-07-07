@@ -82,6 +82,24 @@ First producer: pil wyly_lm_v5 (the sleep judge admitted the mate gate on the Is
 where it set the certified-core arc best). Runtimes: `py/serve_package.py` (support-weighted
 cover) + sgiandubh `rosetta_package.h`.
 
+### estate / estate2 (entity-state kinds)
+
+`estate`: per-attribute ENTITY-STATE REGISTER — last-writer-wins (entity, value) fold with an
+avoid-filter and an answer-slot signature; the EAV family is realized as one register per
+attribute with arbitration selecting the attribute. `estate2`: the WORLD-STATE fold — loc[entity]
+from movement verbs, holder/loc/history[object] from mined take/drop verbs (drops freeze
+location); mode "is" answers current object location, mode "before" answers the history
+predecessor of a reference location. All member sets (entities, locations, objects, verb
+classes incl. take-vs-drop semantics) are self-grounded from the corpus.
+
+### canon (query canonicalization)
+
+Optional manifest section: a mined template inventory ({E}-slotted prefixes clustered into
+properties by shared (entity, value) pairs) + entity list. Runtimes parse free-phrased queries
+onto covered templates BEFORE key lookup (no parse -> clean abstention, never raw fragment
+matching) and surface the canonical form + bindings in the decision payload — the
+silent-substitution defense: consumers always see the question actually answered.
+
 ### Strata (labeled trust pools)
 
 Any rule may carry `"stratum": n` (default 1) and the manifest `"strata_tau"` (default 0.35).

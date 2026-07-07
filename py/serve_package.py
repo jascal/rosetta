@@ -65,7 +65,13 @@ def load_package(manifest_path):
                       "entity_members": set(d.get("entity_members", [])),
                       "value_members": set(d.get("value_members", [])),
                       "within": int(d.get("within", 7)),
-                      "slot": d.get("slot"),
+                      "slot": d.get("slot"), "mode": d.get("mode", "is"),
+                      "entities": set(d.get("entities", [])),
+                      "locations": set(d.get("locations", [])),
+                      "objects": set(d.get("objects", [])),
+                      "move_verbs": set(d.get("move_verbs", [])),
+                      "take_verbs": set(d.get("take_verbs", [])),
+                      "drop_verbs": set(d.get("drop_verbs", [])),
                       "quote_members": set(d.get("quote_members", []))}
                      for d in m.get("derived", [])]
     m["_cmap"] = {int(mm): int(rep) for rep, mem in m.get("concepts", {}).items()
@@ -239,6 +245,56 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             feats[d["id"]] = bucket * 2 + par
         elif d["kind"] == "member-parity":                     # DISCOURSE: quotation scope
             feats[d["id"]] = sum(1 for t in ctx if t in d["members"]) % 2
+        elif d["kind"] == "estate2":                           # WORLD-STATE FOLD: loc[entity],
+            sl = d.get("slot")                                 # holder/loc/history[object]
+            if sl and (len(ctx) < 2 or ctx[-2] != sl[0] or ctx[-1] != sl[1]):
+                feats[d["id"]] = -1
+                fpos[d["id"]] = -1
+                continue
+            E2, L2, O2 = d["entities"], d["locations"], d["objects"]
+            MV, TK, DP = d["move_verbs"], d["take_verbs"], d["drop_verbs"]
+            loc2, holder2, oloc2, ohist2 = {}, {}, {}, {}
+            for i in range(len(ctx) - 1):
+                w, v = ctx[i], ctx[i + 1]
+                if w not in E2:
+                    continue
+                if v in MV:
+                    dest = next((ctx[j] for j in range(i + 2, min(i + 7, len(ctx)))
+                                 if ctx[j] in L2), None)
+                    if dest is not None:
+                        loc2[w] = dest
+                        for o, h in holder2.items():
+                            if h == w and oloc2.get(o) != dest:
+                                ohist2.setdefault(o, []).append(oloc2.get(o, -1))
+                                oloc2[o] = dest
+                elif v in TK or v in DP:
+                    ob = next((ctx[j] for j in range(i + 2, min(i + 6, len(ctx)))
+                               if ctx[j] in O2), None)
+                    if ob is None:
+                        continue
+                    if v in TK:
+                        holder2[ob] = w
+                        if w in loc2 and oloc2.get(ob) != loc2[w]:
+                            ohist2.setdefault(ob, []).append(oloc2.get(ob, -1))
+                            oloc2[ob] = loc2[w]
+                    else:
+                        holder2.pop(ob, None)
+            qo = next((ctx[i] for i in range(len(ctx) - 1, -1, -1) if ctx[i] in O2), None)
+            feat = -1
+            if qo is not None:
+                if d["mode"] == "is":
+                    feat = oloc2.get(qo, -1)
+                else:                                          # "before": predecessor of ref
+                    qi = max(i for i in range(len(ctx)) if ctx[i] == qo)
+                    ref = next((ctx[i] for i in range(len(ctx) - 1, qi, -1)
+                                if ctx[i] in L2), None)
+                    hist = ohist2.get(qo, []) + [oloc2.get(qo, -1)]
+                    for k in range(len(hist) - 1, 0, -1):
+                        if hist[k] == ref:
+                            feat = hist[k - 1]
+                            break
+            feats[d["id"]] = feat
+            fpos[d["id"]] = len(ctx) - 1
         elif d["kind"] == "estate":                            # ENTITY-STATE REGISTER (EAV,
             E, V = d["entity_members"], d["value_members"]     # one attribute per instance):
             AV, wt = d["avoid"], d["within"]                   # last-writer-wins fold
@@ -432,3 +488,35 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+STOPWORDS = {"the", "of", "is", "a", "an", "in", "for", "as", "with", "what", "which",
+             "does", "do", "where", "how", "many", "s", "its", "on", "table", "periodic"}
+
+
+def canonicalize(query, canon):
+    """map a free-phrased query onto the package's mined template inventory.
+    Returns (canonical_string, {"entity": E, "template": prefix}) or None (no parse -> the
+    caller should ABSTAIN, never fall through to raw fragment matching)."""
+    import re as _re
+    words = [w.split("'")[0] for w in _re.findall(r"[A-Za-z']+", query)]
+    lower2ent = {e.lower(): e for e in canon.get("entities", [])}
+    ent = next((lower2ent[w.lower()] for w in words if w.lower() in lower2ent), None)
+    if ent is None:
+        return None
+    for t in canon.get("templates", []):                     # ALREADY canonical -> pass through
+        if query.strip().rstrip(".").lower() == \
+                t["prefix"].replace("{E}", ent).lower():
+            return query.strip(), {"entity": ent, "template": t["prefix"], "score": 1.0}
+    qkw = {w.lower().rstrip("s") for w in words} - STOPWORDS - {ent.lower()}
+    best, bestscore = None, 0.0
+    for t in canon.get("templates", []):
+        kw = {k.rstrip("s") for k in t["keywords"]} - STOPWORDS
+        hit = len(qkw & kw)
+        score = hit / max(1, len(qkw))                       # q-side coverage: how much of the
+        if hit and score > bestscore:                        # query the template explains
+            best, bestscore = t, score
+    if best is None or bestscore < 0.4:
+        return None
+    return (best["prefix"].replace("{E}", ent),
+            {"entity": ent, "template": best["prefix"], "score": round(bestscore, 2)})
