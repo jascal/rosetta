@@ -83,49 +83,44 @@ def load_package(manifest_path):
             ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r),
                                      r.get("confidence"), int(r.get("stratum", 1)))
         elif kind == "gate":
-            idioms.append({"kind": "gate", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "gate", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "slot": r["slot"],
                            "table": {int(k): int(v) for k, v in r["table"].items()},
                            "confs": {int(k): float(c) for k, c in (r.get("confs") or {}).items()}})
         elif kind == "compose":
-            idioms.append({"kind": "compose", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "compose", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
                            "valmap": {int(t): int(v) for t, v in r["valmap"].items()},
                            "sum": {int(s): int(o) for s, o in r["sum"].items()}})
         elif kind == "induction":                                # causal COPY circuit, routed OOD (after n-grams)
-            idioms.append({"kind": "induction", "id": r["id"], "cite": _cite(r), "L": int(r["L"]),
+            idioms.append({"kind": "induction", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r), "L": int(r["L"]),
                            "conf": r.get("confidence")})
         elif kind == "succession":                               # causal ORDINAL circuit, routed OOD (above induction)
-            idioms.append({"kind": "succession", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "succession", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "lord": {int(t): int(o) for t, o in r["lord"].items()},
                            "lat": {int(o): int(t) for o, t in r["lat"].items()}})
         elif kind == "pointer":                                  # generalized copy: (l, lc)-cell scorer
-            idioms.append({"kind": "pointer", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "pointer", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "lmax": int(r.get("lmax", 6)),
                            "cells": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in r["cells"].items()}})
         elif kind == "dgate2":                                   # PAIR gate: two features jointly
-            idioms.append({"kind": "dgate2", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "dgate2", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "fa": r["featureA"], "fb": r["featureB"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in (r.get("confs") or {}).items()}})
         elif kind == "dgate":                                    # TWO-LAYER: gate over a DERIVED predicate
-            idioms.append({"kind": "dgate", "id": r["id"], "cite": _cite(r), "feature": r["feature"],
+            idioms.append({"kind": "dgate", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r), "feature": r["feature"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in (r.get("confs") or {}).items()}})
         elif kind == "relation":                                 # causal EQ-GUARD + COPY (offset-local), routed OOD
-            idioms.append({"kind": "relation", "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "relation", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
                            "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
                            "conf": r.get("confidence")})
-    si = 0
-    for r in m["rules"]:
-        if r.get("kind", "ngram") != "ngram" and si < len(idioms):
-            idioms[si]["stratum"] = int(r.get("stratum", 1))
-            si += 1
     return idioms, ngrams, m
 
 
@@ -369,7 +364,8 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             if bp >= 0 and (bl, blc) in r["cells"]:
                 consider(ctx[bp], r["cells"][(bl, blc)],
                          {"tier": "trusted", "basis": "causal", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "pointer"})
+                          "rule": r["id"], "circuit": "pointer"},
+                         stratum=r.get("stratum", 1))
         elif k == "dgate2":
             fa, fb = feats.get(r["fa"], -1), feats.get(r["fb"], -1)
             if fa >= 0 and fb >= 0 and (fa, fb) in r["table"]:
@@ -405,7 +401,7 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
                 if js and max(js) + L < len(ctx):
                     consider(ctx[max(js) + L], r.get("conf") or 0.0,
                              {"tier": "trusted", "basis": "causal", "citation": r["cite"],
-                              "rule": r["id"], "circuit": "induction"})
+                              "rule": r["id"], "circuit": "induction"}, stratum=r.get("stratum", 1))
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
