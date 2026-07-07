@@ -32,6 +32,15 @@ in the source — the strongest case), or teacher-origin and merely certified (e
 necessarily). Decision payloads carry `origin`, `stratum`, `citation`, and (when canonicalized)
 `canonical` + bindings — consumers never need to know which pipeline built the package.
 
+## The document-origin ingestion route (`py/convert_classic.py`)
+
+Classic content packages (normative `knowledge.tsv` items + word vocabulary) convert into this
+spec: a WordLevel `bundle.tokenizer.json` built THROUGH the runtime's own pretokenizer, gated
+ngram rules with `origin:"document"` and norm-id citations, and the item texts as the grounding
+sidecar. **Support 1 is valid for document origin** — the document saying it once is the
+authority; determinism still gates ambiguous continuations. Known v1 limit: word-level
+detokenization spacing can miss the attestation string-match on punctuation-fused tokens.
+
 ## The grounding sidecar
 
 Manifest key `"grounding"`: a path (relative to the package) to plain text — the source corpus
