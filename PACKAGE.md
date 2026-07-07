@@ -1,4 +1,55 @@
-# The rosetta expert package (schema + runtime protocol)
+# The rosetta expert package v2 — the unified spec (schema + runtime protocol)
+
+**One package, three origins, one contract.** An expert package is a set of arbitrating rules
+over a bounded domain; every answer is cited to its rule, its origin, and its evidence; anything
+else is an abstention. Packages are the SUPERSET of what any pipeline produces — a package with
+one origin populated is a degenerate case of this spec, not a different species.
+
+## The two-axis trust model
+
+Every rule carries two independent coordinates:
+
+**`origin`** — where the knowledge came from (optional; default `teacher` for wyly emissions,
+`document` for classic/normrule conversions):
+
+| origin | producer | evidence |
+|---|---|---|
+| `document` | normrules / grounding pipelines over source text | span references into the grounding sidecar; verbatim-quotable |
+| `teacher` | wyly v5 distillation from an LLM's decisions (manifest `origin_model` names it) | admission record (marginals, folds, calibration) — the only origin that can produce answers present in NO source text (e.g. estate registers) |
+| `feedback` | attributable-feedback patches (human/eval corrections) | the patch provenance; C9-guarded no-regression |
+
+**`stratum`** — how the answer is held at serve time (arbitration pools, lexicographic
+fall-through at `strata_tau`):
+
+| stratum | label | semantics |
+|---|---|---|
+| 0 | **attested** | the served (canonical query + answer) is verbatim-checkable against the grounding sidecar — assigned AT SERVE TIME, not stored |
+| 1 | **certified** | full admission (deployment-calibrated marginals, fold-stable) |
+| 2 | **supported** | calibrated non-winners (query fired-accuracy ≥ 0.5); serve only when stratum-1 confidence < τ |
+
+An answer can be teacher-origin AND attested (compiled rule whose output happens to be verbatim
+in the source — the strongest case), or teacher-origin and merely certified (estate answers,
+necessarily). Decision payloads carry `origin`, `stratum`, `citation`, and (when canonicalized)
+`canonical` + bindings — consumers never need to know which pipeline built the package.
+
+## The grounding sidecar
+
+Manifest key `"grounding"`: a path (relative to the package) to plain text — the source corpus
+or document set. Serve-time attestation: if the canonicalized query's (statement + answer)
+string occurs in the sidecar, the decision is upgraded to stratum 0 (`attested`) and may quote
+the containing span. The sidecar is optional; without it, stratum 0 is simply never assigned.
+
+## Calibration requirements (normative)
+
+Every arbitration participant MUST be calibrated on the deployment distribution where query
+data exists: admitted rules (query-blended marginals), stratum-2 qualification (query
+fired-accuracy), incumbents (eviction / champion restarts), and the counts tier (per-tail
+calibration). Runtimes MUST assign `stratum` per idiom at parse time and pass it at every
+arbitration site (see rosetta #43 / sgiandubh #28 for the failure mode this prevents).
+
+---
+
+# v1 schema and runtime protocol (unchanged, extended by the above)
 
 The package is what rosetta emits and a thin runtime (`py/serve_package.py`, and the future sgiandubh C++) consumes —
 the rosetta→sgiandubh convergence artifact. (For *who builds what* — rosetta is the sole builder, sgiandubh the thin
