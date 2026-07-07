@@ -54,7 +54,7 @@ def load_package(manifest_path):
     JSON keys are strings; normalized to ints here so a C++ porter sees the same shape."""
     m = json.load(open(manifest_path))
     idioms, ngrams = [], defaultdict(dict)
-    m["_tau"] = float(m.get("strata_tau", 0.35))
+    m["_tau"] = float(m.get("strata_tau") or 0.35)
     m["_derived"] = [{"id": d["id"], "kind": d["kind"],
                       "openers": set(d.get("openers", [])),
                       "closers": set(d.get("closers", [])),
