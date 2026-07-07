@@ -1,3 +1,4 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
 # examples/logic — the Open Logic Project expert (model-distilled). See ../../EXPERTS.md.
 # Build (the cover step also needs a gemma `fieldrun --serve` on $FIELDRUN_SERVE):
 #   FIELDRUN=… FIELDRUN_SERVE=PORT BUNDLE=…/gemma-4-e4b-it-int4/gemma-4-e4b-it-int4 \

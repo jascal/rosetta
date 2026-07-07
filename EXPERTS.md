@@ -4,6 +4,9 @@
 **what a build is** and how its quality is established. Forward-looking; claims here are `design`/`open` until the
 artifact (a scorecard, an `equiv.dl` certificate) backs them.*
 
+> **Quickstart**: for the current best-practice package checklist and the three ingestion
+> routes (document / teacher / feedback), see [examples/UNIFIED_QUICKSTART.md](./examples/UNIFIED_QUICKSTART.md).
+
 ## The reframe
 
 A bounded expert is not the output of a pipeline — it is a **claim**:

@@ -1,3 +1,4 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
 # examples/pedagogy — the pedagogy template expert (model-free; ergo selects the template). No model, no GloVe needed.
 [corpus]
 citation = "pedagogy templates"
