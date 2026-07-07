@@ -81,44 +81,45 @@ def load_package(manifest_path):
         if kind == "ngram":
             ctx = tuple(r["ctx"])
             ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r),
-                                     r.get("confidence"), int(r.get("stratum", 1)))
+                                     r.get("confidence"), int(r.get("stratum", 1)),
+                                     r.get("origin", m.get("origin", "teacher")))
         elif kind == "gate":
-            idioms.append({"kind": "gate", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "gate", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "slot": r["slot"],
                            "table": {int(k): int(v) for k, v in r["table"].items()},
                            "confs": {int(k): float(c) for k, c in (r.get("confs") or {}).items()}})
         elif kind == "compose":
-            idioms.append({"kind": "compose", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "compose", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
                            "valmap": {int(t): int(v) for t, v in r["valmap"].items()},
                            "sum": {int(s): int(o) for s, o in r["sum"].items()}})
         elif kind == "induction":                                # causal COPY circuit, routed OOD (after n-grams)
-            idioms.append({"kind": "induction", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r), "L": int(r["L"]),
+            idioms.append({"kind": "induction", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r), "L": int(r["L"]),
                            "conf": r.get("confidence")})
         elif kind == "succession":                               # causal ORDINAL circuit, routed OOD (above induction)
-            idioms.append({"kind": "succession", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "succession", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "lord": {int(t): int(o) for t, o in r["lord"].items()},
                            "lat": {int(o): int(t) for o, t in r["lat"].items()}})
         elif kind == "pointer":                                  # generalized copy: (l, lc)-cell scorer
-            idioms.append({"kind": "pointer", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "pointer", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "lmax": int(r.get("lmax", 6)),
                            "cells": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in r["cells"].items()}})
         elif kind == "dgate2":                                   # PAIR gate: two features jointly
-            idioms.append({"kind": "dgate2", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "dgate2", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "fa": r["featureA"], "fb": r["featureB"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in (r.get("confs") or {}).items()}})
         elif kind == "dgate":                                    # TWO-LAYER: gate over a DERIVED predicate
-            idioms.append({"kind": "dgate", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r), "feature": r["feature"],
+            idioms.append({"kind": "dgate", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r), "feature": r["feature"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
                                      for k, c in (r.get("confs") or {}).items()}})
         elif kind == "relation":                                 # causal EQ-GUARD + COPY (offset-local), routed OOD
-            idioms.append({"kind": "relation", "stratum": int(r.get("stratum", 1)), "id": r["id"], "cite": _cite(r),
+            idioms.append({"kind": "relation", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
                            "conf": r.get("confidence")})
     return idioms, ngrams, m
@@ -148,7 +149,7 @@ def serve(ctx, idioms, ngrams, W):
     for k in range(min(len(ctx), W), 0, -1):                    # gated n-gram tier (longest suffix wins)
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite, _conf, _st = ngrams[k][s]
+            out, basis, cite, _conf, _st, _org = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
     # relation (causal EQ-GUARD + COPY), OOD fallback ABOVE succession/induction — the most specific of the routed
     # circuits: fires iff ctx[-i] == ctx[-j] for every pair in `eq` (offsets 1-based from the end), then copies
@@ -185,7 +186,7 @@ def serve(ctx, idioms, ngrams, W):
             js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
             if js and max(js) + L < len(ctx):
                 return {"answer": ctx[max(js) + L], "tier": "trusted", "basis": "causal",
-                        "citation": r["cite"], "rule": r["id"], "circuit": "induction"}
+                        "citation": r["cite"], "rule": r["id"], "circuit": "induction", "origin": r.get("origin", "teacher")}
     return None  # ABSTAIN
 
 
@@ -364,20 +365,20 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             if bp >= 0 and (bl, blc) in r["cells"]:
                 consider(ctx[bp], r["cells"][(bl, blc)],
                          {"tier": "trusted", "basis": "causal", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "pointer"},
+                          "rule": r["id"], "circuit": "pointer", "origin": r.get("origin", "teacher")},
                          stratum=r.get("stratum", 1))
         elif k == "dgate2":
             fa, fb = feats.get(r["fa"], -1), feats.get(r["fb"], -1)
             if fa >= 0 and fb >= 0 and (fa, fb) in r["table"]:
                 consider(r["table"][(fa, fb)], r["confs"].get((fa, fb), 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "dgate2"}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "dgate2", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
         elif k == "dgate":
             f = feats.get(r["feature"], -1)
             if f >= 0 and (f, ctx[-1]) in r["table"]:
                 consider(r["table"][(f, ctx[-1])], r["confs"].get((f, ctx[-1]), 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "dgate"}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "dgate", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
         elif k == "gate":
             fr = r["frame"]
             if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -386,7 +387,7 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             if len(ctx) >= so and ctx[-so] in r["table"]:
                 consider(r["table"][ctx[-so]], r.get("confs", {}).get(ctx[-so], 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "gate"}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "gate", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
         elif k == "relation":
             offs = [o for ij in r["eq"] for o in ij] + [r["copy"]]
             if max(offs) <= len(ctx) and all(ctx[-i] == ctx[-j] for i, j in r["eq"]):
@@ -401,13 +402,14 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
                 if js and max(js) + L < len(ctx):
                     consider(ctx[max(js) + L], r.get("conf") or 0.0,
                              {"tier": "trusted", "basis": "causal", "citation": r["cite"],
-                              "rule": r["id"], "circuit": "induction"}, stratum=r.get("stratum", 1))
+                              "rule": r["id"], "circuit": "induction", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite, conf, st = ngrams[k][s]
+            out, basis, cite, conf, st, org = ngrams[k][s]
             consider(out, conf if conf is not None else 0.0,
-                     {"tier": "gated", "basis": basis, "citation": cite, "k": k}, stratum=st)
+                     {"tier": "gated", "basis": basis, "citation": cite, "k": k,
+                      "origin": org}, stratum=st)
     tau = (m_tau if m_tau is not None else 0.35)
     if best is not None and bestc >= tau:
         best["confidence"] = round(bestc, 4)
