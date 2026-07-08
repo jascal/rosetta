@@ -1,0 +1,24 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
+# examples/manpage — a Unix CLI reference (the `cut` man page) as a model-free expert.
+#
+# Mode: MODEL-FREE. A man page is a structured reference — ALL-CAPS sections, and one tagged paragraph per option — so
+# it maps exactly onto the strategy table: each section → a citable passage; OPTIONS split per flag; the command name
+# and each long flag → a `define`; the options → a count/list inventory. Retrieval (cited) + strategy + abstain, no model.
+
+[corpus]
+citation = "cut(1) man page (GNU coreutils)"
+
+[adapter]                         # a RENDERED man page → passages + per-option defines + inventory. See ../../py/pack/adapters/manpage.py
+name   = "manpage"
+source = "cut.man.txt"            # produced by:  man cut | col -bx > cut.man.txt  (universally reproducible)
+                                  # the command name is read from the NAME section (pass name= to the adapter to override)
+
+[grounding]
+dim = 0                           # exact strategy route + lexical grounding; no embedding download
+
+[reasoning]                       # count/list inventory over the options (ergo aggregate.dl, souffle, build-time)
+label  = "option"                 # "how many options does cut have?" → count
+prefix = "cut:inventory"          # per-domain count/list citation-handle namespace
+
+[experiment]
+off_domain = "../probes/negatives.txt"

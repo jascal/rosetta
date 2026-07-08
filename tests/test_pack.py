@@ -511,6 +511,139 @@ def test_pedagogy_opener_and_scope_restriction(tmp_path):
     assert pedagogy.META_MARK not in bodies["ped:plain"]
 
 
+def test_new_domain_adapters_registered():
+    """The four new document domains are registered instances of the one Extraction contract."""
+    from pack import adapters
+    assert set(adapters.names()) >= {"glossary", "rfc", "manpage", "nh_legal"}
+
+
+def test_glossary_adapter(tmp_path):
+    """A glossary → one passage + exact define + inventory item per entry, from TSV and JSON, with categories."""
+    from pack.adapters import glossary
+    tsv = tmp_path / "g.tsv"
+    tsv.write_text("# a comment\nTCP\tA reliable byte-stream transport protocol.\tTransport\n"
+                   "UDP\tA connectionless datagram protocol.\tTransport\n"
+                   "DNS: The name system, colons: allowed, in the definition.\n")   # colon-form line, defn keeps colons
+    ext = glossary.adapt(str(tsv), prefix="net")
+    by = {t: pid for pid, t in ext.defines}
+    assert by["tcp"] == "net:tcp" and ("net:dns", "dns") in ext.defines
+    assert ("TCP", "Transport") in ext.items and ("DNS", "terms") in ext.items      # category, and default_group
+    body = dict((s.split(" · ")[0], t) for s, t in ext.passages)
+    assert body["net:dns"].startswith("DNS — The name system, colons: allowed")     # only the FIRST ': ' splits
+
+    js = tmp_path / "g.json"
+    js.write_text('{"TLS": "Transport Layer Security.", "MTU": "Maximum Transmission Unit."}')
+    ej = glossary.adapt(str(js), prefix="net")
+    assert ("net:tls", "tls") in ej.defines and len(ej.passages) == 2
+
+    empty = tmp_path / "empty.tsv"
+    empty.write_text("# only a comment, no entries\n")
+    with pytest.raises(ValueError, match="no usable entries"):
+        glossary.adapt(str(empty), prefix="x")
+
+
+def test_rfc_adapter(tmp_path):
+    """An RFC .txt: page furniture stripped, numbered sections split, quoted-term defines, TOC skipped, section index."""
+    from pack.adapters import rfc
+    src = tmp_path / "rfc9999.txt"
+    src.write_text(
+        "Internet Engineering Task Force (IETF)                        R. Example\n"
+        "Request for Comments: 9999                                  Example Corp\n"
+        "Category: Standards Track                                      July 2026\n\n\n"
+        "                        A Test Protocol\n\n"
+        "Table of Contents\n\n"
+        "   1. Introduction ....................................... 1\n"
+        "   2. Terminology ........................................ 1\n\n"
+        "1.  Introduction\n\n"
+        "   This document specifies a test protocol.  A client MUST send a\n"
+        "   greeting before any other message is transmitted to the server.\n\n"
+        "Example                       Standards Track                    [Page 1]\n\f"
+        "A Test Protocol                                                 July 2026\n\n"
+        "2.  Terminology\n\n"
+        '   A "greeting" is the first message a client sends to open a session.\n\n'
+        "   An object is an unordered collection of zero or more members here.\n")
+    ext = rfc.adapt(str(src))
+    secs = {s.split(" · ")[0] for s, _ in ext.passages}
+    assert "rfc9999:1#1" in secs and "rfc9999:2#1" in secs
+    assert not any("Table of Contents" in s for s, _ in ext.passages)               # TOC section carries no passages
+    assert not any("Standards Track" in t or "[Page" in t for _, t in ext.passages)  # furniture stripped
+    dby = {t: pid for pid, t in ext.defines}
+    assert dby["greeting"] == "rfc9999:2#1"                                         # quoted-term define
+    assert dby["object"] == "rfc9999:2#2"                                           # genus–differentia "An object is …"
+    assert ("1. Introduction", "sections") in ext.items and len(ext.items) == 2     # section inventory
+    body = dict((s.split(" · ")[0], t) for s, t in ext.passages)
+    assert "MUST send a greeting" in body["rfc9999:1#1"]                            # normative text kept verbatim
+
+
+def test_manpage_adapter(tmp_path):
+    """A rendered man page: ALL-CAPS sections, OPTIONS split per flag with COLLISION-FREE ids, long-flag + command
+    defines, an options inventory; running header/footer furniture dropped."""
+    from pack.adapters import manpage
+    src = tmp_path / "tool.man.txt"
+    src.write_text(
+        "TOOL(1)                          User Commands                         TOOL(1)\n\n"
+        "NAME\n       tool - do a thing to files\n\n"
+        "SYNOPSIS\n       tool [OPTION]... FILE\n\n"
+        "DESCRIPTION\n       tool does a thing to each FILE described here in enough words.\n\n"
+        "OPTIONS\n"
+        "       -i, --ignore-case\n              Ignore case distinctions.\n\n"
+        "       -v, --invert-match\n              Select non-matching lines.\n\n"
+        "       -V, --version\n              Print version and exit.\n\n"
+        "GNU coreutils 9.0                 January 2026                          TOOL(1)\n")
+    ext = manpage.adapt(str(src), name="tool")
+    pids = [s.split(" · ")[0] for s, _ in ext.passages]
+    assert len(pids) == len(set(pids))                                             # no id collisions (-v vs -V)
+    assert not any("User Commands" in t or "coreutils" in t for _, t in ext.passages)  # furniture dropped
+    dby = {t: pid for pid, t in ext.defines}
+    assert dby["tool"].endswith(".description") or ".description" in dby["tool"]    # command → DESCRIPTION
+    assert dby["--ignore-case"] == "man:tool.opt.ignore-case"                       # long flag → its option
+    assert dby["--version"] == "man:tool.opt.version"
+    assert all(not t.startswith("-") or t.startswith("--") for t in dby)            # short single-letter flags NOT defined
+    canon = {n for n, g in ext.items if g == "options"}
+    assert canon == {"--ignore-case", "--invert-match", "--version"}                # one item per option (canonical)
+
+
+def test_nh_legal_adapter(tmp_path):
+    """A statute source: RSA-style sections parsed to the pinpoint cite scheme, quoted statutory defines, chapter
+    inventory. Closes the examples/nh_family adapter TODO."""
+    from pack.adapters import nh_legal
+    src = tmp_path / "rsa458.txt"
+    src.write_text(
+        "CHAPTER 461-A PARENTAL RIGHTS AND RESPONSIBILITIES\n\n"
+        '461-A:1 Definitions. – In this chapter: "parenting plan" means a written plan describing rights.\n'
+        '"income" shall mean gross income from any source.\n\n'
+        "461-A:6 Best Interest. – The court shall determine parental rights according to the best interest "
+        "of the child, considering all relevant factors.\n")
+    ext = nh_legal.adapt(str(src))
+    pids = [s.split(" · ")[0] for s, _ in ext.passages]
+    assert pids == ["RSA 461-A:1", "RSA 461-A:6"]                                   # pinpoint cite IS the handle
+    assert all("PARENTAL RIGHTS" in s for s, _ in ext.passages)                     # chapter title = facet
+    dby = {t: pid for pid, t in ext.defines}
+    assert dby["parenting plan"] == "RSA 461-A:1" and dby["income"] == "RSA 461-A:1"  # quoted statutory defines
+    assert ("RSA 461-A:6", "RSA 461-A") in ext.items                                # list/count grouped by chapter
+    body = dict((s.split(" · ")[0], t) for s, t in ext.passages)
+    assert body["RSA 461-A:6"].startswith("Best Interest. The court shall")         # title + text, verbatim
+
+
+def test_inventory_prefix_per_domain(tmp_path):
+    """The count/list citation handle is namespaced PER DOMAIN (not hard-coded to riscv): build a glossary and assert
+    its inventory passages/rows cite the domain prefix, and the strategy count/list rows resolve to it."""
+    if not shutil.which("souffle"):
+        pytest.skip("souffle not installed (build-time inventory/strategy tier)")
+    from pack import build_expert
+    g = tmp_path / "g.tsv"
+    g.write_text("TCP\tA transport protocol.\tTransport\nDNS\tThe name system.\tNaming\n")
+    out = tmp_path / "pkg"
+    build_expert(str(out), dim=0, model="net",
+                 documents=[{"adapter": "glossary", "source": str(g), "opts": {"prefix": "net"}}],
+                 inventory_label="term", inventory_prefix="net:inventory")
+    strat = (out / "strategy.tsv").read_text()
+    assert "answer\tcount\tterm\tnet:inventory:total" in strat                       # count cites the DOMAIN prefix
+    assert "answer\tlist\ttransport\tnet:inventory:Transport" in strat
+    assert "riscv:inventory" not in strat                                            # not the hard-coded riscv handle
+    assert "net:inventory:total" in (out / "knowledge.tsv").read_text()              # inventory passage grounded
+
+
 def test_ergo_pinned_dependency_resolution(tmp_path, monkeypatch):
     """ergo is a pinned PUBLISHED dependency, not a hard sibling-dir: $ERGO_DIR overrides; a recorded pin (repo@ref)
     lets a build elsewhere fetch the rules. (The sibling-dev path + the pinned fetch aren't exercised here.)"""

@@ -1,8 +1,9 @@
 # Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
 # examples/nh_family — NH FAMILY LAW expert (TEMPLATE). See ../../EXPERTS.md + SOURCES.md (sourcing + cite-id scheme).
 #
-# STATUS: template. The corpus (RSA family-law chapters + NH Supreme Court family opinions) and the `nh_legal` adapter
-# are sourced/built per SOURCES.md — this spec is NOT buildable until then. It documents the intended build.
+# STATUS: template. The `nh_legal` adapter now EXISTS (pack/adapters/nh_legal.py — parses RSA §-numbered text into the
+# cite-id scheme). This spec becomes buildable as soon as the corpus (RSA family-law chapters, then NH Supreme Court
+# family opinions) is sourced into raw/ per SOURCES.md; no fabricated legal text is committed here.
 #
 # Mode: MODEL-FREE (like riscv, by the same reasoning — an authoritative legal corpus is a LOOKUP domain; a small model
 # carries no reliable NH-specific legal reasoning, and hallucinated law is dangerous). Retrieval over the verbatim text
@@ -21,13 +22,17 @@ text_plain = "statutes_plain.txt"                # markup-free text (if an n-gra
 citation   = "NH RSA Title XLIII / NH Supreme Court (public domain)"
 
 [adapter]                                        # structured legal source → citable passages (no model). See SOURCES.md.
-name   = "nh_legal"                              # TODO: pack/adapters/nh_legal.py — parses RSA + opinions into the cite-id scheme
-source = "raw/"                                  # raw RSA chapters + opinion text (sourced per SOURCES.md)
+name   = "nh_legal"                              # pack/adapters/nh_legal.py — parses RSA §-numbered text into the cite-id scheme
+source = "raw/"                                  # raw RSA chapter text files (a dir; sourced per SOURCES.md)
 
 [grounding]                                      # one passage per statute section / per opinion chunk
 no_split = true
 dim      = 300                                   # GloVe baseline; legal language wants a real embedding model or BM25 —
                                                  # see SOURCES.md "retrieval at legal scale/quality".
+
+[reasoning]                                      # count/list over the sections + statutory `"term" means …` defines
+label  = "section"                               # "how many sections are in RSA 458?" → count
+prefix = "RSA:inventory"                         # per-domain count/list citation-handle namespace
 
 [experiment]                                     # EXPERIMENTAL DESIGN — grade before shipping (EXPERTS.md)
 off_domain = "../probes/negatives.txt"           # must abstain on non-family-law queries

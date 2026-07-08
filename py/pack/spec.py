@@ -76,6 +76,7 @@ def to_build_kwargs(spec, base="."):
         "corpus_vectors": gr.get("corpus_vectors", False),
         "no_split": gr.get("no_split", False),
         "inventory": bool(rs.get("inventory", False)),          # [reasoning] inventory = true → count/list aggregates
-        "inventory_label": rs.get("label", "instruction"),
+        "inventory_label": rs.get("label", "instruction"),      # the thing counted ("term"/"section"/"option")
+        "inventory_prefix": rs.get("prefix", "riscv:inventory"),  # the count/list citation-handle namespace (per domain)
         "reasoning_rules": rs.get("rules"),                     # e.g. "ergo:aggregate" → ../ergo/aggregate.dl
     }
