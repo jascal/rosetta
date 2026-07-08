@@ -21,6 +21,28 @@ Both source corpora are CC-BY (commercial-OK), so the content is committed here 
   is retrieval over the spec (cited) + gated corpus n-grams + abstain — no model. (Contrast: `logic` is model-distilled;
   it's a reasoning domain.) This is the two-mode demonstration, justified by measurement rather than assumption.
 
+## glossary — `examples/glossary/`
+- **Source:** `webnet.tsv` — a Web & Networking glossary authored for this example (~29 terms).
+- **License:** CC0 (public domain dedication).
+- **Mode: MODEL-FREE.** The `glossary` adapter maps each entry to a citable passage + an exact `define` + a count/list
+  inventory item. Exercises **define + count + list** with the existing intent vocabulary (no model, no new ergo cue).
+
+## manpage — `examples/manpage/`
+- **Source:** `cut.man.txt` — the rendered `cut(1)` page (`man cut | col -bx`), GNU coreutils.
+- **License:** the rendered text is a derived snapshot; regenerate locally on any box with `man` (see the example README).
+- **Mode: MODEL-FREE.** The `manpage` adapter emits per-section passages, per-option passages, command/long-flag
+  `define`s, and an options inventory (count/list). Options are found under DESCRIPTION *or* OPTIONS.
+
+## rfc — `examples/rfc/`
+- **Source:** `rfc8259.txt` — IETF RFC 8259, *The JSON Data Interchange Format*.
+- **License:** freely reproducible under BCP 78 / the IETF Trust legal provisions.
+- **Mode: MODEL-FREE.** The `rfc` adapter strips page furniture, splits numbered sections into cited passages, extracts
+  quoted-term and genus–differentia `define`s, and builds a section inventory (count/list). Verbatim normative text.
+
+## nh_family — `examples/nh_family/` (template)
+- **Source:** NH RSA Title XLIII (public domain) — sourced into `raw/` per that example's `SOURCES.md`; no legal text is
+  committed. The `nh_legal` statute adapter is implemented and unit-tested; the spec builds once `raw/` is populated.
+
 ## Off-domain probes — `examples/probes/negatives.txt`
 A generic out-of-domain negative set (general knowledge, outside both logic and RISC-V) for the scorecard's
 leak/abstain measurement. Genuinely off-domain, not adversarial paraphrases (see EXPERTS.md).

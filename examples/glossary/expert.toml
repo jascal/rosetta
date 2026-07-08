@@ -1,0 +1,25 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
+# examples/glossary — a WEB & NETWORKING glossary as a model-free expert (the simplest structured source there is).
+#
+# Mode: MODEL-FREE. A glossary is ALREADY the exact structure the uniform strategy table wants, so the mapping is exact
+# (no model, no heuristics): each entry → a citable passage + an exact `define` (what is X → its definition) + an
+# inventory item (count/list — "how many terms", "list the Transport terms"). Retrieval (cited) + strategy + abstain.
+
+[corpus]
+citation = "Web & Networking glossary (CC0)"
+
+[adapter]                         # a term→definition file → citable passages + defines + inventory. See ../../py/pack/adapters/glossary.py
+name          = "glossary"
+source        = "webnet.tsv"      # term <TAB> definition <TAB> category  (also accepts .json / colon-form lines)
+prefix        = "webnet"
+default_group = "terms"
+
+[grounding]
+dim = 0                            # selection is via the exact strategy route; lexical grounding suffices (no download)
+
+[reasoning]                       # count/list inventory over the glossary terms (ergo aggregate.dl, souffle, build-time)
+label  = "term"                   # "how many terms are defined?"  → count
+prefix = "webnet:inventory"       # the count/list citation-handle namespace (per domain, not the hard-coded riscv one)
+
+[experiment]
+off_domain = "../probes/negatives.txt"   # must abstain on non-glossary queries

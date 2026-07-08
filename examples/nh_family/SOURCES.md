@@ -36,13 +36,19 @@ Reuses the runtime's `"id · Facet"` section convention (so the cite-as-handle +
 So an answer cites `[1] RSA 461-A:6`, and `GET /lookup?id=RSA 461-A:6` (or, via claymore, `?spoke=nh_family&id=…`)
 refetches the exact provision verbatim. Legal citations *are* the canonical handles — pinpoint, verifiable, stable.
 
-## The `nh_legal` adapter (TODO: `pack/adapters/nh_legal.py`)
+## The `nh_legal` adapter (`pack/adapters/nh_legal.py` — LANDED)
 
-Like `normrules`, but for legal structure (no model):
-- **RSA** → one passage per section: `section = "RSA <chap>:<sec> · <chapter title>"`, `text = <section text>` (preserve
-  subsection structure; emit subsections as their own pinpoint passages where useful).
-- **opinions** → chunk each opinion (headnote / issue / holding paragraphs): `section = "<bluebook cite> · <topic>"`,
-  `text = <chunk>`. Carry the year for currency.
+Like `normrules`, but for legal structure (no model). **Statutes are implemented**; opinions are the follow-up.
+- **RSA (done)** → one passage per section in the documented cite scheme: `section = "RSA <chap>:<sec> · <chapter
+  title>"`, the pinpoint cite is the handle, `text = "<Section Title>. <section text>"`. Source is a `raw/` dir of RSA
+  chapter text files (or a single `.txt`); a `CHAPTER <n> <title>` line sets the chapter-title facet. It also extracts
+  statutory definitions (`"term" means …` / `"term" shall mean …`) as the `define` intent and a per-chapter section
+  inventory for count/list. Validated hermetically in `tests/test_pack.py::test_nh_legal_adapter`.
+- **opinions (TODO)** → chunk each opinion (headnote / issue / holding paragraphs): `section = "<bluebook cite> ·
+  <topic>"`, `text = <chunk>`. Carry the year for currency.
+
+Once `raw/` holds the RSA Title XLIII chapter text, `build_from_spec(expert.toml)` produces the package
+(no fabricated legal text is committed to the repo).
 
 ## Retrieval at legal scale / quality
 

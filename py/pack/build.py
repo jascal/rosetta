@@ -94,7 +94,8 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
                  model="rosetta-expert", adapter=None, adapter_source=None, adapter_opts=None, documents=None,
                  dim=300, corpus_vectors=False, no_split=False,
                  cover=False, minsupp=3, mindet=1.0, fieldrun=None,
-                 inventory=False, inventory_label="instruction", reasoning_rules=None):
+                 inventory=False, inventory_label="instruction", inventory_prefix="riscv:inventory",
+                 reasoning_rules=None):
     """Assemble a package at `out`. Three shapes:
       * document adapter    (adapter=…, adapter_source=…)  → an Extraction (passages + defines/statements/items) → a
                                                              grounding corpus + the uniform strategy table. No cover.
@@ -172,15 +173,15 @@ def build_expert(out, *, corpus=None, prose=None, bundle=None, questions=None, s
             aug = os.path.join(out, "_corpus_with_inventory.txt")
             shutil.copyfile(ground_corpus, aug)
             with open(aug, "a", encoding="utf-8") as f:
-                for sec, text in reasoning.inventory_passages(mat, label=inventory_label):
+                for sec, text in reasoning.inventory_passages(mat, label=inventory_label, prefix=inventory_prefix):
                     f.write(f"[{sec}] {text}\n")
             ground_corpus = aug
             print(f"[reasoning] inventory: {mat['total']} distinct {inventory_label}s across {len(mat['groups'])} groups")
         if mat or defines or statements or gen_answers:
             sdl = _resolve_rules("ergo:strategy")
             _t, ncue, nans = reasoning.strategy_tables(sdl, os.path.join(out, "strategy.tsv"), mat=mat,
-                                                       label=inventory_label, defines=defines, theorems=statements,
-                                                       answers=gen_answers)
+                                                       label=inventory_label, prefix=inventory_prefix,
+                                                       defines=defines, theorems=statements, answers=gen_answers)
             print(f"[reasoning] strategy: {ncue} cues, {nans} answer rows "
                   f"({len(defines)} define, {len(statements)} theorem, {len(gen_answers)} other) → strategy.tsv")
 
@@ -358,8 +359,11 @@ def main():
     ap.add_argument("--steps", type=int, default=256, help="distill depth (EOS-stopping; 256 avoids truncation)")
     ap.add_argument("--citation", default="")
     ap.add_argument("--model", default="rosetta-expert")
-    ap.add_argument("--adapter", choices=["normrules"], help="model-free structured-source adapter")
-    ap.add_argument("--adapter-source", help="the adapter's source file (e.g. norm-rules.json)")
+    ap.add_argument("--adapter", help="model-free document adapter name (see pack.adapters registry: normrules, "
+                    "riscv_prose, pretext, latexml, glossary, rfc, manpage, nh_legal, pedagogy)")
+    ap.add_argument("--adapter-source", help="the adapter's source file/dir (e.g. norm-rules.json, an RFC .txt)")
+    ap.add_argument("--inventory-label", default="instruction", help="the thing counted (term/section/option/…)")
+    ap.add_argument("--inventory-prefix", default="riscv:inventory", help="the count/list citation-handle namespace")
     ap.add_argument("--dim", type=int, default=300, help="grounding embedding dim (0 = lexical only)")
     ap.add_argument("--corpus-vectors", action="store_true", help="PPMI+SVD over the corpus instead of GloVe")
     ap.add_argument("--no-split", action="store_true")
@@ -372,7 +376,8 @@ def main():
     build_expert(a.out, corpus=a.corpus, prose=a.prose, bundle=a.bundle, questions=a.questions, steps=a.steps,
                  citation=a.citation, model=a.model, adapter=a.adapter, adapter_source=a.adapter_source,
                  dim=a.dim, corpus_vectors=a.corpus_vectors, no_split=a.no_split,
-                 cover=a.cover, minsupp=a.minsupp, mindet=a.mindet, fieldrun=a.fieldrun)
+                 cover=a.cover, minsupp=a.minsupp, mindet=a.mindet, fieldrun=a.fieldrun,
+                 inventory_label=a.inventory_label, inventory_prefix=a.inventory_prefix)
 
 
 if __name__ == "__main__":
