@@ -45,23 +45,25 @@ def load_prior(path):
     return recs
 
 
-def align_to_contexts(prior, corpus_ids, w, decide_fn=None, whole=None, check=32):
+def align_to_contexts(prior, corpus_ids, w, decide_fn=None, whole=None, check=32, verbose=False):
     """Map each length-`w` corpus window → its prior record, keyed by the window token tuple.
 
     Each `--source-dump` record carries its corpus position `pos` (context = `corpus_ids[pos-w+1 : pos+1]`);
     absent a `pos` field we fall back to enumerate order. Keying by the context tuple survives idiom_learn's
     window dedup (identical windows share one prior). If `decide_fn`/`whole` are given, ABORT LOUDLY (rosetta
     discipline — no vacuous success) when the prior's `decode` disagrees with the oracle on a sample, i.e. the
-    alignment is off (wrong corpus, off-by-one, wrong bundle).
+    alignment is off (wrong corpus, off-by-one, wrong bundle). `verbose` prints the count of records skipped
+    for an out-of-range `pos` (a wrong-corpus / off-by-one smell during early integration).
 
     Returns {ctx_tuple: prior_rec}. Empty dict ⇒ callers fall back to blind order.
     """
     if not prior:
         return {}
-    out, checked, bad = {}, 0, 0
+    out, checked, bad, skipped = {}, 0, 0, 0
     for i, rec in enumerate(prior):
         p = int(rec.get("pos", i))                       # prefer the dump's explicit position
         if p < w - 1 or p >= len(corpus_ids):
+            skipped += 1
             continue
         ctx = tuple(corpus_ids[p - w + 1: p + 1])
         out.setdefault(ctx, rec)
@@ -69,6 +71,10 @@ def align_to_contexts(prior, corpus_ids, w, decide_fn=None, whole=None, check=32
             checked += 1
             if decide_fn(whole, list(ctx)) != rec.get("decode"):
                 bad += 1
+    if verbose and skipped:
+        import sys as _sys
+        print(f"[jlens_propose] align: {skipped}/{len(prior)} records skipped (pos out of [{w-1},"
+              f"{len(corpus_ids)}) — wrong corpus/off-by-one?)", file=_sys.stderr)
     if checked and bad:
         raise SystemExit(
             f"✗ ABORT: J-Lens prior misaligned — {bad}/{checked} decode mismatches vs the oracle. "
@@ -139,11 +145,13 @@ def family_prior(rec):
 
 
 # ── corpus-level ordering + budget split (what select_cover consults) ─────────────────────────────
-def family_order(ctx_prior, insts, idxs, min_discrim=0.9):
+def family_order(ctx_prior, insts, idxs, min_discrim=0.9, min_n_covered=8):
     """Aggregate per-context family priors over the working set → a corpus-level family admission order
     and a normalized budget weight per family. Returns (order, weight), or (None, None) → select_cover
-    keeps its blind order + uniform budget, when either:
+    keeps its blind order + uniform budget, when any of:
       * no prior covers the set, OR
+      * fewer than `min_n_covered` contexts are covered — an under-powered prior we shouldn't act on
+        (both the order and the discrimination test are noisy on a handful of contexts), OR
       * the prior does not DISCRIMINATE — one family is top-choice for ≥ `min_discrim` of covered contexts
         (a flat/degenerate signal, e.g. a below-the-gate or under-fit J-Lens; the expected null case). A
         prior that says "everything is the same family" gives no ordering benefit over blind. `weight`
@@ -159,7 +167,7 @@ def family_order(ctx_prior, insts, idxs, min_discrim=0.9):
         tops[ranked[0]] += 1; n += 1
         for rank, fam in enumerate(ranked):
             votes[fam] += len(FAMILIES) - rank                # Borda count
-    if not votes or n == 0:
+    if not votes or n < min_n_covered:                        # no / under-powered prior → blind fallback
         return None, None
     if tops.most_common(1)[0][1] >= min_discrim * n:          # no discrimination → blind fallback
         return None, None

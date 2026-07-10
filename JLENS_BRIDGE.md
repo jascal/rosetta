@@ -388,3 +388,24 @@ verdict above — no local model yields a discriminating prior (16L null, 28L ma
 J-Lens stays an analysis-only read-out. **Re-open condition:** a ≥24L, large-corpus (f32-quality) fit that
 shows `dresolve<0` at λ≈0.25–0.5 *and* a prior that clears the `min_discrim` guard — then the producer +
 hook land unchanged. Everything needed to re-run is in place; only the fit budget was the limit.
+
+### Re-run the kill gate (any rope/RMSNorm bundle, e.g. a future ≥24L f32 model)
+
+```bash
+FR=fieldrun; BUN=models/<model>/bundle; SC=/tmp/jlens        # int8 bundles OK since fieldrun PR #127
+python3 -c "import json;json.dump(json.load(open('models/<model>/corpus.json'))['ids'],open('$SC/ids.json','w'))"
+# exports — tensors is fast, source-dump ~minutes; the FIT is the long pole (cost ∝ corpus size, so grow
+# --jlens-corpus for quality but expect ~1h at ~10 prompts on a 1–1.5B model on CPU):
+$FR --bundle $BUN --recursion-explain --tensors-export $SC/m.tensors.npz
+$FR --bundle $BUN --recursion-explain --source-dump  $SC/m.source.jsonl --ids $SC/ids.json --n 160
+$FR --bundle $BUN --recursion-explain --jlens-fit --jlens-out $SC/m.jlens \
+    --jlens-corpus corpus.txt --jlens-probes 24 --jlens-max-src 2 --jlens-max-seq 24
+$FR --jlens-export $SC/m.npz --jlens-in $SC/m.jlens
+# THE GATE — a win = dresolve < 0 at λ≈0.25–0.5 (use --norm layernorm for neox/pythia):
+pil/.venv/bin/python pil/experiments/jlens_correction_sweep.py $SC/m.source.jsonl \
+    --jlens $SC/m.npz --tensors $SC/m.tensors.npz --norm rmsnorm --lams 0,0.1,0.25,0.5,1.0
+# only if it wins: producer → prior JSONL → consumer (checks the prior also clears the min_discrim guard)
+pil/.venv/bin/python pil/experiments/jlens_rosetta_prior.py $SC/m.source.jsonl \
+    --jlens $SC/m.npz --tensors $SC/m.tensors.npz --out $SC/m.prior.jsonl --norm rmsnorm --lam 0.25
+python3 py/jlens_propose.py $SC/m.prior.jsonl
+```
