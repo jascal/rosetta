@@ -87,6 +87,7 @@ was present at build). Three rule kinds:
 | `compose` | trusted / causal | `frame`, `operands:[k1,k2]`, `valmap:{token:value}`, `sum:{value-sum:out}`, `causal`, `extrapolate` | frame matches ∧ both operands in `valmap` ∧ `valmap[op1]+valmap[op2] in sum` → `sum[...]` |
 | `ngram` | gated / observational | `ctx:[token ids]`, `out`, `support`, `determinism` | longest suffix where `ctx` matches → `out` |
 | `relation` | trusted / causal | `eq:[[i,j],...]`, `copy:k`, `confidence` | `ctx[-i]==ctx[-j]` ∀ pairs → `ctx[-k]` (routed after n-grams, above succession/induction; the learned repetition rule is `eq=[[1,2]], copy=1`) |
+| `khop` | trusted / causal | `lo:int`, `hi:int`, `confidence` | 2-hop: rightmost earlier match of `ctx[-1]` (query, excluding the query's own position) → bridge = its successor; rightmost earlier match of `bridge` EXCLUDING the bridge's own site (`i != p1+1`, the load-bearing exclusion) → its successor is the prediction (routed OOD, after induction; mirrors pil `mir_khop2`/`_DL_KHOP` exactly) |
 
 **Offsets are 1-based from the end** (offset 1 = the last context token, offset k = `ctx[-k]`). JSON keys are strings;
 normalize to ints on load.
@@ -99,7 +100,7 @@ normalize to ints on load.
 3. **GATED n-grams** — longest matching suffix wins. Kept at build only by support/determinism ("fire only if confident",
    *not* gating inside an n-gram), so a match is already a confident match.
 4. **ABSTAIN** if nothing fires → defer to a backstop, or refuse (the bounded expert).
-   (Routed OOD circuits fire between 3 and 4, most-specific first: `relation` → `succession` → `induction`.
+   (Routed OOD circuits fire between 3 and 4, most-specific first: `relation` → `succession` → `induction` → `khop`.
    Trusted non-table kinds may ship a `confidence` field (held-out fired-accuracy) so a support-weighted
    runtime can arbitrate tiers per answer instead of by fixed priority.)
 
@@ -177,7 +178,7 @@ answer with the highest confidence wins (ties keep the first candidate — idiom
 then n-grams longest-first). Confidences are what the package ships:
 - `ngram` rules carry `confidence` = Laplace-shrunk per-key determinism `c/(t+α)`;
 - `gate` rules carry `confs` = a per-content-key confidence map parallel to `table`;
-- trusted kinds (`relation`, `induction`, …) carry the scalar `confidence` (held-out fired-accuracy).
+- trusted kinds (`relation`, `induction`, `khop`, …) carry the scalar `confidence` (held-out fired-accuracy).
 
 This is the argmax policy whose dominance over every fixed priority is kernel-checked
 (i-orca `examples/concept_grounding/Arbitration.thy`: `argmax_policy_optimal`), with CALIBRATION as

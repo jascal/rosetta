@@ -122,7 +122,36 @@ def load_package(manifest_path):
             idioms.append({"kind": "relation", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
                            "conf": r.get("confidence")})
+        elif kind == "khop":                                     # 2-hop circuit: q -> bridge -> pred, bridge-site excluded (mirrors pil mir_khop2/_DL_KHOP)
+            idioms.append({"kind": "khop", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
+                           "lo": int(r["lo"]), "hi": int(r["hi"]),
+                           "conf": r.get("confidence")})
     return idioms, ngrams, m
+
+
+def _khop_predict(ctx, lo, hi):
+    """2-hop circuit: mirrors pil `mir_khop2`/`_DL_KHOP` EXACTLY (wyly_selfcompile.py L171-203).
+    q = ctx[-1]; p1 = rightmost earlier match of q (comparison range excludes the query position
+    itself: i in [0, W-2]); bridge = ctx[p1+1] (clamped to W-1); p2 = rightmost earlier match of
+    bridge EXCLUDING position p1+1 itself (the BRIDGE-SITE EXCLUSION -- load-bearing: without it
+    the bridge's own site could re-match itself and the second hop is wrong); returns
+    ctx[p2+1] (clamped), or None if any stage fails to match."""
+    W = len(ctx)
+    if W < 2:
+        return None
+    q = ctx[-1]
+    if not (lo <= q <= hi):
+        return None
+    cand1 = [i for i in range(W - 1) if ctx[i] == q]
+    if not cand1:
+        return None
+    p1 = max(cand1)
+    bridge = ctx[min(p1 + 1, W - 1)]
+    cand2 = [i for i in range(W - 1) if ctx[i] == bridge and i != p1 + 1]
+    if not cand2:
+        return None
+    p2 = max(cand2)
+    return ctx[min(p2 + 1, W - 1)]
 
 
 def serve(ctx, idioms, ngrams, W):
@@ -131,7 +160,7 @@ def serve(ctx, idioms, ngrams, W):
     output) are a structured lookup, so the whole package is consumable without an engine. (No min_det: the manifest holds
     only confident rules — gating happened at build.)"""
     for r in idioms:                                            # trusted tier (causal), first — gate/compose only
-        if r["kind"] in ("induction", "succession", "relation", "dgate", "dgate2", "pointer"):  # OOD/derived route below — handled after
+        if r["kind"] in ("induction", "succession", "relation", "dgate", "dgate2", "pointer", "khop"):  # OOD/derived route below — handled after
             continue
         fr = r["frame"]
         if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -187,6 +216,16 @@ def serve(ctx, idioms, ngrams, W):
             if js and max(js) + L < len(ctx):
                 return {"answer": ctx[max(js) + L], "tier": "trusted", "basis": "causal",
                         "citation": r["cite"], "rule": r["id"], "circuit": "induction", "origin": r.get("origin", "teacher")}
+    # khop (causal 2-HOP), OOD fallback after induction (a 2-hop circuit is checked once the
+    # cheaper single-hop induction copy has already had its chance). Mirrors pil mir_khop2/
+    # _DL_KHOP exactly via _khop_predict — see that function for the bridge-site exclusion.
+    for r in idioms:
+        if r["kind"] != "khop":
+            continue
+        pred = _khop_predict(ctx, r["lo"], r["hi"])
+        if pred is not None:
+            return {"answer": pred, "tier": "trusted", "basis": "causal",
+                    "citation": r["cite"], "rule": r["id"], "circuit": "khop"}
     return None  # ABSTAIN
 
 
@@ -403,6 +442,12 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
                     consider(ctx[max(js) + L], r.get("conf") or 0.0,
                              {"tier": "trusted", "basis": "causal", "citation": r["cite"],
                               "rule": r["id"], "circuit": "induction", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
+        elif k == "khop":
+            pred = _khop_predict(ctx, r["lo"], r["hi"])
+            if pred is not None:
+                consider(pred, r.get("conf") or 0.0,
+                         {"tier": "trusted", "basis": "causal", "citation": r["cite"],
+                          "rule": r["id"], "circuit": "khop", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
