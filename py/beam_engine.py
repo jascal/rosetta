@@ -142,6 +142,7 @@ def beam_decode(
                 "n_steps": M,
                 "prune_events": prune_events,
                 "surviving_counts": surviving_counts,
+                "max_committed_margin": 0.0,
             }
         next_paths.sort(key=cmp_to_key(cmp))
         paths = next_paths[:beam_width]
@@ -154,4 +155,5 @@ def beam_decode(
         "n_steps": M,
         "prune_events": prune_events,
         "surviving_counts": surviving_counts,
+        "max_committed_margin": max((s.margin for s in winner.steps), default=0.0),
     }

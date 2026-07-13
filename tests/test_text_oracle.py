@@ -63,13 +63,13 @@ def test_text_oracle_deduplicates_by_best_confidence_and_keeps_first_tie():
     assert steps[0].meta["conf"] == 0.8
 
 
-def test_serve_energy_genuine_commit_and_later_wipeout_fallback():
+def test_serve_energy_zero_margin_gate_and_later_wipeout_fallback():
     ngrams = defaultdict(dict)
     ngrams[1][(1,)] = _ngram(2, 0.8, "first", (8, 10))
     ngrams[1][(2,)] = _ngram(3, 0.7, "second", (7, 10))
 
-    genuine = serve_energy((1,), [], ngrams, 1, M=2, beam_width=2)
-    assert genuine == {
+    gated = serve_energy((1,), [], ngrams, 1, M=2, beam_width=2)
+    assert gated == {
         "tier": "gated",
         "basis": "observational",
         "citation": "first",
@@ -78,7 +78,7 @@ def test_serve_energy_genuine_commit_and_later_wipeout_fallback():
         "stratum": 1,
         "answer": 2,
         "confidence": 0.8,
-        "cert_kind": "M-step-lookahead",
+        "cert_kind": "per-token",
     }
 
     del ngrams[1][(2,)]
