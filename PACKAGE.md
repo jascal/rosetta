@@ -1,4 +1,9 @@
-# The rosetta expert package v2 — the unified spec (schema + runtime protocol)
+# The rosetta expert package v3 — additive raw-count evidence
+
+v3 adds machine-readable `schema_version: 3` and, for energy-mode packages only, the top-level
+shrinkage constant `alpha` plus optional raw per-key counts. It does not replace v2 confidence
+fields or change serving. v2 unified origins and strata; v1 defined the original package and
+runtime protocol. Old manifests without any v3 field remain valid.
 
 **One package, three origins, one contract.** An expert package is a set of arbitrating rules
 over a bounded domain; every answer is cited to its rule, its origin, and its evidence; anything
@@ -74,8 +79,13 @@ A package is a directory: `circuits.expert.dl` + `run.dl` (souffle decode, optio
 
 ```json
 { "model": "...", "trusted_idioms": N, "gated_ngrams": M, "induction_ood": K,
-  "minsupp": 3, "mindet": 1.0, "rules": [ <rule>, ... ] }
+  "minsupp": 3, "mindet": 1.0, "schema_version": 3, "alpha": 2.0,
+  "rules": [ <rule>, ... ] }
 ```
+
+`schema_version` and `alpha` are emitted only for energy-mode packages in v3, so classic
+`support-weighted` package bytes are unchanged. `alpha` is the denominator pseudocount in the
+shipped shrunk confidence, `cnt/(tot+alpha)`.
 
 Every rule carries **`tier`** (`trusted` | `gated`) and **`basis`** (`causal` | `observational`) + `id` + provenance
 (`cite` = supporting corpus positions; `citation` = resolved passage strings when a `corpus_meta.json` offset→citation map
@@ -83,9 +93,9 @@ was present at build). Three rule kinds:
 
 | `kind` | tier / basis | fields | how the runtime fires it |
 |---|---|---|---|
-| `gate` | trusted / causal | `frame:{offset:token}`, `slot:k`, `table:{token:out}`, `causal`, `support` | frame matches (`ctx[-offset]==token` ∀) ∧ `ctx[-slot] in table` → `table[ctx[-slot]]` |
+| `gate` | trusted / causal | `frame:{offset:token}`, `slot:k`, `table:{token:out}`, `causal`, `support`; energy-mode table rules may add `counts:{token:[cnt,tot]}` | frame matches (`ctx[-offset]==token` ∀) ∧ `ctx[-slot] in table` → `table[ctx[-slot]]` |
 | `compose` | trusted / causal | `frame`, `operands:[k1,k2]`, `valmap:{token:value}`, `sum:{value-sum:out}`, `causal`, `extrapolate` | frame matches ∧ both operands in `valmap` ∧ `valmap[op1]+valmap[op2] in sum` → `sum[...]` |
-| `ngram` | gated / observational | `ctx:[token ids]`, `out`, `support`, `determinism` | longest suffix where `ctx` matches → `out` |
+| `ngram` | gated / observational | `ctx:[token ids]`, `out`, `support`, `determinism`; energy-mode rules may add `counts:[cnt,tot]` | longest suffix where `ctx` matches → `out` |
 | `relation` | trusted / causal | `eq:[[i,j],...]`, `copy:k`, `confidence` | `ctx[-i]==ctx[-j]` ∀ pairs → `ctx[-k]` (routed after n-grams, above succession/induction; the learned repetition rule is `eq=[[1,2]], copy=1`) |
 | `khop` | trusted / causal | `lo:int`, `hi:int`, `confidence` | 2-hop: rightmost earlier match of `ctx[-1]` (query, excluding the query's own position) → bridge = its successor; rightmost earlier match of `bridge` EXCLUDING the bridge's own site (`i != p1+1`, the load-bearing exclusion) → its successor is the prediction (routed OOD, after induction; mirrors pil `mir_khop2`/`_DL_KHOP` exactly) |
 
@@ -136,8 +146,13 @@ gate on it):
 
 ```json
 {"kind": "dgate", "feature": "mate0", "table": {"<mateTok>:<lastTok>": out, ...},
- "confs": {"<mateTok>:<lastTok>": 0.71, ...}}
+ "confs": {"<mateTok>:<lastTok>": 0.71, ...},
+ "counts": {"<mateTok>:<lastTok>": [5, 7], ...}}
 ```
+
+The optional energy-mode `counts` map is parallel to `table` and `confs`; `dgate` and `dgate2`
+use the same colon-separated composite keys. Missing entries mean raw evidence is unavailable,
+not `(0, 0)`.
 
 First producer: pil wyly_lm_v5 (the sleep judge admitted the mate gate on the Isabelle corpus,
 where it set the certified-core arc best). Runtimes: `py/serve_package.py` (support-weighted
@@ -176,9 +191,24 @@ A manifest may declare `"cover": "support-weighted"` at the top level. A conform
 replaces the fixed tier priority with per-answer ARBITRATION: every applicable rule fires and the
 answer with the highest confidence wins (ties keep the first candidate — idioms in manifest order,
 then n-grams longest-first). Confidences are what the package ships:
+
 - `ngram` rules carry `confidence` = Laplace-shrunk per-key determinism `c/(t+α)`;
 - `gate` rules carry `confs` = a per-content-key confidence map parallel to `table`;
 - trusted kinds (`relation`, `induction`, `khop`, …) carry the scalar `confidence` (held-out fired-accuracy).
+
+Energy-mode v3 emission carries raw evidence alongside those floats:
+
+- a single-key `ngram` has `counts: [cnt, tot]`;
+- table-shaped `gate`, `dgate`, and `dgate2` rules have a `counts` dictionary keyed exactly like
+  `confs`, with `[cnt, tot]` values;
+- the online counts-tier `ngram` also has `total` beside its existing `support` and redundantly
+  carries `counts: [support, total]`, giving both runtimes one uniform n-gram parse shape.
+
+All fields are optional on load: absence is unknown evidence, never zero. Counts are parsed but
+are not used by v3 serving. A future multi-step energy beam may rank exact ratios with integer
+cross-multiplication. It must not do so at the `M=1`, `beam_width=1` corner: manifest confidence
+is rounded to four decimals, while integer comparison ranks the exact ratio and can differ on a
+rounding tie. That corner therefore continues to delegate bit-exactly to float `serve_sw`.
 
 This is the argmax policy whose dominance over every fixed priority is kernel-checked
 (i-orca `examples/concept_grounding/Arbitration.thy`: `argmax_policy_optimal`), with CALIBRATION as
