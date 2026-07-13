@@ -18,6 +18,7 @@ Deps: tokenizers (for the NL-query path). Usage: .venv/bin/python py/serve_packa
 """
 import json, os, sys, random
 from collections import defaultdict
+from dataclasses import dataclass
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from abstain_emit import build_tab, confident_rules, emit, emit_manifest
 
@@ -241,17 +242,20 @@ def serve(ctx, idioms, ngrams, W):
     return None  # ABSTAIN
 
 
-def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
-    """SUPPORT-WEIGHTED cover (manifest cover: "support-weighted"): every applicable rule fires and
-    the answer with the highest confidence wins -- the argmax policy whose dominance over every
-    fixed priority is the kernel-checked C10 (i-orca Arbitration.thy: argmax_policy_optimal), with
-    calibration as the stated premise. Confidences are what the package ships: per-key
-    Laplace-shrunk determinism for table rules (ngram "confidence", gate "confs"), held-out
-    fired-accuracy for scalar kinds (relation/induction "confidence"). Ties keep the FIRST
-    candidate in manifest order (the learner's admitted order), n-grams after idioms, longest
-    first."""
-    best, bestc = None, float("-inf")                       # stratum-1 pool
-    best2, bestc2 = None, float("-inf")                     # stratum-2 pool (fall-through)
+@dataclass(frozen=True)
+class Candidate:
+    """One firing support-weighted rule, including optional raw count evidence."""
+
+    answer: int
+    conf: float
+    counts: tuple[int, int] | None
+    stratum: int
+    meta: dict
+
+
+def enumerate_candidates(ctx, idioms, ngrams, W, m_derived=None, cmap=None):
+    """Return every firing rule in serve_sw's exact arbitration order."""
+    candidates = []
     feats, fpos = {}, {}
     for d in (m_derived or []):
         if d["kind"] == "bracket-mate":                        # PROVED extractor (pil wyly_mate_certify):
@@ -383,15 +387,10 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             p2 = q + d["succ"] if q >= 0 else -1
             feats[d["id"]] = ctx[p2] if 0 <= p2 < len(ctx) and q >= 0 else -1
 
-    def consider(ans, c, meta, stratum=1):
-        nonlocal best, bestc, best2, bestc2
+    def consider(ans, c, meta, stratum=1, counts=None):
         if c is None:
             return
-        if stratum <= 1:
-            if c > bestc:
-                best, bestc = dict(meta, answer=ans, stratum=1), float(c)
-        elif c > bestc2:
-            best2, bestc2 = dict(meta, answer=ans, stratum=stratum), float(c)
+        candidates.append(Candidate(ans, float(c), counts, int(stratum), meta))
 
     cmap = cmap if cmap is not None else {}
     for r in idioms:
@@ -423,13 +422,15 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             if fa >= 0 and fb >= 0 and (fa, fb) in r["table"]:
                 consider(r["table"][(fa, fb)], r["confs"].get((fa, fb), 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "dgate2", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "dgate2", "origin": r.get("origin", "teacher")},
+                         stratum=r.get("stratum", 1), counts=r.get("counts", {}).get((fa, fb)))
         elif k == "dgate":
             f = feats.get(r["feature"], -1)
             if f >= 0 and (f, ctx[-1]) in r["table"]:
                 consider(r["table"][(f, ctx[-1])], r["confs"].get((f, ctx[-1]), 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "dgate", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "dgate", "origin": r.get("origin", "teacher")},
+                         stratum=r.get("stratum", 1), counts=r.get("counts", {}).get((f, ctx[-1])))
         elif k == "gate":
             fr = r["frame"]
             if not all(len(ctx) >= o and ctx[-o] == t for o, t in fr.items()):
@@ -438,7 +439,8 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
             if len(ctx) >= so and ctx[-so] in r["table"]:
                 consider(r["table"][ctx[-so]], r.get("confs", {}).get(ctx[-so], 0.0),
                          {"tier": "gated", "basis": "observational", "citation": r["cite"],
-                          "rule": r["id"], "circuit": "gate", "origin": r.get("origin", "teacher")}, stratum=r.get("stratum", 1))
+                          "rule": r["id"], "circuit": "gate", "origin": r.get("origin", "teacher")},
+                         stratum=r.get("stratum", 1), counts=r.get("counts", {}).get(ctx[-so]))
         elif k == "relation":
             offs = [o for ij in r["eq"] for o in ij] + [r["copy"]]
             if max(offs) <= len(ctx) and all(ctx[-i] == ctx[-j] for i, j in r["eq"]):
@@ -463,10 +465,33 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite, conf, st, org, _counts = ngrams[k][s]
+            out, basis, cite, conf, st, org, counts = ngrams[k][s]
             consider(out, conf if conf is not None else 0.0,
                      {"tier": "gated", "basis": basis, "citation": cite, "k": k,
-                      "origin": org}, stratum=st)
+                      "origin": org}, stratum=st, counts=counts)
+    return candidates
+
+
+def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
+    """SUPPORT-WEIGHTED cover (manifest cover: "support-weighted"): every applicable rule fires and
+    the answer with the highest confidence wins -- the argmax policy whose dominance over every
+    fixed priority is the kernel-checked C10 (i-orca Arbitration.thy: argmax_policy_optimal), with
+    calibration as the stated premise. Confidences are what the package ships: per-key
+    Laplace-shrunk determinism for table rules (ngram "confidence", gate "confs"), held-out
+    fired-accuracy for scalar kinds (relation/induction "confidence"). Ties keep the FIRST
+    candidate in manifest order (the learner's admitted order), n-grams after idioms, longest
+    first."""
+    best, bestc = None, float("-inf")                       # stratum-1 pool
+    best2, bestc2 = None, float("-inf")                     # stratum-2 pool (fall-through)
+    candidates = enumerate_candidates(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap)
+    for candidate in candidates:
+        ans, c, meta, stratum = (candidate.answer, candidate.conf,
+                                 candidate.meta, candidate.stratum)
+        if stratum <= 1:
+            if c > bestc:
+                best, bestc = dict(meta, answer=ans, stratum=1), float(c)
+        elif c > bestc2:
+            best2, bestc2 = dict(meta, answer=ans, stratum=stratum), float(c)
     tau = (m_tau if m_tau is not None else 0.35)
     if best is not None and bestc >= tau:
         best["confidence"] = round(bestc, 4)
@@ -478,21 +503,42 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
     return pool[0]
 
 
-def serve_energy(ctx, idioms, ngrams, W, M=1, beam_width=1, m_derived=None, cmap=None, m_tau=None):
+def serve_energy(ctx, idioms, ngrams, W, M=1, beam_width=1, m_derived=None, cmap=None,
+                 m_tau=None, wyly_seed=0):
     """ENERGY-BEAM cover (manifest cover: "energy-beam"), M=1 / beam_width=1 CORNER: a genuine
     REDUCTION of serve_sw, not a delegate in spirit -- at this corner the energy tuple's margin
     component ties (no hard legality term in this slice, so every candidate's PIC turnstile margin
     is identical) and det_rank collapses to serve_sw's own confidence order, so serve_sw's argmax
     commit IS the argmin-energy commit. The integer det_rank cross-multiply and a discriminating
-    margin only become load-bearing in the Slice-2 M-step beam (once the manifest carries raw
-    per-key counts and a hard term). Cert nuance: at M=1 the committed token carries a per-token
-    cert (no lookahead), identical to classic DECIDE."""
-    if M != 1 or beam_width != 1:
-        raise NotImplementedError(
-            "energy-beam M>1 / beam_width>1 arrives in Slice 2 (the M-step beam)")
-    result = serve_sw(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
-    if result is not None:
-        result["cert_kind"] = "per-token"
+    margin become load-bearing in the M-step beam when raw per-key counts are available.
+    Cert nuance: at M=1 the committed token carries a per-token cert (no lookahead),
+    identical to classic DECIDE."""
+    if M == 1 and beam_width == 1:
+        result = serve_sw(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
+        if result is not None:
+            result["cert_kind"] = "per-token"
+        return result
+
+    from beam_engine import beam_decode
+    from text_oracle import TextOracle
+
+    oracle = TextOracle(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
+    beam_result = beam_decode(oracle, M, beam_width, "decide_energy_v1", int(wyly_seed))
+    commit = beam_result["committed_value"]
+    if commit is None:
+        fallback = oracle.fallback()
+        if fallback is not None:
+            fallback["cert_kind"] = "per-token"
+        return fallback
+    if isinstance(commit, dict):
+        commit["cert_kind"] = "per-token"
+        return commit
+
+    token, meta = commit
+    result = {key: value for key, value in meta.items() if key != "conf"}
+    result["answer"] = token
+    result["confidence"] = round(meta["conf"], 4) if meta.get("conf") is not None else 0.0
+    result["cert_kind"] = "M-step-lookahead"
     return result
 
 
@@ -504,7 +550,8 @@ def decide(ctx, idioms, ngrams, m):
     if m.get("cover") == "energy-beam":
         return serve_energy(ctx, idioms, ngrams, m.get("W", 1), M=m.get("M", 1),
                             beam_width=m.get("beam_width", 1), m_derived=m.get("_derived"),
-                            cmap=m.get("_cmap"), m_tau=m.get("_tau"))
+                            cmap=m.get("_cmap"), m_tau=m.get("_tau"),
+                            wyly_seed=m.get("wyly_seed", 0))
     return serve(ctx, idioms, ngrams, m.get("W", 1))
 
 

@@ -19,11 +19,13 @@ class Step:
     key: substrate-defined identity for hash tie-break (e.g. (r,c,v) for sudoku).
     margin: higher is better (forced > guessed); sudoku pins {0.0, 1.0}.
     counts: (cnt, tot) for det_rank cross-multiply, or None => det_rank tie.
+    meta: opaque substrate-defined provenance for the oracle's extract_commit.
     """
 
     key: Hashable
     margin: float
     counts: tuple[int, int] | None
+    meta: Any = None
 
 
 @dataclass(frozen=True)

@@ -218,6 +218,19 @@ inflation: within 2ε·total-weight of optimal under ε-miscalibration). Referen
 `py/serve_package.py` (`serve_sw`/`decide`); C++ port: sgiandubh `src/rosetta_package.h`. First
 producer: pil `wyly_lm_v5` `WYLY_EMIT=1` (served-vs-learner parity verified to 4 decimals on
 11.5k/12k held-out windows per dataset).
+
+### Energy-beam commit certificates (`cert_kind`)
+
+An energy-beam decision labels the scope of the commit certificate in its `cert_kind` field.
+`"per-token"` means a single-step commit with no lookahead, matching classic DECIDE-shaped
+certainty; it is also used when a multi-step request falls back to the single-step
+support-weighted cover. `"M-step-lookahead"` means the committed first token was selected over
+a bounded M-step beam of hypothetical step-2 through step-M continuations.
+
+The latter is bounded by the configured beam, not a proof of global optimality. A wider beam or
+larger M may expose a different or better trajectory, and therefore may change the first-token
+commit.
+
 5. **Cite** the answer: the fired rule's `citation`/`cite`. (`circuits.expert.dl` additionally emits `cprov(inst,ruleid)`
    for the souffle path.)
 
