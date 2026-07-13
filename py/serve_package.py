@@ -466,11 +466,33 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
     return pool[0]
 
 
+def serve_energy(ctx, idioms, ngrams, W, M=1, beam_width=1, m_derived=None, cmap=None, m_tau=None):
+    """ENERGY-BEAM cover (manifest cover: "energy-beam"), M=1 / beam_width=1 CORNER: a genuine
+    REDUCTION of serve_sw, not a delegate in spirit -- at this corner the energy tuple's margin
+    component ties (no hard legality term in this slice, so every candidate's PIC turnstile margin
+    is identical) and det_rank collapses to serve_sw's own confidence order, so serve_sw's argmax
+    commit IS the argmin-energy commit. The integer det_rank cross-multiply and a discriminating
+    margin only become load-bearing in the Slice-2 M-step beam (once the manifest carries raw
+    per-key counts and a hard term). Cert nuance: at M=1 the committed token carries a per-token
+    cert (no lookahead), identical to classic DECIDE."""
+    if M != 1 or beam_width != 1:
+        raise NotImplementedError(
+            "energy-beam M>1 / beam_width>1 arrives in Slice 2 (the M-step beam)")
+    result = serve_sw(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
+    if result is not None:
+        result["cert_kind"] = "per-token"
+    return result
+
+
 def decide(ctx, idioms, ngrams, m):
     """Dispatch on the manifest's declared cover semantics."""
     if m.get("cover") == "support-weighted":
         return serve_sw(ctx, idioms, ngrams, m.get("W", 1), m_derived=m.get("_derived"),
                         cmap=m.get("_cmap"), m_tau=m.get("_tau"))
+    if m.get("cover") == "energy-beam":
+        return serve_energy(ctx, idioms, ngrams, m.get("W", 1), M=m.get("M", 1),
+                            beam_width=m.get("beam_width", 1), m_derived=m.get("_derived"),
+                            cmap=m.get("_cmap"), m_tau=m.get("_tau"))
     return serve(ctx, idioms, ngrams, m.get("W", 1))
 
 
