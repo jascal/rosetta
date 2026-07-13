@@ -50,7 +50,9 @@ def load_package(manifest_path):
     (idiom_learn --package: causal idioms + gated n-grams) and is backward-compatible with the flat n-gram manifest
     (abstain_emit: a rule with no 'kind' is an n-gram). Returns (idioms, ngrams, manifest):
       idioms = ordered TRUSTED rules (gate/compose), kept in priority order — all host-side matchable;
-      ngrams[k][suffix] = (out, basis, cite) — the GATED tier (= 'fire only if confident', NOT gating inside the n-gram).
+      ngrams[k][suffix] = (out, basis, cite, confidence, stratum, origin, counts) — the
+      GATED tier (= 'fire only if confident', NOT gating inside the n-gram). counts is None for
+      old packages.
     JSON keys are strings; normalized to ints here so a C++ porter sees the same shape."""
     m = json.load(open(manifest_path))
     idioms, ngrams = [], defaultdict(dict)
@@ -82,12 +84,16 @@ def load_package(manifest_path):
             ctx = tuple(r["ctx"])
             ngrams[len(ctx)][ctx] = (r["out"], r.get("basis", "observational"), _cite(r),
                                      r.get("confidence"), int(r.get("stratum", 1)),
-                                     r.get("origin", m.get("origin", "teacher")))
+                                     r.get("origin", m.get("origin", "teacher")),
+                                     tuple(int(x) for x in r["counts"])
+                                     if r.get("counts") is not None else None)
         elif kind == "gate":
             idioms.append({"kind": "gate", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "slot": r["slot"],
                            "table": {int(k): int(v) for k, v in r["table"].items()},
-                           "confs": {int(k): float(c) for k, c in (r.get("confs") or {}).items()}})
+                           "confs": {int(k): float(c) for k, c in (r.get("confs") or {}).items()},
+                           "counts": {int(k): tuple(int(x) for x in v)
+                                      for k, v in (r.get("counts") or {}).items()}})
         elif kind == "compose":
             idioms.append({"kind": "compose", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "frame": {int(o): int(t) for o, t in r["frame"].items()}, "operands": r["operands"],
@@ -111,13 +117,19 @@ def load_package(manifest_path):
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
-                                     for k, c in (r.get("confs") or {}).items()}})
+                                     for k, c in (r.get("confs") or {}).items()},
+                           "counts": {tuple(int(x) for x in k.split(":")):
+                                      tuple(int(x) for x in v)
+                                      for k, v in (r.get("counts") or {}).items()}})
         elif kind == "dgate":                                    # TWO-LAYER: gate over a DERIVED predicate
             idioms.append({"kind": "dgate", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r), "feature": r["feature"],
                            "table": {tuple(int(x) for x in k.split(":")): int(v)
                                      for k, v in r["table"].items()},
                            "confs": {tuple(int(x) for x in k.split(":")): float(c)
-                                     for k, c in (r.get("confs") or {}).items()}})
+                                     for k, c in (r.get("confs") or {}).items()},
+                           "counts": {tuple(int(x) for x in k.split(":")):
+                                      tuple(int(x) for x in v)
+                                      for k, v in (r.get("counts") or {}).items()}})
         elif kind == "relation":                                 # causal EQ-GUARD + COPY (offset-local), routed OOD
             idioms.append({"kind": "relation", "stratum": int(r.get("stratum", 1)), "origin": r.get("origin", m.get("origin", "teacher")), "id": r["id"], "cite": _cite(r),
                            "eq": [(int(i), int(j)) for i, j in r["eq"]], "copy": int(r["copy"]),
@@ -178,7 +190,7 @@ def serve(ctx, idioms, ngrams, W):
     for k in range(min(len(ctx), W), 0, -1):                    # gated n-gram tier (longest suffix wins)
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite, _conf, _st, _org = ngrams[k][s]
+            out, basis, cite, _conf, _st, _org, _counts = ngrams[k][s]
             return {"answer": out, "tier": "gated", "basis": basis, "citation": cite, "k": k}
     # relation (causal EQ-GUARD + COPY), OOD fallback ABOVE succession/induction — the most specific of the routed
     # circuits: fires iff ctx[-i] == ctx[-j] for every pair in `eq` (offsets 1-based from the end), then copies
@@ -451,7 +463,7 @@ def serve_sw(ctx, idioms, ngrams, W, m_derived=None, cmap=None, m_tau=None):
     for k in range(min(len(ctx), W), 0, -1):
         s = tuple(ctx[-k:])
         if s in ngrams[k]:
-            out, basis, cite, conf, st, org = ngrams[k][s]
+            out, basis, cite, conf, st, org, _counts = ngrams[k][s]
             consider(out, conf if conf is not None else 0.0,
                      {"tier": "gated", "basis": basis, "citation": cite, "k": k,
                       "origin": org}, stratum=st)
