@@ -524,6 +524,14 @@ def serve_energy(ctx, idioms, ngrams, W, M=1, beam_width=1, m_derived=None, cmap
 
     oracle = TextOracle(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
     beam_result = beam_decode(oracle, M, beam_width, "decide_energy_v1", int(wyly_seed))
+    if beam_result.get("max_committed_margin", 0.0) <= 0.0:
+        # no hard term discriminated within M -> the soft-margin beam is net-negative
+        # on real text; fall back to the bit-exact M=1 corner (identical to the M==1
+        # branch above).
+        result = serve_sw(ctx, idioms, ngrams, W, m_derived=m_derived, cmap=cmap, m_tau=m_tau)
+        if result is not None:
+            result["cert_kind"] = "per-token"
+        return result
     commit = beam_result["committed_value"]
     if commit is None:
         fallback = oracle.fallback()
