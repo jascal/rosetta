@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "py"))
 from certificate import replay  # noqa: E402
 from oracle import run_equiv, run_master  # noqa: E402
-from temperature import certify_T, emit_T, finalize, trange  # noqa: E402
+from temperature import certify_T, check_argmax, emit_T, finalize, trange  # noqa: E402
 
 pytestmark = pytest.mark.skipif(shutil.which("souffle") is None, reason="needs souffle")
 
@@ -64,6 +64,47 @@ def distribution(tmp_path, logits=None):
     p = tmp_path / "circuits.dl"
     emit_T(str(p), {(1,): logits or [(7, 0.0), (8, 0.0)]}, 1)
     return p
+
+
+def test_argmax_adapter_replays_and_rejects_ties(tmp_path):
+    p = distribution(tmp_path, [(7, 1.0), (8, 0.0)])
+    r = check_argmax(p, [[1]], {0: 7}, [0], 0.5, evidence_dir=tmp_path / "evidence")
+    assert r["certified"] and r["nmatch"] == 1, r
+    assert replay(r["evidence"])["certified"]
+    p = distribution(tmp_path)
+    r = check_argmax(p, [[1]], {0: 7}, [0], 0.5)
+    assert not r["certified"] and r["nmiss"] == 1, r
+
+
+@pytest.mark.parametrize("refs,idxs", [({}, [0]), ({}, [])])
+def test_argmax_adapter_rejects_missing_and_empty_domain(tmp_path, refs, idxs):
+    r = check_argmax(distribution(tmp_path), [[1]], refs, idxs, 0.5)
+    assert "error" not in r and not r["certified"], r
+
+
+@pytest.mark.parametrize("missing_logits", [False, True])
+def test_unified_cover_preserves_complete_certificate_obligations(tmp_path, monkeypatch, missing_logits):
+    import exercise_confirm
+    import temperature
+    from types import SimpleNamespace
+
+    (tmp_path / "corpus.json").write_text(json.dumps({"ids": [7, 8]}))
+    (tmp_path / "logit_cache.json").write_text(json.dumps({} if missing_logits else {"7": [[8, 0.0]]}))
+    monkeypatch.delenv("FIELDRUN_SERVE", raising=False)
+    monkeypatch.setattr(exercise_confirm, "instances", lambda *a: [[7]])
+    monkeypatch.setattr(exercise_confirm, "induction_exercise", lambda *a, **kw: ([[50, 51, 50]], [0]))
+    monkeypatch.setattr(exercise_confirm, "CIRCUITS", {})
+    monkeypatch.setattr(temperature, "build_sym", lambda *a: {})
+    tokenizer = SimpleNamespace(encode=lambda *a, **kw: SimpleNamespace(ids=[]))
+    result = exercise_confirm.emit_unified_cover(str(tmp_path), lambda c: 51, lambda cs: None,
+                                                 tokenizer, 100, T_lo=1.0, T=1.0)
+    assert result["certified"] is (not missing_logits)
+    report = json.loads((tmp_path / "unified-certificate.json").read_text())
+    assert not report["interval_certified"]
+    assert report["checks"][0]["ndomain"] == 1
+    assert report["checks"][0]["nmissing"] == int(missing_logits)
+    for check in report["checks"]:
+        assert replay(check["evidence"])["certified"] == check["certified"]
 
 
 def test_distribution_tv_computed_in_datalog(tmp_path):

@@ -13,6 +13,12 @@ they must not disappear from the domain. The candidate defines `cdecide(inst,out
 no mismatches, and no uncovered instances. Missing references, mismatches, and gaps have separate output relations.
 `run_equiv` also rejects unequal context/reference list lengths before serializing them.
 
+For a distribution-producing candidate, `temperature.check_argmax` combines this checker with
+`dl/argmax_adapter.dl`. Datalog derives all maximal-probability tokens; a tied conflicting output fails equivalence.
+The unified-cover builder retains both finite-grid distributional and argmax evidence in `unified-certificate.json`.
+Its circuit domain is selected using oracle agreement, so this is a finite selected-domain certificate, not an
+untouched holdout evaluation. Empty circuit domains cannot pass.
+
 ```bash
 python3 py/verify_threx.py --evidence-dir reference/threx/certificate-evidence
 ```
@@ -82,5 +88,6 @@ load `whole.dl`, model weights, or call fieldrun. `complete_cover.py` is a histo
 standalone replacement.
 
 Still `open`: interval bounds, top-K tail certificates, independent certification of the symbol representation,
-and generalization to unseen inputs. Package holdout isolation and skipped evaluation gates are separate known work;
-these certificate changes do not fix or validate those empirical scorecards.
+and generalization to unseen inputs. Package cover builds now isolate held-out lines before extraction and fail
+requested gates when evidence is missing (see [EXPERTS.md](../EXPERTS.md)); those empirical scorecards do not establish
+model equivalence or evaluate the full retrieval cascade.

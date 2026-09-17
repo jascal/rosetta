@@ -9,8 +9,10 @@
 .decl temp(t:float)
 .input temp
 .decl mp(inst:number, m:number)
-mp(I,M) :- M = max P : { tok(I,P,_) }.
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
 .decl ctxlogit(inst:number, token:symbol, s:float)
+// NOTE: ioi, transitivity, modus_ponens, temporal, spatial, syllogism, succession, induction compute over operand VALUES / are structural pointers, not token lookups —
+// not representable in symbol form; see circuits.dl (their contexts are covered there, omitted here).
 
 .decl gram2d(c0:symbol,token:symbol,s:float)   // 2-gram, distributional
 .decl gram2d_any(inst:number)

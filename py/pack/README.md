@@ -34,6 +34,28 @@ Call the individual modules (`answers`, `grounding`, `cover`, `adapters.*`) only
 The extractor is **named explicitly** — `fieldrun=…` or `$FIELDRUN` (no hard-coded path, no PATH discovery), so a build
 is reproducible.
 
+## Document adapters — one contract, many sources (model-free)
+
+A model-free "document expert" is a SOURCE through a registered adapter that yields one `Extraction` (citable passages +
+the structural facts — `defines`/`statements`/`items`/`answers` — that drive the uniform strategy table). The builder and
+runtime consume only the `Extraction`, so **adding a domain is writing one adapter**, never touching the builder, the
+runtime, or ergo (as long as it reuses the existing intents `define`/`count`/`list`/`theorem`). See `adapters/base.py`.
+
+| adapter | source | structural facts it emits (intents) |
+|---|---|---|
+| `normrules` | a spec's machine-readable normative rules (`norm-rules.json`) | passages + items (count/list) |
+| `riscv_prose` | an AsciiDoc spec manual's prose | passages + defines |
+| `pretext` | a PreTeXt / MathBook-XML textbook | passages + defines + statements (theorem) |
+| `latexml` | LaTeXML HTML5 + MathML (arXiv / ar5iv) | passages + defines + statements |
+| `glossary` | a term→definition file (`.tsv`/`.json`/colon-form) | passages + defines + items |
+| `rfc` | an IETF RFC plain-text spec (`rfc-editor.org` `.txt`) | passages + defines + items (sections) |
+| `manpage` | a rendered man page (`man x \| col -bx`) | passages + defines (cmd + long flags) + items (options) |
+| `nh_legal` | a statute / legal code (RSA §-numbered text) | passages + defines (`"term" means …`) + items (sections) |
+| `pedagogy` | teaching-template TOML | passages + answers (the `pedagogy` intent) |
+
+Per-domain count/list citation handles are namespaced with `[reasoning] prefix` (e.g. `webnet:inventory`,
+`cut:inventory`) — not the historical hard-coded `riscv:inventory`. Runnable examples: `examples/{glossary,manpage,rfc}/`.
+
 ## Composition — cover-first (why)
 
 Every serving tier is ultimately a lookup, so *fast* is a given; the discriminators are **accurate** (abstain / cite /

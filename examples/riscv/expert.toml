@@ -1,3 +1,4 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
 # examples/riscv — the RISC-V ISA expert (MODEL-FREE: retrieval/lookup + gated n-grams). See ../../EXPERTS.md.
 #
 # MEASURED decision (not a default): we distilled riscv with llama-3.2-1b and the scorecard said the cover's smart tier

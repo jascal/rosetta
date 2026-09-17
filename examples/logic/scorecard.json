@@ -1,0 +1,307 @@
+{
+ "domain": "Open Logic Project",
+ "model": "gemma-4-e4b-it (distilled)",
+ "testset": "testset.jsonl",
+ "n": 50,
+ "flags": {
+  "answer_cos": 0.7,
+  "answer_margin": 0.3
+ },
+ "grids": {
+  "require_citation_on": {
+   "i_curated": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "ii_document": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "iii_both": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   }
+  },
+  "require_citation_off": {
+   "i_curated": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 0
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 0,
+     "topical": 0,
+     "distilled": 0,
+     "retrieved": 0
+    }
+   },
+   "ii_document": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 7,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 7
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 9,
+     "topical": 2,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 9,
+     "topical": 3,
+     "distilled": 0,
+     "retrieved": 9
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 5,
+     "topical": 5,
+     "distilled": 0,
+     "retrieved": 5
+    }
+   },
+   "iii_both": {
+    "A_verbatim": {
+     "n": 10,
+     "answered": 10,
+     "topical": 10,
+     "distilled": 10,
+     "retrieved": 0
+    },
+    "B_paraphrase": {
+     "n": 12,
+     "answered": 12,
+     "topical": 12,
+     "distilled": 12,
+     "retrieved": 0
+    },
+    "C_heldout": {
+     "n": 12,
+     "answered": 10,
+     "topical": 7,
+     "distilled": 9,
+     "retrieved": 1
+    },
+    "D_offdomain": {
+     "n": 16,
+     "answered": 5,
+     "topical": 5,
+     "distilled": 0,
+     "retrieved": 5
+    }
+   }
+  }
+ },
+ "tau_sweep_curated_require_citation": {
+  "0.25": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    12,
+    12
+   ],
+   "C_heldout": [
+    9,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  },
+  "0.34": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    11,
+    12
+   ],
+   "C_heldout": [
+    2,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  },
+  "0.40": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    11,
+    12
+   ],
+   "C_heldout": [
+    2,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  },
+  "0.45": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    11,
+    12
+   ],
+   "C_heldout": [
+    2,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  },
+  "0.50": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    11,
+    12
+   ],
+   "C_heldout": [
+    2,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  },
+  "0.60": {
+   "A_verbatim": [
+    10,
+    10
+   ],
+   "B_paraphrase": [
+    9,
+    12
+   ],
+   "C_heldout": [
+    1,
+    12
+   ],
+   "D_offdomain": [
+    0,
+    16
+   ]
+  }
+ },
+ "note": "topical = lenient any-key match; see EXPERTS.md for the manual-read correction (verbatim ~9/10 genuine, held-out ~2-3/12 genuine \u2014 the rest are confident nearest-neighbour matches)."
+}

@@ -138,3 +138,205 @@ genuinely irreducible. (The minimal-suffix cover in `minimize.py` is already tha
 A **learned, certified, per-model idiom library** — and across models, the idioms that *recur* are the universal circuits
 (the substrate-free algorithm); the ones that don't are model-specific. Holdout loss → 0 means the real algorithm is
 captured (substrate-transferable), not just a lookup table. `proved`/`empirical`/`open` tags gate every learned rule.
+
+## Exercise-then-Confirm — validating idioms on REAL models (`py/exercise_confirm.py`)
+
+The learner only ever produced a *surviving* idiom on synthetic threx. Two threats to validity explained the real-model
+zeros: (1) a silently-dead causal oracle scores every idiom `causal=0` — a FALSE "no idioms" indistinguishable from a
+genuinely n-gram model (now blocked by `assert_oracle_live`, which aborts unless the live oracle reproduces known refs);
+(2) a model's **natural corpus MASKS circuits it demonstrably has** — pythia-160m induction is causal **2%** on its own
+corpus but **84–90%** on novel-repeat stimuli (same model, same oracle). So we validate on stimuli that *exercise* the
+circuit, with two bars:
+
+- **RECOVERY** (`empirical`) — detect (argmax = the circuit's answer) **and** causal (perturb the operand → the output
+  follows), both ≥ τ = 0.8. (Induction additionally reports the exercise-vs-natural gap = the mask.)
+- **ADMISSION** (`empirical`) — on a held-out region of NOVEL content (novel to the n-gram *cover*, not necessarily to the
+  model's pretraining), the circuit RULE matches the model on strictly more instances than a minimal-suffix n-gram cover
+  built on the train split: **`admits ⇔ circuit_match > ngram_match`**, both scored against the model's argmax. No tuned
+  threshold — a strict count. Robust because on novel content the n-gram cover scores ~0 (for IOI it forms *zero* rules —
+  the answer isn't a function of any suffix), so deltas are large (+50…+100pp). Admission is a coarse "beats memorization"
+  screen; the emitted cover's real guarantee is the `equiv.dl` certificate below.
+
+### The unifying finding — reasoning-as-binding (`empirical`; certified over stated domains, **behavioral not mechanistic**)
+
+The 8 admittable families reduce to **three token-level mechanisms**: copy (induction), ordinal (succession), and
+**once-appearing / name-mover binding** (output = the entity appearing exactly once among the entity set). Six "reasoning"
+families — IOI, transitivity, modus ponens, temporal, spatial, syllogism — are all served by the ONE `once_app` rule.
+This is established **behaviorally**: a single Datalog rule reproduces the model's argmax on all six, PROVEN by `equiv.dl`
+(`nmiss=0` over the stated domain) — *not* by attention-head patching/ablation, and it is **not** a claim of mechanistic
+identity (rosetta certifies computed behavior, per the behavior≡algorithm thesis).
+
+Scope + counterexamples (why it is *not* "all binding"): it holds only where the model's answer IS the structurally-unique
+token. Binding tasks whose answer is **not** the once-appearing token do NOT reduce to it and stay recovery-only —
+**coreference** (both names appear once; bound by semantic gender) and **set-membership** (both names once; bound by a
+co-occurring item). Semantic recall (antonym, capital, analogy) has no structural rule at all. And within the six,
+instances where the model diverges from once-appearing (llama MP detect 80%, spatial 96%) are excluded from the
+certificate, not certified against.
+
+### Which circuits are admitted (emitted) vs recovery-only
+
+| class | families |
+|---|---|
+| **STRUCTURAL — admitted + emitted** (a token rule → cover rule) | induction · succession · IOI · transitivity · modus ponens · temporal · spatial · syllogism |
+| **SEMANTIC / RECALL — recovery-only** (no structural rule → not emittable) | coreference · antonym · capital · analogy · set · defeasible · causal |
+
+Capability (RECOVERY / ADMISSION) on the capable model **llama-3.2-1B** (detect/causal; Δ = admission vs n-gram):
+
+| family | detect | causal | admits | | family | detect | causal | admits |
+|---|---|---|---|---|---|---|---|---|
+| succession | 100% | 100% | +100pp | | capital | 100% | 100% | recall (N/A) |
+| IOI | 99% | 98% | +98pp | | analogy | 100% | 100% | recall (N/A) |
+| transitivity | 100% | 100% | +100pp | | antonym | 71% | 93% | N/A |
+| temporal | 100% | 100% | +98pp | | coreference | 73% | 22% | N/A (never confirmed) |
+| syllogism | 100% | 98% | +100pp | | defeasible | 60% | 80% | N/A |
+| spatial | 96% | 98% | +98pp | | set | 40% | 36% | N/A (hardest) |
+| modus ponens | 80% | 88% | +60pp | | causal do/see | ctrl 0% | interv 100% | N/A |
+
+(Induction measured on pythia-160m: causal 82/84/86% at L=1/2/3, +81pp admission; llama induction not run — the 1B novel-repeat sweep exceeds the serve-run budget.)
+
+### The emitted cover + its certificate (`proved` over a stated domain)
+
+`emit_full_cover` writes `circuits.full.dl` = the natural-corpus n-gram cover + the three mechanisms as OOD fallbacks
+(routing: **longest n-gram > once-appearing > succession > induction > abstain** — succession is above induction because a
+comma-separated run ends in a repeated punctuation token, on which the copy head fires spuriously) + a
+`circuits.full.symbols.dl` legible twin, then certifies via `equiv.dl` over natural ∪ circuit-behavior stimuli:
+
+| model | arch · scale | domain (inst) | verdict |
+|---|---|---|---|
+| pythia160m | NeoX · 160M | 693 | `nmiss=0 ∧ nuncov=0` — CERTIFIED |
+| llama32_1b | RoPE · 1B | 944 | CERTIFIED |
+| qwen25coder15b | Qwen · 1.5B | 1061 | CERTIFIED |
+
+Per-circuit **certified instances** in the emitted cover (`circuits.full.CERT.json`):
+
+| circuit | mech | pythia160m | llama32_1b | qwen25coder15b |
+|---|---|---|---|---|
+| induction | copy | 135 | 136 | 133 |
+| succession | ordinal | 13 | 23 | 23 |
+| IOI | once-app | 69 | 119 | 119 |
+| transitivity | once-app | 34 | **0 †** | 100 |
+| modus ponens | once-app | **0 †** | 70 | 100 |
+| temporal | once-app | 69 | 99 | 86 |
+| spatial | once-app | 67 | 97 | 100 |
+| syllogism | once-app | 6 | 100 | 100 |
+
+**DOMAIN CAVEAT (`open`).** The certificate is over the *stated domain* only. Because routing is n-gram-**first**, a
+stimulus whose template suffix collides with a natural n-gram rule is EXCLUDED — the cover would return the n-gram's
+(possibly wrong) answer there, and that instance is outside the certificate, not certified against. So `certified_instances`
+per circuit is **domain-dependent, not a capability measure**: the **†** cells are 0 not for lack of capability (both
+recover + admit in the measurement) but because the template suffix collides with the natural cover (transitivity ends in
+the ultra-common `' a'`; modus ponens' tail collides on pythia). A cover that routes these to the circuit rather than the
+pre-empting n-gram is achievable-**open** (precedence tension: routing circuits above n-grams risks spurious firing on
+natural text). The clean per-circuit *capability* signal is the RECOVERY/ADMISSION table above, not the certified count.
+
+## Induction wired into an EXPERT PACKAGE (`py/induction_package.py`) · `empirical`
+
+The work above emits induction into the souffle `circuits.dl` (the minimization arm). The bounded-**expert** builder
+(`emit_expert_package`, the rosetta→sgiandubh serving path) was a different story: it counted only gate/compose idioms
+as the trusted tier and dropped induction into the souffle twin as an **uncounted OOD limb** — so the served
+`manifest.json` never carried it. That was the "induction never emitted to the package" gap. Now `emit_expert_package`
+counts induction coverage and emits a first-class `induction` manifest rule, and `serve_package` serves it host-side
+(routed OOD, after n-grams: `[… A B … A] → B`, copy the successor of the current suffix's previous occurrence).
+
+Measured on **pythia-160m** (resident `fieldrun --serve` oracle; 30 train + 30 **disjoint** held-out novel-repeat
+sequences S+S, seqlen 20):
+
+| set | gate/compose | n-grams | induction (causal) | package coverage | precision | abstain |
+|---|---|---|---|---|---|---|
+| train | 0 | 0 (novel tokens) | L=2 (80%) + L=3 (91%) admitted | — | — | — |
+| **held-out · WITH induction** | 0 | 0 | 2 rules | **94% (510/540)** | **84%** | 6% |
+| **held-out · n-gram only** | 0 | 0 | — | **0%** | — | **100%** |
+
+So on held-out novel tokens — where the n-gram cache has **no support** — the induction rule is the *entire*
+load-bearing tier and it **generalizes** (94% vs 0%). Precision 84% tracks the model's own induction consistency
+(obs ~82%), not a rule defect: the served rule is as faithful as the head. Manifest: `trusted_idioms=0,
+induction_ood=2` — 0 gate/compose idioms (the natural-corpus finding restated) but induction now carried and served.
+
+This is the **circuit-tier mirror** of the logic-expert answer-tier ablation ([`EXPERTS.md`](./EXPERTS.md)): on a
+lookup domain the model's *circuit* tier is empty (0 idioms) and the distilled *answer* tier carries the expert; on
+induction stimuli the *circuit* tier is everything (94% vs 0%) and there is no answer tier. Reproduce (needs the
+bundle): `.venv/bin/python py/induction_package.py models/pythia160m/bundle 30 20`.
+
+**Which tier is load-bearing, by regime** — the combined #27 (answer tier) + #28 (circuit tier) picture:
+
+| domain regime | reusable n-grams / gate-compose | induction circuit | load-bearing served tier |
+|---|---|---|---|
+| **lookup** (logic / OLP, [`EXPERTS.md`](./EXPERTS.md)) | present (a memorized FAQ) | absent (0 idioms) | distilled **ANSWER** tier |
+| **inductive** (novel-repeat, this section) | absent (no support on novel tokens) | present (94% held-out) | **CIRCUIT** tier |
+
+The two forms of model-derived expertise are **complementary**, and each dominates exactly where the other is empty.
+
+**Detection & L-precedence** (for readers of `serve_package`): an induction rule of order L fires when the current
+L-token suffix recurs earlier in the context; it copies the successor of the **most recent** earlier occurrence
+(`max j`). When several L's are admitted, the runtime tries the **longest first** (a longer repeated context is a
+more specific, higher-confidence match). On clean single-repeat stimuli every admitted L points to the same successor,
+so precedence doesn't move the pythia-160m numbers; it matters on general text with multiple/overlapping repeats.
+The induction pass is reached **only after an n-gram miss**, so it is free on the hot path (and skipped entirely by a
+package with no induction rules).
+
+**Generalization — demonstrated, not just claimed.** The wiring pattern — *count the circuit's coverage → emit a
+`{tier:trusted, basis:causal, routing:ood}` manifest rule → serve it after the n-gram cache* — is generic, not
+induction-specific, and is now shown for a **second** family:
+
+### Succession wired in — the second OOD circuit across the boundary (`py/succession_package.py`) · `empirical`
+
+`emit_expert_package(succ=…)` now also emits an `succession` rule (ordinal successor: `lord` token→ordinal, `lat`
+ordinal→token; `[… X X+1 X+2] → X+3`, matching `exercise_confirm.py:py_succ`), and `serve_package` serves it host-side
+routed **above** induction (both OOD, after the n-gram cache). Measured on **llama-3.2-1b** (resident oracle, 26-letter
+alphabet split into early-letter train / late-letter held-out runs — the model does succession at detect 100%, causal
+100%):
+
+| held-out late-letter runs (n=11) | coverage | precision | abstain |
+|---|---|---|---|
+| **WITH succession** | **100% (11/11)** | **100%** | 0% |
+| **n-gram only** | **0%** | — | **100%** |
+
+Same shape as induction: on held-out transitions the n-gram cache never saw, the ordinal *rule* is the entire
+load-bearing tier and it **generalizes** (100% vs 0%). Precision 100% (cleaner than induction's 84%) because a
+single-token letter alphabet is deterministic where the model runs the circuit.
+
+**Build-time gotcha (worth recording).** The served rule is tokenizer-free (just id maps), but *building* `lord` must
+enumerate each letter's token **spacing variants** — the same letter is a different token by position (`"A"`=32 after a
+comma vs `" A"`=362 after a space). Keying `lord` on only `" A"` made the rule miss the first letter in the comma
+format and cover **0%**; enumerating variants at build time fixed it to 100%. (This is a small instance of the
+token-space subtlety that also governs multi-model rule merging: rules live in the model's BPE id space.)
+
+**Still `open`.** The third family — the once-appearing / name-mover binding rule (IOI + the reasoning families,
+`exercise_confirm.py:py_once`) — is the natural next one across: it needs a frame + entity-set in the manifest and an
+`entity-count` host executor. Two families in (induction, succession) the pattern is established; a small registry that
+dispatches serve on `kind` becomes justified when the third lands.
+
+### Does the circuit tier actually help on NATURAL in-domain text? The prevalence test (`py/circuit_prevalence.py`) · `empirical`
+
+Before wiring a third family or the sgiandubh C++ executors, the load-bearing question: the #28/#29 wins were on
+*synthetic exercising probes* — does a confirmed circuit help on the natural in-domain text a real expert serves?
+Measured with ONE model (qwen2.5-coder-1.5b, induction confirmed L=1/2/3 causal 95–99%) on two natural corpora (so the
+variable is domain STRUCTURE, not the model): build the n-gram memorization tier on a disjoint train split, then over
+~400 held-out positions measure induction's **marginal** coverage in the region where the n-gram tier ABSTAINS.
+
+| corpus | n-gram covers | abstains | induction fires (of abstains) | induction MATCHES model (of fires) | deployed net (of all holdout) |
+|---|---|---|---|---|---|
+| **code** (CPython `json/__init__.py`) | 4% | 96% | 44% | **43%** | +18% right / **+24% wrong** |
+| **prose** (OLP logic) | 6% | 94% | 35% | **32%** | +10.5% right / **+22.5% wrong** |
+
+**The synthetic-probe faithfulness does NOT transfer — this is a warning, not a win.** Induction is causal 95–99% on
+novel-repeat probes and served 84–100% precision there (#28), but on NATURAL text it fires promiscuously (mostly L=1
+coincidental token recurrences) and reproduces the model's argmax only **~40%** of the time. A naive induction rule
+served on all its firings therefore emits **more confident-WRONG answers than correct ones** — net-harmful as a
+"trusted" tier on natural in-domain text. This quantifies the "masked on natural text" finding at the served-rule
+level: a recurring suffix in prose/code usually does NOT mean the model copies.
+
+Directionally the domain contrast holds (code fires 44% / marginal 18% vs prose 35% / 10.5% — code is more
+induction-amenable, as predicted), but **neither is deployable as-built**. (Aside: the n-gram tier covers only 4–6% at
+strict gates on a few-thousand-token corpus, so the abstain region is nearly everything; a larger corpus lifts n-gram
+coverage but does not change induction's ~40% natural-text precision, which is the deciding number.)
+
+**Decision (2026-07-02) — park the circuit-tier-into-expert line; the answer tier is the model's contribution.** The
+naive circuits don't pay off on natural in-domain text, and rather than chase the one remaining rescue lever
+(confidence-gating: serve induction only at L≥2/3 or above a per-fire threshold, trading most firing for precision),
+the call is to **stop here**. The distilled **answer** tier ([`EXPERTS.md`](./EXPERTS.md)) is the model's real value
+for a content expert (the #27 verdict). The OOD-circuit work (#28 induction, #29 succession) stands as a **validated
+mechanism** and a **minimization-arm** result (the certified `circuits.dl`) — *not* a served-expert lever: **not**
+adding a third family, **not** wiring the sgiandubh C++ executors. This is a `recipe-plateaus` stop, not an
+impossibility claim — the confidence-gating calibration and structurally-sequential domains remain `open` levers if a
+future need justifies revisiting; the measurement above is why we don't spend on them now.

@@ -1,0 +1,12 @@
+// Added to equiv.dl when the candidate defines cdist instead of cdecide.
+.decl temp(t:float)
+.input temp
+.decl argmax_prob(inst:number, p:float)
+argmax_prob(I,P) :- cdist(I,_,_), P = max V : { cdist(I,_,V) }.
+.decl cdecide(inst:number, out:number)
+cdecide(I,T) :- cdist(I,T,P), argmax_prob(I,P).
+.decl matched(inst:number)
+matched(I) :- domain(I), ref(I,T), cdecide(I,T), !mismatch(I,_,_).
+.decl nmatch(n:number)
+.output nmatch
+nmatch(N) :- N = count : { matched(_) }.

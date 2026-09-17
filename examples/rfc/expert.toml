@@ -1,0 +1,24 @@
+# Package best-practice checklist (origin/grounding/strata/canon/calibration): see ../UNIFIED_QUICKSTART.md
+# examples/rfc — an IETF RFC (RFC 8259, "The JSON Data Interchange Format") as a model-free expert.
+#
+# Mode: MODEL-FREE. An RFC is a spec — its normative text is exactly the LOOKUP domain a bounded, cited, abstaining
+# expert is for (never model synthesis over a standard). The adapter strips the page furniture, splits the numbered
+# sections, and maps them onto the strategy table: each paragraph → a citable passage; quoted-term definitions → a
+# `define`; the sections → a count/list inventory. Retrieval (cited, verbatim normative text) + strategy + abstain.
+
+[corpus]
+citation = "IETF RFC 8259 (BCP 78 / IETF Trust — freely reproducible)"
+
+[adapter]                         # an RFC .txt → citable passages + quoted-term defines + a section index. See ../../py/pack/adapters/rfc.py
+name   = "rfc"
+source = "rfc8259.txt"            # fetched: curl -O https://www.rfc-editor.org/rfc/rfc8259.txt
+
+[grounding]
+dim = 0                           # exact strategy route + lexical grounding; no embedding download
+
+[reasoning]                       # count/list inventory over the RFC's sections (ergo aggregate.dl, souffle, build-time)
+label  = "section"                # "how many sections does this RFC have?" → count
+prefix = "rfc8259:inventory"      # per-domain count/list citation-handle namespace
+
+[experiment]
+off_domain = "../probes/negatives.txt"

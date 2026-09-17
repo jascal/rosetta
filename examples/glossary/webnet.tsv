@@ -1,0 +1,29 @@
+HTTP	The Hypertext Transfer Protocol, a stateless request/response protocol used to exchange web resources between clients and servers.	Web
+HTTPS	HTTP layered over TLS, so requests and responses are encrypted and the server's identity is authenticated.	Web
+URL	A Uniform Resource Locator: the address of a resource, giving its scheme, host, optional port, path, and query.	Web
+URI	A Uniform Resource Identifier: a string that identifies a resource; a URL is a URI that also locates it.	Web
+REST	Representational State Transfer, an architectural style that models operations as HTTP methods acting on addressable resources.	Web
+JSON	JavaScript Object Notation, a lightweight text format for structured data built from objects, arrays, numbers, strings, booleans, and null.	Web
+API	An Application Programming Interface: a defined contract through which one program requests services from another.	Web
+CORS	Cross-Origin Resource Sharing, a browser mechanism that lets a server opt in to requests from web pages of a different origin.	Web
+cookie	A small piece of data a server asks a browser to store and send back on later requests, commonly used for sessions.	Web
+TCP	The Transmission Control Protocol, a connection-oriented transport that provides a reliable, ordered byte stream with flow and congestion control.	Transport
+UDP	The User Datagram Protocol, a connectionless transport that sends best-effort datagrams with no delivery or ordering guarantees.	Transport
+IP	The Internet Protocol, the network-layer protocol that addresses hosts and routes packets between networks.	Transport
+port	A 16-bit number that identifies a specific service or endpoint on a host, so multiple connections can share one IP address.	Transport
+socket	An endpoint of a network connection, identified by an IP address and port, through which a program sends and receives data.	Transport
+packet	A formatted unit of data carried by a packet-switched network, consisting of control headers and a payload.	Transport
+DNS	The Domain Name System, a hierarchical distributed directory that resolves human-readable names to IP addresses.	Naming
+DHCP	The Dynamic Host Configuration Protocol, which automatically assigns IP addresses and network settings to hosts on a network.	Naming
+MAC address	A Media Access Control address, a hardware identifier assigned to a network interface for communication on a local link.	Naming
+TLS	Transport Layer Security, a protocol that provides encryption, integrity, and server authentication for network connections.	Security
+firewall	A system that monitors and filters network traffic according to configured rules, allowing or blocking flows at a boundary.	Security
+VPN	A Virtual Private Network, which tunnels traffic over a shared network inside an encrypted, authenticated connection.	Security
+proxy	An intermediary server that forwards requests and responses between clients and origin servers, often adding caching or policy.	Security
+NAT	Network Address Translation, which rewrites addresses in packet headers so many private hosts can share one public IP address.	Infrastructure
+subnet	A subdivision of an IP network, defined by a prefix length, that groups hosts sharing a common routing prefix.	Infrastructure
+gateway	A node that connects two networks and forwards traffic between them, typically the router a host uses to reach other networks.	Infrastructure
+CDN	A Content Delivery Network, a geographically distributed set of caching servers that serve content from close to the user.	Infrastructure
+load balancer	A component that distributes incoming requests across multiple backend servers to improve capacity and availability.	Infrastructure
+latency	The time it takes for a unit of data to travel from source to destination across a network.	Infrastructure
+bandwidth	The maximum rate at which data can be transferred across a network path, usually measured in bits per second.	Infrastructure

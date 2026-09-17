@@ -27,6 +27,36 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MINCOV, MAXF = 4, 4
 
 
+class OracleUnavailable(RuntimeError):
+    """Raised when the causal oracle can't reproduce known refs — we refuse to emit a false 'no idioms'."""
+
+
+def assert_oracle_live(decide_fn, insts, refs, idxs, label="", nprobe=8, thresh=0.75):
+    """Preflight guard for the CAUSAL phase. Confirmation compares decide_fn(perturbed) against a table; if the
+    oracle is dead/misconfigured it returns None for every call, so every idiom scores causal=0 and the run
+    SILENTLY reports 'no idioms' — byte-indistinguishable from a genuinely n-gram model. This probes the live
+    oracle on instances whose refs are already known (from cache) and ABORTS LOUDLY unless it reproduces them,
+    so a reported zero means the model, not the plumbing. (emit-only paths take pre-confirmed idioms and need
+    no oracle, so they are not guarded here.)"""
+    tag = f" · {label}" if label else ""
+    known = [i for i in idxs if refs[i] is not None][:nprobe]
+    if not known:
+        raise OracleUnavailable(
+            f"[oracle preflight{tag}] no known refs to probe — the refs oracle produced nothing, so causal "
+            f"confirmation cannot run. Set FIELDRUN_BIN=<fieldrun binary>, or bring up `fieldrun --serve <port>` "
+            f"and export FIELDRUN_SERVE=<port>. Refusing to run (would emit a false 'no idioms').")
+    got = [decide_fn(insts[i]) for i in known]
+    agree = sum(g is not None and g == refs[i] for g, i in zip(got, known))
+    if agree < thresh * len(known):
+        nnone = sum(g is None for g in got)
+        raise OracleUnavailable(
+            f"[oracle preflight{tag}] CAUSAL ORACLE NOT LIVE: reproduces only {agree}/{len(known)} known refs "
+            f"({nnone} returned no answer). Every idiom would be silently rejected (causal=0) → a FALSE 'no idioms'. "
+            f"Refusing to run. Fix the oracle: FIELDRUN_BIN=<binary>, or `fieldrun --serve <port>` + FIELDRUN_SERVE=<port>.")
+    print(f"[oracle preflight{tag}] live — reproduced {agree}/{len(known)} known refs; causal confirmation trustworthy.")
+    return agree, len(known)
+
+
 def tableof(insts, refs, sub, k):
     vm = defaultdict(set)
     for i in sub:
@@ -474,7 +504,7 @@ def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, 
     return finalize(md, insts, logmap, idxs, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
 
 
-def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0):
+def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0, succ=None):
     """The bounded-EXPERT package (rosetta→sgiandubh convergence): CAUSALLY-CONFIRMED idioms as the TRUSTED (ungated) tier
     + a GATED n-gram backfill (support/determinism → abstain on weak suffixes) + a manifest that distinguishes causal
     idioms from observational n-grams (with provenance). The strengthening over the corpus-only abstain_emit path: the
@@ -521,18 +551,64 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
             ngram_rules[s] = o
             man.append({"id": rid, "kind": "ngram", "tier": "gated", "basis": "observational", "ctx": list(s),
                         "out": o, "support": sup, "determinism": round(det, 3), "cite": cite}); rid += 1
+    ng_covered = {i for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1))}
+    # ordinal/succession — the SECOND causally-confirmed OOD circuit across the manifest boundary (same wiring as
+    # induction below: count coverage on the n-gram tail → emit a {trusted,causal,ood} manifest rule → serve host-side).
+    # lord: token→ordinal, lat: ordinal→token; predicts the successor of a >=3-long consecutive ascending run
+    # ([… X X+1 X+2] → X+3). Matches exercise_confirm.py:py_succ (the certified souffle form). Routes ABOVE induction.
+    succ_cov = set()
+    if succ:
+        lord, lat = succ["lord"], succ["lat"]
+        for i in residual:
+            if i in ng_covered:
+                continue
+            pres = {lord[t] for t in insts[i] if t in lord}
+            if pres:
+                o = max(pres)
+                if (o - 1) in pres and (o - 2) in pres and lat.get(o + 1) == refs[i]:
+                    succ_cov.add(i)
+        man.append({"id": rid, "kind": "succession", "tier": "trusted", "basis": "causal", "routing": "ood",
+                    "causal": round(succ.get("causal", 0), 3), "support": len(succ_cov),
+                    "lord": {int(t): int(o) for t, o in lord.items()}, "lat": {int(o): int(t) for o, t in lat.items()},
+                    "cite": sorted(succ_cov)[:5]})
+        rid += 1
+    # copy/induction — the causally-confirmed COPY circuit, wired in as a first-class rule (was souffle-only OOD before).
+    # Routes as OOD (below n-grams, matching emit_circuits), so it covers only what n-grams didn't: the novel-repeat tail.
+    ind_cov = set()
+    for r in rels_real:
+        L, c = r["L"], set()
+        for i in residual:
+            if i in ng_covered or i in succ_cov:
+                continue
+            ctx = insts[i]
+            if len(ctx) > L:
+                suf = tuple(ctx[-L:])
+                js = [j for j in range(len(ctx) - L) if tuple(ctx[j:j + L]) == suf]
+                if js and max(js) + L < len(ctx) and ctx[max(js) + L] == refs[i]:
+                    c.add(i)
+        ind_cov |= c
+        man.append({"id": rid, "kind": "induction", "tier": "trusted", "basis": "causal", "routing": "ood",
+                    "causal": round(r.get("causal", 0), 3), "L": L, "support": len(c), "cite": sorted(c)[:5]})
+        rid += 1
     out = os.path.join(pkg, "circuits.expert.dl")
     emit_circuits(out, real, real_c, rels_real, ngram_rules, w, name)  # idiom > gated-ngram > induction(OOD) > abstain
     json.dump({"model": name, "trusted_idioms": len(real) + len(real_c), "gated_ngrams": len(ngram_rules),
-               "induction_ood": len(rels_real), "minsupp": minsupp, "mindet": mindet, "rules": man},
+               "induction_ood": len(rels_real), "induction_cover": len(ind_cov),
+               "succession_ood": (1 if succ else 0), "succession_cover": len(succ_cov),
+               "minsupp": minsupp, "mindet": mindet, "rules": man},
               open(os.path.join(pkg, "manifest.json"), "w"))
-    ngcov = sum(1 for i in residual if any(tuple(insts[i][-k:]) in conf.get(k, {}) for k in range(1, w + 1)))
-    H = len(idxs)
+    ngcov, sccov, indcov, H = len(ng_covered), len(succ_cov), len(ind_cov), len(idxs)
     print(f"\n=== EXPERT PACKAGE (bounded, causal-confirmed) → {pkg}/ ===")
     print(f"  TRUSTED idioms (causal): {len(real_c)} compose + {len(real)} gate → cover {len(covered)}/{H} = {len(covered)/H:.0%}")
     print(f"  GATED n-grams (supp>={minsupp},det>={mindet}): {len(ngram_rules)} rules → cover {ngcov}/{H} = {ngcov/H:.0%} of residual")
-    cov = (len(covered) + ngcov) / H
-    print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%} = answer {cov:.0%}, abstain {1-cov:.0%}")
+    if succ:
+        print(f"  SUCCESSION (causal, OOD): 1 rule → cover {sccov}/{H} = {sccov/H:.0%} (the ordinal tail)")
+    if rels_real:
+        print(f"  INDUCTION (causal, OOD): {len(rels_real)} rule(s) → cover {indcov}/{H} = {indcov/H:.0%} (the n-gram tail)")
+    cov = (len(covered) + ngcov + sccov + indcov) / H
+    print(f"  bounded-expert composition: trusted {len(covered)/H:.0%} + gated {ngcov/H:.0%}"
+          f"{f' + succession {sccov/H:.0%}' if succ else ''}{f' + induction {indcov/H:.0%}' if rels_real else ''}"
+          f" = answer {cov:.0%}, abstain {1 - cov:.0%}")
     print(f"  manifest.json: {len(man)} rules tagged causal(trusted) vs observational(gated) + provenance — the audit of what the expert knows")
     return out, os.path.join(pkg, "manifest.json")
 
@@ -542,6 +618,7 @@ def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
     with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
     IDIOM_LEARNER objective). This split is VALIDATION because it selects families, not an untouched final test.
     The residual is relative to these candidate families; it does not establish an irreducible model floor."""
+    assert_oracle_live(decide_fn, insts, refs, idxs, label="select_cover")   # a dead oracle → false 'no idioms'
     import random as _r
     sh = idxs[:]; _r.Random(0).shuffle(sh)
     cut = int(len(sh) * (1 - hold))
@@ -689,6 +766,7 @@ def main():
         select_cover(insts, refs, idxs, w, decide_fn, fill=fill, s=s)
         return
 
+    assert_oracle_live(decide_fn, insts, refs, idxs, label=name)   # abort loudly if causal can't reproduce known refs
     gates = learn_gates(insts, refs, idxs, w, decide_fn, max_confirm=(cb or 40), ntest=(6 if cb else 14), fill=fill)
     real = [b for b in gates if not b["viol"] and b["causal"] >= 0.8]
     print(f"frame-conditioned GATEs (select family) — {len(real)} REAL (faithful + causally confirmed) of {len(gates)} mined:\n")
