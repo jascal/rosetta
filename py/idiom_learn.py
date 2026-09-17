@@ -839,7 +839,8 @@ def main():
                   f" {len(rules)} n-gram rules memoize the residual" + (f"; {len(remaining)} uncovered" if remaining else "")
                   + (f"; {len(rels_real)} induction OOD fallback" if rels_real else "") + ".  + run.dl (souffle-only harness).")
             from oracle import run_equiv
-            r = run_equiv(out, [insts[i] for i in idxs], [refs[i] for i in idxs],
+            # Discovery may omit missing references; the certificate must retain every requested window.
+            r = run_equiv(out, insts, refs,
                           evidence_dir=os.path.join(md, "certificate-evidence"))
             ok = cert_ok = r["certified"]
             print(f"  CERTIFY (equiv.dl, EXACT argmax): ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
@@ -853,7 +854,7 @@ def main():
                 get_lg = lambda c: model_logits(whole, c)
             else:
                 get_lg = lambda c: None                           # cache-only: regenerate from logit_cache.json
-            cert_ok = emit_canonical_T(md, insts, idxs, real, real_c, rels_real, w, sym, name, get_lg)
+            cert_ok = emit_canonical_T(md, insts, list(range(len(insts))), real, real_c, rels_real, w, sym, name, get_lg)
 
     print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
           "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")

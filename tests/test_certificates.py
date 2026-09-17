@@ -107,6 +107,35 @@ def test_unified_cover_preserves_complete_certificate_obligations(tmp_path, monk
         assert replay(check["evidence"])["certified"] == check["certified"]
 
 
+@pytest.mark.parametrize("crisp_mode", [False, True])
+@pytest.mark.parametrize("missing_reference", [False, True])
+def test_idiom_cli_certifies_requested_domain(tmp_path, monkeypatch, crisp_mode, missing_reference):
+    import idiom_learn
+
+    (tmp_path / "corpus.json").write_text(json.dumps({"ids": [1, 2, 3]}))
+    cache = {"1": [[7, 0.0]]}
+    if not missing_reference:
+        cache["2"] = [[7, 0.0]]
+    (tmp_path / "logit_cache.json").write_text(json.dumps(cache))
+    monkeypatch.delenv("FIELDRUN_SERVE", raising=False)
+    monkeypatch.setattr(sys, "argv", ["idiom_learn.py", "2", "1", str(tmp_path), "--certify"]
+                        + (["--crisp"] if crisp_mode else []))
+    monkeypatch.setattr(idiom_learn, "model_refs", lambda *a: [7, None if missing_reference else 7])
+    monkeypatch.setattr(idiom_learn, "ref_source", lambda *a: ("test", lambda c: 7))
+    # Isolate certificate wiring from candidate search; use the real emitter and Datalog checker.
+    for name in ("learn_gates", "learn_compose", "learn_relational"):
+        monkeypatch.setattr(idiom_learn, name, lambda *a, **kw: [])
+    monkeypatch.setattr(idiom_learn, "learn_skeleton", lambda *a, **kw: ([], set()))
+    assert idiom_learn.main() == int(missing_reference)
+    checks = list((tmp_path / "certificate-evidence").glob("*/certificate.json"))
+    assert len(checks) == (1 if crisp_mode else 3)
+    for path in checks:
+        result = json.loads(path.read_text())["result"]
+        assert result["ndomain"] == 2
+        assert result["nmissing"] == int(missing_reference)
+        assert result["certified"] is (not missing_reference)
+
+
 def test_distribution_tv_computed_in_datalog(tmp_path):
     p = distribution(tmp_path, [(7, math.log(3)), (8, 0.0)])
     refs = {0: [(7, 0.0), (8, 0.0)]}

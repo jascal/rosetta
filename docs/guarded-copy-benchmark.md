@@ -6,6 +6,11 @@ in that earlier dataset. There is no reuse of old cases as final-test evidence.
 
 ## Qwen result
 
+**Scope limit confirmed by later tests:** this guard is not a generally faithful replacement for the model.
+The frozen guard made [8 errors in 288 generalization cases](copy-generalization.md) and
+[12 errors in 192 diagnostic cases](copy-target-diagnosis.md). Both broader certificates fail. The success below
+remains a proof only over its stated 96-case firing domain.
+
 **Proved on the frozen 96-case firing domain:** the selected guard exactly matches the local quantized
 Qwen2.5-0.5B-Instruct oracle (`nmiss=0`, `nuncov=0`, no missing or invalid references). It uses suffix length 3 and
 at least two agreeing sources. The same rule answered 48/48 covered train cases and 36/36 covered validation cases

@@ -13,6 +13,12 @@ they must not disappear from the domain. The candidate defines `cdecide(inst,out
 no mismatches, and no uncovered instances. Missing references, mismatches, and gaps have separate output relations.
 `run_equiv` also rejects unequal context/reference list lengths before serializing them.
 
+Python callers use `run_equiv` (or `certify`, which delegates to it) to stage the domain. `run_master`, `certify_T`,
+and `check_argmax` also stage explicit domains. Candidate discovery in the idiom learner may use only available
+references, but both final emission paths certify all requested windows. Direct Souffle callers must provide
+`domain.facts`, one instance ID per line, independently of whether that instance has token or reference rows.
+External callers are not covered by the repository caller audit.
+
 For a distribution-producing candidate, `temperature.check_argmax` combines this checker with
 `dl/argmax_adapter.dl`. Datalog derives all maximal-probability tokens; a tied conflicting output fails equivalence.
 The unified-cover builder retains both finite-grid distributional and argmax evidence in `unified-certificate.json`.
@@ -34,6 +40,11 @@ coverage, and `certified()` in Datalog. It rejects missing references, uncovered
 probabilities, invalid probability mass, invalid parameters, outside-domain data, and TV greater than or equal to epsilon.
 Normalization uses a fixed absolute tolerance of 1e-9. These are checks under **Souffle floating-point semantics**,
 not exact-real arithmetic proofs.
+
+Cross-platform numerical reproducibility has not been established. Different Souffle versions, compiler builds,
+or floating-point environments may affect results near the normalization tolerance or strict TV threshold.
+Evidence records the Souffle version and exact outputs; replay on the deployment toolchain is the check, not a
+promise of bit-identical floating-point output across platforms. No measured platform-variance bound is claimed.
 
 The certificate compares the candidate to **softmax of exactly the supplied reference logits**. If those logits came
 from `/topk`, renormalizing them does not bound the omitted model mass. A full-model distributional claim remains
@@ -62,6 +73,13 @@ Each retained check contains:
 - `outputs/`: the actual Souffle verdict and diagnostic relations.
 - `certificate.json`: SHA-256 hashes, reference provenance, tool version, command, and observed verdict.
 - `stderr.txt`: verifier diagnostics, including failures.
+
+The copy benchmark trees and threx certificate evidence are intentionally versioned together: 2,241 files totaling
+15.4 MiB of file contents in the initial benchmark series, with the largest file about 374 KiB. All 1,121 retained
+output CSVs are tracked, including empty verdicts. The `.gitignore` exceptions cover nested evidence outputs under
+both `reference/` and `models/`. Failed runs and baseline corrections are retained to preserve the experimental
+record. This series remains in Git for self-contained replay; a separate evidence store can be reconsidered if
+future series make repository growth material, while preserving content hashes and access to complete bundles.
 
 ```bash
 python3 py/certificate.py <evidence-directory>
