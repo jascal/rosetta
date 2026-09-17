@@ -1,0 +1,29 @@
+// train-only n-gram baseline — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).
+// Same rules; a transliteration via the lexicon, so it inherits circuits.dl's certificate. gramN = N-gram
+// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:
+//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>"token"> -D out  →  cdecide.csv
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+.decl gram2(c0:symbol,t:symbol)   // 2-gram
+.decl gram2_hit(inst:number,t:symbol)
+.decl gram2_any(inst:number)
+gram2("id2853","id0").
+gram2("id32045","id0").
+gram2("id31434","id0").
+gram2("id16617","id0").
+gram2("id9831","id0").
+gram2("id5032","id0").
+gram2("id36410","id0").
+gram2("id34367","id0").
+gram2("id36159","id0").
+gram2("id4327","id0").
+gram2("id14729","id0").
+gram2("id35785","id0").
+gram2_hit(I,T) :- mp(I,P), tok(I,P,C0), gram2(C0,T).
+gram2_any(I) :- gram2_hit(I,_).
+cdecide(I,T) :- gram2_hit(I,T).

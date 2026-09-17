@@ -1,0 +1,51 @@
+// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).
+// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…
+// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.
+// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.
+
+.decl mp(inst:number,m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number,out:number)
+.decl gram13(c0:number,c1:number,c2:number,c3:number,c4:number,c5:number,c6:number,c7:number,c8:number,c9:number,c10:number,c11:number,t:number)   // 13-gram: 12 context token(s) → next
+.decl gram13_hit(inst:number,t:number)
+.decl gram13_any(inst:number)
+gram13(17004,7971,32825,29800,31297,25202,14032,6384,32327,9055,37685,4354,17004).
+gram13(2065,7971,32825,29800,31297,25202,14032,6384,32327,9055,37685,4354,2065).
+gram13(29800,31297,25202,14032,6384,32327,9055,37685,4354,17004,7971,32825,29800).
+gram13(25875,31297,25202,14032,6384,32327,9055,37685,4354,17004,7971,32825,25875).
+gram13(14032,6384,32327,9055,37685,4354,17004,7971,32825,29800,31297,25202,14032).
+gram13(28698,6384,32327,9055,37685,4354,17004,7971,32825,29800,31297,25202,28698).
+gram13(25306,39131,6938,21110,2212,1668,1874,35852,804,339,29529,17747,25306).
+gram13(21110,2212,1668,1874,35852,804,339,29529,17747,15271,39131,6938,21110).
+gram13(14469,2212,1668,1874,35852,804,339,29529,17747,15271,39131,6938,14469).
+gram13(1874,35852,804,339,29529,17747,15271,39131,6938,21110,2212,1668,1874).
+gram13(27997,35852,804,339,29529,17747,15271,39131,6938,21110,2212,1668,27997).
+gram13(29035,32850,36609,15554,22972,15409,14614,30464,19292,2111,34943,14807,29035).
+gram13(1613,32850,36609,15554,22972,15409,14614,30464,19292,2111,34943,14807,1613).
+gram13(15554,22972,15409,14614,30464,19292,2111,34943,14807,29035,32850,36609,15554).
+gram13(27606,22972,15409,14614,30464,19292,2111,34943,14807,29035,32850,36609,27606).
+gram13(14614,30464,19292,2111,34943,14807,29035,32850,36609,15554,22972,15409,14614).
+gram13(36844,30464,19292,2111,34943,14807,29035,32850,36609,15554,22972,15409,36844).
+gram13(8167,22117,33177,33633,12707,20185,18920,38897,33083,6788,12446,19725,8167).
+gram13(33472,22117,33177,33633,12707,20185,18920,38897,33083,6788,12446,19725,33472).
+gram13(33633,12707,20185,18920,38897,33083,6788,12446,19725,8167,22117,33177,33633).
+gram13(26107,12707,20185,18920,38897,33083,6788,12446,19725,8167,22117,33177,26107).
+gram13(18920,38897,33083,6788,12446,19725,8167,22117,33177,33633,12707,20185,18920).
+gram13(38990,38897,33083,6788,12446,19725,8167,22117,33177,33633,12707,20185,38990).
+gram13_hit(I,T) :- mp(I,P), tok(I,P11,C0), tok(I,P10,C1), tok(I,P9,C2), tok(I,P8,C3), tok(I,P7,C4), tok(I,P6,C5), tok(I,P5,C6), tok(I,P4,C7), tok(I,P3,C8), tok(I,P2,C9), tok(I,P1,C10), tok(I,P,C11), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, P7=P-7, P8=P-8, P9=P-9, P10=P-10, P11=P-11, gram13(C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,T).
+gram13_any(I) :- gram13_hit(I,_).
+.decl gram16(c0:number,c1:number,c2:number,c3:number,c4:number,c5:number,c6:number,c7:number,c8:number,c9:number,c10:number,c11:number,c12:number,c13:number,c14:number,t:number)   // 16-gram: 15 context token(s) → next
+.decl gram16_hit(inst:number,t:number)
+.decl gram16_any(inst:number)
+gram16(339,29529,17747,15271,39131,6938,21110,2212,1668,1874,35852,804,339,29529,17747,2937).
+gram16_hit(I,T) :- mp(I,P), tok(I,P14,C0), tok(I,P13,C1), tok(I,P12,C2), tok(I,P11,C3), tok(I,P10,C4), tok(I,P9,C5), tok(I,P8,C6), tok(I,P7,C7), tok(I,P6,C8), tok(I,P5,C9), tok(I,P4,C10), tok(I,P3,C11), tok(I,P2,C12), tok(I,P1,C13), tok(I,P,C14), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, P7=P-7, P8=P-8, P9=P-9, P10=P-10, P11=P-11, P12=P-12, P13=P-13, P14=P-14, gram16(C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,T).
+gram16_any(I) :- gram16_hit(I,_).
+.decl gram17(c0:number,c1:number,c2:number,c3:number,c4:number,c5:number,c6:number,c7:number,c8:number,c9:number,c10:number,c11:number,c12:number,c13:number,c14:number,c15:number,t:number)   // 17-gram: 16 context token(s) → next
+.decl gram17_hit(inst:number,t:number)
+.decl gram17_any(inst:number)
+gram17(804,339,29529,17747,15271,39131,6938,21110,2212,1668,1874,35852,804,339,29529,17747,15271).
+gram17_hit(I,T) :- mp(I,P), tok(I,P15,C0), tok(I,P14,C1), tok(I,P13,C2), tok(I,P12,C3), tok(I,P11,C4), tok(I,P10,C5), tok(I,P9,C6), tok(I,P8,C7), tok(I,P7,C8), tok(I,P6,C9), tok(I,P5,C10), tok(I,P4,C11), tok(I,P3,C12), tok(I,P2,C13), tok(I,P1,C14), tok(I,P,C15), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, P7=P-7, P8=P-8, P9=P-9, P10=P-10, P11=P-11, P12=P-12, P13=P-13, P14=P-14, P15=P-15, gram17(C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13,C14,C15,T).
+gram17_any(I) :- gram17_hit(I,_).
+cdecide(I,T) :- gram13_hit(I,T), !gram16_any(I), !gram17_any(I).
+cdecide(I,T) :- gram16_hit(I,T), !gram17_any(I).
+cdecide(I,T) :- gram17_hit(I,T).

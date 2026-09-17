@@ -69,7 +69,7 @@ def get_refs(ref_fn, insts, cache_path, workers=1):
     forward) — primes the first call serially so a compiled/split oracle compiles once before fanning out."""
     cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
     key = lambda ctx: ",".join(map(str, ctx))
-    todo = [ctx for ctx in insts if key(ctx) not in cache]
+    todo = [ctx for ctx in insts if key(ctx) not in cache or cache[key(ctx)] is None]
     if todo:
         cache[key(todo[0])] = ref_fn(todo[0])                       # prime (compile/split happens once)
         rest, done = todo[1:], 1
@@ -112,7 +112,10 @@ def model_params(md):
 def model_refs(md, insts, cache_name="ref_cache.json"):
     """refs for a model dir via its chosen build-time oracle (fieldrun parallel; whole.dl serial+compiled)."""
     label, fn = ref_source(md)
-    return get_refs(fn, insts, os.path.join(md, cache_name), workers=8 if label == "fieldrun" else 1)
+    refs = get_refs(fn, insts, os.path.join(md, cache_name), workers=8 if label == "fieldrun" else 1)
+    if any(ref is None for ref in refs):
+        raise RuntimeError("oracle returned missing references; refusing to shrink the requested domain")
+    return refs
 
 
 def composed_fires(ctx):
@@ -160,7 +163,7 @@ def emit_symbols(path, rules, composed, sym, name):
          "// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:",
          "//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>\"token\"> -D out  →  cdecide.csv", "",
          ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
-         ".decl mp(inst:number, m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl mp(inst:number, m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
          ".decl cdecide(inst:number, out:symbol)", ".output cdecide"]
     if composed:
         L.append("// NOTE: this model also has a COMPOSED arithmetic circuit (a computation, not a token lookup) — see"
@@ -185,7 +188,7 @@ def emit(out_path, rules, composed, sym=None, name=""):
          "// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…",
          "// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.",
          "// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.", "",
-         ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
+         ".decl mp(inst:number,m:number)", "mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.",
          ".decl cdecide(inst:number,out:number)"]
     if composed:
         L += [".decl strength(b:number,s:number)", ".decl sumthing(s:number,t:number)",
@@ -258,14 +261,18 @@ def main():
     print(f"   rule lengths {dict(sorted(bylen.items()))}  (len1=priors · mid=structural/idiom · len{w}=memorized)")
     emit(out, rules, use_composed, sym, name)
     print("4. certify train program vs the model, in Datalog (equiv.dl):")
-    r = run_equiv(out, [insts[i] for i in train], [refs[i] for i in train])
+    from certificate import sha256
+    r = run_equiv(out, [insts[i] for i in train], [refs[i] for i in train],
+                  evidence_dir=os.path.join(md, "certificate-evidence"),
+                  provenance={"source": src_label, "reference_scope": "supplied argmax references",
+                              "cache_sha256": sha256(os.path.join(md, "ref_cache.json"))})
     if "error" in r:
-        print("   ERROR:", r["error"]); return
+        print("   ERROR:", r["error"]); return 1
     print(f"   ncover={r['ncover']}  nmiss={r['nmiss']}  nuncov={r['nuncov']}")
     if r["mismatches"]:
         print("   mismatches:", [(sym.get(a), sym.get(b)) for _, a, b in r["mismatches"][:6]])
     nrules = (1 if use_composed else 0) + len(rules)
-    ok = r["nmiss"] == 0 and r["nuncov"] == 0 and r["ncover"] == len(train)
+    ok = r["certified"]
     print(f"\n   {name} train CERTIFIED (Datalog): {ok}")
     memo = bylen.get(w, 0)
     print(f"   program: {nrules} rules for {len(train)} train decisions "
@@ -297,6 +304,7 @@ def main():
     write_certificate(md, name, w, len(train), nrules, use_composed, r, ok, rules, hist, eff, sym,
                       (len(holdout), hcov, hcorr))
     print(f"   wrote {os.path.join(md, 'CERTIFICATE.md')}")
+    return 0 if ok else 1
 
 
 def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, eff, sym, holdout=None):
@@ -319,6 +327,7 @@ def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, 
              (f"**Params/rule:** {model_params(md):,} / {nrules} = **{model_params(md)/max(1,nrules):,.0f}** "
               f"(capacity per certified rule — the part beyond the recall skeleton; grows with model size)."
               if model_params(md) else ""), "",
+             f"Evidence: `{os.path.relpath(r['evidence'], md)}` (verifier, facts, outputs, hashes).", "",
              "## Automatic n-gram characterization", "",
              "A length-k suffix rule is a certified (k+1)-gram (prefix-invariant over the preceding W−k tokens on the "
              "domain). Order histogram (contexts, from dl/ngram.dl):", "",
@@ -334,4 +343,4 @@ def write_certificate(md, name, w, ndec, nrules, composed, r, ok, rules, order, 
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

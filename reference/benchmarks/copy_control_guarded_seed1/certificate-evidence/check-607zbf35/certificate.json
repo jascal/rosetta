@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5\nWord size: 64 bits\nOptions enabled: ffi ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "copy-control",
+    "seed": 1,
+    "synthetic": true,
+    "prior_dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "prior_usage": "discovery only; all previous token IDs excluded",
+    "stage": "domain before test references"
+  },
+  "scalars": {
+    "ndomain": "int"
+  },
+  "result": {
+    "certified": true,
+    "ndomain": 144
+  },
+  "sha256": {
+    "circuit.dl": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+    "facts/sample.facts": "dae230627dbcbcbf80f426e02fe59fa28e13e692c0e6104f87ce865ebb0117eb",
+    "facts/tok.facts": "ed1038fb6d4d19af4ff3cce232dd53f0c4d3b91e2774b01bdd2967376b019f7b",
+    "outputs/abstained.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/domain.csv": "dae230627dbcbcbf80f426e02fe59fa28e13e692c0e6104f87ce865ebb0117eb",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ndomain.csv": "9efe5a55840d37eb5db13a22ccab7e8f9867c982d1f7d18313c63fa0aa1c801b",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "56391900ff484da316e949cc0571d7936a4ea7bb27f86ba78b2e5f50d8521d0b"
+  }
+}

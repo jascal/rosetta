@@ -1,0 +1,3 @@
+Warning: No rules/facts defined for relation guard in file circuit.dl at line 2
+.decl guard(g:number,k:number,m:number)
+------^---------------------------------

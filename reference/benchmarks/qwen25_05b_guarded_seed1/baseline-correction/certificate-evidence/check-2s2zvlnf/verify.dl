@@ -1,0 +1,9 @@
+// The baseline is learned from train facts only, using the existing Datalog suffix detector.
+#include "circuit.dl" // ngram.dl
+.decl domain(inst:number) .input domain
+.decl missing(inst:number)
+missing(I) :- domain(I), !ref(I,_).
+.decl ntrain(n:number) .output ntrain
+ntrain(N) :- N = count : { domain(_) }.
+.decl certified() .output certified
+certified() :- domain(_), !missing(_).

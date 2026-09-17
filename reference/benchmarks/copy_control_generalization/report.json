@@ -1,0 +1,2055 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "source": "copy-control",
+    "synthetic": true,
+    "excluded_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31"
+    }
+  },
+  "results": {
+    "guarded": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-p6lurfvt"
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 288,
+          "correct": 288,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 54,
+          "coverage": 0.0,
+          "precision": null
+        }
+      },
+      "strata": {
+        "seed": {
+          "2": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "3": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "4": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "length": {
+          "8": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "12": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "24": {
+            "n": 96,
+            "answered": 96,
+            "correct": 96,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "layout": {
+          "plain": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "noise8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "noise32": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "near_match8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "exposures": {
+          "2": {
+            "n": 144,
+            "answered": 144,
+            "correct": 144,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "3": {
+            "n": 144,
+            "answered": 144,
+            "correct": 144,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "kind": {
+          "repeat": {
+            "n": 144,
+            "answered": 144,
+            "correct": 144,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "intervention": {
+            "n": 144,
+            "answered": 144,
+            "correct": 144,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        },
+        "negative": {
+          "no_repeat": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "one_source": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "conflicting_sources": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          }
+        }
+      },
+      "counterexamples": [],
+      "certificates": {
+        "full_test": {
+          "certified": true,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-7s8t7_b6",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "frozen_firing_domain": {
+          "certified": true,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-u9t8pxhx",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "firing_domain_size": 288,
+      "sha256": "d4e6a652ac7f515db4a2ef2e7c11df4bf82c1400d70c244ac6d3325b2cb5fe16"
+    },
+    "raw_copy": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-y3uzaeec"
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 288,
+          "correct": 216,
+          "wrong": 72,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 0.75
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 36,
+          "correct": 36,
+          "wrong": 0,
+          "abstained": 18,
+          "coverage": 0.6666666666666666,
+          "precision": 1.0
+        }
+      },
+      "strata": {
+        "seed": {
+          "2": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "3": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "4": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          }
+        },
+        "length": {
+          "8": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "12": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "24": {
+            "n": 96,
+            "answered": 96,
+            "correct": 72,
+            "wrong": 24,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          }
+        },
+        "layout": {
+          "plain": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "noise8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "noise32": {
+            "n": 72,
+            "answered": 72,
+            "correct": 72,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "near_match8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 0,
+            "wrong": 72,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.0
+          }
+        },
+        "exposures": {
+          "2": {
+            "n": 144,
+            "answered": 144,
+            "correct": 108,
+            "wrong": 36,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "3": {
+            "n": 144,
+            "answered": 144,
+            "correct": 108,
+            "wrong": 36,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          }
+        },
+        "kind": {
+          "repeat": {
+            "n": 144,
+            "answered": 144,
+            "correct": 108,
+            "wrong": 36,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          },
+          "intervention": {
+            "n": 144,
+            "answered": 144,
+            "correct": 108,
+            "wrong": 36,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.75
+          }
+        },
+        "negative": {
+          "no_repeat": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "one_source": {
+            "n": 18,
+            "answered": 18,
+            "correct": 18,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          },
+          "conflicting_sources": {
+            "n": 18,
+            "answered": 18,
+            "correct": 18,
+            "wrong": 0,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 1.0
+          }
+        }
+      },
+      "counterexamples": [
+        {
+          "id": 6,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 11436,
+          "prediction": 38796
+        },
+        {
+          "id": 7,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 2579,
+          "prediction": 38796
+        },
+        {
+          "id": 14,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 11436,
+          "prediction": 38796
+        },
+        {
+          "id": 15,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2579,
+          "prediction": 38796
+        },
+        {
+          "id": 22,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 11642,
+          "prediction": 4690
+        },
+        {
+          "id": 23,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 7878,
+          "prediction": 4690
+        },
+        {
+          "id": 30,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 11642,
+          "prediction": 4690
+        },
+        {
+          "id": 31,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 7878,
+          "prediction": 4690
+        },
+        {
+          "id": 44,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 24793,
+          "prediction": 20905
+        },
+        {
+          "id": 45,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 13925,
+          "prediction": 20905
+        },
+        {
+          "id": 52,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24793,
+          "prediction": 20905
+        },
+        {
+          "id": 53,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 13925,
+          "prediction": 20905
+        },
+        {
+          "id": 60,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 19360,
+          "prediction": 6601
+        },
+        {
+          "id": 61,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 33753,
+          "prediction": 6601
+        },
+        {
+          "id": 68,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 19360,
+          "prediction": 6601
+        },
+        {
+          "id": 69,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 33753,
+          "prediction": 6601
+        },
+        {
+          "id": 82,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 24308,
+          "prediction": 3217
+        },
+        {
+          "id": 83,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1938,
+          "prediction": 3217
+        },
+        {
+          "id": 90,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24308,
+          "prediction": 3217
+        },
+        {
+          "id": 91,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1938,
+          "prediction": 3217
+        },
+        {
+          "id": 98,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 34624,
+          "prediction": 23943
+        },
+        {
+          "id": 99,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 38150,
+          "prediction": 23943
+        },
+        {
+          "id": 106,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 34624,
+          "prediction": 23943
+        },
+        {
+          "id": 107,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 38150,
+          "prediction": 23943
+        },
+        {
+          "id": 120,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 32803,
+          "prediction": 38085
+        },
+        {
+          "id": 121,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 18050,
+          "prediction": 38085
+        },
+        {
+          "id": 128,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 32803,
+          "prediction": 38085
+        },
+        {
+          "id": 129,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 18050,
+          "prediction": 38085
+        },
+        {
+          "id": 136,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 38768,
+          "prediction": 16598
+        },
+        {
+          "id": 137,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 29925,
+          "prediction": 16598
+        },
+        {
+          "id": 144,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 38768,
+          "prediction": 16598
+        },
+        {
+          "id": 145,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 29925,
+          "prediction": 16598
+        },
+        {
+          "id": 158,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 39846,
+          "prediction": 33545
+        },
+        {
+          "id": 159,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 29285,
+          "prediction": 33545
+        },
+        {
+          "id": 166,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 39846,
+          "prediction": 33545
+        },
+        {
+          "id": 167,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 29285,
+          "prediction": 33545
+        },
+        {
+          "id": 174,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 7162,
+          "prediction": 33581
+        },
+        {
+          "id": 175,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 3147,
+          "prediction": 33581
+        },
+        {
+          "id": 182,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 7162,
+          "prediction": 33581
+        },
+        {
+          "id": 183,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 3147,
+          "prediction": 33581
+        },
+        {
+          "id": 196,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 23771,
+          "prediction": 29649
+        },
+        {
+          "id": 197,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 37905,
+          "prediction": 29649
+        },
+        {
+          "id": 204,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 23771,
+          "prediction": 29649
+        },
+        {
+          "id": 205,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 37905,
+          "prediction": 29649
+        },
+        {
+          "id": 212,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 3426,
+          "prediction": 13122
+        },
+        {
+          "id": 213,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 20928,
+          "prediction": 13122
+        },
+        {
+          "id": 220,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 3426,
+          "prediction": 13122
+        },
+        {
+          "id": 221,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 20928,
+          "prediction": 13122
+        },
+        {
+          "id": 234,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 34341,
+          "prediction": 28810
+        },
+        {
+          "id": 235,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1602,
+          "prediction": 28810
+        },
+        {
+          "id": 242,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 34341,
+          "prediction": 28810
+        },
+        {
+          "id": 243,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1602,
+          "prediction": 28810
+        },
+        {
+          "id": 250,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 866,
+          "prediction": 26302
+        },
+        {
+          "id": 251,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 12318,
+          "prediction": 26302
+        },
+        {
+          "id": 258,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 866,
+          "prediction": 26302
+        },
+        {
+          "id": 259,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 12318,
+          "prediction": 26302
+        },
+        {
+          "id": 272,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 22114,
+          "prediction": 16889
+        },
+        {
+          "id": 273,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 16944,
+          "prediction": 16889
+        },
+        {
+          "id": 280,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 22114,
+          "prediction": 16889
+        },
+        {
+          "id": 281,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 16944,
+          "prediction": 16889
+        },
+        {
+          "id": 288,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 8458,
+          "prediction": 17864
+        },
+        {
+          "id": 289,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 6972,
+          "prediction": 17864
+        },
+        {
+          "id": 296,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 8458,
+          "prediction": 17864
+        },
+        {
+          "id": 297,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 6972,
+          "prediction": 17864
+        },
+        {
+          "id": 310,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 26100,
+          "prediction": 10508
+        },
+        {
+          "id": 311,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 14611,
+          "prediction": 10508
+        },
+        {
+          "id": 318,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 26100,
+          "prediction": 10508
+        },
+        {
+          "id": 319,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 14611,
+          "prediction": 10508
+        },
+        {
+          "id": 326,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 9669,
+          "prediction": 720
+        },
+        {
+          "id": 327,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 39015,
+          "prediction": 720
+        },
+        {
+          "id": 334,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 9669,
+          "prediction": 720
+        },
+        {
+          "id": 335,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 39015,
+          "prediction": 720
+        }
+      ],
+      "certificates": {
+        "full_test": {
+          "certified": false,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 72,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-jzh8m_px",
+          "mismatches": [
+            [
+              6,
+              11436,
+              38796
+            ],
+            [
+              7,
+              2579,
+              38796
+            ],
+            [
+              14,
+              11436,
+              38796
+            ],
+            [
+              15,
+              2579,
+              38796
+            ],
+            [
+              22,
+              11642,
+              4690
+            ],
+            [
+              23,
+              7878,
+              4690
+            ],
+            [
+              30,
+              11642,
+              4690
+            ],
+            [
+              31,
+              7878,
+              4690
+            ],
+            [
+              38,
+              24793,
+              20905
+            ],
+            [
+              39,
+              13925,
+              20905
+            ],
+            [
+              46,
+              24793,
+              20905
+            ],
+            [
+              47,
+              13925,
+              20905
+            ],
+            [
+              54,
+              19360,
+              6601
+            ],
+            [
+              55,
+              33753,
+              6601
+            ],
+            [
+              62,
+              19360,
+              6601
+            ],
+            [
+              63,
+              33753,
+              6601
+            ],
+            [
+              70,
+              24308,
+              3217
+            ],
+            [
+              71,
+              1938,
+              3217
+            ],
+            [
+              78,
+              24308,
+              3217
+            ],
+            [
+              79,
+              1938,
+              3217
+            ],
+            [
+              86,
+              34624,
+              23943
+            ],
+            [
+              87,
+              38150,
+              23943
+            ],
+            [
+              94,
+              34624,
+              23943
+            ],
+            [
+              95,
+              38150,
+              23943
+            ],
+            [
+              102,
+              32803,
+              38085
+            ],
+            [
+              103,
+              18050,
+              38085
+            ],
+            [
+              110,
+              32803,
+              38085
+            ],
+            [
+              111,
+              18050,
+              38085
+            ],
+            [
+              118,
+              38768,
+              16598
+            ],
+            [
+              119,
+              29925,
+              16598
+            ],
+            [
+              126,
+              38768,
+              16598
+            ],
+            [
+              127,
+              29925,
+              16598
+            ],
+            [
+              134,
+              39846,
+              33545
+            ],
+            [
+              135,
+              29285,
+              33545
+            ],
+            [
+              142,
+              39846,
+              33545
+            ],
+            [
+              143,
+              29285,
+              33545
+            ],
+            [
+              150,
+              7162,
+              33581
+            ],
+            [
+              151,
+              3147,
+              33581
+            ],
+            [
+              158,
+              7162,
+              33581
+            ],
+            [
+              159,
+              3147,
+              33581
+            ],
+            [
+              166,
+              23771,
+              29649
+            ],
+            [
+              167,
+              37905,
+              29649
+            ],
+            [
+              174,
+              23771,
+              29649
+            ],
+            [
+              175,
+              37905,
+              29649
+            ],
+            [
+              182,
+              3426,
+              13122
+            ],
+            [
+              183,
+              20928,
+              13122
+            ],
+            [
+              190,
+              3426,
+              13122
+            ],
+            [
+              191,
+              20928,
+              13122
+            ],
+            [
+              198,
+              34341,
+              28810
+            ],
+            [
+              199,
+              1602,
+              28810
+            ],
+            [
+              206,
+              34341,
+              28810
+            ],
+            [
+              207,
+              1602,
+              28810
+            ],
+            [
+              214,
+              866,
+              26302
+            ],
+            [
+              215,
+              12318,
+              26302
+            ],
+            [
+              222,
+              866,
+              26302
+            ],
+            [
+              223,
+              12318,
+              26302
+            ],
+            [
+              230,
+              22114,
+              16889
+            ],
+            [
+              231,
+              16944,
+              16889
+            ],
+            [
+              238,
+              22114,
+              16889
+            ],
+            [
+              239,
+              16944,
+              16889
+            ],
+            [
+              246,
+              8458,
+              17864
+            ],
+            [
+              247,
+              6972,
+              17864
+            ],
+            [
+              254,
+              8458,
+              17864
+            ],
+            [
+              255,
+              6972,
+              17864
+            ],
+            [
+              262,
+              26100,
+              10508
+            ],
+            [
+              263,
+              14611,
+              10508
+            ],
+            [
+              270,
+              26100,
+              10508
+            ],
+            [
+              271,
+              14611,
+              10508
+            ],
+            [
+              278,
+              9669,
+              720
+            ],
+            [
+              279,
+              39015,
+              720
+            ],
+            [
+              286,
+              9669,
+              720
+            ],
+            [
+              287,
+              39015,
+              720
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "frozen_firing_domain": {
+          "certified": false,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 72,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-_5ds9k5m",
+          "mismatches": [
+            [
+              6,
+              11436,
+              38796
+            ],
+            [
+              7,
+              2579,
+              38796
+            ],
+            [
+              14,
+              11436,
+              38796
+            ],
+            [
+              15,
+              2579,
+              38796
+            ],
+            [
+              22,
+              11642,
+              4690
+            ],
+            [
+              23,
+              7878,
+              4690
+            ],
+            [
+              30,
+              11642,
+              4690
+            ],
+            [
+              31,
+              7878,
+              4690
+            ],
+            [
+              38,
+              24793,
+              20905
+            ],
+            [
+              39,
+              13925,
+              20905
+            ],
+            [
+              46,
+              24793,
+              20905
+            ],
+            [
+              47,
+              13925,
+              20905
+            ],
+            [
+              54,
+              19360,
+              6601
+            ],
+            [
+              55,
+              33753,
+              6601
+            ],
+            [
+              62,
+              19360,
+              6601
+            ],
+            [
+              63,
+              33753,
+              6601
+            ],
+            [
+              70,
+              24308,
+              3217
+            ],
+            [
+              71,
+              1938,
+              3217
+            ],
+            [
+              78,
+              24308,
+              3217
+            ],
+            [
+              79,
+              1938,
+              3217
+            ],
+            [
+              86,
+              34624,
+              23943
+            ],
+            [
+              87,
+              38150,
+              23943
+            ],
+            [
+              94,
+              34624,
+              23943
+            ],
+            [
+              95,
+              38150,
+              23943
+            ],
+            [
+              102,
+              32803,
+              38085
+            ],
+            [
+              103,
+              18050,
+              38085
+            ],
+            [
+              110,
+              32803,
+              38085
+            ],
+            [
+              111,
+              18050,
+              38085
+            ],
+            [
+              118,
+              38768,
+              16598
+            ],
+            [
+              119,
+              29925,
+              16598
+            ],
+            [
+              126,
+              38768,
+              16598
+            ],
+            [
+              127,
+              29925,
+              16598
+            ],
+            [
+              134,
+              39846,
+              33545
+            ],
+            [
+              135,
+              29285,
+              33545
+            ],
+            [
+              142,
+              39846,
+              33545
+            ],
+            [
+              143,
+              29285,
+              33545
+            ],
+            [
+              150,
+              7162,
+              33581
+            ],
+            [
+              151,
+              3147,
+              33581
+            ],
+            [
+              158,
+              7162,
+              33581
+            ],
+            [
+              159,
+              3147,
+              33581
+            ],
+            [
+              166,
+              23771,
+              29649
+            ],
+            [
+              167,
+              37905,
+              29649
+            ],
+            [
+              174,
+              23771,
+              29649
+            ],
+            [
+              175,
+              37905,
+              29649
+            ],
+            [
+              182,
+              3426,
+              13122
+            ],
+            [
+              183,
+              20928,
+              13122
+            ],
+            [
+              190,
+              3426,
+              13122
+            ],
+            [
+              191,
+              20928,
+              13122
+            ],
+            [
+              198,
+              34341,
+              28810
+            ],
+            [
+              199,
+              1602,
+              28810
+            ],
+            [
+              206,
+              34341,
+              28810
+            ],
+            [
+              207,
+              1602,
+              28810
+            ],
+            [
+              214,
+              866,
+              26302
+            ],
+            [
+              215,
+              12318,
+              26302
+            ],
+            [
+              222,
+              866,
+              26302
+            ],
+            [
+              223,
+              12318,
+              26302
+            ],
+            [
+              230,
+              22114,
+              16889
+            ],
+            [
+              231,
+              16944,
+              16889
+            ],
+            [
+              238,
+              22114,
+              16889
+            ],
+            [
+              239,
+              16944,
+              16889
+            ],
+            [
+              246,
+              8458,
+              17864
+            ],
+            [
+              247,
+              6972,
+              17864
+            ],
+            [
+              254,
+              8458,
+              17864
+            ],
+            [
+              255,
+              6972,
+              17864
+            ],
+            [
+              262,
+              26100,
+              10508
+            ],
+            [
+              263,
+              14611,
+              10508
+            ],
+            [
+              270,
+              26100,
+              10508
+            ],
+            [
+              271,
+              14611,
+              10508
+            ],
+            [
+              278,
+              9669,
+              720
+            ],
+            [
+              279,
+              39015,
+              720
+            ],
+            [
+              286,
+              9669,
+              720
+            ],
+            [
+              287,
+              39015,
+              720
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "firing_domain_size": 288,
+      "sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed"
+    }
+  },
+  "frozen_sha256": "666db2f1cd7add3e78fb56bc6504d529208452f9a7e7ec0fdc72b00e37385789",
+  "references_sha256": "885feb20c503219fdb7b18d0f787a2016d1c07286469297590ff9ff7ce11df02",
+  "observations_sha256": "24cbae12b58231a2828d3a02858660f35edd90d67543f3a95c18bfeab1b966c2"
+}

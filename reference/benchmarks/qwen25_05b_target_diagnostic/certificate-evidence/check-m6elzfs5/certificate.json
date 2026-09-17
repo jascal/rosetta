@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5\nWord size: 64 bits\nOptions enabled: ffi ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "fieldrun",
+    "prior_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705"
+    },
+    "bundle_sha256": {
+      ".fieldrun.bin": "7bb34aa996044d89689d18adb61e092f410605fe33d9762eac7a92a5676352ea",
+      ".fieldrun.json": "59ae79cd40f7197c6943584d468845335dd94215ad019bc09e1cda477be2491a"
+    },
+    "tokenizer_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+  },
+  "scalars": {
+    "ninvalid": "int",
+    "nleak": "int"
+  },
+  "result": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0
+  },
+  "sha256": {
+    "circuit.dl": "d4e6a652ac7f515db4a2ef2e7c11df4bf82c1400d70c244ac6d3325b2cb5fe16",
+    "facts/bucket.facts": "9258ddc89819e746967ef2e95f417555670bc5518cd7470f74a3ebfda2734228",
+    "facts/changed.facts": "ba469dcc292c1a9eb1291311188adec92b5cfe10024130a55e10a5bebc2801a3",
+    "facts/pair.facts": "05d3f4dade690888b5c12f8cf069498043ac5b08673db3e41bf30527f71ce422",
+    "facts/ref.facts": "c4520b6dfbdf7702197bed528d91c38fbb5e3f25db0178ca845f7ede9f0740ce",
+    "facts/sample.facts": "dddfee71d0bf9c39e396f86773a4eac9ab57ace5c117552401168be5d2e4954c",
+    "facts/tok.facts": "4aae0b46dd3845042f8685ff97bf428a5aa9955c917a84fd3a4f6826a1ba9059",
+    "outputs/abstain.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/breakdown.csv": "0529d19870375177017cf93d5fbc067c35fcf7b454eeb5d6b334fe54e764d515",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counterexample.csv": "83699b3245dcd8100886848fd370ec6989266afb66411c9c99b4b122944b9cd2",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/leakage.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ninvalid.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/nleak.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/pair_result.csv": "acca37914c2dbd16cd4361f15de7eb6a2885c5ca14dc10f3ba9ba39c4054ae70",
+    "outputs/paired_count.csv": "590efc4f5f2ede72f4c28d94a21360b785310beea3c642188a7c038dc620228a",
+    "outputs/score.csv": "c54c346f0388d1600402f00d30d73ff36c29bfc8300ad24a20980f895a928e4a",
+    "stderr.txt": "6b06fbf4986c6233f078dd65a84638936d7acbb2e6b69ff9785de0a8cecfc9d0",
+    "verify.dl": "7b762cad63f93888ef8b0bef292e6f536a9d83017effe238c7e6b26094382451"
+  }
+}

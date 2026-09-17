@@ -288,13 +288,21 @@ def build_from_spec(spec_path):
     if s.get("reasoning"):                                        # "rosetta is aware of it" — opt-in, wiring takes care
         print("[reasoning] authored-deductive tier present in spec (opt-in) — recognized; "
               "wiring is a deliberate separate step (see REASONING.md)")
+    if kw["cover"] and (s.get("gate") or "holdout" in (s.get("experiment") or {})):
+        from . import holdout
+        experiment = s.get("experiment") or {}
+        source = kw["corpus"] or kw["questions"]
+        if not source:
+            raise ValueError("holdout evaluation requires a cover source corpus")
+        kw["corpus"] = holdout.prepare(out, source, fraction=experiment.get("holdout", .2),
+                                      seed=experiment.get("seed", 0), window=8)
     build_expert(out, **kw)
     _score_if_gated(out, s, base)
     return out
 
 
 def _score_if_gated(out, spec, base):
-    """If [gate] is set and a manifest was produced, grade the package and HARD-FAIL on a miss (EXPERTS.md)."""
+    """A requested gate requires evaluation evidence; missing inputs must fail the build."""
     g = spec.get("gate")
     if not g:
         return
@@ -302,16 +310,20 @@ def _score_if_gated(out, spec, base):
     mpath = next((p for p in (os.path.join(out, "manifest.json"), os.path.join(out, "package", "manifest.json"))
                   if os.path.exists(p)), None)
     if not mpath:
-        print("[scorecard] no manifest (model-free grounding-only build) — gate skipped (see the model-free n-gram open item)")
-        return
+        raise SystemExit("[gate] FAIL — no cover manifest; model-free experts require the retrieval runtime evaluator")
     holdout, off_domain = _eval_sets(out, spec, base)
     if not holdout:
-        print("[scorecard] no holdout derivable (no tokenizer/corpus) — gate skipped")
-        return
+        raise SystemExit("[gate] FAIL — no isolated holdout/tokenizer or no evaluable holdout windows")
     sc = scorer.score(mpath, holdout, off_domain)
+    from .holdout import load
+    _, _, split = load(out)
+    sc["evaluation"] = {"scope": "cover tier only", "reference": "held-out corpus continuation (not model argmax)",
+                        "split": split}
     scorer.write_scorecard(sc, os.path.join(out, "scorecard.json"))
-    print(f"[scorecard] coverage {sc['coverage']:.0%}  precision {sc['precision']:.0%}  "
-          f"abstain {sc['abstain']:.0%}  leak {sc['off_domain_leak']:.0%}  (n={sc['holdout_n']})")
+    precision = f"{sc['precision']:.0%}" if sc['precision'] is not None else "undefined"
+    leak = f"{sc['off_domain_leak']:.0%}" if sc['off_domain_leak'] is not None else "unmeasured"
+    print(f"[scorecard] coverage {sc['coverage']:.0%}  precision {precision}  "
+          f"abstain {sc['abstain']:.0%}  leak {leak}  (n={sc['holdout_n']})")
     ok, reasons = scorer.gate(sc, min_precision=g.get("min_precision"), max_leak=g.get("max_leak"),
                               benchmarks=spec.get("benchmark"))
     if not ok:
@@ -319,27 +331,27 @@ def _score_if_gated(out, spec, base):
     print("[gate] PASS")
 
 
-def _eval_sets(out, spec, base, W=8, frac=0.3):
-    """Held-out (ctx, gold) pairs + off-domain contexts for the scorecard, tokenized with the built package's tokenizer.
-    NOTE: a held-out *tail* of the same corpus the cover was built on has leakage — proper train/hold isolation (build
-    the cover on TRAIN only) is the EXPERTS.md open item; this is the plumbed baseline."""
+def _eval_sets(out, spec, base):
+    """Read the split made before extraction; windows never cross document boundaries."""
     tok_path = os.path.join(out, "bundle.tokenizer.json")
-    text = (spec.get("corpus", {}) or {}).get("text")
-    if not (os.path.exists(tok_path) and text):
+    if not os.path.exists(tok_path) or not os.path.exists(os.path.join(out, "evaluation", "split.json")):
         return [], []
+    from .holdout import load, documents
+    _, test, split = load(out)
+    W = split["window"]
     from tokenizers import Tokenizer
     tok = Tokenizer.from_file(tok_path)
-    text = text if os.path.isabs(text) else os.path.join(base, text)
-    ids = tok.encode(open(text, encoding="utf-8").read()).ids
-    wins = [(tuple(ids[i - W:i]), ids[i]) for i in range(W, len(ids))]
-    hold = wins[int(len(wins) * (1 - frac)):]
+    hold = []
+    for document in test:
+        ids = tok.encode(document).ids
+        hold.extend((tuple(ids[i - W:i]), ids[i]) for i in range(W, len(ids)))
     od = []
     odf = (spec.get("experiment", {}) or {}).get("off_domain")
     if odf:
         odf = odf if os.path.isabs(odf) else os.path.join(base, odf)
-        if os.path.exists(odf):
-            oids = tok.encode(open(odf, encoding="utf-8").read()).ids
-            od = [tuple(oids[i - W:i]) for i in range(W, len(oids))]
+        for document in documents(odf):
+            oids = tok.encode(document).ids
+            od.extend(tuple(oids[i - W:i]) for i in range(W, len(oids)))
     return hold, od
 
 

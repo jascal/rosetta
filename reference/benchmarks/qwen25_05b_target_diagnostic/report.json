@@ -1,0 +1,517 @@
+{
+  "tag": "empirical",
+  "scope": "controlled diagnosis informed by previous failures; not untouched final-test evidence",
+  "provenance": {
+    "source": "fieldrun",
+    "prior_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705"
+    },
+    "bundle_sha256": {
+      ".fieldrun.bin": "7bb34aa996044d89689d18adb61e092f410605fe33d9762eac7a92a5676352ea",
+      ".fieldrun.json": "59ae79cd40f7197c6943584d468845335dd94215ad019bc09e1cda477be2491a"
+    },
+    "tokenizer_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+  },
+  "audit": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0,
+    "evidence": "certificate-evidence/check-m6elzfs5"
+  },
+  "scores": {
+    "test": {
+      "n": 192,
+      "answered": 192,
+      "correct": 180,
+      "wrong": 12,
+      "abstained": 0,
+      "coverage": 1.0,
+      "precision": 0.9375
+    }
+  },
+  "strata": {
+    "seed": {
+      "5": {
+        "n": 96,
+        "answered": 96,
+        "correct": 94,
+        "wrong": 2,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9791666666666666
+      },
+      "6": {
+        "n": 96,
+        "answered": 96,
+        "correct": 86,
+        "wrong": 10,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.8958333333333334
+      }
+    },
+    "length": {
+      "8": {
+        "n": 96,
+        "answered": 96,
+        "correct": 86,
+        "wrong": 10,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.8958333333333334
+      },
+      "12": {
+        "n": 96,
+        "answered": 96,
+        "correct": 94,
+        "wrong": 2,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9791666666666666
+      }
+    },
+    "prefix": {
+      "4": {
+        "n": 96,
+        "answered": 96,
+        "correct": 88,
+        "wrong": 8,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9166666666666666
+      },
+      "6": {
+        "n": 96,
+        "answered": 96,
+        "correct": 92,
+        "wrong": 4,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9583333333333334
+      }
+    },
+    "gap": {
+      "8": {
+        "n": 64,
+        "answered": 64,
+        "correct": 58,
+        "wrong": 6,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.90625
+      },
+      "0": {
+        "n": 64,
+        "answered": 64,
+        "correct": 63,
+        "wrong": 1,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.984375
+      },
+      "32": {
+        "n": 64,
+        "answered": 64,
+        "correct": 59,
+        "wrong": 5,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.921875
+      }
+    },
+    "target": {
+      "11436": {
+        "n": 24,
+        "answered": 24,
+        "correct": 20,
+        "wrong": 4,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.8333333333333334
+      },
+      "2579": {
+        "n": 24,
+        "answered": 24,
+        "correct": 23,
+        "wrong": 1,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9583333333333334
+      },
+      "34341": {
+        "n": 24,
+        "answered": 24,
+        "correct": 19,
+        "wrong": 5,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.7916666666666666
+      },
+      "1602": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "317": {
+        "n": 24,
+        "answered": 24,
+        "correct": 23,
+        "wrong": 1,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9583333333333334
+      },
+      "23268": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "698": {
+        "n": 24,
+        "answered": 24,
+        "correct": 23,
+        "wrong": 1,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9583333333333334
+      },
+      "13551": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "token_class": {
+      "punctuation_newline": {
+        "n": 96,
+        "answered": 96,
+        "correct": 85,
+        "wrong": 11,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.8854166666666666
+      },
+      "lexical": {
+        "n": 96,
+        "answered": 96,
+        "correct": 95,
+        "wrong": 1,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9895833333333334
+      }
+    },
+    "target_origin": {
+      "discovery": {
+        "n": 96,
+        "answered": 96,
+        "correct": 86,
+        "wrong": 10,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.8958333333333334
+      },
+      "new_target": {
+        "n": 96,
+        "answered": 96,
+        "correct": 94,
+        "wrong": 2,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.9791666666666666
+      }
+    }
+  },
+  "counterexamples": [
+    {
+      "id": 16,
+      "part": "test",
+      "group": "seed5-length8",
+      "seed": 5,
+      "length": 8,
+      "layout": "gap32",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 80984,
+      "prediction": 11436
+    },
+    {
+      "id": 81,
+      "part": "test",
+      "group": "seed5-length12",
+      "seed": 5,
+      "length": 12,
+      "layout": "gap8",
+      "kind": "lexical",
+      "exposures": 2,
+      "reference": 18844,
+      "prediction": 2579
+    },
+    {
+      "id": 98,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap0",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 21406,
+      "prediction": 34341
+    },
+    {
+      "id": 104,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap8",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 1,
+      "prediction": 11436
+    },
+    {
+      "id": 106,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap8",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 3211,
+      "prediction": 34341
+    },
+    {
+      "id": 112,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap32",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 382,
+      "prediction": 11436
+    },
+    {
+      "id": 114,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap32",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 35640,
+      "prediction": 34341
+    },
+    {
+      "id": 118,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap32",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 198,
+      "prediction": 698
+    },
+    {
+      "id": 128,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap8",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 1,
+      "prediction": 11436
+    },
+    {
+      "id": 130,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap8",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 3211,
+      "prediction": 34341
+    },
+    {
+      "id": 138,
+      "part": "test",
+      "group": "seed6-length8",
+      "seed": 6,
+      "length": 8,
+      "layout": "gap32",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 3211,
+      "prediction": 34341
+    },
+    {
+      "id": 156,
+      "part": "test",
+      "group": "seed6-length12",
+      "seed": 6,
+      "length": 12,
+      "layout": "gap8",
+      "kind": "punctuation_newline",
+      "exposures": 2,
+      "reference": 280,
+      "prediction": 317
+    }
+  ],
+  "paired_count": [
+    [
+      "317",
+      "23268",
+      "recovered",
+      "1"
+    ],
+    [
+      "317",
+      "23268",
+      "both_correct",
+      "23"
+    ],
+    [
+      "698",
+      "13551",
+      "recovered",
+      "1"
+    ],
+    [
+      "698",
+      "13551",
+      "both_correct",
+      "23"
+    ],
+    [
+      "11436",
+      "2579",
+      "recovered",
+      "4"
+    ],
+    [
+      "11436",
+      "2579",
+      "regressed",
+      "1"
+    ],
+    [
+      "11436",
+      "2579",
+      "both_correct",
+      "19"
+    ],
+    [
+      "34341",
+      "1602",
+      "recovered",
+      "5"
+    ],
+    [
+      "34341",
+      "1602",
+      "both_correct",
+      "19"
+    ]
+  ],
+  "certificate": {
+    "certified": false,
+    "ndomain": 192,
+    "ncover": 192,
+    "nmiss": 12,
+    "nuncov": 0,
+    "nmissing": 0,
+    "ninvalid": 0,
+    "evidence": "certificate-evidence/check-za8svp3s",
+    "mismatches": [
+      [
+        16,
+        80984,
+        11436
+      ],
+      [
+        81,
+        18844,
+        2579
+      ],
+      [
+        98,
+        21406,
+        34341
+      ],
+      [
+        104,
+        1,
+        11436
+      ],
+      [
+        106,
+        3211,
+        34341
+      ],
+      [
+        112,
+        382,
+        11436
+      ],
+      [
+        114,
+        35640,
+        34341
+      ],
+      [
+        118,
+        198,
+        698
+      ],
+      [
+        128,
+        1,
+        11436
+      ],
+      [
+        130,
+        3211,
+        34341
+      ],
+      [
+        138,
+        3211,
+        34341
+      ],
+      [
+        156,
+        280,
+        317
+      ]
+    ],
+    "uncovered": [],
+    "missing_refs": []
+  },
+  "frozen_sha256": "e5afb26a482fa9b4c53bf75ff82a8c3a1f2f2680dbfe05c1a6f9637389147e25",
+  "references_sha256": "aa8801b1c0274a77d48f261ff2b3af75bb809f35713e8c5fa094abb1fe1c1984"
+}

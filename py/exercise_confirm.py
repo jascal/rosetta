@@ -614,11 +614,11 @@ def extract_frame(insts):
 
 
 def emit_unified_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8, T=1.0, eps=0.02, T_lo=0.7):
-    """THE single canonical circuits.dl: the T-distributional n-gram cover (certified across T via TV) + the frame-gated
+    """THE single canonical circuits.dl: the finite-grid distributional n-gram cover + the frame-gated
     structural circuits as point-mass rules (certified at argmax). Supersedes the separate circuits.full.* pair — one
     cover, one symbols twin, one CERTIFICATE.md with both legs. Distributional part reuses temperature.dist_cover/emit_T;
     circuits reuse this module's frame extraction."""
-    from temperature import build_sym, dist_cover, emit_T, certify_T, certify_argmax, trange
+    from temperature import build_sym, dist_cover, emit_T, certify_T, check_argmax, trange
     from oracle import serve_topk
     name = os.path.basename(md.rstrip("/"))
     corpus = json.load(open(os.path.join(md, "corpus.json")))["ids"]
@@ -680,16 +680,25 @@ def emit_unified_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8, T=1.0, eps
     out = os.path.join(md, "circuits.dl")
     structural = {"entity_ids": entity_ids, "families": families, "lord": lord, "lat": lat}
     emit_T(out, ng_rules, nat_w, idioms=[], induction=True, sym=build_sym(md), name=name, structural=structural)
-    # 6. dual certificate: T-range distributional over natural, argmax over the circuit domain
+    # 6. Datalog certificates: finite temperature grid and the selected circuit domain.
     tresults, tok_ok = [], True
+    evidence_dir = os.path.join(md, "certificate-evidence")
+    checks = []
     for q in trange(T_lo, T):
-        worst, ngot = certify_T(out, nat, logmap, nat_idx, q, eps)
-        ok = worst < eps and ngot == len(nat_idx); tok_ok &= ok; tresults.append((q, ngot, worst, ok))
+        result = certify_T(out, nat, logmap, list(range(len(nat))), q, eps, evidence_dir=evidence_dir)
+        ok = result["certified"]
+        tok_ok &= ok
+        tresults.append((q, result.get("ncover", 0), result.get("worst", float("nan")), ok))
+        checks.append({k: v for k, v in result.items() if k != "relations"})
     cinsts = [ci for ci, _ in dom_circ]
-    amatch, achecked = certify_argmax(out, cinsts, {k: dom_circ[k][1] for k in range(len(dom_circ))},
-                                      list(range(len(cinsts))), T_lo) if cinsts else (0, 0)
-    argmax_ok = amatch == achecked
+    argmax = check_argmax(out, cinsts, {k: dom_circ[k][1] for k in range(len(dom_circ))},
+                         list(range(len(cinsts))), T_lo, evidence_dir=evidence_dir)
+    checks.append({k: v for k, v in argmax.items() if k != "relations"})
+    amatch, achecked = argmax.get("nmatch", 0), len(cinsts)
+    argmax_ok = argmax["certified"]
     certified = tok_ok and argmax_ok
+    with open(os.path.join(md, "unified-certificate.json"), "w") as f:
+        json.dump({"certified": certified, "checks": checks, "interval_certified": False}, f, indent=2)
     _write_unified_cert(md, name, nat_w, T_lo, T, eps, tresults, per, families, amatch, achecked, certified, remaining)
     for suffix in ("full.dl", "full.symbols.dl", "full.CERT.json"):    # supersede the old separate pair
         p = os.path.join(md, "circuits." + suffix)
@@ -701,25 +710,28 @@ def emit_unified_cover(md, dec, fill, tok, vocab, nat_n=300, nat_w=8, T=1.0, eps
     for c, d in per.items():
         if d["certified_instances"]:
             print(f"  + {c:13} [{d['emit']}{'/framed' if d['framed'] else ''}]: {d['certified_instances']} argmax-certified instances")
-    print("  T-range (n-gram): " + " ".join(f"T={q}:{'ok' if ok else 'FAIL'}(TV{worst:.3f})" for q, _n, worst, ok in tresults))
+    print("  T-grid (n-gram): " + " ".join(f"T={q}:{'ok' if ok else 'FAIL'}(TV{worst:.3f})" for q, _n, worst, ok in tresults))
     print(f"  argmax (circuits): {amatch}/{achecked} match model")
     print("  → circuits.dl + circuits.symbols.dl + CERTIFICATE.md — "
-          + ("CERTIFIED (T-range n-gram ∧ argmax circuits)" if certified else "NOT certified"))
+          + ("CERTIFIED (finite-grid n-gram ∧ argmax circuits)" if certified else "NOT certified"))
     return {"model": name, "certified": certified, "trange_ok": tok_ok, "argmax": [amatch, achecked], "per_circuit": per}
 
 
 def _write_unified_cert(md, name, w, T_lo, T, eps, tresults, per, families, amatch, achecked, certified, remaining):
+    from temperature import trange
     circ = sum(d["certified_instances"] for d in per.values())
     lines = [f"# {name} · certificate (unified — T-distributional n-gram + argmax circuits)", "",
              "`circuits.dl` is ONE cover: the natural-corpus n-gram rules carry top-K logits and the runtime computes",
-             "`softmax(logits/T)` at a queried `.input temp` (certified across the T-range by total-variation distance);",
+             "`softmax(logits/T)` at a queried `.input temp` (checked only at the listed temperatures against supplied logits);",
              "the structural circuits are frame-gated point-mass rules routed above/below the n-gram (a circuit predicts a",
-             "token, so it is certified at the **argmax** collapse, not by TV). `circuits.symbols.dl` is the legible twin.", "",
-             f"## Distributional leg — n-gram cover, T ∈ [{T_lo}, {T}], ε = {eps} ({tresults[0][1]} natural windows, W={w})", "",
+             "token, so it is checked at the **argmax** collapse, not by TV). The symbol rendering is uncertified.",
+             "No interval or omitted-probability-mass bound is established. See `unified-certificate.json` for retained evidence.",
+             "The circuit domain is selected using oracle agreement; this is not an untouched holdout evaluation.", "",
+             f"## Distributional leg — n-gram cover, finite grid {trange(T_lo, T)}, ε = {eps} (W={w})", "",
              "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
     lines += [f"| {q} | {n}/{tresults[0][1]} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, n, worst, ok in tresults]
     lines += ["", f"## Argmax leg — structural circuits ({circ} circuit-behavior instances)", "",
-              f"**{amatch}/{achecked} match the model at argmax** → {'CERTIFIED' if amatch == achecked else 'NOT certified'}.", "",
+              f"**{amatch}/{achecked} match the supplied argmax references**; the Datalog verdict is in `unified-certificate.json`.", "",
               "| circuit | mechanism | frame-gated | argmax-certified instances |", "|---|---|---|---|"]
     lines += [f"| {c} | {d['emit']} | {'yes' if d['framed'] else 'no'} | {d['certified_instances']} |"
               for c, d in per.items() if d["certified_instances"]]

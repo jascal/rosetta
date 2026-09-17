@@ -3,6 +3,9 @@ __pycache__/
 .venv/
 # souffle scratch / generated outputs
 *.csv
+# Retained certificate outputs are evidence, not scratch data.
+!reference/**/certificate-evidence/**/outputs/*.csv
+!models/**/certificate-evidence/**/outputs/*.csv
 /tmp/
 models/*/whole.dl
 *.exe

@@ -1,23 +1,28 @@
-# pythia70m · certificate (unified — T-distributional n-gram + argmax circuits)
+# pythia70m · historical unified-cover measurements (`empirical`)
 
-`circuits.dl` is ONE cover: the natural-corpus n-gram rules carry top-K logits and the runtime computes
-`softmax(logits/T)` at a queried `.input temp` (certified across the T-range by total-variation distance);
-the structural circuits are frame-gated point-mass rules routed above/below the n-gram (a circuit predicts a
-token, so it is certified at the **argmax** collapse, not by TV). `circuits.symbols.dl` is the legible twin.
+`circuits.dl` combines distributional n-grams with structural point-mass circuits; the runtime computes `softmax(logits/T)` in souffle
+at a queried `.input temp` (T > 0; use the crisp emitter for T=0). Build-time logits from the cached logits (cache-only — no oracle).
+`circuits.symbols.dl` is an uncertified token-string rendering; some idioms may be omitted.
 
-## Distributional leg — n-gram cover, T ∈ [0.7, 1.0], ε = 0.02 (300 natural windows, W=8)
+- domain: 300 decision windows (W=8)
+- tested temperatures: T ∈ {0.7, 0.85, 1.0}, ε = 0.02
+- rules: 300 (no idioms + 300 n-gram, top-K mean 53.4)
 
 | T | contexts | max TV | verdict |
 |---|---|---|---|
-| 0.7 | 300/300 | 0.0058 | CERTIFIED |
-| 0.85 | 300/300 | 0.0073 | CERTIFIED |
-| 1.0 | 300/300 | 0.0100 | CERTIFIED |
+| 0.7 | 300/300 | 0.0058 | historical Python check passed |
+| 0.85 | 300/300 | 0.0073 | historical Python check passed |
+| 1.0 | 300/300 | 0.0100 | historical Python check passed |
+
+**empirical** — historical Python comparisons against supplied reference logits at the three listed temperatures.
+These measurements have not been replayed with `dl/equiv_dist.dl`; no interval or full-model tail bound is established.
+Runtime: `souffle run.dl` with T > 0. See [certificate scope](../../docs/certificates.md).
 
 ## Argmax leg — structural circuits (111 circuit-behavior instances)
 
-**111/111 match the model at argmax** → CERTIFIED.
+**111/111 match the model at argmax** (`empirical`; historical comparison, no retained Datalog certificate).
 
-| circuit | mechanism | frame-gated | argmax-certified instances |
+| circuit | mechanism | frame-gated | historically matching instances |
 |---|---|---|---|
 | induction | induction | no | 35 |
 | succession | succession | no | 1 |
@@ -26,4 +31,5 @@ token, so it is certified at the **argmax** collapse, not by TV). `circuits.symb
 | temporal | once_appearing | yes | 36 |
 | spatial | once_appearing | yes | 28 |
 
-**CERTIFIED** over the stated domain (natural windows ∪ circuit-behavior stimuli). Runtime: `souffle run.dl`.
+**empirical** — these structural counts were reported by the earlier build. They are retained as historical
+measurements and have not been replayed with the current Datalog verifier. No combined certificate is claimed.

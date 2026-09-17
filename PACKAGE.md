@@ -239,6 +239,7 @@ equivalent engine path, not required for a host-side runtime.
 
 ## Two regimes
 
-- **Exact backstop** (rosetta `whole.dl`): abstain → exact recompute; the package compresses the confident part.
+- **Historical build-time backstop experiment** (`whole.dl`): abstain → oracle recompute. This violates the standalone
+  runtime contract and must not ship as the minimized artifact.
 - **Partial / no backstop** (sgiandubh bounded expert): abstain → honest refusal. The `trusted` (causal) tier is the
   safe core — a backstop-less expert must not trust purely `observational` rules, which is why the tier/basis tagging exists.

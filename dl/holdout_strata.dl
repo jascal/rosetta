@@ -1,0 +1,16 @@
+// Append to holdout.dl. Buckets are preregistered experimental metadata, not circuit inputs.
+.decl bucket(inst:number,factor:symbol,value:symbol) .input bucket
+invalid(I) :- bucket(I,_,_), !sample(I,_,_,_).
+invalid(I) :- bucket(I,F,A), bucket(I,F,B), A != B.
+.decl stratum(factor:symbol,value:symbol)
+stratum(F,V) :- bucket(_,F,V).
+.decl breakdown(factor:symbol,value:symbol,n:number,answered:number,correct:number,wrong:number,abstained:number)
+.output breakdown
+breakdown(F,V,N,A,C,W,U) :- stratum(F,V),
+    N = count : { bucket(_,F,V) },
+    A = count : { bucket(I,F,V), answered(I) },
+    C = count : { bucket(I,F,V), correct(I) },
+    W = count : { bucket(I,F,V), wrong(I) },
+    U = count : { bucket(I,F,V), abstain(I) }.
+.decl counterexample(inst:number,model:number,circuit:number) .output counterexample
+counterexample(I,R,C) :- ref(I,R), cdecide(I,C), R != C.

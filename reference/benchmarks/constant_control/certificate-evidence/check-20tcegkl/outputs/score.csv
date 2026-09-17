@@ -1,0 +1,4 @@
+train	24	24	0	24	0
+validation	12	12	0	12	0
+test	24	24	0	24	0
+off_domain	4	0	0	0	4

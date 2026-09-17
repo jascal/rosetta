@@ -1,0 +1,38 @@
+// BUILD-TIME admission: only train and validation facts may be staged here.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(inst:number,part:symbol) .input sample
+.decl intervention(base:number,edited:number,position:number,replacement:number) .input intervention
+.decl copy_length(k:number)
+copy_length(1). copy_length(2). copy_length(3).
+#include "circuit.dl" // copy_core.dl, serialized by the driver
+.decl invalid() .output invalid
+invalid() :- sample(_,S), S != "train", S != "validation".
+invalid() :- sample(I,A), sample(I,B), A != B.
+invalid() :- sample(I,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- ref(I,_), !sample(I,_).
+invalid() :- intervention(B,E,_,_), sample(B,S), !sample(E,S).
+invalid() :- intervention(B,_,_,_), !sample(B,_).
+invalid() :- !sample(_,"train").
+invalid() :- !sample(_,"validation").
+.decl failed(k:number,inst:number) .output failed
+failed(K,I) :- copy_length(K), sample(I,_), !copy_prediction(K,I,_).
+failed(K,I) :- copy_prediction(K,I,C), ref(I,R), C != R.
+// A causal pair must actually change the copied token, and the oracle must follow that change.
+.decl causal_hit(k:number,part:symbol,base:number)
+causal_hit(K,S,B) :- intervention(B,E,P,X), sample(B,S), sample(E,S),
+                     copy_source(K,B,J), P = J+1, tok(B,P,Y), Y != X,
+                     tok(E,P,X), ref(B,Y), ref(E,X), copy_prediction(K,E,X).
+.decl causal_fail(k:number,base:number)
+causal_fail(K,B) :- copy_length(K), intervention(B,_,_,_), sample(B,S), !causal_hit(K,S,B).
+.decl eligible(k:number) .output eligible
+eligible(K) :- copy_length(K), !invalid(), !failed(K,_), !causal_fail(K,_),
+               causal_hit(K,"train",_), causal_hit(K,"validation",_).
+.decl selected(k:number) .output selected
+selected(K) :- eligible(_), K = min L : { eligible(L) }.
+.decl nselected(n:number) .output nselected
+nselected(N) :- N = count : { selected(_) }.
+// This verdict certifies admission-input integrity, not equivalence. Use equiv.dl for that.
+.decl certified() .output certified
+certified() :- !invalid().

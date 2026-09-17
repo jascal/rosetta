@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""rosetta · complete_cover.py — the semiring backstop: route the residual to the forward-pass-as-Datalog (no abstain).
+"""rosetta · complete_cover.py — historical BUILD-TIME residual experiment (empirical).
 
 cover-ordering: idiom/n-gram rules (compressed) → SEMIRING backstop (whole.dl, the exact forward pass) for whatever no
-rule covers. The backstop is souffle (the algorithm in Datalog, NOT the fieldrun binary), so runtime-independence holds;
-and it's exact (it IS the model) → the complete cover has zero abstain, zero loss. T-respecting because the backstop
+rule covers. This requires whole.dl and weights and VIOLATES the standalone runtime contract; it is not a deployable
+minimization. It removes abstentions, not errors from rules that fire incorrectly. T-respecting because the backstop
 emits the full LOGITS — softmax(logits/T) gives the exact distribution at any temperature (argmax at T=0).
 Demonstrated on threx (whole.dl exists). Usage: python3 py/complete_cover.py [n] [w]
 """
@@ -44,8 +44,8 @@ def main():
     print(f"  COMPLETENESS (what the backstop guarantees):")
     print(f"    rule layer abstains on {len(residual)} (no rule fires) → SEMIRING BACKSTOP (whole.dl, souffle):"
           f" {back_ok}/{len(residual)} EXACT (it IS the model). Abstain → 0; the residual is computed, never lost.")
-    print(f"  EXACTNESS over the certified domain: the cover built ON the corpus is complete+exact there —"
-          f" dl/equiv.dl already proves nmiss=0 nuncov=0 (rules faithful by construction + backstop fills any gap).")
+    print("  BUILD-TIME experiment only: no certificate is produced by this script."
+          " A shipped runtime must abstain rather than call whole.dl.")
     print(f"  GENERALIZATION (orthogonal — the toolkit's job, NOT the backstop's):")
     print(f"    rules that FIRED on holdout: {fired_ok}/{len(fired)} correct — the {len(fired)-fired_ok} covered-but-wrong are")
     print(f"    rule MISPREDICTIONS on unseen contexts (a train suffix firing wrongly). The backstop can't fix a rule that")
@@ -53,8 +53,7 @@ def main():
     if residual:
         lg = logits(whole, insts[residual[0]])
         print(f"  T-respecting: the backstop emits the full {len(lg)}-logit scoreboard → softmax(logits/T) exact at any T (argmax at T=0).")
-    print("  pruning: the backstop runs ONLY on abstentions (routing); weights prune to that footprint, and every certified")
-    print("  rule provably carves its region out (certificate-gated) — the unembed melts as coverage grows. No floor: residual = computed.")
+    print("  open: replacing this build-time oracle with a standalone, certified residual policy.")
 
 
 if __name__ == "__main__":

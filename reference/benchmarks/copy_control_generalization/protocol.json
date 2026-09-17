@@ -1,0 +1,31 @@
+{
+  "provenance": {
+    "source": "copy-control",
+    "synthetic": true,
+    "excluded_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31"
+    }
+  },
+  "selection": "none; both circuits copied byte-for-byte from prior frozen artifacts",
+  "prior_frozen_sha256": "f514c3240ccdcdb214d661ea1d6f79d2d4a53b69d11d2b5f32111c1caf23a888",
+  "driver_sha256": "3acc0d6ea797a800261820297c3d5c7fd4056902a0fa96a5998d5bc8c3afb9b4",
+  "seeds": [
+    2,
+    3,
+    4
+  ],
+  "lengths": [
+    8,
+    12,
+    24
+  ],
+  "layouts": [
+    "plain",
+    "noise8",
+    "noise32",
+    "near_match8"
+  ],
+  "test_groups": 18,
+  "scope": "all preregistered test cases and each reference-independent firing domain"
+}
