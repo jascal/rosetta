@@ -4,6 +4,16 @@
 **what a build is** and how its quality is established. Forward-looking; claims here are `design`/`open` until the
 artifact (a scorecard, an `equiv.dl` certificate) backs them.*
 
+**Implemented evaluation scope:** gated cover builds now split source lines into document groups **before** cover
+extraction, retain hashes in `evaluation/split.json`, and score held-out corpus continuations. Whitespace-equivalent
+duplicate lines stay in one split; evaluation windows never cross lines. This is **cover-tier empirical accuracy**,
+not model equivalence or full-package retrieval/curated evaluation. `[experiment].holdout` defaults to 0.2 for gated
+cover builds; `seed` defaults to 0. Missing holdout evidence fails a requested gate; zero answers leave precision
+undefined, and absent off-domain probes cannot satisfy `max_leak`. Model-free gates fail explicitly until a retrieval
+evaluator exists. Failed builds retain their files for inspection. Owner `testset` ingestion, full-cascade evaluation,
+and automatic generic negative probes below remain **open**. External benchmark targets without scores fail the gate.
+For the separate certified copy experiment, see [the benchmark report](docs/induction-benchmark.md).
+
 ## The reframe
 
 A bounded expert is not the output of a pipeline — it is a **claim**:
@@ -169,7 +179,8 @@ harness (a non-goal).
 This is already rosetta's wheelhouse; `pack.eval` composes the existing primitives over the *deployable package* (all
 tiers) on the held-out query set:
 
-- `py/holdout_score.py` — train/holdout generalization ("is it us, not the model").
+- `py/holdout_score.py` — legacy exploratory validation; its scoring split also chooses families.
+- `py/benchmark_induction.py` — grouped train/validation/test copy experiment with Datalog decisions and certificates.
 - `py/abstain_cover.py` + [`ABSTAIN.md`](./ABSTAIN.md) — the coverage / precision / abstain frontier.
 - `dl/equiv.dl` — the cover's faithfulness certificate.
 - `py/probe_families.py` + [`CROSS_ARCH.md`](./CROSS_ARCH.md) — which reasoning families the cover carries.

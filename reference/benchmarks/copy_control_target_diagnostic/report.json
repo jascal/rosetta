@@ -1,0 +1,276 @@
+{
+  "tag": "empirical",
+  "scope": "controlled diagnosis informed by previous failures; not untouched final-test evidence",
+  "provenance": {
+    "source": "copy-control",
+    "prior_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705"
+    }
+  },
+  "audit": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0,
+    "evidence": "certificate-evidence/check-1rautznt"
+  },
+  "scores": {
+    "test": {
+      "n": 192,
+      "answered": 192,
+      "correct": 192,
+      "wrong": 0,
+      "abstained": 0,
+      "coverage": 1.0,
+      "precision": 1.0
+    }
+  },
+  "strata": {
+    "seed": {
+      "5": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "6": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "length": {
+      "8": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "12": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "prefix": {
+      "4": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "6": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "gap": {
+      "8": {
+        "n": 64,
+        "answered": 64,
+        "correct": 64,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "0": {
+        "n": 64,
+        "answered": 64,
+        "correct": 64,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "32": {
+        "n": 64,
+        "answered": 64,
+        "correct": 64,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "target": {
+      "11436": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "2579": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "34341": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "1602": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "317": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "23268": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "698": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "13551": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "token_class": {
+      "punctuation_newline": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "lexical": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    },
+    "target_origin": {
+      "discovery": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      },
+      "new_target": {
+        "n": 96,
+        "answered": 96,
+        "correct": 96,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0
+      }
+    }
+  },
+  "counterexamples": [],
+  "paired_count": [
+    [
+      "317",
+      "23268",
+      "both_correct",
+      "24"
+    ],
+    [
+      "698",
+      "13551",
+      "both_correct",
+      "24"
+    ],
+    [
+      "11436",
+      "2579",
+      "both_correct",
+      "24"
+    ],
+    [
+      "34341",
+      "1602",
+      "both_correct",
+      "24"
+    ]
+  ],
+  "certificate": {
+    "certified": true,
+    "ndomain": 192,
+    "ncover": 192,
+    "nmiss": 0,
+    "nuncov": 0,
+    "nmissing": 0,
+    "ninvalid": 0,
+    "evidence": "certificate-evidence/check-flalj98y",
+    "mismatches": [],
+    "uncovered": [],
+    "missing_refs": []
+  },
+  "frozen_sha256": "a937574fb7b81e1fc35437c23882601d597300df49c8f2f31f5ffacd40175366",
+  "references_sha256": "0948fd685bf02a4095abdfc175ef61e02c3f84b6937e437f7f200836e922d6ac"
+}

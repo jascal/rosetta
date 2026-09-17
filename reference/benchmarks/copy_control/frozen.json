@@ -1,0 +1,12 @@
+{
+  "dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+  "artifact_sha256": {
+    "baseline": "2edd2bb13a162640770ad033447e9a01d345ce46282f82b1fd869f0f322ea179",
+    "raw_copy": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+    "selected": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed"
+  },
+  "selected_length": [
+    1
+  ],
+  "selection": "zero train+validation errors and causal failures"
+}

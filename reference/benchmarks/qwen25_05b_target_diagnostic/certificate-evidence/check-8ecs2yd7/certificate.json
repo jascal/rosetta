@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5\nWord size: 64 bits\nOptions enabled: ffi ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "fieldrun",
+    "prior_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705"
+    },
+    "bundle_sha256": {
+      ".fieldrun.bin": "7bb34aa996044d89689d18adb61e092f410605fe33d9762eac7a92a5676352ea",
+      ".fieldrun.json": "59ae79cd40f7197c6943584d468845335dd94215ad019bc09e1cda477be2491a"
+    },
+    "tokenizer_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "stage": "domain before test references"
+  },
+  "scalars": {
+    "ndomain": "int"
+  },
+  "result": {
+    "certified": true,
+    "ndomain": 192
+  },
+  "sha256": {
+    "circuit.dl": "d4e6a652ac7f515db4a2ef2e7c11df4bf82c1400d70c244ac6d3325b2cb5fe16",
+    "facts/sample.facts": "99b9be5f20aedb3e4850a465feab04484634db3307e9b627f66553a04d2a9bdd",
+    "facts/tok.facts": "4aae0b46dd3845042f8685ff97bf428a5aa9955c917a84fd3a4f6826a1ba9059",
+    "outputs/abstained.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/domain.csv": "99b9be5f20aedb3e4850a465feab04484634db3307e9b627f66553a04d2a9bdd",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ndomain.csv": "49d7ac459790bd263dec212b9b71f59c0b5d55947c3c9593127ccfe8dadeff08",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "56391900ff484da316e949cc0571d7936a4ea7bb27f86ba78b2e5f50d8521d0b"
+  }
+}

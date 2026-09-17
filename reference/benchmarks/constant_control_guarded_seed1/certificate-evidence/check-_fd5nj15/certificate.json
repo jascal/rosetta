@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5\nWord size: 64 bits\nOptions enabled: ffi ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "constant-control",
+    "seed": 1,
+    "synthetic": true,
+    "prior_dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "prior_usage": "discovery only; all previous token IDs excluded"
+  },
+  "scalars": {
+    "ninvalid": "int",
+    "nleak": "int"
+  },
+  "result": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0
+  },
+  "sha256": {
+    "circuit.dl": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+    "facts/ref.facts": "a2b6c11e6c279bec35d0fd10d38c1d97c63f840d95d039ddc890cfacbcdbc489",
+    "facts/sample.facts": "6059d34c87a6663a857f946874b344b0351f3a9f7840f60c3139d9604416c214",
+    "facts/tok.facts": "dc44c2685e9a18ffe68422ac8ab13890ec554f30be5d286cd10c7aac6868371a",
+    "outputs/abstain.csv": "a23ff70d9213d5f94532fa34e65bbee7da0b58507fad6829754199ebff3f38c2",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/leakage.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ninvalid.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/nleak.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/score.csv": "ea97bdb7d68358ea8b1f123ffddf1bf8192436c27db1f20bb14e2022f76bf777",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "bc1506ef4c4ed3262d571d19de531f474e12ae08c8c6bc343eb0ea890abeb945"
+  }
+}

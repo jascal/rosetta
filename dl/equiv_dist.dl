@@ -1,0 +1,75 @@
+// Finite-domain distributional certificate, under Souffle floating-point semantics.
+// Reference = softmax of exactly the supplied logits. Top-K input without a tail
+// bound proves nothing about the omitted model mass. One positive temperature per run.
+.decl domain(inst:number) .input domain
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl temp(t:float) .input temp
+.decl epsilon(e:float) .input epsilon
+.decl ref_logit(inst:number,token:number,s:float) .input ref_logit
+
+#include "circuit.dl"
+
+.decl bad_config() .output bad_config
+bad_config() :- N = count : { temp(_) }, N != 1.
+bad_config() :- N = count : { epsilon(_) }, N != 1.
+bad_config() :- temp(T), T <= 0.
+bad_config() :- epsilon(E), E <= 0.
+bad_config() :- epsilon(E), E > 1.
+
+.decl v_max(inst:number,m:float)
+v_max(I,M) :- domain(I), ref_logit(I,_,_), M = max S : { ref_logit(I,_,S) }.
+.decl v_exp(inst:number,token:number,w:float)
+v_exp(I,Tk,W) :- ref_logit(I,Tk,S), v_max(I,M), temp(T), T > 0,
+                 W = 2.718281828459045^((S-M)/T).
+.decl v_z(inst:number,z:float)
+v_z(I,Z) :- domain(I), Z = sum W : { v_exp(I,_,W) }.
+.decl v_ref(inst:number,token:number,p:float)
+v_ref(I,Tk,W/Z) :- v_exp(I,Tk,W), v_z(I,Z), Z > 0.
+
+.decl missing_ref(inst:number) .output missing_ref
+missing_ref(I) :- domain(I), !v_ref(I,_,_).
+.decl uncovered(inst:number) .output uncovered
+uncovered(I) :- domain(I), !cdist(I,_,_).
+.decl abstain(inst:number) .output abstain
+abstain(I) :- uncovered(I).
+
+.decl invalid(inst:number) .output invalid
+invalid(I) :- ref_logit(I,_,_), !domain(I).
+invalid(I) :- tok(I,_,_), !domain(I).
+invalid(I) :- cdist(I,_,_), !domain(I).
+invalid(I) :- ref_logit(I,T,A), ref_logit(I,T,B), A != B.
+invalid(I) :- cdist(I,T,A), cdist(I,T,B), A != B.
+invalid(I) :- cdist(I,_,P), P < 0.
+invalid(I) :- cdist(I,_,P), P > 1.
+.decl v_mass(inst:number,m:float)
+v_mass(I,M) :- domain(I), cdist(I,_,_), M = sum P : { cdist(I,_,P) }.
+invalid(I) :- v_mass(I,M), M < 0.999999999.
+invalid(I) :- v_mass(I,M), M > 1.000000001.
+
+// Union of supports: both missing reference tokens and extra candidate tokens count.
+.decl v_diff(inst:number,token:number,d:float)
+v_diff(I,T,P-Q) :- v_ref(I,T,P), cdist(I,T,Q), P >= Q.
+v_diff(I,T,Q-P) :- v_ref(I,T,P), cdist(I,T,Q), P < Q.
+v_diff(I,T,P) :- v_ref(I,T,P), !cdist(I,T,_).
+v_diff(I,T,Q) :- domain(I), cdist(I,T,Q), !v_ref(I,T,_).
+.decl tv_error(inst:number,tv:float) .output tv_error
+tv_error(I,S/2.0) :- domain(I), S = sum D : { v_diff(I,_,D) }.
+.decl mismatch(inst:number) .output mismatch
+mismatch(I) :- tv_error(I,V), epsilon(E), V >= E.
+.decl worst(v:float) .output worst
+worst(V) :- domain(_), V = max D : { tv_error(_,D) }.
+worst(0.0) :- !domain(_).
+.decl ndomain(n:number) .output ndomain
+ndomain(N) :- N = count : { domain(_) }.
+.decl ncover(n:number) .output ncover
+ncover(N) :- N = count : { domain(I), cdist(I,_,_) }.
+.decl nmiss(n:number) .output nmiss
+nmiss(N) :- N = count : { mismatch(_) }.
+.decl nuncov(n:number) .output nuncov
+nuncov(N) :- N = count : { uncovered(_) }.
+.decl nmissing(n:number) .output nmissing
+nmissing(N) :- N = count : { missing_ref(_) }.
+.decl ninvalid(n:number) .output ninvalid
+ninvalid(N) :- N = count : { invalid(_) }.
+.decl certified() .output certified
+certified() :- ndomain(N), N > 0, !bad_config(), nmissing(0), ninvalid(0), nmiss(0), nuncov(0).

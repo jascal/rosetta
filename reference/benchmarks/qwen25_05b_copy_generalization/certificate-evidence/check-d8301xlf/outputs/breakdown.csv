@@ -1,0 +1,17 @@
+seed	2	96	96	68	28	0
+seed	3	96	96	72	24	0
+seed	4	96	96	69	27	0
+length	8	96	96	65	31	0
+length	12	96	96	72	24	0
+length	24	96	96	72	24	0
+layout	plain	72	72	72	0	0
+layout	noise8	72	72	69	3	0
+layout	noise32	72	72	68	4	0
+layout	near_match8	72	72	0	72	0
+exposures	2	144	144	104	40	0
+exposures	3	144	144	105	39	0
+kind	repeat	144	144	101	43	0
+kind	intervention	144	144	108	36	0
+negative	no_repeat	18	0	0	0	18
+negative	one_source	18	18	18	0	0
+negative	conflicting_sources	18	18	10	8	0

@@ -1,0 +1,533 @@
+{
+  "provenance": {
+    "source": "post-test baseline emitter correction; cached references",
+    "original_run": "qwen25_05b_guarded_seed1",
+    "dataset_sha256": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+    "references_sha256": "0f740376bcb44ebb67d2dc06cce33174e60de373f96ea5027f9823c716ad4907",
+    "emitter_sha256": "f5c871a2fc95c61f2dcaf667cc23fa240db127b53c6c2a0b8a18a8a8583524fd"
+  },
+  "baseline_rules": 25,
+  "baseline_learning": {
+    "certified": true,
+    "ntrain": 72,
+    "evidence": "certificate-evidence/check-2s2zvlnf"
+  },
+  "audit": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0,
+    "evidence": "certificate-evidence/check-9vje8waj"
+  },
+  "scores": {
+    "train": {
+      "n": 72,
+      "answered": 72,
+      "correct": 72,
+      "wrong": 0,
+      "abstained": 0,
+      "coverage": 1.0,
+      "precision": 1.0,
+      "fidelity": 1.0,
+      "confident_wrong": 0.0,
+      "abstain": 0.0
+    },
+    "validation": {
+      "n": 54,
+      "answered": 0,
+      "correct": 0,
+      "wrong": 0,
+      "abstained": 54,
+      "coverage": 0.0,
+      "precision": null,
+      "fidelity": 0.0,
+      "confident_wrong": 0.0,
+      "abstain": 1.0
+    },
+    "test": {
+      "n": 144,
+      "answered": 0,
+      "correct": 0,
+      "wrong": 0,
+      "abstained": 144,
+      "coverage": 0.0,
+      "precision": null,
+      "fidelity": 0.0,
+      "confident_wrong": 0.0,
+      "abstain": 1.0
+    },
+    "off_domain": {
+      "n": 16,
+      "answered": 0,
+      "correct": 0,
+      "wrong": 0,
+      "abstained": 16,
+      "coverage": 0.0,
+      "precision": null,
+      "fidelity": 0.0,
+      "confident_wrong": 0.0,
+      "abstain": 1.0
+    }
+  },
+  "certificates": {
+    "train": {
+      "certified": true,
+      "ndomain": 72,
+      "ncover": 72,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-5prs0hgl",
+      "mismatches": [],
+      "uncovered": [],
+      "missing_refs": []
+    },
+    "test": {
+      "certified": false,
+      "ndomain": 144,
+      "ncover": 144,
+      "nmiss": 0,
+      "nuncov": 144,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-sgoe88lr",
+      "mismatches": [],
+      "uncovered": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5
+        ],
+        [
+          6
+        ],
+        [
+          7
+        ],
+        [
+          8
+        ],
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ],
+        [
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          16
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ],
+        [
+          19
+        ],
+        [
+          20
+        ],
+        [
+          21
+        ],
+        [
+          22
+        ],
+        [
+          23
+        ],
+        [
+          24
+        ],
+        [
+          25
+        ],
+        [
+          26
+        ],
+        [
+          27
+        ],
+        [
+          28
+        ],
+        [
+          29
+        ],
+        [
+          30
+        ],
+        [
+          31
+        ],
+        [
+          32
+        ],
+        [
+          33
+        ],
+        [
+          34
+        ],
+        [
+          35
+        ],
+        [
+          36
+        ],
+        [
+          37
+        ],
+        [
+          38
+        ],
+        [
+          39
+        ],
+        [
+          40
+        ],
+        [
+          41
+        ],
+        [
+          42
+        ],
+        [
+          43
+        ],
+        [
+          44
+        ],
+        [
+          45
+        ],
+        [
+          46
+        ],
+        [
+          47
+        ],
+        [
+          48
+        ],
+        [
+          49
+        ],
+        [
+          50
+        ],
+        [
+          51
+        ],
+        [
+          52
+        ],
+        [
+          53
+        ],
+        [
+          54
+        ],
+        [
+          55
+        ],
+        [
+          56
+        ],
+        [
+          57
+        ],
+        [
+          58
+        ],
+        [
+          59
+        ],
+        [
+          60
+        ],
+        [
+          61
+        ],
+        [
+          62
+        ],
+        [
+          63
+        ],
+        [
+          64
+        ],
+        [
+          65
+        ],
+        [
+          66
+        ],
+        [
+          67
+        ],
+        [
+          68
+        ],
+        [
+          69
+        ],
+        [
+          70
+        ],
+        [
+          71
+        ],
+        [
+          72
+        ],
+        [
+          73
+        ],
+        [
+          74
+        ],
+        [
+          75
+        ],
+        [
+          76
+        ],
+        [
+          77
+        ],
+        [
+          78
+        ],
+        [
+          79
+        ],
+        [
+          80
+        ],
+        [
+          81
+        ],
+        [
+          82
+        ],
+        [
+          83
+        ],
+        [
+          84
+        ],
+        [
+          85
+        ],
+        [
+          86
+        ],
+        [
+          87
+        ],
+        [
+          88
+        ],
+        [
+          89
+        ],
+        [
+          90
+        ],
+        [
+          91
+        ],
+        [
+          92
+        ],
+        [
+          93
+        ],
+        [
+          94
+        ],
+        [
+          95
+        ],
+        [
+          96
+        ],
+        [
+          97
+        ],
+        [
+          98
+        ],
+        [
+          99
+        ],
+        [
+          100
+        ],
+        [
+          101
+        ],
+        [
+          102
+        ],
+        [
+          103
+        ],
+        [
+          104
+        ],
+        [
+          105
+        ],
+        [
+          106
+        ],
+        [
+          107
+        ],
+        [
+          108
+        ],
+        [
+          109
+        ],
+        [
+          110
+        ],
+        [
+          111
+        ],
+        [
+          112
+        ],
+        [
+          113
+        ],
+        [
+          114
+        ],
+        [
+          115
+        ],
+        [
+          116
+        ],
+        [
+          117
+        ],
+        [
+          118
+        ],
+        [
+          119
+        ],
+        [
+          120
+        ],
+        [
+          121
+        ],
+        [
+          122
+        ],
+        [
+          123
+        ],
+        [
+          124
+        ],
+        [
+          125
+        ],
+        [
+          126
+        ],
+        [
+          127
+        ],
+        [
+          128
+        ],
+        [
+          129
+        ],
+        [
+          130
+        ],
+        [
+          131
+        ],
+        [
+          132
+        ],
+        [
+          133
+        ],
+        [
+          134
+        ],
+        [
+          135
+        ],
+        [
+          136
+        ],
+        [
+          137
+        ],
+        [
+          138
+        ],
+        [
+          139
+        ],
+        [
+          140
+        ],
+        [
+          141
+        ],
+        [
+          142
+        ],
+        [
+          143
+        ]
+      ],
+      "missing_refs": []
+    }
+  },
+  "artifact_sha256": "1d92d6bc14eeb16c974132f7694a6df2fc9dd45df4a5ad0e6f685253acbb1542"
+}

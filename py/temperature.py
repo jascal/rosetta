@@ -3,10 +3,8 @@
 
 This is the canonical `circuits.dl` (no `.t` suffix — we always emit T-rules). Each rule carries the top-K
 (token, LOGIT) — the incidence values, which are T-INVARIANT — and the runtime computes softmax(logits/T) IN SOUFFLE
-at any query temperature (`.input temp`). It is a semiring lift: **T=0 = the argmax (tropical) collapse, recovered by
-querying temp→0** (so the crisp argmax cover is just this artifact at T=0, not a separate file); T>0 = the probability
-semiring with the incidence weights restored. The legible `circuits.symbols.dl` is the transliteration of THIS
-distributional artifact (token strings + the same logits), when a lexicon.json is present.
+at a positive query temperature (`.input temp`). T=0 is not supported by this runtime; use the crisp emitter for
+argmax. The optional `circuits.symbols.dl` is an uncertified rendering that may omit arithmetic/structural idioms.
 
 Pipeline (pure souffle at runtime, fieldrun/whole.dl only at build time):
   1. logits   — the full scoreboard per context (oracle.logits, T-invariant), cached → regenerable cache-only (no oracle).
@@ -14,14 +12,15 @@ Pipeline (pure souffle at runtime, fieldrun/whole.dl only at build time):
                 within ε across the group (stronger than T=0's argmax-consistency → longer suffixes, the honest T cost).
   3. top-K    — per rule keep the top-K logits covering ≥1-ε mass at T_max (K small: threx ~3, max 9).
   4. emit     — circuits.dl: gramNd facts + softmax-at-T (E^((S-max)/T)) + cdist(inst,token,prob); + run.dl + symbols twin.
-  5. certify  — run it in souffle at T_max, compare cdist to the model's full softmax; CERTIFIED iff max TV < ε over the corpus.
+  5. certify  — equiv_dist.dl computes TV and the verdict at the finite temperature grid against supplied logits.
+                Complete domain and replayable evidence are retained. No interval or unbounded-tail claim.
 Usage: python3 py/temperature.py [n] [w] [model_dir] [T_max] [eps] [T_min] [--compose]
 """
-import os, sys, json, math, subprocess, tempfile
+import os, sys, json, math
 from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from minimize import instances
-from oracle import logits as model_logits, serve_topk, _run
+from oracle import logits as model_logits, serve_topk
 
 E = "2.718281828459045"
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,7 +81,7 @@ def topk(ls, T, eps):
 
 
 def trange(T_lo, T_hi):
-    return sorted({T_lo, round((T_lo + T_hi) / 2, 3), T_hi})
+    return sorted({T_lo, (T_lo + T_hi) / 2, T_hi})
 
 
 def dist_table(insts, logmap, members, keyfn, T_lo, T_hi, eps):
@@ -146,7 +145,7 @@ def _idiom_lines(idiom, q, ktype):
 
 
 def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
-    """shortest suffix s.t. the group's softmax is consistent within eps at EVERY T across the range (the two error
+    """shortest suffix s.t. the group's softmax is consistent within eps at every tested grid temperature (the two error
     sources sit at opposite ends — group-divergence is worst cold for structured models, hot for diverse ones — so we
     must check the whole [T_lo, T_hi] grid, not one endpoint), with the representative's top-K sized at the hot end (where
     the tail is fattest). Always terminates: at full-W each context is its own group (the per-context memorization corner)."""
@@ -160,7 +159,7 @@ def dist_cover(insts, logmap, idxs, T_lo, T_hi, eps, w):
             groups[tuple(insts[i][-k:])].append(i)
         for suf, members in groups.items():
             rep = dists[members[0]]
-            if all(tv(rep[T], dists[i][T]) < half for i in members for T in grid):   # consistent across the whole range
+            if all(tv(rep[T], dists[i][T]) < half for i in members for T in grid):   # finite-grid candidate search
                 rules[suf] = topk(logmap[members[0]], T_hi, half)
                 for i in members:
                     order_of[i] = k
@@ -190,7 +189,7 @@ def build_threx_compose(insts, logmap, idxs, T_hi, eps):
 def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
     """The legible, RUNNABLE twin of circuits.dl: the SAME distributional rules carrying top-K logits, with token STRINGS
     instead of ids — a self-contained, symbol-typed souffle program that computes softmax(logits/T) at a queried temp.
-    A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Select-GATE idioms symbolize (they are
+    This rendering has no inherited certificate. Select-GATE idioms symbolize (they are
     token lookups); COMPOSE (arithmetic over operand values) and induction (a structural pointer) can't, so they stay in
     circuits.dl and their contexts are omitted here (noted)."""
     safe = lambda s: "".join(c if (0x20 <= ord(c) != 0x7f) else f"<0x{ord(c):02X}>" for c in s)  # control chars → visible,
@@ -201,7 +200,7 @@ def emit_symbols_T(path, rules, sym, name, idioms=None, induction=False):
     omitted = [i["name"] for i in idioms if i["kind"] != "gate"] + (["induction"] if induction else [])
     L = [f"// {name} — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).",
          "// Same DISTRIBUTIONAL rules carrying top-K logits (incidence); the runtime computes softmax(logits/T) at a",
-         "// queried temp. A transliteration via the lexicon, so it inherits circuits.dl's T-certificate. Run on symbol input:",
+         "// queried positive temp. Uncertified rendering; no inherited certificate. Run on symbol input:",
          "//   souffle circuits.symbols.dl -F <dir: tok.facts (inst<TAB>pos<TAB>token) + temp.facts (T)> -D out  →  cdist.csv",
          "//   (control-char tokens — tab/newline — render as <0xNN> so the symbol stays TSV-safe; tokenize input the same way.)", "",
          ".decl tok(inst:number, pos:number, sym:symbol)", ".input tok",
@@ -254,11 +253,11 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
     """Canonical emit: circuits.dl (distributional, ids) + run.dl + — as the FINAL STEP — circuits.symbols.dl (legible twin)
     when a lexicon (sym) is given. Routing (priority via negation guards): the LEARNED idioms (compose/gate carrying top-K
     logits) in order > longest n-gram > induction (OOD point-mass) > abstain; each fires its full distribution into ctxlogit,
-    then softmax(logits/T) runs uniformly. T=0 is the argmax collapse of this same artifact (query temp→0)."""
+    then softmax(logits/T) runs uniformly for T > 0; T=0 requires the crisp emitter."""
     idioms = idioms or []
     order = " > ".join([i["name"] for i in idioms] + ["longest-ngram"] + (["induction(OOD)"] if induction else []) + ["abstain"])
     L = ["// rosetta · circuits.dl — the model as next-token rules carrying top-K logits (incidence); softmax(logits/T) at",
-         "// query temp. CANONICAL: we always emit T-rules; T=0 is the argmax (tropical) collapse, recovered by querying temp→0.",
+         "// query temp > 0. T=0 is unsupported here; use the crisp emitter for argmax.",
          f"// Routing: {order}.  tok(inst,pos,id) + temp(t) provided by the includer (run.dl). cdist(inst,token,prob) = the dist at T.",
          "", ".decl mp(inst:number,m:number)", "mp(I,M) :- M = max P : { tok(I,P,_) }.",
          ".decl ctxlogit(inst:number,token:number,s:float)"]
@@ -313,72 +312,101 @@ def emit_T(out_path, rules, w, idioms=None, induction=None, sym=None, name=""):
     open(run, "w").write("// standalone runtime harness for circuits.dl — souffle only, no fieldrun/whole.dl/weights.\n"
                          "// souffle run.dl -F <dir: tok.facts (inst<TAB>pos<TAB>id) + temp.facts (T)> -D <out>  →  cdist.csv\n"
                          ".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
-                         f'#include "{os.path.basename(out_path)}"\n.output cdist\n')
+                         f'#include "{os.path.basename(out_path)}"\n.output cdist\n'
+                         '.decl abstain(inst:number)\n.output abstain\nabstain(I) :- tok(I,_,_), !cdist(I,_,_).\n')
     if sym:                                                       # FINAL STEP of extraction: the legible token-string twin
         emit_symbols_T(os.path.join(os.path.dirname(out_path), "circuits.symbols.dl"), rules, sym, name, idioms=idioms, induction=bool(induction))
 
 
-def certify_T(out_path, insts, logmap, idxs, T, eps):
-    """run circuits.dl in souffle at T, compare cdist to the model's full softmax; CERTIFIED iff max TV < eps."""
-    with tempfile.TemporaryDirectory() as d:
-        ind, outd, inc = os.path.join(d, "in"), os.path.join(d, "out"), os.path.join(d, "inc")
-        os.makedirs(ind); os.makedirs(outd); os.makedirs(inc)
-        import shutil
-        shutil.copyfile(out_path, os.path.join(inc, os.path.basename(out_path)))
-        with open(os.path.join(ind, "tok.facts"), "w") as tf:
-            for i in idxs:
-                for p, t in enumerate(insts[i]):
-                    tf.write(f"{i}\t{p}\t{t}\n")
-        open(os.path.join(ind, "temp.facts"), "w").write(f"{T}\n")
-        harness = os.path.join(d, "h.dl")
-        open(harness, "w").write(".decl tok(inst:number,pos:number,id:number)\n.input tok\n.decl temp(t:float)\n.input temp\n"
-                                 f'#include "{os.path.basename(out_path)}"\n.output cdist\n')
-        _run(harness, ind, outd, includes=[inc])
-        got = defaultdict(dict)
-        cp = os.path.join(outd, "cdist.csv")
-        if os.path.exists(cp):
-            for ln in open(cp).read().splitlines():
-                i, t, p = ln.split("\t")
-                got[int(i)][int(t)] = float(p)
-    worst = 0.0
+REFERENCE_SCOPE = (
+    "softmax of the supplied reference logits only; omitted model probability mass is not bounded"
+)
+
+
+def certify_T(out_path, insts, logmap, idxs, T, eps, *, evidence_dir=None, provenance=None):
+    """Read equiv_dist.dl's verdict at ONE temperature over the entire requested domain.
+
+    Missing logits remain missing obligations. Python serializes logits; Datalog computes both softmax and TV.
+    """
+    from certificate import check
+    if len(set(idxs)) != len(idxs) or any(i < 0 or i >= len(insts) for i in idxs):
+        raise ValueError("domain indices must be unique and refer to supplied instances")
+    if not math.isfinite(T) or not math.isfinite(eps):
+        raise ValueError("temperature and epsilon must be finite")
     for i in idxs:
-        worst = max(worst, tv(got.get(i, {}), softmax(logmap[i], T)))
-    return worst, len(got)
+        if any(not math.isfinite(s) for _, s in logmap.get(i, [])):
+            raise ValueError(f"non-finite reference logit for instance {i}")
+    facts = {
+        "domain": "".join(f"{i}\n" for i in idxs),
+        "tok": "".join(f"{i}\t{p}\t{t}\n" for i in idxs for p, t in enumerate(insts[i])),
+        "temp": f"{T}\n",
+        "epsilon": f"{eps}\n",
+        "ref_logit": "".join(f"{i}\t{t}\t{s}\n" for i in idxs for t, s in logmap.get(i, [])),
+    }
+    scalars = {name: int for name in ("ndomain", "ncover", "nmiss", "nuncov", "nmissing", "ninvalid")}
+    scalars["worst"] = float
+    return check(os.path.join(HERE, "dl", "equiv_dist.dl"), out_path, facts, scalars,
+                 evidence_dir=evidence_dir, provenance=provenance)
 
 
 def finalize(md, insts, logmap, idxs, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src):
-    """Emit the canonical circuits.dl (+ run.dl + symbols twin) from idioms + n-gram cover (+ induction OOD), certify across
-    the T-grid, write CERTIFICATE.md. Shared by temperature.main (n-gram + threx-compose) and idiom_learn (full learned
-    idioms carrying distributions). Returns the across-range verdict."""
+    """Emit and retain a finite-temperature-grid Datalog certificate against supplied logits.
+
+    Each evidence directory is independently replayable. No interval, full-model-tail, symbol-twin or OOD claim.
+    """
+    from certificate import sha256
+    if not (math.isfinite(T_lo) and math.isfinite(T) and 0 < T_lo <= T):
+        raise ValueError("temperature grid requires 0 < T_min <= T_max")
+    if not math.isfinite(eps) or not 0 < eps <= 1:
+        raise ValueError("epsilon must be finite and in (0, 1]")
     out = os.path.join(md, "circuits.dl")
     emit_T(out, rules, w, idioms=idioms, induction=induction, sym=sym, name=name)
-    Ks = [len(v) for v in rules.values()] or [0]
-    nc = sum(1 for i in idioms if i["kind"] == "compose"); ng = sum(1 for i in idioms if i["kind"] == "gate")
-    idiom_desc = ", ".join(f"{x} {k}" for x, k in [(nc, "compose"), (ng, "select-gate")] if x) or "no idioms"
-    print(f"canonical emit: {idiom_desc} carrying distributions + {len(rules)} n-gram (top-K mean {sum(Ks)/len(Ks):.1f}, max {max(Ks)})"
-          + (" + induction OOD" if induction else "") + (f"; {len(remaining)} uncovered" if remaining else "")
-          + f" → {out}" + (" + circuits.symbols.dl (legible twin)" if sym else ""))
-    grid = sorted({T_lo, round((T_lo + T) / 2, 3), T})
-    ok_all, results = True, []
-    for q in grid:                                                    # ONE rule set, certified across the whole range
-        worst, ngot = certify_T(out, insts, logmap, idxs, q, eps)
-        ok = worst < eps and ngot == len(idxs)
-        ok_all &= ok
-        results.append((q, ngot, worst, ok))
-        print(f"  CERTIFY @T={q}: {ngot}/{len(idxs)} contexts, max TV={worst:.4f} {'✓' if ok else '✗'}")
-    print("→ " + (f"CERTIFIED across T∈[{T_lo},{T}] — learned idioms + n-gram, softmax(logits/T) in souffle" if ok_all else "NOT certified over the range"))
-    nrules = len(rules) + len(idioms)
-    lines = [f"# {name} · certificate (T-parameterized — the canonical artifact)", "",
-             "`circuits.dl` carries top-K logits (incidence) per rule; the runtime computes `softmax(logits/T)` in souffle",
-             f"at a queried `.input temp` (T=0 = the argmax collapse). Build-time logits from {src}.",
-             (f"`circuits.symbols.dl` is the legible token-string twin (inherits this certificate)." if sym else None), "",
-             f"- domain: {len(idxs)} decision windows (W={w})",
-             f"- range: T ∈ [{T_lo}, {T}], ε = {eps}",
-             f"- rules: {nrules} ({idiom_desc} + {len(rules)} n-gram" + (", induction OOD" if induction else "") + f", top-K mean {sum(Ks)/len(Ks):.1f})",
-             "", "| T | contexts | max TV | verdict |", "|---|---|---|---|"]
-    lines += [f"| {q} | {ngot}/{len(idxs)} | {worst:.4f} | {'CERTIFIED' if ok else 'NOT certified'} |" for q, ngot, worst, ok in results]
-    lines += ["", f"**{'CERTIFIED across the range' if ok_all else 'NOT certified over the full range'}** — souffle cdist vs the model's own softmax(logits/T). Runtime: `souffle run.dl`."]
-    open(os.path.join(md, "CERTIFICATE.md"), "w").write("\n".join([x for x in lines if x is not None]) + "\n")
+    grid = trange(T_lo, T)
+    provenance = {"source": src, "reference_scope": REFERENCE_SCOPE,
+                  "source_files_sha256": {f: sha256(os.path.join(md, f))
+                      for f in ("whole.dl", "corpus.json", "logit_cache.json") if os.path.isfile(os.path.join(md, f))}}
+    results = []
+    for q in grid:
+        result = certify_T(out, insts, logmap, idxs, q, eps,
+                           evidence_dir=os.path.join(md, "certificate-evidence"), provenance=provenance)
+        result.pop("relations", None)
+        result["temperature"] = q
+        result["evidence"] = os.path.relpath(result["evidence"], md)
+        results.append(result)
+        print(f"  Datalog check @T={q}: {result.get('ncover', '?')}/{len(idxs)} contexts, "
+              f"max TV={result.get('worst', '?')} → {'CERTIFIED' if result['certified'] else 'NOT certified'}")
+        if "error" in result:
+            print(result["error"])
+    ok_all = all(r["certified"] for r in results)
+    report = {
+        "schema_version": 1, "tag": "proved" if ok_all else "open",
+        "scope": REFERENCE_SCOPE, "numeric_semantics": "Souffle floating-point arithmetic",
+        "temperatures": grid, "epsilon": eps, "domain": idxs, "window": w,
+        "artifact_sha256": sha256(out), "provenance": provenance, "checks": results,
+        "interval_certified": False, "symbol_twin_certified": False,
+        "residual_policy": "no matching rule: no output (abstain); no model fallback",
+    }
+    with open(os.path.join(md, "certificate.json"), "w") as f:
+        json.dump(report, f, indent=2); f.write("\n")
+    lines = [f"# {name} · finite-grid distributional certificate", "",
+             f"**{'proved' if ok_all else 'open'}** — {'CERTIFIED' if ok_all else 'NOT certified'} against {REFERENCE_SCOPE}.",
+             "The verifier is `dl/equiv_dist.dl`; arithmetic follows Souffle floating-point semantics.", "",
+             f"- domain: {len(idxs)} requested decision windows (W={w}); exact inputs retained in evidence",
+             f"- temperatures checked: {grid}; epsilon = {eps}",
+             f"- rules: {len(rules)} n-gram + {len(idioms)} idioms",
+             f"- artifact SHA-256: `{report['artifact_sha256']}`", "",
+             "| T | contexts producing output | max TV | verdict | evidence |", "|---|---|---|---|---|"]
+    for r in results:
+        lines.append(f"| {r['temperature']} | {r.get('ncover', '?')}/{len(idxs)} | {r.get('worst', '?')} | "
+                     f"{'CERTIFIED' if r['certified'] else 'NOT certified'} | [{r['evidence']}]({r['evidence']}/certificate.json) |")
+    lines += ["", "No claim is made between the checked temperatures, outside the stated domain, or about omitted model mass.",
+              "The symbol rendering is an uncertified view; it does not inherit this certificate.",
+              "Runtime: `souffle run.dl` with positive `temp` and token facts only. No matching rule means abstention.",
+              "Replay a check: `python3 py/certificate.py <model-dir>/<evidence-directory>`.",
+              "`certificate.json` records the grid and artifact identity; each evidence directory retains the exact",
+              "candidate, verifier, facts, output relations, reference provenance, and SHA-256 hashes."]
+    with open(os.path.join(md, "CERTIFICATE.md"), "w") as f:
+        f.write("\n".join(lines) + "\n")
     return ok_all
 
 
@@ -420,8 +448,9 @@ def main():
     idioms = [{**compose, "kind": "compose", "name": "comp0"}] if compose else []
     cover_idxs = [i for i in idxs if not (compose and i in compose["covered"])]
     rules, remaining = dist_cover(insts, logmap, cover_idxs, T_lo, T, eps, w)
-    finalize(md, insts, logmap, idxs, idioms, rules, remaining, False, w, sym, name, T, eps, T_lo, src)
+    ok = finalize(md, insts, logmap, list(range(len(insts))), idioms, rules, remaining, False, w, sym, name, T, eps, T_lo, src)
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

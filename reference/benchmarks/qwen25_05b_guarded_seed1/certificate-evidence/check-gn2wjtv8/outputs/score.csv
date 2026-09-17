@@ -1,0 +1,4 @@
+train	72	72	71	1	0
+validation	54	54	53	1	0
+test	144	144	137	7	0
+off_domain	16	8	7	1	8

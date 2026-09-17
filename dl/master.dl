@@ -14,10 +14,17 @@
 // rule reproduces the model for every context it covers. nmiss is computed independently anyway, as a genuine check.
 
 #include "ngram.dl"
+.decl domain(inst:number) .input domain
+.decl missing_ref(inst:number)
+missing_ref(I) :- domain(I), !ref(I,_).
+.decl invalid(inst:number)
+invalid(I) :- ref(I,_), !domain(I).
+invalid(I) :- ctx(I,_,_), !domain(I).
+invalid(I) :- ref(I,A), ref(I,B), A != B.
 
 .decl uncovered(inst:number)            // a context the cover leaves with no rule
 .output uncovered
-uncovered(I) :- ref(I, _), !minorder(I, _).
+uncovered(I) :- domain(I), !minorder(I, _).
 
 .decl ncover(n:number)   .output ncover
 ncover(N) :- N = count : { ref(_, _) }.
@@ -30,4 +37,4 @@ nuncov(N) :- N = count : { uncovered(_) }.
 nmiss(N) :- N = count : { minorder(I, K), conflict(I, K) }.
 
 .decl certified()        .output certified
-certified() :- nmiss(0), nuncov(0).
+certified() :- domain(_), !missing_ref(_), !invalid(_), nmiss(0), nuncov(0).

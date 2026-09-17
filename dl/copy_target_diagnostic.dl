@@ -1,0 +1,26 @@
+// Append to holdout.dl + holdout_strata.dl. Audit paired interventions and report oracle responses.
+.decl pair(base:number,edited:number) .input pair
+.decl changed(base:number,edited:number,pos:number,replacement:number) .input changed
+invalid(B) :- pair(B,E), sample(B,G,S,_), !sample(E,G,S,_).
+invalid(B) :- pair(B,_), !sample(B,_,_,_).
+invalid(B) :- pair(B,E), !changed(B,E,_,_).
+invalid(B) :- changed(B,E,_,_), !pair(B,E).
+invalid(B) :- changed(B,E,P,X), !tok(E,P,X).
+invalid(B) :- changed(B,E,P,_), !tok(B,P,_).
+invalid(B) :- changed(B,E,P,X), tok(B,P,X).
+invalid(B) :- pair(B,E), tok(B,P,_), !tok(E,P,_).
+invalid(B) :- pair(B,E), tok(E,P,_), !tok(B,P,_).
+invalid(B) :- pair(B,E), tok(B,P,X), tok(E,P,Y), X != Y, !changed(B,E,P,Y).
+// Every edit is a copied-from successor, and every matching successor is edited.
+invalid(B) :- changed(B,_,P,_), !guard_source(_,B,P-1,_).
+invalid(B) :- pair(B,E), guard_source(_,B,J,_), !changed(B,E,J+1,_).
+.decl pair_result(base:number,edited:number,status:symbol) .output pair_result
+pair_result(B,E,"recovered") :- pair(B,E), wrong(B), correct(E).
+pair_result(B,E,"regressed") :- pair(B,E), correct(B), wrong(E).
+pair_result(B,E,"both_correct") :- pair(B,E), correct(B), correct(E).
+pair_result(B,E,"both_wrong") :- pair(B,E), wrong(B), wrong(E).
+pair_result(B,E,"unanswered") :- pair(B,E), !answered(B).
+pair_result(B,E,"unanswered") :- pair(B,E), !answered(E).
+.decl paired_count(original:number,replacement:number,status:symbol,n:number) .output paired_count
+paired_count(X,Y,S,N) :- pair_result(B,E,S), cdecide(B,X), cdecide(E,Y),
+                       N = count : { pair_result(BB,EE,S), cdecide(BB,X), cdecide(EE,Y) }.

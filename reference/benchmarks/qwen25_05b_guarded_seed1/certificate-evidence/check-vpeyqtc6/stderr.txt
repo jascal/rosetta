@@ -1,0 +1,9 @@
+Warning: Variable B only occurs once in file verify.dl at line 26
+invalid() :- changed(B,E,P,X), !tok(E,P,X).
+---------------------^----------------------
+Warning: Variable E only occurs once in file verify.dl at line 27
+invalid() :- changed(B,E,P,_), !tok(B,P,_).
+-----------------------^--------------------
+Warning: Variable E only occurs once in file verify.dl at line 28
+invalid() :- changed(B,E,P,X), tok(B,P,X).
+-----------------------^-------------------

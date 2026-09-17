@@ -1,0 +1,41 @@
+// train-only n-gram baseline — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).
+// Same rules; a transliteration via the lexicon, so it inherits circuits.dl's certificate. gramN = N-gram
+// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:
+//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>"token"> -D out  →  cdecide.csv
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+.decl gram13(c0:symbol,c1:symbol,c2:symbol,c3:symbol,c4:symbol,c5:symbol,c6:symbol,c7:symbol,c8:symbol,c9:symbol,c10:symbol,c11:symbol,t:symbol)   // 13-gram
+.decl gram13_hit(inst:number,t:symbol)
+.decl gram13_any(inst:number)
+gram13("id17168","id33706","id32045","id26737","id20077","id31434","id23665","id38432","id14515","id25447","id27762","id2853","id17168").
+gram13("id33275","id33706","id32045","id26737","id20077","id31434","id23665","id38432","id14515","id25447","id27762","id2853","id33275").
+gram13("id26737","id20077","id31434","id23665","id38432","id14515","id25447","id27762","id2853","id17168","id33706","id32045","id26737").
+gram13("id9327","id20077","id31434","id23665","id38432","id14515","id25447","id27762","id2853","id17168","id33706","id32045","id9327").
+gram13("id23665","id38432","id14515","id25447","id27762","id2853","id17168","id33706","id32045","id26737","id20077","id31434","id23665").
+gram13("id18670","id38432","id14515","id25447","id27762","id2853","id17168","id33706","id32045","id26737","id20077","id31434","id18670").
+gram13("id35102","id39646","id9831","id20525","id6672","id5032","id21839","id31142","id36887","id9358","id6414","id16617","id35102").
+gram13("id6799","id39646","id9831","id20525","id6672","id5032","id21839","id31142","id36887","id9358","id6414","id16617","id6799").
+gram13("id20525","id6672","id5032","id21839","id31142","id36887","id9358","id6414","id16617","id35102","id39646","id9831","id20525").
+gram13("id23386","id6672","id5032","id21839","id31142","id36887","id9358","id6414","id16617","id35102","id39646","id9831","id23386").
+gram13("id21839","id31142","id36887","id9358","id6414","id16617","id35102","id39646","id9831","id20525","id6672","id5032","id21839").
+gram13("id28653","id31142","id36887","id9358","id6414","id16617","id35102","id39646","id9831","id20525","id6672","id5032","id28653").
+gram13("id31461","id29212","id34367","id17271","id4281","id36159","id1120","id6312","id26337","id20922","id13600","id36410","id31461").
+gram13("id274","id29212","id34367","id17271","id4281","id36159","id1120","id6312","id26337","id20922","id13600","id36410","id274").
+gram13("id17271","id4281","id36159","id1120","id6312","id26337","id20922","id13600","id36410","id31461","id29212","id34367","id17271").
+gram13("id32547","id4281","id36159","id1120","id6312","id26337","id20922","id13600","id36410","id31461","id29212","id34367","id32547").
+gram13("id1120","id6312","id26337","id20922","id13600","id36410","id31461","id29212","id34367","id17271","id4281","id36159","id1120").
+gram13("id22032","id6312","id26337","id20922","id13600","id36410","id31461","id29212","id34367","id17271","id4281","id36159","id22032").
+gram13("id12721","id37392","id14729","id15837","id9538","id35785","id29558","id6177","id5472","id16184","id21512","id4327","id12721").
+gram13("id21175","id37392","id14729","id15837","id9538","id35785","id29558","id6177","id5472","id16184","id21512","id4327","id21175").
+gram13("id15837","id9538","id35785","id29558","id6177","id5472","id16184","id21512","id4327","id12721","id37392","id14729","id15837").
+gram13("id33488","id9538","id35785","id29558","id6177","id5472","id16184","id21512","id4327","id12721","id37392","id14729","id33488").
+gram13("id29558","id6177","id5472","id16184","id21512","id4327","id12721","id37392","id14729","id15837","id9538","id35785","id29558").
+gram13("id32265","id6177","id5472","id16184","id21512","id4327","id12721","id37392","id14729","id15837","id9538","id35785","id32265").
+gram13_hit(I,T) :- mp(I,P), tok(I,P11,C0), tok(I,P10,C1), tok(I,P9,C2), tok(I,P8,C3), tok(I,P7,C4), tok(I,P6,C5), tok(I,P5,C6), tok(I,P4,C7), tok(I,P3,C8), tok(I,P2,C9), tok(I,P1,C10), tok(I,P,C11), P1=P-1, P2=P-2, P3=P-3, P4=P-4, P5=P-5, P6=P-6, P7=P-7, P8=P-8, P9=P-9, P10=P-10, P11=P-11, gram13(C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,T).
+gram13_any(I) :- gram13_hit(I,_).
+cdecide(I,T) :- gram13_hit(I,T).

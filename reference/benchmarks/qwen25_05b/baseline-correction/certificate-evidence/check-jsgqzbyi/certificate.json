@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5\nWord size: 64 bits\nOptions enabled: ffi ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "post-test baseline emitter correction; cached references",
+    "original_run": "qwen25_05b",
+    "dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "references_sha256": "1a9d5590fef673f46ff021fe8259cde9ac3269b53021399e5ce1e3d8ea14ef15",
+    "emitter_sha256": "f5c871a2fc95c61f2dcaf667cc23fa240db127b53c6c2a0b8a18a8a8583524fd"
+  },
+  "scalars": {
+    "ninvalid": "int",
+    "nleak": "int"
+  },
+  "result": {
+    "certified": true,
+    "ninvalid": 0,
+    "nleak": 0
+  },
+  "sha256": {
+    "circuit.dl": "e6238c818c04e057c044dacbce05a4e5561213c264bd1f3634e1886c60207851",
+    "facts/ref.facts": "c840de7b545787f6ec7de6b47750f1eeb4baf59cbdf4b93aeb1dd95ce96befbd",
+    "facts/sample.facts": "f997bc2d09cfd0285e0741b66f9dd1c7ae7d1e8ee33e290d2dde26a3228658a2",
+    "facts/tok.facts": "51354934d8929eaa546e1c67830a40a34863961e6ffe7668f854dce1da41a1ee",
+    "outputs/abstain.csv": "3183626f9ae2e7173567a05bb92abe2c7e4205063e6864d479bff757b51f6693",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/leakage.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ninvalid.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/nleak.csv": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "outputs/score.csv": "9c1986040570ee75c533444ea4acfc440d6d6d7ab487a41744ac5fc2ae257118",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "bc1506ef4c4ed3262d571d19de531f474e12ae08c8c6bc343eb0ea890abeb945"
+  }
+}

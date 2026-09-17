@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """rosetta · holdout_score.py — does the SKELETON idiom actually generalize, or are we just memoizing?
 
+LEGACY EXPLORATORY VALIDATION: this script chooses families using the same split it scores, and splits overlapping
+windows rather than document groups. Its scores are selection/validation metrics, NOT untouched test measurements.
+Use benchmark_induction.py for grouped train/validation/test evaluation with frozen standalone circuits.
+
 The honest test of "is it us, not the model". Split the corpus windows train/holdout; build the cover on TRAIN ONLY;
 predict HELDOUT windows (which the cover never saw) and compare to the model's refs. n-gram rules generalize only when a
 held-out window's lexical suffix recurred in train; SKELETON rules also fire when the held-out window shares a *syntactic
@@ -19,6 +23,7 @@ O = -1
 
 
 def main():
+    print("[scope] exploratory validation: this split selects families; it is not an untouched final test")
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 1000
     w = int(sys.argv[2]) if len(sys.argv) > 2 else 8
     md = sys.argv[3] if len(sys.argv) > 3 else os.path.join(HERE, "reference", "threx")

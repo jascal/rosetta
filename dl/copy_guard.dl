@@ -1,0 +1,11 @@
+// Includer supplies copy_core.dl and guard(id, suffix_length, minimum_sources).
+// All earlier matches must agree on the successor; repeated support is a runtime structural guard.
+.decl guard_source(g:number,inst:number,j:number,out:number)
+guard_source(G,I,J,T) :- guard(G,K,_), copy_match(I,J,K), tok(I,J+1,T).
+.decl guard_conflict(g:number,inst:number)
+guard_conflict(G,I) :- guard_source(G,I,_,A), guard_source(G,I,_,B), A != B.
+.decl guard_support(g:number,inst:number,n:number)
+guard_support(G,I,N) :- guard_source(G,I,_,_), N = count : { guard_source(G,I,_,_) }.
+.decl guard_prediction(g:number,inst:number,out:number)
+guard_prediction(G,I,T) :- guard(G,_,M), guard_source(G,I,_,T), guard_support(G,I,N), N >= M,
+                          !guard_conflict(G,I).

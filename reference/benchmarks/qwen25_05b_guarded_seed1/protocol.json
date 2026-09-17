@@ -1,0 +1,55 @@
+{
+  "provenance": {
+    "source": "fieldrun",
+    "seed": 1,
+    "synthetic": false,
+    "prior_dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "prior_usage": "discovery only; all previous token IDs excluded",
+    "bundle_sha256": {
+      ".fieldrun.bin": "7bb34aa996044d89689d18adb61e092f410605fe33d9762eac7a92a5676352ea",
+      ".fieldrun.json": "59ae79cd40f7197c6943584d468845335dd94215ad019bc09e1cda477be2491a"
+    }
+  },
+  "guards": [
+    [
+      1,
+      3,
+      2
+    ],
+    [
+      2,
+      3,
+      3
+    ],
+    [
+      3,
+      6,
+      2
+    ],
+    [
+      4,
+      6,
+      3
+    ],
+    [
+      5,
+      9,
+      2
+    ],
+    [
+      6,
+      9,
+      3
+    ]
+  ],
+  "dataset_sha256": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+  "selection": "zero errors on firing development cases; causal pairs in >=2 groups in EACH split; maximize development coverage, then smallest guard ID",
+  "source_sha256": {
+    "copy_core.dl": "34c44dd23c1fe91c3f812d53e72ba66a6c72201b20ae682ad4e810fd4eac8fd2",
+    "copy_guard.dl": "cbaee14cb5061b073744ddda119d76d4b2de5360a7064e2e3316ec605f6f7b7f",
+    "copy_guard_select.dl": "4f57335ea850c33d48ff2943268d3850394cdbe024ee01ba65e5f5a8a2f604fe",
+    "guard_domain.dl": "56391900ff484da316e949cc0571d7936a4ea7bb27f86ba78b2e5f50d8521d0b",
+    "equiv.dl": "d0b11ff904f80d4454042b8f20ccf2a38083f91479a27d5b8b26d5bbc83d4966"
+  },
+  "driver_sha256": "c3ab2ca113aa5ea736172669aa12ed9bebf946c81b90fa1bc6e5589662c1f354"
+}

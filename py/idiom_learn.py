@@ -435,7 +435,7 @@ def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, 
     where the model's softmax is CONSISTENT within that key's group across the T-range (temperature.dist_table) — so the
     idiom genuinely carries+generalizes the distribution, certifiably; inconsistent contexts fall back to the n-gram cover.
     Routing compose > gate > n-gram > induction(OOD). This is the distributional twin of emit_circuits, and the canonical
-    artifact (vs equiv.dl's exact-argmax cert on the crisp emit). Returns the across-range verdict."""
+    artifact (vs equiv.dl's exact-argmax cert on the crisp emit). Returns the finite-grid verdict against supplied reference logits."""
     from temperature import dist_table, dist_cover, finalize          # the distributional machinery lives in temperature
     cache_p = os.path.join(md, "logit_cache.json")
     cache = json.load(open(cache_p)) if os.path.exists(cache_p) else {}
@@ -471,7 +471,7 @@ def emit_canonical_T(md, insts, idxs, gates, comps, rels, w, sym, name, get_lg, 
     src = "a fieldrun --serve /topk server" if os.environ.get("FIELDRUN_SERVE") else ("whole.dl" if os.path.exists(os.path.join(md, "whole.dl")) else "the cached logits")
     print(f"\n=== EMIT (canonical, distributional — the FINAL STEP of extraction) ===")
     print(f"  learned idioms carrying distributions cover {len(covered)}/{len(lidx)} windows (the rest → n-gram backfill)")
-    return finalize(md, insts, logmap, lidx, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
+    return finalize(md, insts, logmap, idxs, idioms, rules, remaining, induction, w, sym, name, T, eps, T_lo, src)
 
 
 def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name, minsupp=3, mindet=1.0):
@@ -540,7 +540,8 @@ def emit_expert_package(md, insts, refs, idxs, real, real_c, rels_real, w, name,
 def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
     """The reframed learner: learn every family on TRAIN (causal-soundness = the gate), then GREEDILY admit the family
     with the best Δcorrect-holdout ÷ Δrules and stop when nothing pays (minimize holdout loss, bias to fewer rules — the
-    IDIOM_LEARNER objective). Reports the residual floor (what no family captures = the model, not us)."""
+    IDIOM_LEARNER objective). This split is VALIDATION because it selects families, not an untouched final test.
+    The residual is relative to these candidate families; it does not establish an irreducible model floor."""
     import random as _r
     sh = idxs[:]; _r.Random(0).shuffle(sh)
     cut = int(len(sh) * (1 - hold))
@@ -649,6 +650,7 @@ def select_cover(insts, refs, idxs, w, decide_fn, fill=None, hold=0.3, s=str):
 
 
 def main():
+    cert_ok = True
     backfill = "--backfill" in sys.argv                       # report idiom coverage + n-gram backfill stats
     emit = "--emit" in sys.argv                               # write circuits.dl + run.dl (idioms + n-gram cover, souffle-only)
     cert = "--certify" in sys.argv                            # prove the emitted circuits.dl == model via equiv.dl (cached refs)
@@ -759,8 +761,9 @@ def main():
                   f" {len(rules)} n-gram rules memoize the residual" + (f"; {len(remaining)} uncovered" if remaining else "")
                   + (f"; {len(rels_real)} induction OOD fallback" if rels_real else "") + ".  + run.dl (souffle-only harness).")
             from oracle import run_equiv
-            r = run_equiv(out, [insts[i] for i in idxs], [refs[i] for i in idxs])
-            ok = r.get("nmiss", 1) == 0 and r.get("nuncov", 1) == 0
+            r = run_equiv(out, [insts[i] for i in idxs], [refs[i] for i in idxs],
+                          evidence_dir=os.path.join(md, "certificate-evidence"))
+            ok = cert_ok = r["certified"]
             print(f"  CERTIFY (equiv.dl, EXACT argmax): ncover={r.get('ncover')} nmiss={r.get('nmiss')} nuncov={r.get('nuncov')} → "
                   + ("CERTIFIED — circuits.dl == model over the corpus (souffle-only)" if ok else "NOT certified"))
         else:                                                     # CANONICAL (default): the distributional T circuits.dl + symbols,
@@ -772,11 +775,12 @@ def main():
                 get_lg = lambda c: model_logits(whole, c)
             else:
                 get_lg = lambda c: None                           # cache-only: regenerate from logit_cache.json
-            emit_canonical_T(md, insts, idxs, real, real_c, rels_real, w, sym, name, get_lg)
+            cert_ok = emit_canonical_T(md, insts, idxs, real, real_c, rels_real, w, sym, name, get_lg)
 
     print("\nselect = one operand → lookup · compose = two operands → computation · copy/induction = content-relative pointer. "
           "All learned from behavior, nothing hand-coded; the CAUSAL test is the universal discriminator.")
+    return 0 if cert_ok else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

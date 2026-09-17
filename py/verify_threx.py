@@ -17,20 +17,28 @@ BEARINGS = [21, 22, 23, 24, 25]
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--evidence-dir", help="retain replayable verifier inputs and outputs here")
+    args = parser.parse_args()
     instances = [[0, 20, bi, bj, 19, 19, 7] for bi in BEARINGS for bj in BEARINGS]  # all 25 bearing pairs
     print(f"=== rosetta · certify threx COMPOSED circuit vs whole.dl · {len(instances)} instances ===")
-    r = certify(CIRCUIT, WHOLE, instances)
+    r = certify(CIRCUIT, WHOLE, instances, evidence_dir=args.evidence_dir)
     if "error" in r:
-        print("ERROR:", r["error"]); return
+        print("ERROR:", r["error"]); return 1
     print(f"  instances checked (ncover): {r['ncover']}")
     print(f"  disagreements (nmiss)     : {r['nmiss']}")
     print(f"  gaps (nuncov)             : {r['nuncov']}")
+    if "evidence" in r:
+        print(f"  replayable evidence      : {r['evidence']}")
     if r["mismatches"]:
         print("  mismatches (inst, model, circuit):", r["mismatches"][:8])
-    ok = r["nmiss"] == 0 and r["nuncov"] == 0 and r["ncover"] == len(instances)
+    ok = r["certified"]
     print(f"\n  CERTIFIED (Datalog): {ok}  — circuit is provably equivalent to the model over its whole domain"
           if ok else f"\n  NOT certified: {r}")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())

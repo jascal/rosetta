@@ -4,7 +4,8 @@ An expert is a CLAIM ("over domain D: coverage C, precision P, leak L"); this ma
 artifact. We grade a built package by SERVING it (the thin runtime: trusted idioms → gated n-grams → abstain) over a
 held-out in-domain set + an off-domain probe set, then the build HARD-FAILS if the scorecard misses the gate.
 
-Reuses the core's reference runtime (serve_package) — the scorecard measures exactly what ships.
+Reuses the core's reference runtime (serve_package) for the COVER TIER only. Curated answers and retrieval are not
+evaluated here. Corpus-continuation accuracy is empirical; it is not a model-equivalence certificate.
 """
 import json
 import os
@@ -44,11 +45,11 @@ def score(manifest_path, holdout, off_domain=()):
         "n_rules": manifest.get("n_rules", len(manifest.get("rules", []))),
         "holdout_n": n,
         "coverage": (ans / n) if n else 0.0,
-        "precision": (cor / ans) if ans else 0.0,
+        "precision": (cor / ans) if ans else None,
         "abstain": (1 - ans / n) if n else 1.0,
         "confident_wrong": ((ans - cor) / n) if n else 0.0,        # answered-but-wrong as a fraction of all (the hallucination rate)
         "off_domain_n": nod,
-        "off_domain_leak": (leaked / nod) if nod else 0.0,         # answered (not abstained) on an off-domain probe
+        "off_domain_leak": (leaked / nod) if nod else None,
         "tiers": {t: {"coverage": d["answered"] / n if n else 0.0,
                       "precision": d["correct"] / d["answered"] if d["answered"] else 0.0}
                   for t, d in tiers.items()},
@@ -59,10 +60,12 @@ def score(manifest_path, holdout, off_domain=()):
 def gate(sc, *, min_precision=None, max_leak=None, benchmarks=None):
     """Hard-fail check → (ok, reasons). Thresholds from the spec's [gate] + [[benchmark]] targets."""
     reasons = []
-    if min_precision is not None and sc["precision"] < min_precision:
-        reasons.append(f"precision {sc['precision']:.3f} < min_precision {min_precision}")
-    if max_leak is not None and sc["off_domain_leak"] > max_leak:
-        reasons.append(f"off_domain_leak {sc['off_domain_leak']:.3f} > max_leak {max_leak}")
+    if not sc["holdout_n"]:
+        reasons.append("no held-out observations")
+    if min_precision is not None and (sc["precision"] is None or sc["precision"] < min_precision):
+        reasons.append(f"precision {sc['precision']} does not establish min_precision {min_precision}")
+    if max_leak is not None and (sc["off_domain_leak"] is None or sc["off_domain_leak"] > max_leak):
+        reasons.append(f"off_domain_leak {sc['off_domain_leak']} does not establish max_leak {max_leak}")
     for b in (benchmarks or []):
         got = sc.get("benchmarks", {}).get(b.get("name"))
         if b.get("target") is not None and (got is None or got < b["target"]):

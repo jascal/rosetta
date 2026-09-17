@@ -1,0 +1,74 @@
+{
+  "scope": "controlled diagnosis informed by previous failures; not untouched final-test evidence",
+  "provenance": {
+    "source": "copy-control",
+    "prior_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705"
+    }
+  },
+  "targets": [
+    [
+      11436,
+      "punctuation_newline",
+      "discovery"
+    ],
+    [
+      2579,
+      "lexical",
+      "discovery"
+    ],
+    [
+      34341,
+      "punctuation_newline",
+      "discovery"
+    ],
+    [
+      1602,
+      "lexical",
+      "discovery"
+    ],
+    [
+      317,
+      "punctuation_newline",
+      "new_target"
+    ],
+    [
+      23268,
+      "lexical",
+      "new_target"
+    ],
+    [
+      698,
+      "punctuation_newline",
+      "new_target"
+    ],
+    [
+      13551,
+      "lexical",
+      "new_target"
+    ]
+  ],
+  "tokenizer_pieces": {},
+  "seeds": [
+    5,
+    6
+  ],
+  "lengths": [
+    8,
+    12
+  ],
+  "prefixes": [
+    4,
+    6
+  ],
+  "gaps": [
+    0,
+    8,
+    32
+  ],
+  "driver_sha256": "b1f5eb8c2390b49961d84c3fce9ff82d78ff31a1afb154f4c05e98a4b9258436",
+  "guard_sha256": "d4e6a652ac7f515db4a2ef2e7c11df4bf82c1400d70c244ac6d3325b2cb5fe16",
+  "selection": "none; length and prefix vary independently; every target in every background cell"
+}

@@ -1,0 +1,319 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "source": "copy-control",
+    "seed": 0,
+    "synthetic": true
+  },
+  "dataset_sha256": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+  "references_sha256": "c393533df5e6ed083e4f07eee3764c37cf98e7263ddf4eeba3b06cc5254a5145",
+  "baseline_rules": 24,
+  "selected_length": [
+    1
+  ],
+  "admission": {
+    "certified": true,
+    "nselected": 1,
+    "evidence": "certificate-evidence/check-gr4p1uxw"
+  },
+  "baseline_learning": {
+    "certified": true,
+    "ntrain": 24,
+    "evidence": "certificate-evidence/check-5t8nck4j"
+  },
+  "results": {
+    "baseline": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-o6335fxb"
+      },
+      "scores": {
+        "train": {
+          "n": 24,
+          "answered": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 16,
+          "coverage": 0.3333333333333333,
+          "precision": 1.0,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.0,
+          "abstain": 0.6666666666666666
+        },
+        "validation": {
+          "n": 12,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 12,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "test": {
+          "n": 24,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 24,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "off_domain": {
+          "n": 4,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 4,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        }
+      },
+      "test_certificate": {
+        "certified": false,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 24,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-4tjag439",
+        "mismatches": [],
+        "uncovered": [
+          [
+            0
+          ],
+          [
+            1
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          [
+            6
+          ],
+          [
+            7
+          ],
+          [
+            8
+          ],
+          [
+            9
+          ],
+          [
+            10
+          ],
+          [
+            11
+          ],
+          [
+            12
+          ],
+          [
+            13
+          ],
+          [
+            14
+          ],
+          [
+            15
+          ],
+          [
+            16
+          ],
+          [
+            17
+          ],
+          [
+            18
+          ],
+          [
+            19
+          ],
+          [
+            20
+          ],
+          [
+            21
+          ],
+          [
+            22
+          ],
+          [
+            23
+          ]
+        ],
+        "missing_refs": []
+      },
+      "artifact_sha256": "2edd2bb13a162640770ad033447e9a01d345ce46282f82b1fd869f0f322ea179",
+      "bytes": 3185
+    },
+    "raw_copy": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-syx5c0t4"
+      },
+      "scores": {
+        "train": {
+          "n": 24,
+          "answered": 24,
+          "correct": 24,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "validation": {
+          "n": 12,
+          "answered": 12,
+          "correct": 12,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "test": {
+          "n": 24,
+          "answered": 24,
+          "correct": 24,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "off_domain": {
+          "n": 4,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 4,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        }
+      },
+      "test_certificate": {
+        "certified": true,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-k7u_myo1",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "artifact_sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+      "bytes": 972
+    },
+    "selected": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-woj5o36p"
+      },
+      "scores": {
+        "train": {
+          "n": 24,
+          "answered": 24,
+          "correct": 24,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "validation": {
+          "n": 12,
+          "answered": 12,
+          "correct": 12,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "test": {
+          "n": 24,
+          "answered": 24,
+          "correct": 24,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "off_domain": {
+          "n": 4,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 4,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        }
+      },
+      "test_certificate": {
+        "certified": true,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-z_tvgqvz",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "artifact_sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+      "bytes": 972
+    }
+  },
+  "scope": "finite generated nonce corpus; synthetic controls do not establish LLM behavior"
+}

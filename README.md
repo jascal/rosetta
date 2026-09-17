@@ -51,7 +51,13 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 
 | path | role |
 |------|------|
-| `dl/equiv.dl` | **the keystone (live)** — multi-instance equivalence verifier; `certified()` iff `nmiss=0 ∧ nuncov=0` over the domain. Every emitted `circuits.dl` is proved against the model through this. |
+| `dl/equiv.dl` | **the keystone (live)** — multi-instance equivalence verifier; `certified()` iff `nmiss=0 ∧ nuncov=0` over the domain. Explicit nonempty domain; missing references fail certification. |
+| `dl/equiv_dist.dl` | **distributional verifier** — finite-temperature checks against supplied reference logits; computes softmax, TV, coverage, and the verdict in Datalog. |
+| `py/certificate.py` | Isolated verifier I/O, retained evidence with hashes, and model-free replay. |
+| `py/benchmark_induction.py` | Grouped train/validation/test benchmark; Datalog copy admission, frozen artifacts, train-only n-gram baseline, and exact finite-domain certificates. [Results and replay](docs/induction-benchmark.md). |
+| `py/benchmark_guarded_copy.py` | Consensus copy guards with Datalog selection; freezes the firing domain before fresh test references. [Protocol and results](docs/guarded-copy-benchmark.md). |
+| `py/benchmark_copy_generalization.py` | Keeps the guard unchanged across fresh seeds, lengths, and distractors; Datalog reports strata and counterexamples. [Protocol and results](docs/copy-generalization.md). |
+| `py/diagnose_copy_targets.py` | Controlled target substitutions cross prefix length, sequence length, and gaps to investigate copy failures. [Diagnostic protocol](docs/copy-target-diagnosis.md). |
 | `dl/{ngram,induction,master}.dl` | **reference / legacy** hand-coded Datalog detectors — *subsumed* by the learner, which discovers these circuits unsupervised and inlines them into the emitted `circuits.dl`. Not on the live path. |
 | `dl/primitives.dl` | **design reference** — the ILP primitive vocabulary (`prev_occ`, `at_offset`, `sum_at`, …) the learner composes over (implemented in Python, inlined when emitted). |
 | `py/idiom_learn.py` | **the main tool** — unsupervised idiom learning (select / compose / copy-induction, causally confirmed) → `--emit` a runtime-independent `circuits.dl` + `run.dl` → `--certify` via `equiv.dl`. Model-general (CLI flags). |
@@ -68,7 +74,8 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 ```bash
 # learn idioms, emit a souffle-only circuits.dl, and prove it == the model — one tool, CLI-configured:
 python3 py/idiom_learn.py 1400 8 reference/threx --emit --certify
-#   → 1 compose + 2 select-gate idioms (LEARNED, nothing hand-coded) + n-gram backfill, CERTIFIED nmiss=0 nuncov=0
+#   → learned idioms + n-gram backfill; finite-grid Datalog checks and replayable evidence
+# Add --crisp for exact argmax certification through equiv.dl.
 
 # a real model (resident server oracle; bundle loads once):
 fieldrun --bundle models/<m>/bundle --serve 8177 &        # build-time refs server
@@ -117,10 +124,21 @@ consequences, and the fixes:
 
 ## Status — the T=0 ladder so far
 
-Four models minimized and **certified `nmiss=0 ∧ nuncov=0` in-domain** (T=0 / greedy), via the fieldrun-refs path for
+**Certificate integrity update:** the historical measurements below are `empirical`. Exact certification now requires
+an explicit nonempty domain with complete references. The canonical distributional path uses `dl/equiv_dist.dl` and
+retains replayable, hashed evidence. Its proof is restricted to the supplied reference logits at the listed finite
+temperature grid; it establishes neither an interval bound nor a bound on omitted model mass. Historical temperature
+reports have been relabeled accordingly. See [certificate scope and replay](docs/certificates.md).
+
+The original four-model experiment reported **`nmiss=0 ∧ nuncov=0` in-domain** (T=0 / greedy), via the fieldrun-refs path for
 the real models. Same generation budget (250×80, temp 0.8) so the comparison is fair; threx is the capped toy.
 
-| model | params | corpus windows | rules | compression | params/rule | **holdout loss** |
+These historical loss figures are exploratory **empirical** measurements, not untouched final-test evidence:
+the legacy selector uses its evaluation split to choose families. For an isolated final test, see the
+[copy/induction benchmark](docs/induction-benchmark.md): the synthetic copy control certifies 24/24;
+the Qwen2.5-0.5B-Instruct copy hypothesis matches 22/24 and fails certification.
+
+| model | params | corpus windows | rules | compression | params/rule | **historical split loss** |
 |-------|------:|------:|------:|----:|----:|----:|
 | threx (Threxian) | 21,632 | 360 | 151 | 58% | 143 | **12%** |
 | stories260K | 260K | 13,911 | 7,921 | 43% | 33 | **47%** |
@@ -141,32 +159,16 @@ are agreement / delimiter-bracket / coreference. `proved`/`empirical`/`open` tag
 
 ## Frontiers (revisit later)
 
-- **Temperature: one rule set, T parameterized at query time.** Today's `circuits.dl` is the **T=0 (greedy)** corner —
-  each context → its **argmax**, exact, rules with no weights. The goal is *not* a separate program per temperature but
-  **one set of rules carrying the logits as incidence values**, with **T applied at query time** as `softmax(logits/T)`.
-  This works because logits are **T-invariant** (T only scales them in the softmax), so a single export serves every
-  temperature; `run.dl` softmax-samples the kept logits at any T, making `circuits.dl` a faithful **sampler**, not just a
-  greedy predictor. It is a **semiring lift**: T=0 is the boolean/tropical (argmax) collapse; T>0 is the probability
-  (sum-product) semiring where the incidence weights reappear. Each idiom keeps its *structure* but emits a distribution,
-  and its incidence value **measures circuit sharpness** (induction strength = the copy probability). The same lift turns
-  the causal test binary→graded (mass shifts, not argmax flips) and the certificate exact→distributional (a TV/KL bound,
-  the rank-1 shortlist certificate generalized). **Built + certified on threx** (`py/temperature.py`, `oracle.logits`):
-  each rule carries top-K (token, logit); the runtime computes `softmax(logits/T)` in souffle at a queried `.input temp`;
-  `circuits.dl` reproduces the model's full distribution within ε across a temperature *range* (it is canonical — we always
-  emit T-rules; `circuits.symbols.dl` is its legible token-string twin, emitted as the final step). threx T∈[0.5,1.0] ε=0.02:
-  173 rules (top-K mean 3.8 — only 6 more than the 167-rule T=0 cover), CERTIFIED at T=0.5/0.75/1.0 (max TV ≤ 0.016).
-  - **A T-cover spans a [T_min, T_max] range, not a point — two opposing error sources.** Top-K *truncation* is worst at
-    the **hot** end (the tail fattens with T → size K at `T_max`); but *group consistency* (one representative per suffix)
-    is worst at the **cold** end (low T amplifies within-group logit gaps → check grouping at `T_min`). `T_max` still trades
-    fidelity-range against compression (`T=0` most compressible; `T→∞` ≈ the full unembed). *Done for the n-gram cover via
-    whole.dl; remaining: idioms carrying distributions too, and top-K logits from fieldrun for big models (serve `/predict`
-    returns argmax only — needs a top-K endpoint).*
-  - **The routing *is* the T=0 shadow of this.** The cover-ordering priority in `circuits.dl` (compose > select-gate >
-    longest n-gram > copy/induction fallback), encoded as hard negation guards, is exactly the **argmax-override collapse**
-    of an incidence-weighted mixture: at T>0 the rules don't strictly override — each contributes logit-weighted mass and
-    the model's distribution is their (semiring) sum; the priority order is just *which contribution has the max logit*.
-    Bonus: induction's hard "OOD fallback" gating dissolves into a graded copy-mass contribution at T>0 (the incidence
-    weight handles it, no special-casing). *The n-gram T-cover is built; folding the idioms into the weighted mixture is next.*
+- **Temperature: one rule set, T parameterized at query time.** The canonical emitter carries top-K logits per rule
+  and computes `softmax(logits/T)` in Souffle for positive T. It emits a probability relation; it does not itself sample.
+  The crisp emitter handles exact argmax. Learned compose/select idioms can carry distributions; copy/induction remains
+  a point-mass fallback. Routing still uses hard priority guards.
+  - **proved only over stated inputs:** `dl/equiv_dist.dl` checks TV against the supplied reference logits at the lower
+    endpoint, midpoint, and upper endpoint. The certificate retains these exact temperatures and input facts.
+  - **empirical:** historical threx experiments reported max TV ≤ 0.016 at T=0.5/0.75/1.0. These three measurements
+    establish neither a continuous interval bound nor the correctness of an uncertified symbol rendering.
+  - **open:** certified interval bounds, omitted-mass bounds for fieldrun `/topk`, symbol-form certification, and a
+    justified weighted mixture of idioms. The current top-K endpoint is available but carries no tail certificate.
 - **Non-n-gram circuit detectors** beyond `ngram.dl`/`induction.dl` — agreement, delimiter/bracket-matching, coreference
   — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
 - **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing

@@ -214,15 +214,17 @@ def test_inventory_aggregates(tmp_path):
 
 
 def test_build_from_spec_model_free(tmp_path):
-    """build_from_spec on a model-free [corpus]-only spec (dim=0, hermetic) → package built; no manifest ⇒ gate skipped."""
+    """A model-free build completes, but cannot pass a requested cover evaluation gate."""
     import pack.build as B
     (tmp_path / "kb.txt").write_text("A tautology is always true. An argument is valid if the form preserves truth.\n")
     (tmp_path / "neg.txt").write_text("What is the capital of France?\n")
     (tmp_path / "expert.toml").write_text(
         '[corpus]\ntext="kb.txt"\ncitation="T (CC BY)"\n'
         '[grounding]\ndim=0\n'
-        '[experiment]\noff_domain="neg.txt"\n[gate]\nmax_leak=0.05\n')          # gate set, but no manifest → skipped, no crash
-    out = B.build_from_spec(str(tmp_path / "expert.toml"))
+        '[experiment]\noff_domain="neg.txt"\n[gate]\nmax_leak=0.05\n')
+    with pytest.raises(SystemExit, match="no cover manifest"):
+        B.build_from_spec(str(tmp_path / "expert.toml"))
+    out = tmp_path / "package"
     assert os.path.exists(os.path.join(out, "index.json"))                       # empty index (model-free)
     assert os.path.exists(os.path.join(out, "knowledge.tsv"))                    # grounding (citation)
     assert not os.path.exists(os.path.join(out, "manifest.json"))                # no cover (model-free)
