@@ -1,0 +1,143 @@
+{
+  "domain": {
+    "cases": 40,
+    "training_trials": [
+      0,
+      1
+    ],
+    "holdout_trials": [
+      2,
+      3
+    ]
+  },
+  "architectures": [
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 1,
+        "direct_edge": 3,
+        "at_most_two_hops": 5,
+        "recursive_reach": 9,
+        "constant_yes": 19
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 2,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 2,
+        "at_most_two_hops": 8,
+        "constant_no": 10,
+        "constant_yes": 10,
+        "direct_edge": 10
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 3,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 4,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 2,
+        "constant_no": 8,
+        "at_most_two_hops": 8,
+        "direct_edge": 10,
+        "constant_yes": 12
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 8,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 3,
+        "at_most_two_hops": 7,
+        "constant_no": 9,
+        "direct_edge": 9,
+        "constant_yes": 11
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 16,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 3,
+        "constant_no": 9,
+        "at_most_two_hops": 9,
+        "constant_yes": 11,
+        "direct_edge": 11
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 3,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        36
+      ]
+    }
+  ]
+}

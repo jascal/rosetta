@@ -1,0 +1,15 @@
+// Standalone recursive reachability circuit: graph + query facts -> cdecide.
+// Node ids are local to each instance. No model, ref, Python, or weights.
+.decl edge(inst:number, src:number, dst:number)
+.input edge
+.decl query(inst:number, src:number, dst:number)
+.input query
+
+.decl reach(inst:number, src:number, dst:number)
+reach(I, A, B) :- edge(I, A, B).
+reach(I, A, C) :- reach(I, A, B), edge(I, B, C).
+
+.decl cdecide(inst:number, out:number)
+.output cdecide
+cdecide(I, 1) :- query(I, A, B), reach(I, A, B).
+cdecide(I, 0) :- query(I, A, B), !reach(I, A, B).

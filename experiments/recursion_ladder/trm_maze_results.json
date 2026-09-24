@@ -1,0 +1,921 @@
+{
+  "domain": {
+    "cases": 40,
+    "depths": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "trials_per_depth": 4,
+    "representation": "undirected grid-cell relation graphs encoded as 30x30 mazes",
+    "budgets": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "training_trials": [
+      0,
+      1
+    ],
+    "holdout_trials": [
+      2,
+      3
+    ]
+  },
+  "semantic_certificate": {
+    "certified": true,
+    "ncover": 40,
+    "nmiss": 0,
+    "nuncov": 0,
+    "mismatches": [],
+    "uncovered": [],
+    "predictions": {
+      "0": 1,
+      "1": 0,
+      "2": 1,
+      "3": 0,
+      "4": 1,
+      "5": 0,
+      "6": 1,
+      "7": 0,
+      "8": 1,
+      "9": 0,
+      "10": 1,
+      "11": 0,
+      "12": 1,
+      "13": 0,
+      "14": 1,
+      "15": 0,
+      "16": 1,
+      "17": 0,
+      "18": 1,
+      "19": 0,
+      "20": 1,
+      "21": 0,
+      "22": 1,
+      "23": 0,
+      "24": 1,
+      "25": 0,
+      "26": 1,
+      "27": 0,
+      "28": 1,
+      "29": 0,
+      "30": 1,
+      "31": 0,
+      "32": 1,
+      "33": 0,
+      "34": 1,
+      "35": 0,
+      "36": 1,
+      "37": 0,
+      "38": 1,
+      "39": 0
+    }
+  },
+  "architectures": [
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 1,
+      "prompt_style": "plain",
+      "depths": {
+        "1": {
+          "n": 8,
+          "accuracy": 0.5,
+          "perturbation_follow": 0.0,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "2": {
+          "n": 8,
+          "accuracy": 0.5,
+          "perturbation_follow": 0.0,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "3": {
+          "n": 8,
+          "accuracy": 0.5,
+          "perturbation_follow": 0.0,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.0,
+          "abstentions": 0
+        },
+        "4": {
+          "n": 8,
+          "accuracy": 0.5,
+          "perturbation_follow": 0.0,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.0,
+          "abstentions": 0
+        },
+        "5": {
+          "n": 8,
+          "accuracy": 0.625,
+          "perturbation_follow": 0.25,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.25,
+          "abstentions": 0
+        }
+      },
+      "model_certificate": {
+        "certified": false,
+        "ncover": 40,
+        "nmiss": 19,
+        "nuncov": 0,
+        "mismatches": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            4,
+            0,
+            1
+          ],
+          [
+            6,
+            0,
+            1
+          ],
+          [
+            8,
+            0,
+            1
+          ],
+          [
+            10,
+            0,
+            1
+          ],
+          [
+            12,
+            0,
+            1
+          ],
+          [
+            14,
+            0,
+            1
+          ],
+          [
+            16,
+            0,
+            1
+          ],
+          [
+            18,
+            0,
+            1
+          ],
+          [
+            20,
+            0,
+            1
+          ],
+          [
+            22,
+            0,
+            1
+          ],
+          [
+            24,
+            0,
+            1
+          ],
+          [
+            26,
+            0,
+            1
+          ],
+          [
+            28,
+            0,
+            1
+          ],
+          [
+            30,
+            0,
+            1
+          ],
+          [
+            34,
+            0,
+            1
+          ],
+          [
+            36,
+            0,
+            1
+          ],
+          [
+            38,
+            0,
+            1
+          ]
+        ],
+        "uncovered": [],
+        "predictions": {
+          "0": 1,
+          "1": 0,
+          "2": 1,
+          "3": 0,
+          "4": 1,
+          "5": 0,
+          "6": 1,
+          "7": 0,
+          "8": 1,
+          "9": 0,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 0,
+          "14": 1,
+          "15": 0,
+          "16": 1,
+          "17": 0,
+          "18": 1,
+          "19": 0,
+          "20": 1,
+          "21": 0,
+          "22": 1,
+          "23": 0,
+          "24": 1,
+          "25": 0,
+          "26": 1,
+          "27": 0,
+          "28": 1,
+          "29": 0,
+          "30": 1,
+          "31": 0,
+          "32": 1,
+          "33": 0,
+          "34": 1,
+          "35": 0,
+          "36": 1,
+          "37": 0,
+          "38": 1,
+          "39": 0
+        }
+      },
+      "model_certificate_status": "checked"
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 2,
+      "prompt_style": "plain",
+      "depths": {
+        "1": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "2": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "3": {
+          "n": 8,
+          "accuracy": 1.0,
+          "perturbation_follow": 1.0,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 1.0,
+          "abstentions": 0
+        },
+        "4": {
+          "n": 8,
+          "accuracy": 0.75,
+          "perturbation_follow": 0.5,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.5,
+          "abstentions": 0
+        },
+        "5": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        }
+      },
+      "model_certificate": {
+        "certified": false,
+        "ncover": 40,
+        "nmiss": 5,
+        "nuncov": 0,
+        "mismatches": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            14,
+            0,
+            1
+          ],
+          [
+            27,
+            1,
+            0
+          ],
+          [
+            30,
+            0,
+            1
+          ],
+          [
+            36,
+            0,
+            1
+          ]
+        ],
+        "uncovered": [],
+        "predictions": {
+          "0": 1,
+          "1": 0,
+          "2": 1,
+          "3": 0,
+          "4": 1,
+          "5": 0,
+          "6": 1,
+          "7": 0,
+          "8": 1,
+          "9": 0,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 0,
+          "14": 1,
+          "15": 0,
+          "16": 1,
+          "17": 0,
+          "18": 1,
+          "19": 0,
+          "20": 1,
+          "21": 0,
+          "22": 1,
+          "23": 0,
+          "24": 1,
+          "25": 0,
+          "26": 1,
+          "27": 0,
+          "28": 1,
+          "29": 0,
+          "30": 1,
+          "31": 0,
+          "32": 1,
+          "33": 0,
+          "34": 1,
+          "35": 0,
+          "36": 1,
+          "37": 0,
+          "38": 1,
+          "39": 0
+        }
+      },
+      "model_certificate_status": "checked"
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 4,
+      "prompt_style": "plain",
+      "depths": {
+        "1": {
+          "n": 8,
+          "accuracy": 0.75,
+          "perturbation_follow": 0.5,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "2": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "3": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        },
+        "4": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        },
+        "5": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        }
+      },
+      "model_certificate": {
+        "certified": false,
+        "ncover": 40,
+        "nmiss": 6,
+        "nuncov": 0,
+        "mismatches": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            14,
+            0,
+            1
+          ],
+          [
+            21,
+            1,
+            0
+          ],
+          [
+            30,
+            0,
+            1
+          ],
+          [
+            36,
+            0,
+            1
+          ]
+        ],
+        "uncovered": [],
+        "predictions": {
+          "0": 1,
+          "1": 0,
+          "2": 1,
+          "3": 0,
+          "4": 1,
+          "5": 0,
+          "6": 1,
+          "7": 0,
+          "8": 1,
+          "9": 0,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 0,
+          "14": 1,
+          "15": 0,
+          "16": 1,
+          "17": 0,
+          "18": 1,
+          "19": 0,
+          "20": 1,
+          "21": 0,
+          "22": 1,
+          "23": 0,
+          "24": 1,
+          "25": 0,
+          "26": 1,
+          "27": 0,
+          "28": 1,
+          "29": 0,
+          "30": 1,
+          "31": 0,
+          "32": 1,
+          "33": 0,
+          "34": 1,
+          "35": 0,
+          "36": 1,
+          "37": 0,
+          "38": 1,
+          "39": 0
+        }
+      },
+      "model_certificate_status": "checked"
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 8,
+      "prompt_style": "plain",
+      "depths": {
+        "1": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "2": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "3": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        },
+        "4": {
+          "n": 8,
+          "accuracy": 0.625,
+          "perturbation_follow": 0.5,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.5,
+          "abstentions": 0
+        },
+        "5": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        }
+      },
+      "model_certificate": {
+        "certified": false,
+        "ncover": 40,
+        "nmiss": 7,
+        "nuncov": 0,
+        "mismatches": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            14,
+            0,
+            1
+          ],
+          [
+            21,
+            1,
+            0
+          ],
+          [
+            26,
+            0,
+            1
+          ],
+          [
+            27,
+            1,
+            0
+          ],
+          [
+            30,
+            0,
+            1
+          ],
+          [
+            36,
+            0,
+            1
+          ]
+        ],
+        "uncovered": [],
+        "predictions": {
+          "0": 1,
+          "1": 0,
+          "2": 1,
+          "3": 0,
+          "4": 1,
+          "5": 0,
+          "6": 1,
+          "7": 0,
+          "8": 1,
+          "9": 0,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 0,
+          "14": 1,
+          "15": 0,
+          "16": 1,
+          "17": 0,
+          "18": 1,
+          "19": 0,
+          "20": 1,
+          "21": 0,
+          "22": 1,
+          "23": 0,
+          "24": 1,
+          "25": 0,
+          "26": 1,
+          "27": 0,
+          "28": 1,
+          "29": 0,
+          "30": 1,
+          "31": 0,
+          "32": 1,
+          "33": 0,
+          "34": 1,
+          "35": 0,
+          "36": 1,
+          "37": 0,
+          "38": 1,
+          "39": 0
+        }
+      },
+      "model_certificate_status": "checked"
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 16,
+      "prompt_style": "plain",
+      "depths": {
+        "1": {
+          "n": 8,
+          "accuracy": 0.75,
+          "perturbation_follow": 0.5,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "2": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 0,
+          "interior_edge_follow": null,
+          "abstentions": 0
+        },
+        "3": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        },
+        "4": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        },
+        "5": {
+          "n": 8,
+          "accuracy": 0.875,
+          "perturbation_follow": 0.75,
+          "interior_edge_pairs": 4,
+          "interior_edge_follow": 0.75,
+          "abstentions": 0
+        }
+      },
+      "model_certificate": {
+        "certified": false,
+        "ncover": 40,
+        "nmiss": 6,
+        "nuncov": 0,
+        "mismatches": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            14,
+            0,
+            1
+          ],
+          [
+            21,
+            1,
+            0
+          ],
+          [
+            27,
+            1,
+            0
+          ],
+          [
+            36,
+            0,
+            1
+          ]
+        ],
+        "uncovered": [],
+        "predictions": {
+          "0": 1,
+          "1": 0,
+          "2": 1,
+          "3": 0,
+          "4": 1,
+          "5": 0,
+          "6": 1,
+          "7": 0,
+          "8": 1,
+          "9": 0,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 0,
+          "14": 1,
+          "15": 0,
+          "16": 1,
+          "17": 0,
+          "18": 1,
+          "19": 0,
+          "20": 1,
+          "21": 0,
+          "22": 1,
+          "23": 0,
+          "24": 1,
+          "25": 0,
+          "26": 1,
+          "27": 0,
+          "28": 1,
+          "29": 0,
+          "30": 1,
+          "31": 0,
+          "32": 1,
+          "33": 0,
+          "34": 1,
+          "35": 0,
+          "36": 1,
+          "37": 0,
+          "38": 1,
+          "39": 0
+        }
+      },
+      "model_certificate_status": "checked"
+    }
+  ],
+  "candidate_extraction": [
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 1,
+        "direct_edge": 3,
+        "at_most_two_hops": 5,
+        "recursive_reach": 9,
+        "constant_yes": 19
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 2,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 2,
+        "at_most_two_hops": 8,
+        "constant_no": 10,
+        "constant_yes": 10,
+        "direct_edge": 10
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 3,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 4,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 2,
+        "constant_no": 8,
+        "at_most_two_hops": 8,
+        "direct_edge": 10,
+        "constant_yes": 12
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 8,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 3,
+        "at_most_two_hops": 7,
+        "constant_no": 9,
+        "direct_edge": 9,
+        "constant_yes": 11
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        30,
+        36
+      ]
+    },
+    {
+      "architecture": "TRM-Maze-Hard",
+      "budget": 16,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "recursive_reach",
+      "best_fit_rule_id": 4,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "recursive_reach": 3,
+        "constant_no": 9,
+        "at_most_two_hops": 9,
+        "constant_yes": 11,
+        "direct_edge": 11
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 3,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        14,
+        21,
+        36
+      ]
+    }
+  ]
+}

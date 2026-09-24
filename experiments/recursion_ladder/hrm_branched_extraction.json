@@ -1,0 +1,14 @@
+{
+  "selected": null,
+  "selected_rule_id": null,
+  "train_cases": 100,
+  "holdout_cases": 100,
+  "training_errors_by_candidate": {
+    "constant_no": 30,
+    "direct_edge": 32,
+    "at_most_two_hops": 32,
+    "recursive_reach": 42
+  },
+  "holdout_errors": null,
+  "holdout_error_ids": []
+}

@@ -1,0 +1,64 @@
+// Select the smallest graph-query rule with zero training errors.
+// Candidate 3 is recursive transitive closure; lower ids are finite shortcuts.
+// Facts for train/test/ref are supplied at build time. No model runtime.
+.decl edge(inst:number, src:number, dst:number)
+.input edge
+.decl query(inst:number, src:number, dst:number)
+.input query
+.decl ref(inst:number, out:number)
+.input ref
+.decl train(inst:number)
+.input train
+.decl test(inst:number)
+.input test
+
+.decl direct(inst:number, src:number, dst:number)
+direct(I,A,B) :- edge(I,A,B).
+.decl two(inst:number, src:number, dst:number)
+two(I,A,B) :- direct(I,A,B).
+two(I,A,C) :- edge(I,A,B), edge(I,B,C).
+.decl reach(inst:number, src:number, dst:number)
+reach(I,A,B) :- edge(I,A,B).
+reach(I,A,C) :- reach(I,A,B), edge(I,B,C).
+
+.decl candidate(rule:number)
+candidate(0). candidate(1). candidate(2). candidate(3). candidate(4).
+.decl yes(rule:number, inst:number)
+yes(1,I) :- query(I,_,_).
+yes(2,I) :- query(I,A,B), direct(I,A,B).
+yes(3,I) :- query(I,A,B), two(I,A,B).
+yes(4,I) :- query(I,A,B), reach(I,A,B).
+.decl prediction(rule:number, inst:number, out:number)
+prediction(R,I,1) :- candidate(R), query(I,_,_), yes(R,I).
+prediction(R,I,0) :- candidate(R), query(I,_,_), !yes(R,I).
+
+.decl training_error(rule:number, inst:number)
+.output training_error
+training_error(R,I) :- train(I), ref(I,V), prediction(R,I,P), V != P.
+.decl training_error_count(rule:number, errors:number)
+.output training_error_count
+training_error_count(R,N) :- candidate(R), N = count : { training_error(R,_) }.
+.decl clean(rule:number)
+clean(R) :- candidate(R), !training_error(R,_).
+.decl selected(rule:number)
+.output selected
+selected(R) :- clean(R), R = min C : { clean(C) }.
+
+// If no exact candidate exists, keep the simplest candidate tied for minimum
+// training error and report its independent holdout error separately.
+.decl minimum_training_errors(errors:number)
+minimum_training_errors(N) :- N = min M : { training_error_count(_,M) }.
+.decl best_candidate(rule:number)
+.output best_candidate
+best_candidate(R) :- training_error_count(R,N), minimum_training_errors(N),
+                      R = min C : { training_error_count(C,N) }.
+
+.decl holdout_error(rule:number, inst:number)
+.output holdout_error
+holdout_error(R,I) :- selected(R), test(I), ref(I,V), prediction(R,I,P), V != P.
+.decl best_holdout_error(inst:number)
+.output best_holdout_error
+best_holdout_error(I) :- best_candidate(R), test(I), ref(I,V), prediction(R,I,P), V != P.
+.decl selected_prediction(inst:number, out:number)
+.output selected_prediction
+selected_prediction(I,P) :- selected(R), prediction(R,I,P).

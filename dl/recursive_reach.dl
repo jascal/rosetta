@@ -1,0 +1,23 @@
+// Certify the standalone circuit against graph truth or model responses.
+#include "reach_circuit.dl"
+.decl ref(inst:number, out:number)
+.input ref
+
+.decl mismatch(inst:number, expected:number, actual:number)
+.output mismatch
+mismatch(I, R, C) :- ref(I, R), cdecide(I, C), R != C.
+.decl uncovered(inst:number)
+.output uncovered
+uncovered(I) :- ref(I, _), !cdecide(I, _).
+.decl ncover(n:number)
+.output ncover
+ncover(N) :- N = count : { ref(_, _) }.
+.decl nmiss(n:number)
+.output nmiss
+nmiss(N) :- N = count : { mismatch(_, _, _) }.
+.decl nuncov(n:number)
+.output nuncov
+nuncov(N) :- N = count : { uncovered(_) }.
+.decl certified()
+.output certified
+certified() :- nmiss(0), nuncov(0).

@@ -1,0 +1,19 @@
+{
+  "selected": "recursive_reach",
+  "selected_rule_id": 4,
+  "best_fit": "recursive_reach",
+  "best_fit_rule_id": 4,
+  "train_cases": 100,
+  "holdout_cases": 100,
+  "training_errors_by_candidate": {
+    "recursive_reach": 0,
+    "at_most_two_hops": 30,
+    "direct_edge": 40,
+    "constant_no": 50,
+    "constant_yes": 50
+  },
+  "holdout_errors": 0,
+  "best_fit_holdout_errors": 0,
+  "holdout_error_ids": [],
+  "best_fit_holdout_error_ids": []
+}
