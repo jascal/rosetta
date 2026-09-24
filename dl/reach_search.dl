@@ -1,5 +1,5 @@
 // Select the smallest graph-query rule with zero training errors.
-// Candidate 3 is recursive transitive closure; lower ids are finite shortcuts.
+// Candidate ids: 0 constant no, 1 constant yes, 2 direct, 3 two-hop, 4 recursive.
 // Facts for train/test/ref are supplied at build time. No model runtime.
 .decl edge(inst:number, src:number, dst:number)
 .input edge
