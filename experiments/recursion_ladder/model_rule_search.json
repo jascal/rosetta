@@ -1,0 +1,502 @@
+{
+  "domain": {
+    "cases": 40,
+    "training_trials": [
+      0,
+      1
+    ],
+    "holdout_trials": [
+      2,
+      3
+    ]
+  },
+  "architectures": [
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 2,
+      "prompt_style": "fewshot",
+      "selected": "constant_no",
+      "selected_rule_id": 0,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 0,
+        "direct_edge": 2,
+        "at_most_two_hops": 4,
+        "recursive_reach": 10,
+        "constant_yes": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 2,
+      "prompt_style": "plain",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 4,
+      "prompt_style": "fewshot",
+      "selected": "constant_no",
+      "selected_rule_id": 0,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 0,
+        "direct_edge": 2,
+        "at_most_two_hops": 4,
+        "recursive_reach": 10,
+        "constant_yes": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 4,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 3,
+        "recursive_reach": 11,
+        "at_most_two_hops": 13,
+        "direct_edge": 15,
+        "constant_no": 17
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        20,
+        21,
+        28,
+        29
+      ]
+    },
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 8,
+      "prompt_style": "fewshot",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 2,
+        "direct_edge": 4,
+        "at_most_two_hops": 6,
+        "recursive_reach": 10,
+        "constant_yes": 18
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 12,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        4,
+        6,
+        12,
+        13,
+        14,
+        20,
+        22,
+        28,
+        29,
+        37,
+        38,
+        39
+      ]
+    },
+    {
+      "architecture": "hrm_text_1b",
+      "budget": 8,
+      "prompt_style": "plain",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "llama32_1b",
+      "budget": 1,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "llama32_1b",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 1,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 2,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 2,
+      "prompt_style": "plain",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 4,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 4,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 2,
+        "direct_edge": 4,
+        "at_most_two_hops": 4,
+        "recursive_reach": 10,
+        "constant_yes": 18
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 5,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        6,
+        7,
+        12,
+        13,
+        15
+      ]
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 8,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "loopformer_3x8_fineweb300k",
+      "budget": 8,
+      "prompt_style": "plain",
+      "selected": "constant_no",
+      "selected_rule_id": 0,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 0,
+        "direct_edge": 2,
+        "at_most_two_hops": 4,
+        "recursive_reach": 10,
+        "constant_yes": 20
+      },
+      "holdout_errors": 0,
+      "best_fit_holdout_errors": 0,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": []
+    },
+    {
+      "architecture": "pythia70m",
+      "budget": 1,
+      "prompt_style": "fewshot",
+      "selected": "constant_yes",
+      "selected_rule_id": 1,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 0,
+        "recursive_reach": 10,
+        "at_most_two_hops": 16,
+        "direct_edge": 18,
+        "constant_no": 20
+      },
+      "holdout_errors": 1,
+      "best_fit_holdout_errors": 1,
+      "holdout_error_ids": [
+        6
+      ],
+      "best_fit_holdout_error_ids": [
+        6
+      ]
+    },
+    {
+      "architecture": "pythia70m",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": "constant_no",
+      "selected_rule_id": 0,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 0,
+        "direct_edge": 2,
+        "at_most_two_hops": 4,
+        "recursive_reach": 10,
+        "constant_yes": 20
+      },
+      "holdout_errors": 2,
+      "best_fit_holdout_errors": 2,
+      "holdout_error_ids": [
+        36,
+        37
+      ],
+      "best_fit_holdout_error_ids": [
+        36,
+        37
+      ]
+    },
+    {
+      "architecture": "qwen25coder15b",
+      "budget": 1,
+      "prompt_style": "fewshot",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_yes",
+      "best_fit_rule_id": 1,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_yes": 3,
+        "recursive_reach": 7,
+        "at_most_two_hops": 13,
+        "direct_edge": 15,
+        "constant_no": 17
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 4,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        5,
+        7,
+        23,
+        31
+      ]
+    },
+    {
+      "architecture": "qwen25coder15b",
+      "budget": 1,
+      "prompt_style": "plain",
+      "selected": null,
+      "selected_rule_id": null,
+      "best_fit": "constant_no",
+      "best_fit_rule_id": 0,
+      "train_cases": 20,
+      "holdout_cases": 20,
+      "training_errors_by_candidate": {
+        "constant_no": 2,
+        "direct_edge": 4,
+        "at_most_two_hops": 6,
+        "recursive_reach": 10,
+        "constant_yes": 18
+      },
+      "holdout_errors": null,
+      "best_fit_holdout_errors": 7,
+      "holdout_error_ids": [],
+      "best_fit_holdout_error_ids": [
+        4,
+        6,
+        13,
+        14,
+        29,
+        38,
+        39
+      ]
+    }
+  ]
+}

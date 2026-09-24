@@ -1,0 +1,61 @@
+{
+  "domain": {
+    "training_graphs": "four-node",
+    "holdout_graph_sizes": [
+      5,
+      6
+    ],
+    "training_cases": 8,
+    "holdout_cases": 6,
+    "holdout_features": [
+      "new node identifiers",
+      "cycles",
+      "branches",
+      "shortcut edge",
+      "disconnected component"
+    ]
+  },
+  "candidate_search": {
+    "selected": "recursive_reach",
+    "selected_rule_id": 4,
+    "best_fit": "recursive_reach",
+    "best_fit_rule_id": 4,
+    "train_cases": 8,
+    "holdout_cases": 6,
+    "training_errors_by_candidate": {
+      "recursive_reach": 0,
+      "at_most_two_hops": 1,
+      "direct_edge": 3,
+      "constant_no": 4,
+      "constant_yes": 4
+    },
+    "holdout_errors": 0,
+    "best_fit_holdout_errors": 0,
+    "holdout_error_ids": [],
+    "best_fit_holdout_error_ids": []
+  },
+  "certificate": {
+    "certified": true,
+    "ncover": 14,
+    "nmiss": 0,
+    "nuncov": 0,
+    "mismatches": [],
+    "uncovered": [],
+    "predictions": {
+      "0": 1,
+      "1": 0,
+      "2": 1,
+      "3": 0,
+      "4": 1,
+      "5": 0,
+      "6": 1,
+      "7": 0,
+      "8": 1,
+      "9": 0,
+      "10": 1,
+      "11": 1,
+      "12": 1,
+      "13": 1
+    }
+  }
+}

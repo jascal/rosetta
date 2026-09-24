@@ -1,0 +1,384 @@
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 0, "query": [0, 1], "topology": "exhaustive", "trial": 0}
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 1, "query": [0, 2], "topology": "exhaustive", "trial": 0}
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 2, "query": [1, 0], "topology": "exhaustive", "trial": 0}
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 3, "query": [1, 2], "topology": "exhaustive", "trial": 0}
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 4, "query": [2, 0], "topology": "exhaustive", "trial": 0}
+{"answer": 0, "depth": 0, "edges": [], "graph_mask": 0, "id": 5, "query": [2, 1], "topology": "exhaustive", "trial": 0}
+{"answer": 1, "depth": 1, "edges": [[0, 1]], "graph_mask": 1, "id": 6, "query": [0, 1], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 1]], "graph_mask": 1, "id": 7, "query": [0, 2], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 1]], "graph_mask": 1, "id": 8, "query": [1, 0], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 1]], "graph_mask": 1, "id": 9, "query": [1, 2], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 1]], "graph_mask": 1, "id": 10, "query": [2, 0], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 1]], "graph_mask": 1, "id": 11, "query": [2, 1], "topology": "exhaustive", "trial": 1}
+{"answer": 0, "depth": 0, "edges": [[0, 2]], "graph_mask": 2, "id": 12, "query": [0, 1], "topology": "exhaustive", "trial": 2}
+{"answer": 1, "depth": 1, "edges": [[0, 2]], "graph_mask": 2, "id": 13, "query": [0, 2], "topology": "exhaustive", "trial": 2}
+{"answer": 0, "depth": 0, "edges": [[0, 2]], "graph_mask": 2, "id": 14, "query": [1, 0], "topology": "exhaustive", "trial": 2}
+{"answer": 0, "depth": 0, "edges": [[0, 2]], "graph_mask": 2, "id": 15, "query": [1, 2], "topology": "exhaustive", "trial": 2}
+{"answer": 0, "depth": 0, "edges": [[0, 2]], "graph_mask": 2, "id": 16, "query": [2, 0], "topology": "exhaustive", "trial": 2}
+{"answer": 0, "depth": 0, "edges": [[0, 2]], "graph_mask": 2, "id": 17, "query": [2, 1], "topology": "exhaustive", "trial": 2}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 18, "query": [0, 1], "topology": "exhaustive", "trial": 3}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 19, "query": [0, 2], "topology": "exhaustive", "trial": 3}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 20, "query": [1, 0], "topology": "exhaustive", "trial": 3}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 21, "query": [1, 2], "topology": "exhaustive", "trial": 3}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 22, "query": [2, 0], "topology": "exhaustive", "trial": 3}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2]], "graph_mask": 3, "id": 23, "query": [2, 1], "topology": "exhaustive", "trial": 3}
+{"answer": 0, "depth": 0, "edges": [[1, 0]], "graph_mask": 4, "id": 24, "query": [0, 1], "topology": "exhaustive", "trial": 4}
+{"answer": 0, "depth": 0, "edges": [[1, 0]], "graph_mask": 4, "id": 25, "query": [0, 2], "topology": "exhaustive", "trial": 4}
+{"answer": 1, "depth": 1, "edges": [[1, 0]], "graph_mask": 4, "id": 26, "query": [1, 0], "topology": "exhaustive", "trial": 4}
+{"answer": 0, "depth": 0, "edges": [[1, 0]], "graph_mask": 4, "id": 27, "query": [1, 2], "topology": "exhaustive", "trial": 4}
+{"answer": 0, "depth": 0, "edges": [[1, 0]], "graph_mask": 4, "id": 28, "query": [2, 0], "topology": "exhaustive", "trial": 4}
+{"answer": 0, "depth": 0, "edges": [[1, 0]], "graph_mask": 4, "id": 29, "query": [2, 1], "topology": "exhaustive", "trial": 4}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 30, "query": [0, 1], "topology": "exhaustive", "trial": 5}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 31, "query": [0, 2], "topology": "exhaustive", "trial": 5}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 32, "query": [1, 0], "topology": "exhaustive", "trial": 5}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 33, "query": [1, 2], "topology": "exhaustive", "trial": 5}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 34, "query": [2, 0], "topology": "exhaustive", "trial": 5}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0]], "graph_mask": 5, "id": 35, "query": [2, 1], "topology": "exhaustive", "trial": 5}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 36, "query": [0, 1], "topology": "exhaustive", "trial": 6}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 37, "query": [0, 2], "topology": "exhaustive", "trial": 6}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 38, "query": [1, 0], "topology": "exhaustive", "trial": 6}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 39, "query": [1, 2], "topology": "exhaustive", "trial": 6}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 40, "query": [2, 0], "topology": "exhaustive", "trial": 6}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0]], "graph_mask": 6, "id": 41, "query": [2, 1], "topology": "exhaustive", "trial": 6}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 42, "query": [0, 1], "topology": "exhaustive", "trial": 7}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 43, "query": [0, 2], "topology": "exhaustive", "trial": 7}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 44, "query": [1, 0], "topology": "exhaustive", "trial": 7}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 45, "query": [1, 2], "topology": "exhaustive", "trial": 7}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 46, "query": [2, 0], "topology": "exhaustive", "trial": 7}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 0]], "graph_mask": 7, "id": 47, "query": [2, 1], "topology": "exhaustive", "trial": 7}
+{"answer": 0, "depth": 0, "edges": [[1, 2]], "graph_mask": 8, "id": 48, "query": [0, 1], "topology": "exhaustive", "trial": 8}
+{"answer": 0, "depth": 0, "edges": [[1, 2]], "graph_mask": 8, "id": 49, "query": [0, 2], "topology": "exhaustive", "trial": 8}
+{"answer": 0, "depth": 0, "edges": [[1, 2]], "graph_mask": 8, "id": 50, "query": [1, 0], "topology": "exhaustive", "trial": 8}
+{"answer": 1, "depth": 1, "edges": [[1, 2]], "graph_mask": 8, "id": 51, "query": [1, 2], "topology": "exhaustive", "trial": 8}
+{"answer": 0, "depth": 0, "edges": [[1, 2]], "graph_mask": 8, "id": 52, "query": [2, 0], "topology": "exhaustive", "trial": 8}
+{"answer": 0, "depth": 0, "edges": [[1, 2]], "graph_mask": 8, "id": 53, "query": [2, 1], "topology": "exhaustive", "trial": 8}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 54, "query": [0, 1], "topology": "exhaustive", "trial": 9}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 55, "query": [0, 2], "topology": "exhaustive", "trial": 9}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 56, "query": [1, 0], "topology": "exhaustive", "trial": 9}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 57, "query": [1, 2], "topology": "exhaustive", "trial": 9}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 58, "query": [2, 0], "topology": "exhaustive", "trial": 9}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 2]], "graph_mask": 9, "id": 59, "query": [2, 1], "topology": "exhaustive", "trial": 9}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 60, "query": [0, 1], "topology": "exhaustive", "trial": 10}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 61, "query": [0, 2], "topology": "exhaustive", "trial": 10}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 62, "query": [1, 0], "topology": "exhaustive", "trial": 10}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 63, "query": [1, 2], "topology": "exhaustive", "trial": 10}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 64, "query": [2, 0], "topology": "exhaustive", "trial": 10}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2]], "graph_mask": 10, "id": 65, "query": [2, 1], "topology": "exhaustive", "trial": 10}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 66, "query": [0, 1], "topology": "exhaustive", "trial": 11}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 67, "query": [0, 2], "topology": "exhaustive", "trial": 11}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 68, "query": [1, 0], "topology": "exhaustive", "trial": 11}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 69, "query": [1, 2], "topology": "exhaustive", "trial": 11}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 70, "query": [2, 0], "topology": "exhaustive", "trial": 11}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 2]], "graph_mask": 11, "id": 71, "query": [2, 1], "topology": "exhaustive", "trial": 11}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 72, "query": [0, 1], "topology": "exhaustive", "trial": 12}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 73, "query": [0, 2], "topology": "exhaustive", "trial": 12}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 74, "query": [1, 0], "topology": "exhaustive", "trial": 12}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 75, "query": [1, 2], "topology": "exhaustive", "trial": 12}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 76, "query": [2, 0], "topology": "exhaustive", "trial": 12}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2]], "graph_mask": 12, "id": 77, "query": [2, 1], "topology": "exhaustive", "trial": 12}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 78, "query": [0, 1], "topology": "exhaustive", "trial": 13}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 79, "query": [0, 2], "topology": "exhaustive", "trial": 13}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 80, "query": [1, 0], "topology": "exhaustive", "trial": 13}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 81, "query": [1, 2], "topology": "exhaustive", "trial": 13}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 82, "query": [2, 0], "topology": "exhaustive", "trial": 13}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [1, 2]], "graph_mask": 13, "id": 83, "query": [2, 1], "topology": "exhaustive", "trial": 13}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 84, "query": [0, 1], "topology": "exhaustive", "trial": 14}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 85, "query": [0, 2], "topology": "exhaustive", "trial": 14}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 86, "query": [1, 0], "topology": "exhaustive", "trial": 14}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 87, "query": [1, 2], "topology": "exhaustive", "trial": 14}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 88, "query": [2, 0], "topology": "exhaustive", "trial": 14}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [1, 2]], "graph_mask": 14, "id": 89, "query": [2, 1], "topology": "exhaustive", "trial": 14}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 90, "query": [0, 1], "topology": "exhaustive", "trial": 15}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 91, "query": [0, 2], "topology": "exhaustive", "trial": 15}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 92, "query": [1, 0], "topology": "exhaustive", "trial": 15}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 93, "query": [1, 2], "topology": "exhaustive", "trial": 15}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 94, "query": [2, 0], "topology": "exhaustive", "trial": 15}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 0], [1, 2]], "graph_mask": 15, "id": 95, "query": [2, 1], "topology": "exhaustive", "trial": 15}
+{"answer": 0, "depth": 0, "edges": [[2, 0]], "graph_mask": 16, "id": 96, "query": [0, 1], "topology": "exhaustive", "trial": 16}
+{"answer": 0, "depth": 0, "edges": [[2, 0]], "graph_mask": 16, "id": 97, "query": [0, 2], "topology": "exhaustive", "trial": 16}
+{"answer": 0, "depth": 0, "edges": [[2, 0]], "graph_mask": 16, "id": 98, "query": [1, 0], "topology": "exhaustive", "trial": 16}
+{"answer": 0, "depth": 0, "edges": [[2, 0]], "graph_mask": 16, "id": 99, "query": [1, 2], "topology": "exhaustive", "trial": 16}
+{"answer": 1, "depth": 1, "edges": [[2, 0]], "graph_mask": 16, "id": 100, "query": [2, 0], "topology": "exhaustive", "trial": 16}
+{"answer": 0, "depth": 0, "edges": [[2, 0]], "graph_mask": 16, "id": 101, "query": [2, 1], "topology": "exhaustive", "trial": 16}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 102, "query": [0, 1], "topology": "exhaustive", "trial": 17}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 103, "query": [0, 2], "topology": "exhaustive", "trial": 17}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 104, "query": [1, 0], "topology": "exhaustive", "trial": 17}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 105, "query": [1, 2], "topology": "exhaustive", "trial": 17}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 106, "query": [2, 0], "topology": "exhaustive", "trial": 17}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [2, 0]], "graph_mask": 17, "id": 107, "query": [2, 1], "topology": "exhaustive", "trial": 17}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 108, "query": [0, 1], "topology": "exhaustive", "trial": 18}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 109, "query": [0, 2], "topology": "exhaustive", "trial": 18}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 110, "query": [1, 0], "topology": "exhaustive", "trial": 18}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 111, "query": [1, 2], "topology": "exhaustive", "trial": 18}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 112, "query": [2, 0], "topology": "exhaustive", "trial": 18}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0]], "graph_mask": 18, "id": 113, "query": [2, 1], "topology": "exhaustive", "trial": 18}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 114, "query": [0, 1], "topology": "exhaustive", "trial": 19}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 115, "query": [0, 2], "topology": "exhaustive", "trial": 19}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 116, "query": [1, 0], "topology": "exhaustive", "trial": 19}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 117, "query": [1, 2], "topology": "exhaustive", "trial": 19}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 118, "query": [2, 0], "topology": "exhaustive", "trial": 19}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [2, 0]], "graph_mask": 19, "id": 119, "query": [2, 1], "topology": "exhaustive", "trial": 19}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 120, "query": [0, 1], "topology": "exhaustive", "trial": 20}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 121, "query": [0, 2], "topology": "exhaustive", "trial": 20}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 122, "query": [1, 0], "topology": "exhaustive", "trial": 20}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 123, "query": [1, 2], "topology": "exhaustive", "trial": 20}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 124, "query": [2, 0], "topology": "exhaustive", "trial": 20}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0]], "graph_mask": 20, "id": 125, "query": [2, 1], "topology": "exhaustive", "trial": 20}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 126, "query": [0, 1], "topology": "exhaustive", "trial": 21}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 127, "query": [0, 2], "topology": "exhaustive", "trial": 21}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 128, "query": [1, 0], "topology": "exhaustive", "trial": 21}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 129, "query": [1, 2], "topology": "exhaustive", "trial": 21}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 130, "query": [2, 0], "topology": "exhaustive", "trial": 21}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [2, 0]], "graph_mask": 21, "id": 131, "query": [2, 1], "topology": "exhaustive", "trial": 21}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 132, "query": [0, 1], "topology": "exhaustive", "trial": 22}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 133, "query": [0, 2], "topology": "exhaustive", "trial": 22}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 134, "query": [1, 0], "topology": "exhaustive", "trial": 22}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 135, "query": [1, 2], "topology": "exhaustive", "trial": 22}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 136, "query": [2, 0], "topology": "exhaustive", "trial": 22}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [2, 0]], "graph_mask": 22, "id": 137, "query": [2, 1], "topology": "exhaustive", "trial": 22}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 138, "query": [0, 1], "topology": "exhaustive", "trial": 23}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 139, "query": [0, 2], "topology": "exhaustive", "trial": 23}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 140, "query": [1, 0], "topology": "exhaustive", "trial": 23}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 141, "query": [1, 2], "topology": "exhaustive", "trial": 23}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 142, "query": [2, 0], "topology": "exhaustive", "trial": 23}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [2, 0]], "graph_mask": 23, "id": 143, "query": [2, 1], "topology": "exhaustive", "trial": 23}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 144, "query": [0, 1], "topology": "exhaustive", "trial": 24}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 145, "query": [0, 2], "topology": "exhaustive", "trial": 24}
+{"answer": 1, "depth": 2, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 146, "query": [1, 0], "topology": "exhaustive", "trial": 24}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 147, "query": [1, 2], "topology": "exhaustive", "trial": 24}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 148, "query": [2, 0], "topology": "exhaustive", "trial": 24}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 0]], "graph_mask": 24, "id": 149, "query": [2, 1], "topology": "exhaustive", "trial": 24}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 150, "query": [0, 1], "topology": "exhaustive", "trial": 25}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 151, "query": [0, 2], "topology": "exhaustive", "trial": 25}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 152, "query": [1, 0], "topology": "exhaustive", "trial": 25}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 153, "query": [1, 2], "topology": "exhaustive", "trial": 25}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 154, "query": [2, 0], "topology": "exhaustive", "trial": 25}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 0]], "graph_mask": 25, "id": 155, "query": [2, 1], "topology": "exhaustive", "trial": 25}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 156, "query": [0, 1], "topology": "exhaustive", "trial": 26}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 157, "query": [0, 2], "topology": "exhaustive", "trial": 26}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 158, "query": [1, 0], "topology": "exhaustive", "trial": 26}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 159, "query": [1, 2], "topology": "exhaustive", "trial": 26}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 160, "query": [2, 0], "topology": "exhaustive", "trial": 26}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2], [2, 0]], "graph_mask": 26, "id": 161, "query": [2, 1], "topology": "exhaustive", "trial": 26}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 162, "query": [0, 1], "topology": "exhaustive", "trial": 27}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 163, "query": [0, 2], "topology": "exhaustive", "trial": 27}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 164, "query": [1, 0], "topology": "exhaustive", "trial": 27}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 165, "query": [1, 2], "topology": "exhaustive", "trial": 27}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 166, "query": [2, 0], "topology": "exhaustive", "trial": 27}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 2], [2, 0]], "graph_mask": 27, "id": 167, "query": [2, 1], "topology": "exhaustive", "trial": 27}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 168, "query": [0, 1], "topology": "exhaustive", "trial": 28}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 169, "query": [0, 2], "topology": "exhaustive", "trial": 28}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 170, "query": [1, 0], "topology": "exhaustive", "trial": 28}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 171, "query": [1, 2], "topology": "exhaustive", "trial": 28}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 172, "query": [2, 0], "topology": "exhaustive", "trial": 28}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 0]], "graph_mask": 28, "id": 173, "query": [2, 1], "topology": "exhaustive", "trial": 28}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 174, "query": [0, 1], "topology": "exhaustive", "trial": 29}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 175, "query": [0, 2], "topology": "exhaustive", "trial": 29}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 176, "query": [1, 0], "topology": "exhaustive", "trial": 29}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 177, "query": [1, 2], "topology": "exhaustive", "trial": 29}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 178, "query": [2, 0], "topology": "exhaustive", "trial": 29}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2], [2, 0]], "graph_mask": 29, "id": 179, "query": [2, 1], "topology": "exhaustive", "trial": 29}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 180, "query": [0, 1], "topology": "exhaustive", "trial": 30}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 181, "query": [0, 2], "topology": "exhaustive", "trial": 30}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 182, "query": [1, 0], "topology": "exhaustive", "trial": 30}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 183, "query": [1, 2], "topology": "exhaustive", "trial": 30}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 184, "query": [2, 0], "topology": "exhaustive", "trial": 30}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 30, "id": 185, "query": [2, 1], "topology": "exhaustive", "trial": 30}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 186, "query": [0, 1], "topology": "exhaustive", "trial": 31}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 187, "query": [0, 2], "topology": "exhaustive", "trial": 31}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 188, "query": [1, 0], "topology": "exhaustive", "trial": 31}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 189, "query": [1, 2], "topology": "exhaustive", "trial": 31}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 190, "query": [2, 0], "topology": "exhaustive", "trial": 31}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0]], "graph_mask": 31, "id": 191, "query": [2, 1], "topology": "exhaustive", "trial": 31}
+{"answer": 0, "depth": 0, "edges": [[2, 1]], "graph_mask": 32, "id": 192, "query": [0, 1], "topology": "exhaustive", "trial": 32}
+{"answer": 0, "depth": 0, "edges": [[2, 1]], "graph_mask": 32, "id": 193, "query": [0, 2], "topology": "exhaustive", "trial": 32}
+{"answer": 0, "depth": 0, "edges": [[2, 1]], "graph_mask": 32, "id": 194, "query": [1, 0], "topology": "exhaustive", "trial": 32}
+{"answer": 0, "depth": 0, "edges": [[2, 1]], "graph_mask": 32, "id": 195, "query": [1, 2], "topology": "exhaustive", "trial": 32}
+{"answer": 0, "depth": 0, "edges": [[2, 1]], "graph_mask": 32, "id": 196, "query": [2, 0], "topology": "exhaustive", "trial": 32}
+{"answer": 1, "depth": 1, "edges": [[2, 1]], "graph_mask": 32, "id": 197, "query": [2, 1], "topology": "exhaustive", "trial": 32}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 198, "query": [0, 1], "topology": "exhaustive", "trial": 33}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 199, "query": [0, 2], "topology": "exhaustive", "trial": 33}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 200, "query": [1, 0], "topology": "exhaustive", "trial": 33}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 201, "query": [1, 2], "topology": "exhaustive", "trial": 33}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 202, "query": [2, 0], "topology": "exhaustive", "trial": 33}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 1]], "graph_mask": 33, "id": 203, "query": [2, 1], "topology": "exhaustive", "trial": 33}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 204, "query": [0, 1], "topology": "exhaustive", "trial": 34}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 205, "query": [0, 2], "topology": "exhaustive", "trial": 34}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 206, "query": [1, 0], "topology": "exhaustive", "trial": 34}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 207, "query": [1, 2], "topology": "exhaustive", "trial": 34}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 208, "query": [2, 0], "topology": "exhaustive", "trial": 34}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 1]], "graph_mask": 34, "id": 209, "query": [2, 1], "topology": "exhaustive", "trial": 34}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 210, "query": [0, 1], "topology": "exhaustive", "trial": 35}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 211, "query": [0, 2], "topology": "exhaustive", "trial": 35}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 212, "query": [1, 0], "topology": "exhaustive", "trial": 35}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 213, "query": [1, 2], "topology": "exhaustive", "trial": 35}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 214, "query": [2, 0], "topology": "exhaustive", "trial": 35}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 1]], "graph_mask": 35, "id": 215, "query": [2, 1], "topology": "exhaustive", "trial": 35}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 216, "query": [0, 1], "topology": "exhaustive", "trial": 36}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 217, "query": [0, 2], "topology": "exhaustive", "trial": 36}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 218, "query": [1, 0], "topology": "exhaustive", "trial": 36}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 219, "query": [1, 2], "topology": "exhaustive", "trial": 36}
+{"answer": 1, "depth": 2, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 220, "query": [2, 0], "topology": "exhaustive", "trial": 36}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 1]], "graph_mask": 36, "id": 221, "query": [2, 1], "topology": "exhaustive", "trial": 36}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 222, "query": [0, 1], "topology": "exhaustive", "trial": 37}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 223, "query": [0, 2], "topology": "exhaustive", "trial": 37}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 224, "query": [1, 0], "topology": "exhaustive", "trial": 37}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 225, "query": [1, 2], "topology": "exhaustive", "trial": 37}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 226, "query": [2, 0], "topology": "exhaustive", "trial": 37}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 1]], "graph_mask": 37, "id": 227, "query": [2, 1], "topology": "exhaustive", "trial": 37}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 228, "query": [0, 1], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 229, "query": [0, 2], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 230, "query": [1, 0], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 231, "query": [1, 2], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 232, "query": [2, 0], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 1]], "graph_mask": 38, "id": 233, "query": [2, 1], "topology": "exhaustive", "trial": 38}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 234, "query": [0, 1], "topology": "exhaustive", "trial": 39}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 235, "query": [0, 2], "topology": "exhaustive", "trial": 39}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 236, "query": [1, 0], "topology": "exhaustive", "trial": 39}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 237, "query": [1, 2], "topology": "exhaustive", "trial": 39}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 238, "query": [2, 0], "topology": "exhaustive", "trial": 39}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 1]], "graph_mask": 39, "id": 239, "query": [2, 1], "topology": "exhaustive", "trial": 39}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 240, "query": [0, 1], "topology": "exhaustive", "trial": 40}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 241, "query": [0, 2], "topology": "exhaustive", "trial": 40}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 242, "query": [1, 0], "topology": "exhaustive", "trial": 40}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 243, "query": [1, 2], "topology": "exhaustive", "trial": 40}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 244, "query": [2, 0], "topology": "exhaustive", "trial": 40}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 1]], "graph_mask": 40, "id": 245, "query": [2, 1], "topology": "exhaustive", "trial": 40}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 246, "query": [0, 1], "topology": "exhaustive", "trial": 41}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 247, "query": [0, 2], "topology": "exhaustive", "trial": 41}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 248, "query": [1, 0], "topology": "exhaustive", "trial": 41}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 249, "query": [1, 2], "topology": "exhaustive", "trial": 41}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 250, "query": [2, 0], "topology": "exhaustive", "trial": 41}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 1]], "graph_mask": 41, "id": 251, "query": [2, 1], "topology": "exhaustive", "trial": 41}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 252, "query": [0, 1], "topology": "exhaustive", "trial": 42}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 253, "query": [0, 2], "topology": "exhaustive", "trial": 42}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 254, "query": [1, 0], "topology": "exhaustive", "trial": 42}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 255, "query": [1, 2], "topology": "exhaustive", "trial": 42}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 256, "query": [2, 0], "topology": "exhaustive", "trial": 42}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 1]], "graph_mask": 42, "id": 257, "query": [2, 1], "topology": "exhaustive", "trial": 42}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 258, "query": [0, 1], "topology": "exhaustive", "trial": 43}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 259, "query": [0, 2], "topology": "exhaustive", "trial": 43}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 260, "query": [1, 0], "topology": "exhaustive", "trial": 43}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 261, "query": [1, 2], "topology": "exhaustive", "trial": 43}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 262, "query": [2, 0], "topology": "exhaustive", "trial": 43}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 1]], "graph_mask": 43, "id": 263, "query": [2, 1], "topology": "exhaustive", "trial": 43}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 264, "query": [0, 1], "topology": "exhaustive", "trial": 44}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 265, "query": [0, 2], "topology": "exhaustive", "trial": 44}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 266, "query": [1, 0], "topology": "exhaustive", "trial": 44}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 267, "query": [1, 2], "topology": "exhaustive", "trial": 44}
+{"answer": 1, "depth": 2, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 268, "query": [2, 0], "topology": "exhaustive", "trial": 44}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 1]], "graph_mask": 44, "id": 269, "query": [2, 1], "topology": "exhaustive", "trial": 44}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 270, "query": [0, 1], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 271, "query": [0, 2], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 272, "query": [1, 0], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 273, "query": [1, 2], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 274, "query": [2, 0], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 1]], "graph_mask": 45, "id": 275, "query": [2, 1], "topology": "exhaustive", "trial": 45}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 276, "query": [0, 1], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 277, "query": [0, 2], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 278, "query": [1, 0], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 279, "query": [1, 2], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 280, "query": [2, 0], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 46, "id": 281, "query": [2, 1], "topology": "exhaustive", "trial": 46}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 282, "query": [0, 1], "topology": "exhaustive", "trial": 47}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 283, "query": [0, 2], "topology": "exhaustive", "trial": 47}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 284, "query": [1, 0], "topology": "exhaustive", "trial": 47}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 285, "query": [1, 2], "topology": "exhaustive", "trial": 47}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 286, "query": [2, 0], "topology": "exhaustive", "trial": 47}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 1]], "graph_mask": 47, "id": 287, "query": [2, 1], "topology": "exhaustive", "trial": 47}
+{"answer": 0, "depth": 0, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 288, "query": [0, 1], "topology": "exhaustive", "trial": 48}
+{"answer": 0, "depth": 0, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 289, "query": [0, 2], "topology": "exhaustive", "trial": 48}
+{"answer": 0, "depth": 0, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 290, "query": [1, 0], "topology": "exhaustive", "trial": 48}
+{"answer": 0, "depth": 0, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 291, "query": [1, 2], "topology": "exhaustive", "trial": 48}
+{"answer": 1, "depth": 1, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 292, "query": [2, 0], "topology": "exhaustive", "trial": 48}
+{"answer": 1, "depth": 1, "edges": [[2, 0], [2, 1]], "graph_mask": 48, "id": 293, "query": [2, 1], "topology": "exhaustive", "trial": 48}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 294, "query": [0, 1], "topology": "exhaustive", "trial": 49}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 295, "query": [0, 2], "topology": "exhaustive", "trial": 49}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 296, "query": [1, 0], "topology": "exhaustive", "trial": 49}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 297, "query": [1, 2], "topology": "exhaustive", "trial": 49}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 298, "query": [2, 0], "topology": "exhaustive", "trial": 49}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [2, 0], [2, 1]], "graph_mask": 49, "id": 299, "query": [2, 1], "topology": "exhaustive", "trial": 49}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 300, "query": [0, 1], "topology": "exhaustive", "trial": 50}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 301, "query": [0, 2], "topology": "exhaustive", "trial": 50}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 302, "query": [1, 0], "topology": "exhaustive", "trial": 50}
+{"answer": 0, "depth": 0, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 303, "query": [1, 2], "topology": "exhaustive", "trial": 50}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 304, "query": [2, 0], "topology": "exhaustive", "trial": 50}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [2, 0], [2, 1]], "graph_mask": 50, "id": 305, "query": [2, 1], "topology": "exhaustive", "trial": 50}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 306, "query": [0, 1], "topology": "exhaustive", "trial": 51}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 307, "query": [0, 2], "topology": "exhaustive", "trial": 51}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 308, "query": [1, 0], "topology": "exhaustive", "trial": 51}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 309, "query": [1, 2], "topology": "exhaustive", "trial": 51}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 310, "query": [2, 0], "topology": "exhaustive", "trial": 51}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [2, 0], [2, 1]], "graph_mask": 51, "id": 311, "query": [2, 1], "topology": "exhaustive", "trial": 51}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 312, "query": [0, 1], "topology": "exhaustive", "trial": 52}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 313, "query": [0, 2], "topology": "exhaustive", "trial": 52}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 314, "query": [1, 0], "topology": "exhaustive", "trial": 52}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 315, "query": [1, 2], "topology": "exhaustive", "trial": 52}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 316, "query": [2, 0], "topology": "exhaustive", "trial": 52}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [2, 0], [2, 1]], "graph_mask": 52, "id": 317, "query": [2, 1], "topology": "exhaustive", "trial": 52}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 318, "query": [0, 1], "topology": "exhaustive", "trial": 53}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 319, "query": [0, 2], "topology": "exhaustive", "trial": 53}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 320, "query": [1, 0], "topology": "exhaustive", "trial": 53}
+{"answer": 0, "depth": 0, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 321, "query": [1, 2], "topology": "exhaustive", "trial": 53}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 322, "query": [2, 0], "topology": "exhaustive", "trial": 53}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [2, 0], [2, 1]], "graph_mask": 53, "id": 323, "query": [2, 1], "topology": "exhaustive", "trial": 53}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 324, "query": [0, 1], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 325, "query": [0, 2], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 326, "query": [1, 0], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 327, "query": [1, 2], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 328, "query": [2, 0], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 54, "id": 329, "query": [2, 1], "topology": "exhaustive", "trial": 54}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 330, "query": [0, 1], "topology": "exhaustive", "trial": 55}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 331, "query": [0, 2], "topology": "exhaustive", "trial": 55}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 332, "query": [1, 0], "topology": "exhaustive", "trial": 55}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 333, "query": [1, 2], "topology": "exhaustive", "trial": 55}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 334, "query": [2, 0], "topology": "exhaustive", "trial": 55}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [2, 0], [2, 1]], "graph_mask": 55, "id": 335, "query": [2, 1], "topology": "exhaustive", "trial": 55}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 336, "query": [0, 1], "topology": "exhaustive", "trial": 56}
+{"answer": 0, "depth": 0, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 337, "query": [0, 2], "topology": "exhaustive", "trial": 56}
+{"answer": 1, "depth": 2, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 338, "query": [1, 0], "topology": "exhaustive", "trial": 56}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 339, "query": [1, 2], "topology": "exhaustive", "trial": 56}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 340, "query": [2, 0], "topology": "exhaustive", "trial": 56}
+{"answer": 1, "depth": 1, "edges": [[1, 2], [2, 0], [2, 1]], "graph_mask": 56, "id": 341, "query": [2, 1], "topology": "exhaustive", "trial": 56}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 342, "query": [0, 1], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 343, "query": [0, 2], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 344, "query": [1, 0], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 345, "query": [1, 2], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 346, "query": [2, 0], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 2], [2, 0], [2, 1]], "graph_mask": 57, "id": 347, "query": [2, 1], "topology": "exhaustive", "trial": 57}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 348, "query": [0, 1], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 349, "query": [0, 2], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 350, "query": [1, 0], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 351, "query": [1, 2], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 352, "query": [2, 0], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 58, "id": 353, "query": [2, 1], "topology": "exhaustive", "trial": 58}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 354, "query": [0, 1], "topology": "exhaustive", "trial": 59}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 355, "query": [0, 2], "topology": "exhaustive", "trial": 59}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 356, "query": [1, 0], "topology": "exhaustive", "trial": 59}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 357, "query": [1, 2], "topology": "exhaustive", "trial": 59}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 358, "query": [2, 0], "topology": "exhaustive", "trial": 59}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 2], [2, 0], [2, 1]], "graph_mask": 59, "id": 359, "query": [2, 1], "topology": "exhaustive", "trial": 59}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 360, "query": [0, 1], "topology": "exhaustive", "trial": 60}
+{"answer": 0, "depth": 0, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 361, "query": [0, 2], "topology": "exhaustive", "trial": 60}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 362, "query": [1, 0], "topology": "exhaustive", "trial": 60}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 363, "query": [1, 2], "topology": "exhaustive", "trial": 60}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 364, "query": [2, 0], "topology": "exhaustive", "trial": 60}
+{"answer": 1, "depth": 1, "edges": [[1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 60, "id": 365, "query": [2, 1], "topology": "exhaustive", "trial": 60}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 366, "query": [0, 1], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 2, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 367, "query": [0, 2], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 368, "query": [1, 0], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 369, "query": [1, 2], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 370, "query": [2, 0], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 61, "id": 371, "query": [2, 1], "topology": "exhaustive", "trial": 61}
+{"answer": 1, "depth": 2, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 372, "query": [0, 1], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 373, "query": [0, 2], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 374, "query": [1, 0], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 375, "query": [1, 2], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 376, "query": [2, 0], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 62, "id": 377, "query": [2, 1], "topology": "exhaustive", "trial": 62}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 378, "query": [0, 1], "topology": "exhaustive", "trial": 63}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 379, "query": [0, 2], "topology": "exhaustive", "trial": 63}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 380, "query": [1, 0], "topology": "exhaustive", "trial": 63}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 381, "query": [1, 2], "topology": "exhaustive", "trial": 63}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 382, "query": [2, 0], "topology": "exhaustive", "trial": 63}
+{"answer": 1, "depth": 1, "edges": [[0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]], "graph_mask": 63, "id": 383, "query": [2, 1], "topology": "exhaustive", "trial": 63}

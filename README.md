@@ -171,6 +171,12 @@ are agreement / delimiter-bracket / coreference. `proved`/`empirical`/`open` tag
     justified weighted mixture of idioms. The current top-K endpoint is available but carries no tail certificate.
 - **Non-n-gram circuit detectors** beyond `ngram.dl`/`induction.dl` — agreement, delimiter/bracket-matching, coreference
   — to capture the long-order tail that recall can't. params/rule grows with model size precisely because that tail does.
+- **Recursive reasoning depth ladder:** [`docs/RECURSION_LADDER.md`](docs/RECURSION_LADDER.md) specifies novel
+  graph paths, paired edge perturbations, per-budget model measurements, and a standalone recursive Datalog
+  reachability circuit. A Datalog search selects that rule from a bounded candidate library on training graphs
+  and checks it on held-out graphs. The first model run covers depths 1–5 with three one-pass baselines and
+  budget sweeps for LoopFormer, HRM-Text, and a maze-trained TRM on maze-encoded undirected graphs; none is
+  equivalent to the recursive rule on the tested domain. Arbitrary directed graph input remains open for TRM.
 - **Runtime input ergonomics**: a JSON / quoted-CSV input adapter so `circuits.symbols.dl` runs on contexts containing
   control-char tokens (tab/newline); `<0xNN>` rendering for byte-fallback tokens in the lexicon.
 - **The learning-curriculum (time axis).** Run rosetta over a model's **training checkpoints**. The conjecture — *learn
