@@ -129,14 +129,25 @@ fieldrun bundle (`13068ab3…`), with `--allow-bundle-mismatch` recorded as `sam
 
 The guard abstained on all 21 negatives.
 
-- **Proved over this finite domain:** the fixed guard and raw copy each have an exact certificate over the 168 positive
-  cases, relative to this bundle's recorded references.
-- **Empirical:** the model's copy accuracy is flat in k, while the binding-blind baseline falls as 1/k. In the paper's
-  terms, on this task Qwen binds novel tokens to slots systematically, rather than reproducing pairs it has seen.
+**What this table says, and only this.** Everything below is scoped to bundle `13068ab3…`.
+- **Proved over this finite domain:** the frozen guard artifact and raw copy each have an exact certificate over these
+  168 positive cases, relative to **this bundle's** recorded references.
+- **Empirical:** on this bundle the model agrees with gold on 168/168 at every k, while the binding-blind baseline
+  falls from 1 to 1/6.
 
-The guard is token-agnostic, so its own flatness across k is structural. The informative quantity is the model's.
-The same columns apply unchanged to a lexicalized circuit (for example the train-only n-gram baseline), whose
-agreement would be expected to fall with k.
+**What it does not say.**
+- **It does not confirm the guard selection.** The guard was selected against bundle `7bb34aa9…`, and this is a
+  different checkpoint. That confirmation is the pending re-run on the selection bundle.
+- **It is weak evidence of binding.** Flat accuracy across k is what any position-copy rule produces, the guard's own
+  rule included. It rules out a lookup over seen (token, slot) pairs, which would fall towards the baseline. It does
+  not show systematic role-filler binding in the paper's sense.
+- **What k measures.** k is a property of the *dataset*: novelty against the selection data file. That file is fixed
+  and bundle-independent, so k stays well defined here. But it describes this bundle's inputs, not anything the
+  selection process saw on this bundle.
+
+The bundle-independent result of this section is the rescore above (280/288 against an expected 48). The same columns
+apply unchanged to a lexicalized circuit (for example the train-only n-gram baseline), whose agreement would be
+expected to fall with k.
 
 ```bash
 python3 py/benchmark_copy_generalization.py /tmp/withheld --protocol withheld-pairs --oracle copy-control
