@@ -8,7 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "py"))
-from benchmark_copy_generalization import benchmark, generate  # noqa: E402
+from benchmark_copy_generalization import benchmark, generate, generate_withheld, known_pairs, rescore  # noqa: E402
 from certificate import replay, sha256  # noqa: E402
 
 PRIOR = ROOT / "reference/benchmarks/qwen25_05b_guarded_seed1"
@@ -97,3 +97,44 @@ def test_missing_oracle_reference_fails_evaluation_audit(tmp_path):
     with pytest.raises(ValueError, match="evaluation audit failed"):
         benchmark(tmp_path / "missing", generate(seeds=(2,), lengths=(8,), groups=1),
                   lambda row: None if row["id"] == 0 else row["expected"], {"source": "missing-reference"}, PRIOR)
+
+
+def test_withheld_pair_design_controls_novel_slots():
+    known = known_pairs(json.loads((PRIOR / "dataset.json").read_text()))
+    assert {s for _, s in known} == set(range(12))
+    rows = generate_withheld(known, seeds=(5,), novel=range(7))
+    for row in rows:
+        if row["part"] != "test":
+            continue
+        seq, prefix, k = row["seq"], row["prefix"], row["design_k"]
+        assert len(set(seq)) == len(seq) == 12
+        assert [s for s in range(prefix, 12) if (seq[s], s) not in known] == list(range(prefix, prefix + k))
+        assert not {t for t, _ in known} & set(seq[:prefix])
+
+
+def test_binding_baseline_is_one_over_k_for_novel_targets(tmp_path):
+    known = known_pairs(json.loads((PRIOR / "dataset.json").read_text()))
+    rows = generate_withheld(known, seeds=(5,), novel=(0, 3, 6))
+    report = benchmark(tmp_path / "run", rows, lambda row: row["expected"], {"source": "copy-control"}, PRIOR,
+                       protocol_name="withheld-pairs")
+    by_k = {r["k"]: r for r in report["results"]["guarded"]["binding_baseline"]["by_k"]}
+    # Design k=0 repeats keep a known target (chance 1); their interventions swap in a fresh token (k=1, chance 1).
+    assert by_k[0]["n"] == 4 and by_k[0]["chance"] == pytest.approx(4)
+    assert by_k[1]["n"] == 4 and by_k[1]["chance"] == pytest.approx(4)
+    assert by_k[3]["chance"] == pytest.approx(8 / 3) and by_k[6]["chance"] == pytest.approx(8 / 6)
+    assert all(r["model_gold"] == r["agree"] == r["n"] for r in by_k.values())
+
+
+def test_fixed_matrix_is_all_novel_so_k_is_the_unconsumed_suffix(tmp_path):
+    report = benchmark(tmp_path / "run", generate(seeds=(2,), lengths=(8, 12), groups=1),
+                       lambda row: row["expected"], {"source": "copy-control"}, PRIOR)
+    by_k = {r["k"]: r for r in report["results"]["guarded"]["binding_baseline"]["by_k"]}
+    assert set(by_k) == {4, 6}
+    assert by_k[4]["chance"] == pytest.approx(16 / 4) and by_k[6]["chance"] == pytest.approx(16 / 6)
+
+
+def test_rescore_recorded_qwen_run_without_oracle(tmp_path):
+    report = rescore(ROOT / "reference/benchmarks/qwen25_05b_copy_generalization", tmp_path / "rescore", PRIOR)
+    total = report["results"]["guarded"]["binding_baseline"]["total"]
+    assert (total["n"], total["model_gold"], total["agree"]) == (288, 280, 280)
+    assert total["chance"] == pytest.approx(48)

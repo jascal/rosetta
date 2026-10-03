@@ -1,0 +1,3 @@
+Warning: Variable I0 only occurs once in file verify.dl at line 87
+    N = count : { nnovel(I,K) },
+-------------------------^-------
