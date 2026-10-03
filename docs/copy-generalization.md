@@ -112,8 +112,8 @@ same slot. The design uses seeds 5–7, k = 0…6, two or three exposures, plain
 interventions: 168 positive and 21 no-repeat negative cases. Interventions substitute a fresh token, so design k = 0
 interventions are measured at k = 1; Datalog counts k from the facts, not from the design label.
 
-The selection bundle (`7bb34aa9…`) is not on this machine. This run therefore used the local Qwen2.5-0.5B-Instruct
-fieldrun bundle (`13068ab3…`), with `--allow-bundle-mismatch` recorded as `same_bundle_as_selection: false`
+This first run used the local f32 Qwen2.5-0.5B-Instruct fieldrun bundle (`13068ab3…`), with `--allow-bundle-mismatch`
+recorded as `same_bundle_as_selection: false`
 ([report](../reference/benchmarks/qwen25_05b_withheld_pairs/REPORT.md)):
 
 | k | Cases | Model = gold | Binding-blind expected hits | Guard = model |
@@ -137,13 +137,50 @@ The guard abstained on all 21 negatives.
 
 **What it does not say.**
 - **It does not confirm the guard selection.** The guard was selected against bundle `7bb34aa9…`, and this is a
-  different checkpoint. That confirmation is the pending re-run on the selection bundle.
+  different checkpoint. That confirmation is the selection-bundle run below.
 - **It is weak evidence of binding.** Flat accuracy across k is what any position-copy rule produces, the guard's own
   rule included. It rules out a lookup over seen (token, slot) pairs, which would fall towards the baseline. It does
   not show systematic role-filler binding in the paper's sense.
 - **What k measures.** k is a property of the *dataset*: novelty against the selection data file. That file is fixed
   and bundle-independent, so k stays well defined here. But it describes this bundle's inputs, not anything the
   selection process saw on this bundle.
+
+### On the selection bundle
+
+**The selection bundle is reproducible.** `7bb34aa9…` / sidecar `59ae79cd…` is exactly what current fieldrun
+writes for `fieldrun convert --model Qwen/Qwen2.5-0.5B-Instruct --arch rope --dtype int8`. Export is deterministic:
+re-exporting the June int8 Coder bundle also reproduces it byte-for-byte. The earlier note that this bundle "is not on
+this machine" was wrong. It had simply never been exported here, and the f32 bundle above is a different checkpoint
+of the same model. The sidecar alone does not identify a model: it records only architecture config and array layout.
+
+The same frozen guard on the selection bundle (`same_bundle_as_selection: true`;
+[report](../reference/benchmarks/qwen25_05b_int8_withheld_pairs/REPORT.md)):
+
+| k | Cases | Model = gold | Binding-blind expected hits | Guard = model |
+|---:|---:|---:|---:|---:|
+| 0 | 12 | 12 | 12.0 | 12 |
+| 1 | 36 | 34 | 36.0 | 34 |
+| 2 | 24 | 24 | 12.0 | 24 |
+| 3 | 24 | 24 | 8.0 | 24 |
+| 4 | 24 | 24 | 6.0 | 24 |
+| 5 | 24 | 24 | 4.8 | 24 |
+| 6 | 24 | 24 | 4.0 | 24 |
+| all | 168 | 166 | 82.8 | 166 |
+
+- **Not certified.** The guard fired on all 168 positive cases and disagrees with the model on 2. Both the
+  full-test and the frozen-firing-domain certificates fail with `nmiss=2`, and both circuits miss the same 2. The
+  guard abstained on all 21 negatives.
+- **The two failures are one target token, not novelty.** Both are design-k=0 interventions in one sequence group
+  (seed 5, two exposures, plain and `noise8`). The substituted target is the subword `uther` (id 25487); the model
+  emits `ħ` (id 227), which is absent from the context. The paired repeats, and the same group at three exposures,
+  are correct. This matches the target-identity confound in the [copy-target diagnosis](copy-target-diagnosis.md).
+  It does not show a dependence on k.
+- **Empirical, scoped to `7bb34aa9…`:** the model agrees with gold on 166/168. Accuracy is flat in k apart from those
+  two cases. The binding-blind baseline falls from 1 to 1/6. The earlier caveat stands: flat-in-k rules out a
+  seen-pair lookup, not more.
+
+The f32 bundle certified (168/168) where the selection bundle does not (166/168). The int8 quantization of this
+checkpoint changes the model's answer on this target token.
 
 The bundle-independent result of this section is the rescore above (280/288 against an expected 48). The same columns
 apply unchanged to a lexicalized circuit (for example the train-only n-gram baseline), whose agreement would be

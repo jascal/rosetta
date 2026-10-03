@@ -1,0 +1,15 @@
+// Freeze the candidate's firing domain before staging ANY test reference.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl sample(inst:number) .input sample
+#include "circuit.dl"
+.decl domain(inst:number) .output domain
+domain(I) :- sample(I), cdecide(I,_).
+.decl abstained(inst:number) .output abstained
+abstained(I) :- sample(I), !cdecide(I,_).
+.decl invalid() .output invalid
+invalid() :- cdecide(I,_), !sample(I).
+invalid() :- cdecide(I,A), cdecide(I,B), A != B.
+.decl ndomain(n:number) .output ndomain
+ndomain(N) :- N = count : { domain(_) }.
+.decl certified() .output certified
+certified() :- sample(_), !invalid().
