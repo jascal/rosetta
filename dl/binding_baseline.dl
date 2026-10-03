@@ -1,0 +1,34 @@
+// Append to holdout.dl + holdout_strata.dl. Withheld-pair strata and the strong binding-blind chance baseline
+// (McCoy, Soulos, Linzen & Smolensky 2026, §8). Role = left-to-right slot in the copied sequence; filler = token.
+// A pair (token, slot) is KNOWN iff it occurred in the circuit's selection data, else NOVEL. The baseline predictor
+// knows every known pair and which fillers occupy the unconsumed slots, but cannot bind a novel filler to its slot:
+// it fills the queried slot correctly with probability 1 if that pair is known, else 1/k for k novel unconsumed
+// slots (random placement of k fillers into k slots, (k-1)!/k!). Descriptive diagnostics; never selection inputs.
+.decl slot(inst:number,slot:number,tok:number) .input slot
+.decl target_slot(inst:number,slot:number) .input target_slot
+.decl known(tok:number,slot:number) .input known
+.decl gold(inst:number,tok:number) .input gold
+invalid(I) :- slot(I,_,_), !sample(I,_,"test",_).
+invalid(I) :- slot(I,S,A), slot(I,S,B), A != B.
+invalid(I) :- sample(I,_,"test",_), !target_slot(I,_).
+invalid(I) :- target_slot(I,S), !slot(I,S,_).
+invalid(I) :- target_slot(I,S), slot(I,S,T), !gold(I,T).
+invalid(I) :- target_slot(I,A), target_slot(I,B), A != B.
+.decl novel(inst:number,slot:number)
+novel(I,S) :- slot(I,S,T), !known(T,S).
+.decl nnovel(inst:number,k:number)
+nnovel(I,K) :- target_slot(I,_), K = count : { novel(I,_) }.
+.decl chance(inst:number,p:float)
+chance(I,1.0) :- target_slot(I,S), !novel(I,S).
+chance(I,P) :- target_slot(I,S), novel(I,S), nnovel(I,K), P = 1.0 / to_float(K).
+.decl model_gold(inst:number)
+model_gold(I) :- gold(I,T), ref(I,T).
+// Per number of novel unconsumed pairs: cases, model==gold, circuit answered, circuit==model, expected chance hits.
+.decl binding_baseline(k:number,n:number,model_gold:number,answered:number,agree:number,chance:float)
+.output binding_baseline
+binding_baseline(K,N,G,A,C,E) :- nnovel(_,K),
+    N = count : { nnovel(I,K) },
+    G = count : { nnovel(I,K), model_gold(I) },
+    A = count : { nnovel(I,K), answered(I) },
+    C = count : { nnovel(I,K), correct(I) },
+    E = sum P : { nnovel(I,K), chance(I,P) }.

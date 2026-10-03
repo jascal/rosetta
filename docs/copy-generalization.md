@@ -80,6 +80,71 @@ The [constant-output control](../reference/benchmarks/constant_control_generaliz
 with the unchanged guard on all **288** positive cases and fails equivalence. Because this is a fixed-artifact
 experiment, the runner must not replace that circuit with an abstaining alternative after seeing failures.
 
+## Withheld pairs and the binding-blind baseline
+
+This section adapts the generalization test of McCoy, Soulos, Linzen and Smolensky (2026, *The Emergent Symbolic
+Structure of Artificial Neural Networks*, arXiv:2608.29530, §8). A copy target is a **(token, slot)** pair: the token
+filling a left-to-right slot of the copied sequence. A pair is **known** if the guard's selection data
+(`train`/`validation` of the prior experiment) showed that token in that slot; otherwise it is **novel**. Let **k** be
+the number of novel pairs among the unconsumed slots `[prefix, length)`.
+
+The **strong binding-blind baseline** knows every known pair and which tokens fill the unconsumed slots. It cannot bind a
+novel token to its slot, so it places the novel tokens randomly. It predicts the queried slot correctly with
+probability 1 if that pair is known, else `1/k` (the slot-wise form of the paper's `1/n!`). `dl/binding_baseline.dl`
+computes k, the baseline and the per-k counts. It is appended to every strata verifier, so each report includes it.
+Like the other strata, these are descriptive diagnostics, never selection inputs.
+
+**The preregistered matrix above is all-novel by construction.** Vocabularies are disjoint from the selection data, so
+`k = length − prefix` and k is confounded with length. Rescoring the recorded Qwen run uses its stored references and
+makes no oracle queries (`--rescore`;
+[report](../reference/benchmarks/qwen25_05b_copy_generalization_binding/REPORT.md)):
+
+| k (= length − prefix) | Cases | Model = gold | Binding-blind expected hits |
+|---:|---:|---:|---:|
+| 4 | 96 | 88 | 24.0 |
+| 6 | 96 | 96 | 16.0 |
+| 12 | 96 | 96 | 8.0 |
+| all | 288 | 280 | 48.0 |
+
+**The `--protocol withheld-pairs` dataset varies k at a fixed length**, 12 with prefix 6. The first k unconsumed slots
+get fresh tokens, so the queried slot is novel iff k ≥ 1. The rest reuse a token that the selection data showed in that
+same slot. The design uses seeds 5–7, k = 0…6, two or three exposures, plain and `noise8` layouts, and paired
+interventions: 168 positive and 21 no-repeat negative cases. Interventions substitute a fresh token, so design k = 0
+interventions are measured at k = 1; Datalog counts k from the facts, not from the design label.
+
+The selection bundle (`7bb34aa9…`) is not on this machine. This run therefore used the local Qwen2.5-0.5B-Instruct
+fieldrun bundle (`13068ab3…`), with `--allow-bundle-mismatch` recorded as `same_bundle_as_selection: false`
+([report](../reference/benchmarks/qwen25_05b_withheld_pairs/REPORT.md)):
+
+| k | Cases | Model = gold | Binding-blind expected hits | Guard = model |
+|---:|---:|---:|---:|---:|
+| 0 | 12 | 12 | 12.0 | 12 |
+| 1 | 36 | 36 | 36.0 | 36 |
+| 2 | 24 | 24 | 12.0 | 24 |
+| 3 | 24 | 24 | 8.0 | 24 |
+| 4 | 24 | 24 | 6.0 | 24 |
+| 5 | 24 | 24 | 4.8 | 24 |
+| 6 | 24 | 24 | 4.0 | 24 |
+| all | 168 | 168 | 82.8 | 168 |
+
+The guard abstained on all 21 negatives.
+
+- **Proved over this finite domain:** the fixed guard and raw copy each have an exact certificate over the 168 positive
+  cases, relative to this bundle's recorded references.
+- **Empirical:** the model's copy accuracy is flat in k, while the binding-blind baseline falls as 1/k. In the paper's
+  terms, on this task Qwen binds novel tokens to slots systematically, rather than reproducing pairs it has seen.
+
+The guard is token-agnostic, so its own flatness across k is structural. The informative quantity is the model's.
+The same columns apply unchanged to a lexicalized circuit (for example the train-only n-gram baseline), whose
+agreement would be expected to fall with k.
+
+```bash
+python3 py/benchmark_copy_generalization.py /tmp/withheld --protocol withheld-pairs --oracle copy-control
+python3 py/benchmark_copy_generalization.py /tmp/withheld-qwen --protocol withheld-pairs --oracle fieldrun \
+  --port 8187 --bundle /path/to/bundle [--allow-bundle-mismatch]
+python3 py/benchmark_copy_generalization.py /tmp/binding --rescore reference/benchmarks/qwen25_05b_copy_generalization
+```
+
 ## Reproduce and replay
 
 ```bash

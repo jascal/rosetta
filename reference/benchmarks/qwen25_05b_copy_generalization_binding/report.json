@@ -1,0 +1,127 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "source": "recorded-references",
+    "run": "reference/benchmarks/qwen25_05b_copy_generalization",
+    "frozen_sha256": "af37936a2e87699d9416744ce8661cdf6a26d65f401afe05691fd6c54c886892",
+    "references_sha256": "1dd5274b8dbf81bd051bf236d06ac3d09462716b2ae23d24d64dc8d9b5f85fb3",
+    "driver_sha256": "204ce5cf177b48ed6389b73e0cf691e7fe6445f0ce1694ae5251d745944d47f7"
+  },
+  "known_pairs": 105,
+  "results": {
+    "guarded": {
+      "binding_baseline": {
+        "by_k": [
+          {
+            "k": 4,
+            "n": 96,
+            "model_gold": 88,
+            "answered": 96,
+            "agree": 88,
+            "chance": 24.0
+          },
+          {
+            "k": 6,
+            "n": 96,
+            "model_gold": 96,
+            "answered": 96,
+            "agree": 96,
+            "chance": 15.999999999999977
+          },
+          {
+            "k": 12,
+            "n": 96,
+            "model_gold": 96,
+            "answered": 96,
+            "agree": 96,
+            "chance": 7.9999999999999885
+          }
+        ],
+        "total": {
+          "n": 288,
+          "model_gold": 280,
+          "answered": 288,
+          "agree": 280,
+          "chance": 47.999999999999964
+        }
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 288,
+          "correct": 280,
+          "wrong": 8,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 0.9722222222222222
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 54,
+          "coverage": 0.0,
+          "precision": null
+        }
+      }
+    },
+    "raw_copy": {
+      "binding_baseline": {
+        "by_k": [
+          {
+            "k": 4,
+            "n": 96,
+            "model_gold": 88,
+            "answered": 96,
+            "agree": 65,
+            "chance": 24.0
+          },
+          {
+            "k": 6,
+            "n": 96,
+            "model_gold": 96,
+            "answered": 96,
+            "agree": 72,
+            "chance": 15.999999999999977
+          },
+          {
+            "k": 12,
+            "n": 96,
+            "model_gold": 96,
+            "answered": 96,
+            "agree": 72,
+            "chance": 7.9999999999999885
+          }
+        ],
+        "total": {
+          "n": 288,
+          "model_gold": 280,
+          "answered": 288,
+          "agree": 209,
+          "chance": 47.999999999999964
+        }
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 288,
+          "correct": 209,
+          "wrong": 79,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 0.7256944444444444
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 36,
+          "correct": 28,
+          "wrong": 8,
+          "abstained": 18,
+          "coverage": 0.6666666666666666,
+          "precision": 0.7777777777777778
+        }
+      }
+    }
+  }
+}
