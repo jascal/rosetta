@@ -138,3 +138,11 @@ def test_rescore_recorded_qwen_run_without_oracle(tmp_path):
     total = report["results"]["guarded"]["binding_baseline"]["total"]
     assert (total["n"], total["model_gold"], total["agree"]) == (288, 280, 280)
     assert total["chance"] == pytest.approx(48)
+
+
+def test_relative_output_directory_is_accepted(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    report = benchmark(Path("relative-run"), generate(seeds=(2,), lengths=(8,), groups=1),
+                       lambda row: row["expected"], {"source": "copy-control"}, PRIOR)
+    cert = report["results"]["guarded"]["certificates"]["frozen_firing_domain"]
+    assert cert["certified"] and not Path(cert["evidence"]).is_absolute()

@@ -1,0 +1,11 @@
+seed	5	56	56	54	2	0
+seed	6	56	56	56	0	0
+seed	7	56	56	56	0	0
+length	12	168	168	166	2	0
+layout	plain	84	84	83	1	0
+layout	noise8	84	84	83	1	0
+exposures	2	84	84	82	2	0
+exposures	3	84	84	84	0	0
+kind	repeat	84	84	84	0	0
+kind	intervention	84	84	82	2	0
+negative	no_repeat	21	0	0	0	21

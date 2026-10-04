@@ -228,7 +228,7 @@ def verify_frozen(out, frozen):
 
 
 def benchmark(out, rows, oracle, provenance, prior=DEFAULT_PRIOR, protocol_name="fixed-guard-generalization"):
-    out, prior = Path(out), Path(prior)
+    out, prior = Path(out).resolve(), Path(prior)  # evidence paths are absolute; relative_to needs an absolute out
     known = known_pairs(json.loads((prior / "dataset.json").read_text()))
     out.mkdir(parents=True, exist_ok=False)
     previous = json.loads((prior / "frozen.json").read_text())
