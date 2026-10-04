@@ -1,0 +1,26 @@
+{
+  "tag": "empirical",
+  "seed": 40,
+  "length": 32,
+  "group_counts": {
+    "train": 2,
+    "validation": 2,
+    "test": 4,
+    "off_domain": 2
+  },
+  "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+  "excluded_dataset_sha256": {
+    "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+    "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "experiments/mimo_preflight/guarded_copy_base_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+    "experiments/mimo_preflight/guarded_copy_rl_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+    "experiments/mimo_preflight/copy_stress_base_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60",
+    "experiments/mimo_preflight/copy_stress_rl_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60",
+    "experiments/mimo_preflight/search_base_int8_retry/dataset.json": "73d6f38ffe62f9727ca2fc03bab8edc72760d50a68d7dca1033e70c864232bff",
+    "experiments/mimo_preflight/search_rl_int8/dataset.json": "73d6f38ffe62f9727ca2fc03bab8edc72760d50a68d7dca1033e70c864232bff",
+    "experiments/mimo_preflight/copy_guard_stress_seed37_len32_v2.json": "d730de85475d6e30cc2bfa78cae31c0055f356817b31a4ca2b520a239c796d72",
+    "experiments/mimo_preflight/copy_guard_stress_seed38_len32.json": "1cd1bd8504a8b0992eae9050abddc009d956776241f5805b7f16d18014f32d34",
+    "experiments/mimo_preflight/copy_guard_stress_seed39_len32.json": "af9a6422c8da8e25cdb94cfa38e4fe2127c0391ddb4822bdae8d9473bb84c840"
+  },
+  "exclusion_policy": "all token IDs appearing in prior datasets are removed from generation pool"
+}

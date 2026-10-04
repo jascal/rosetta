@@ -1,0 +1,32 @@
+// Includer supplies copy_core.dl, guard(g,max_suffix,min_sources), and
+// guard_horizon(g,h). Rank source occurrences by their longest suffix match,
+// restrict to globally best specificity, then choose the nearest such source
+// inside the frozen horizon. Minimum support counts the best-specificity
+// sources inside that horizon.
+.decl ranked_source(g:number,inst:number,j:number,k:number,out:number)
+ranked_source(G,I,J,K,T) :- guard(G,L,_), copy_match(I,J,K), K <= L,
+                            tok(I,J+1,T).
+
+.decl best_specificity(g:number,inst:number,k:number)
+best_specificity(G,I,K) :- ranked_source(G,I,_,K,_),
+                            K = max Q : { ranked_source(G,I,_,Q,_) }.
+
+.decl best_recent_source(g:number,inst:number,j:number,out:number)
+best_recent_source(G,I,J,T) :- ranked_source(G,I,J,K,T), best_specificity(G,I,K),
+                               guard_horizon(G,H), copy_last(I,P), J >= P-H.
+
+// Expose the selected specificity tier to the shared causal admission query.
+.decl guard_source(g:number,inst:number,j:number,out:number)
+guard_source(G,I,J,T) :- best_recent_source(G,I,J,T).
+
+.decl ranked_support(g:number,inst:number,n:number)
+ranked_support(G,I,N) :- best_recent_source(G,I,_,_),
+                         N = count : { best_recent_source(G,I,_,_) }.
+
+.decl ranked_nearest(g:number,inst:number,j:number,out:number)
+ranked_nearest(G,I,J,T) :- best_recent_source(G,I,J,T),
+                            J = max Q : { best_recent_source(G,I,Q,_) }.
+
+.decl guard_prediction(g:number,inst:number,out:number)
+guard_prediction(G,I,T) :- guard(G,_,M), ranked_nearest(G,I,_,T),
+                            ranked_support(G,I,N), N >= M.

@@ -1,0 +1,126 @@
+{
+  "protocol_sha256": "3d962cbfae5ab0467520f7e11739fd56021ae8f162f2dd5fc27b12b7c6e6bcc1",
+  "dataset_sha256": "1cd1bd8504a8b0992eae9050abddc009d956776241f5805b7f16d18014f32d34",
+  "selected": [],
+  "artifacts": {
+    "baseline": {
+      "sha256": "3caa4bf0fbec4a2a85ca8a4f531f410f619b37fee91a46b5cfc4d2ab63e9f517",
+      "domain": [],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 0,
+        "evidence": "certificate-evidence/check-kpedfxn_"
+      }
+    },
+    "raw_copy": {
+      "sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+      "domain": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 48,
+        "evidence": "certificate-evidence/check-cso3dbt1"
+      }
+    },
+    "strict_guard": {
+      "sha256": "a06cd2ef6c8260b767764c894b0d032645d46ee7177b87cbee97106e9234bc94",
+      "domain": [
+        48,
+        49,
+        52,
+        53,
+        54,
+        55,
+        58,
+        59,
+        60,
+        61,
+        64,
+        65,
+        66,
+        67,
+        70,
+        71,
+        72,
+        73,
+        76,
+        77,
+        78,
+        79,
+        82,
+        83,
+        84,
+        85,
+        88,
+        89,
+        90,
+        91,
+        94,
+        95
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 32,
+        "evidence": "certificate-evidence/check-86eq37wm"
+      }
+    },
+    "selected": {
+      "sha256": "c79a14cb505f31889274cf8feba7e43c9b5c0639f36545539b8623ac0a469401",
+      "domain": [],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 0,
+        "evidence": "certificate-evidence/check-ttqg_h26"
+      }
+    }
+  },
+  "development_references_sha256": "b46ce4dc3a4fe59b8d9f5f6baa520d2bdada4a3cb90707329b9f24474ca8adc4"
+}

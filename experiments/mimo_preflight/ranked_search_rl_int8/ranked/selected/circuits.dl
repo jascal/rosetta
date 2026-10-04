@@ -1,0 +1,2 @@
+// Standalone abstaining circuit: no guard passed admission.
+.decl cdecide(inst:number,out:number)

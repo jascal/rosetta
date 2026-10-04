@@ -1,0 +1,125 @@
+{
+  "protocol_sha256": "bc743367d5c2977da00ee0483a39de664ec66e80d8f7630a5fda675a63a52970",
+  "dataset_sha256": "af9a6422c8da8e25cdb94cfa38e4fe2127c0391ddb4822bdae8d9473bb84c840",
+  "selected": [
+    [
+      156,
+      13,
+      3
+    ]
+  ],
+  "artifacts": {
+    "baseline": {
+      "sha256": "b436106a0c2ce66eaa220af0b05533fe46079f1cac205185f28625a3f7f54f84",
+      "domain": [],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 0,
+        "evidence": "certificate-evidence/check-rqfgp150"
+      }
+    },
+    "raw_copy": {
+      "sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+      "domain": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 48,
+        "evidence": "certificate-evidence/check-_faymp9y"
+      }
+    },
+    "strict_guard": {
+      "sha256": "d44ab62dd0e610a18247751e553e68163a09e72424d14a0bd8d755ea274591fd",
+      "domain": [
+        48,
+        49,
+        54,
+        55,
+        60,
+        61,
+        66,
+        67,
+        72,
+        73,
+        78,
+        79,
+        84,
+        85,
+        90,
+        91
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 16,
+        "evidence": "certificate-evidence/check-y8mss4hz"
+      }
+    },
+    "selected": {
+      "sha256": "447c9cc0e41ffb24e250bdf16dd5e8285575146a4063a90c3bcd71b7a80f8706",
+      "domain": [
+        54,
+        55,
+        66,
+        67,
+        78,
+        79,
+        90,
+        91
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 8,
+        "evidence": "certificate-evidence/check-qv7832g4"
+      }
+    }
+  },
+  "development_references_sha256": "1ff42eb4f0ceb96f1b727e2e6792f9257b8e28e85d51d5e8d27d0ae3e5f08d03"
+}

@@ -1,0 +1,3 @@
+Warning: No rules/facts defined for relation cdecide in file circuit.dl at line 2
+.decl cdecide(inst:number,out:number)
+------^-------------------------------

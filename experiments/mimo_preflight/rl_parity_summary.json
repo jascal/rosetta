@@ -1,0 +1,65 @@
+{
+  "tag": "empirical",
+  "suite_sha256": "c6e10a434360004878a7c1c02a8203886112edbd4f0bfedc97bd497a027996fc",
+  "n": 32,
+  "top1_matches": 29,
+  "by_family": {
+    "copy": {
+      "n": 12,
+      "top1_matches": 12
+    },
+    "graph": {
+      "n": 8,
+      "top1_matches": 5
+    },
+    "family": {
+      "n": 8,
+      "top1_matches": 8
+    },
+    "ordinary": {
+      "n": 4,
+      "top1_matches": 4
+    }
+  },
+  "mismatches": [
+    {
+      "id": 12,
+      "family": "graph",
+      "reference_top2": [
+        4710,
+        23754
+      ],
+      "fieldrun_top2": [
+        23754,
+        4710
+      ],
+      "reference_margin": 0.018545150756835938
+    },
+    {
+      "id": 13,
+      "family": "graph",
+      "reference_top2": [
+        4710,
+        23754
+      ],
+      "fieldrun_top2": [
+        23754,
+        4710
+      ],
+      "reference_margin": 0.15639686584472656
+    },
+    {
+      "id": 16,
+      "family": "graph",
+      "reference_top2": [
+        4710,
+        9834
+      ],
+      "fieldrun_top2": [
+        23754,
+        4710
+      ],
+      "reference_margin": 0.1746540069580078
+    }
+  ]
+}

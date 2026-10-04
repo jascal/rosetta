@@ -1,0 +1,31 @@
+// Standalone consensus-copy circuit; abstains without sufficient agreeing sources.
+.decl guard(g:number,k:number,m:number)
+guard(6,9,3).
+.decl copy_length(k:number)
+copy_length(K) :- guard(_,K,_).
+// Runtime copy primitive. Includer supplies tok(inst,pos,id) and copy_length(k).
+// Match the current k-token suffix, choose the most recent earlier match, copy its successor.
+.decl copy_last(inst:number,p:number)
+copy_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl copy_match(inst:number,j:number,k:number)
+copy_match(I,J,1) :- copy_last(I,P), tok(I,P,X), tok(I,J,X), J < P.
+copy_match(I,J,K+1) :- copy_match(I,J,K), copy_length(L), K < L,
+                      copy_last(I,P), tok(I,P-K,X), tok(I,J-K,X).
+.decl copy_source(k:number,inst:number,j:number)
+copy_source(K,I,J) :- copy_length(K), copy_match(I,_,K), J = max Q : { copy_match(I,Q,K) }.
+.decl copy_prediction(k:number,inst:number,out:number)
+copy_prediction(K,I,T) :- copy_source(K,I,J), tok(I,J+1,T).
+// Includer supplies copy_core.dl and guard(id, suffix_length, minimum_sources).
+// All earlier matches must agree on the successor; repeated support is a runtime structural guard.
+.decl guard_source(g:number,inst:number,j:number,out:number)
+guard_source(G,I,J,T) :- guard(G,K,_), copy_match(I,J,K), tok(I,J+1,T).
+.decl guard_conflict(g:number,inst:number)
+guard_conflict(G,I) :- guard_source(G,I,_,A), guard_source(G,I,_,B), A != B.
+.decl guard_support(g:number,inst:number,n:number)
+guard_support(G,I,N) :- guard_source(G,I,_,_), N = count : { guard_source(G,I,_,_) }.
+.decl guard_prediction(g:number,inst:number,out:number)
+guard_prediction(G,I,T) :- guard(G,_,M), guard_source(G,I,_,T), guard_support(G,I,N), N >= M,
+                          !guard_conflict(G,I).
+
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- guard_prediction(_,I,T).

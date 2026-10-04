@@ -1,0 +1,19 @@
+// Train-only context-independent output baseline. The host stages refs from
+// train cases only; Datalog chooses the modal token, with the smallest token
+// ID as a deterministic tie break.
+.decl sample(inst:number,split:symbol) .input sample
+.decl ref(inst:number,out:number) .input ref
+
+.decl train_support(out:number,n:number) .output train_support
+train_support(T,N) :- ref(I,T), sample(I,"train"),
+                      N = count : { ref(J,T), sample(J,"train") }.
+
+.decl max_support(n:number)
+max_support(N) :- N = max M : { train_support(_,M) }.
+
+.decl default_token(out:number) .output default_token
+default_token(T) :- train_support(T,N), max_support(N),
+                    T = min Q : { train_support(Q,N) }.
+
+.decl selected_support(n:number) .output selected_support
+selected_support(N) :- default_token(T), train_support(T,N).

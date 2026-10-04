@@ -1,0 +1,340 @@
+// Standalone nearest source among the longest suffix matches copy circuit; abstains without sufficient support.
+.decl guard(g:number,k:number,m:number)
+guard(1,1,1).
+guard(2,1,1).
+guard(3,1,1).
+guard(4,1,1).
+guard(5,1,2).
+guard(6,1,2).
+guard(7,1,2).
+guard(8,1,2).
+guard(9,1,3).
+guard(10,1,3).
+guard(11,1,3).
+guard(12,1,3).
+guard(13,2,1).
+guard(14,2,1).
+guard(15,2,1).
+guard(16,2,1).
+guard(17,2,2).
+guard(18,2,2).
+guard(19,2,2).
+guard(20,2,2).
+guard(21,2,3).
+guard(22,2,3).
+guard(23,2,3).
+guard(24,2,3).
+guard(25,3,1).
+guard(26,3,1).
+guard(27,3,1).
+guard(28,3,1).
+guard(29,3,2).
+guard(30,3,2).
+guard(31,3,2).
+guard(32,3,2).
+guard(33,3,3).
+guard(34,3,3).
+guard(35,3,3).
+guard(36,3,3).
+guard(37,4,1).
+guard(38,4,1).
+guard(39,4,1).
+guard(40,4,1).
+guard(41,4,2).
+guard(42,4,2).
+guard(43,4,2).
+guard(44,4,2).
+guard(45,4,3).
+guard(46,4,3).
+guard(47,4,3).
+guard(48,4,3).
+guard(49,5,1).
+guard(50,5,1).
+guard(51,5,1).
+guard(52,5,1).
+guard(53,5,2).
+guard(54,5,2).
+guard(55,5,2).
+guard(56,5,2).
+guard(57,5,3).
+guard(58,5,3).
+guard(59,5,3).
+guard(60,5,3).
+guard(61,6,1).
+guard(62,6,1).
+guard(63,6,1).
+guard(64,6,1).
+guard(65,6,2).
+guard(66,6,2).
+guard(67,6,2).
+guard(68,6,2).
+guard(69,6,3).
+guard(70,6,3).
+guard(71,6,3).
+guard(72,6,3).
+guard(73,7,1).
+guard(74,7,1).
+guard(75,7,1).
+guard(76,7,1).
+guard(77,7,2).
+guard(78,7,2).
+guard(79,7,2).
+guard(80,7,2).
+guard(81,7,3).
+guard(82,7,3).
+guard(83,7,3).
+guard(84,7,3).
+guard(85,8,1).
+guard(86,8,1).
+guard(87,8,1).
+guard(88,8,1).
+guard(89,8,2).
+guard(90,8,2).
+guard(91,8,2).
+guard(92,8,2).
+guard(93,8,3).
+guard(94,8,3).
+guard(95,8,3).
+guard(96,8,3).
+guard(97,9,1).
+guard(98,9,1).
+guard(99,9,1).
+guard(100,9,1).
+guard(101,9,2).
+guard(102,9,2).
+guard(103,9,2).
+guard(104,9,2).
+guard(105,9,3).
+guard(106,9,3).
+guard(107,9,3).
+guard(108,9,3).
+guard(109,10,1).
+guard(110,10,1).
+guard(111,10,1).
+guard(112,10,1).
+guard(113,10,2).
+guard(114,10,2).
+guard(115,10,2).
+guard(116,10,2).
+guard(117,10,3).
+guard(118,10,3).
+guard(119,10,3).
+guard(120,10,3).
+guard(121,11,1).
+guard(122,11,1).
+guard(123,11,1).
+guard(124,11,1).
+guard(125,11,2).
+guard(126,11,2).
+guard(127,11,2).
+guard(128,11,2).
+guard(129,11,3).
+guard(130,11,3).
+guard(131,11,3).
+guard(132,11,3).
+guard(133,12,1).
+guard(134,12,1).
+guard(135,12,1).
+guard(136,12,1).
+guard(137,12,2).
+guard(138,12,2).
+guard(139,12,2).
+guard(140,12,2).
+guard(141,12,3).
+guard(142,12,3).
+guard(143,12,3).
+guard(144,12,3).
+.decl copy_length(k:number)
+copy_length(K) :- guard(_,K,_).
+.decl guard_horizon(g:number,h:number)
+guard_horizon(1,16).
+guard_horizon(2,32).
+guard_horizon(3,64).
+guard_horizon(4,128).
+guard_horizon(5,16).
+guard_horizon(6,32).
+guard_horizon(7,64).
+guard_horizon(8,128).
+guard_horizon(9,16).
+guard_horizon(10,32).
+guard_horizon(11,64).
+guard_horizon(12,128).
+guard_horizon(13,16).
+guard_horizon(14,32).
+guard_horizon(15,64).
+guard_horizon(16,128).
+guard_horizon(17,16).
+guard_horizon(18,32).
+guard_horizon(19,64).
+guard_horizon(20,128).
+guard_horizon(21,16).
+guard_horizon(22,32).
+guard_horizon(23,64).
+guard_horizon(24,128).
+guard_horizon(25,16).
+guard_horizon(26,32).
+guard_horizon(27,64).
+guard_horizon(28,128).
+guard_horizon(29,16).
+guard_horizon(30,32).
+guard_horizon(31,64).
+guard_horizon(32,128).
+guard_horizon(33,16).
+guard_horizon(34,32).
+guard_horizon(35,64).
+guard_horizon(36,128).
+guard_horizon(37,16).
+guard_horizon(38,32).
+guard_horizon(39,64).
+guard_horizon(40,128).
+guard_horizon(41,16).
+guard_horizon(42,32).
+guard_horizon(43,64).
+guard_horizon(44,128).
+guard_horizon(45,16).
+guard_horizon(46,32).
+guard_horizon(47,64).
+guard_horizon(48,128).
+guard_horizon(49,16).
+guard_horizon(50,32).
+guard_horizon(51,64).
+guard_horizon(52,128).
+guard_horizon(53,16).
+guard_horizon(54,32).
+guard_horizon(55,64).
+guard_horizon(56,128).
+guard_horizon(57,16).
+guard_horizon(58,32).
+guard_horizon(59,64).
+guard_horizon(60,128).
+guard_horizon(61,16).
+guard_horizon(62,32).
+guard_horizon(63,64).
+guard_horizon(64,128).
+guard_horizon(65,16).
+guard_horizon(66,32).
+guard_horizon(67,64).
+guard_horizon(68,128).
+guard_horizon(69,16).
+guard_horizon(70,32).
+guard_horizon(71,64).
+guard_horizon(72,128).
+guard_horizon(73,16).
+guard_horizon(74,32).
+guard_horizon(75,64).
+guard_horizon(76,128).
+guard_horizon(77,16).
+guard_horizon(78,32).
+guard_horizon(79,64).
+guard_horizon(80,128).
+guard_horizon(81,16).
+guard_horizon(82,32).
+guard_horizon(83,64).
+guard_horizon(84,128).
+guard_horizon(85,16).
+guard_horizon(86,32).
+guard_horizon(87,64).
+guard_horizon(88,128).
+guard_horizon(89,16).
+guard_horizon(90,32).
+guard_horizon(91,64).
+guard_horizon(92,128).
+guard_horizon(93,16).
+guard_horizon(94,32).
+guard_horizon(95,64).
+guard_horizon(96,128).
+guard_horizon(97,16).
+guard_horizon(98,32).
+guard_horizon(99,64).
+guard_horizon(100,128).
+guard_horizon(101,16).
+guard_horizon(102,32).
+guard_horizon(103,64).
+guard_horizon(104,128).
+guard_horizon(105,16).
+guard_horizon(106,32).
+guard_horizon(107,64).
+guard_horizon(108,128).
+guard_horizon(109,16).
+guard_horizon(110,32).
+guard_horizon(111,64).
+guard_horizon(112,128).
+guard_horizon(113,16).
+guard_horizon(114,32).
+guard_horizon(115,64).
+guard_horizon(116,128).
+guard_horizon(117,16).
+guard_horizon(118,32).
+guard_horizon(119,64).
+guard_horizon(120,128).
+guard_horizon(121,16).
+guard_horizon(122,32).
+guard_horizon(123,64).
+guard_horizon(124,128).
+guard_horizon(125,16).
+guard_horizon(126,32).
+guard_horizon(127,64).
+guard_horizon(128,128).
+guard_horizon(129,16).
+guard_horizon(130,32).
+guard_horizon(131,64).
+guard_horizon(132,128).
+guard_horizon(133,16).
+guard_horizon(134,32).
+guard_horizon(135,64).
+guard_horizon(136,128).
+guard_horizon(137,16).
+guard_horizon(138,32).
+guard_horizon(139,64).
+guard_horizon(140,128).
+guard_horizon(141,16).
+guard_horizon(142,32).
+guard_horizon(143,64).
+guard_horizon(144,128).
+// Runtime copy primitive. Includer supplies tok(inst,pos,id) and copy_length(k).
+// Match the current k-token suffix, choose the most recent earlier match, copy its successor.
+.decl copy_last(inst:number,p:number)
+copy_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl copy_match(inst:number,j:number,k:number)
+copy_match(I,J,1) :- copy_last(I,P), tok(I,P,X), tok(I,J,X), J < P.
+copy_match(I,J,K+1) :- copy_match(I,J,K), copy_length(L), K < L,
+                      copy_last(I,P), tok(I,P-K,X), tok(I,J-K,X).
+.decl copy_source(k:number,inst:number,j:number)
+copy_source(K,I,J) :- copy_length(K), copy_match(I,_,K), J = max Q : { copy_match(I,Q,K) }.
+.decl copy_prediction(k:number,inst:number,out:number)
+copy_prediction(K,I,T) :- copy_source(K,I,J), tok(I,J+1,T).
+// Includer supplies copy_core.dl, guard(g,max_suffix,min_sources), and
+// guard_horizon(g,h). Rank source occurrences by their longest suffix match,
+// restrict to globally best specificity, then choose the nearest such source
+// inside the frozen horizon. Minimum support counts the best-specificity
+// sources inside that horizon.
+.decl ranked_source(g:number,inst:number,j:number,k:number,out:number)
+ranked_source(G,I,J,K,T) :- guard(G,L,_), copy_match(I,J,K), K <= L,
+                            tok(I,J+1,T).
+
+.decl best_specificity(g:number,inst:number,k:number)
+best_specificity(G,I,K) :- ranked_source(G,I,_,K,_),
+                            K = max Q : { ranked_source(G,I,_,Q,_) }.
+
+.decl best_recent_source(g:number,inst:number,j:number,out:number)
+best_recent_source(G,I,J,T) :- ranked_source(G,I,J,K,T), best_specificity(G,I,K),
+                               guard_horizon(G,H), copy_last(I,P), J >= P-H.
+
+// Expose the selected specificity tier to the shared causal admission query.
+.decl guard_source(g:number,inst:number,j:number,out:number)
+guard_source(G,I,J,T) :- best_recent_source(G,I,J,T).
+
+.decl ranked_support(g:number,inst:number,n:number)
+ranked_support(G,I,N) :- best_recent_source(G,I,_,_),
+                         N = count : { best_recent_source(G,I,_,_) }.
+
+.decl ranked_nearest(g:number,inst:number,j:number,out:number)
+ranked_nearest(G,I,J,T) :- best_recent_source(G,I,J,T),
+                            J = max Q : { best_recent_source(G,I,Q,_) }.
+
+.decl guard_prediction(g:number,inst:number,out:number)
+guard_prediction(G,I,T) :- guard(G,_,M), ranked_nearest(G,I,_,T),
+                            ranked_support(G,I,N), N >= M.
+
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- guard_prediction(_,I,T).

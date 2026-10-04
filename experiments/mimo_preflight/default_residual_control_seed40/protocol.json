@@ -1,0 +1,11 @@
+{
+  "tag": "empirical",
+  "source": "constant-control",
+  "selection": "most frequent answer on train only; lowest token ID breaks frequency ties",
+  "bundle_sha256": null,
+  "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+  "mode_program_sha256": "943563a95c1263fc29eef152525c390c70be8d56f9258e4c5bdbde8963d19ce6",
+  "driver_sha256": "6f8b8a11ac97c045c43bfd09c2d51f8d8055d91999eb158e8529527d252c7a84",
+  "training_references_sha256": "47bd316a6e01c6efdae3f32aad186fc2980ffa9e56e0f4ff4f06a8d6d0b6222e",
+  "runtime": "standalone Datalog; no model, Python, or fieldrun dependency"
+}

@@ -1,0 +1,353 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "d730de85475d6e30cc2bfa78cae31c0055f356817b31a4ca2b520a239c796d72",
+  "bundle_sha256": {
+    ".fieldrun.bin": "bb51a546061d016d74026a74484631e912137a186d2aefdaec134d3c7145eb7e",
+    ".fieldrun.json": "1db26d98a918adf13aa2d838b469d5cd94dc2f3bc8ede0b47ee27461f00294b9"
+  },
+  "source": "fieldrun",
+  "search": "suffix lengths 1..12, support 1..4",
+  "consensus": {
+    "selected": {
+      "selected": [],
+      "test": {
+        "n": 48,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 48,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": false,
+        "ndomain": 0,
+        "ncover": 0,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-m84suar3",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        }
+      }
+    },
+    "strict_guard": {
+      "selected": null,
+      "test": {
+        "n": 48,
+        "answered": 16,
+        "correct": 10,
+        "wrong": 6,
+        "abstained": 32,
+        "coverage": 0.3333333333333333,
+        "precision": 0.625,
+        "fidelity": 0.20833333333333334,
+        "confident_wrong": 0.125,
+        "abstain": 0.6666666666666666
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": false,
+        "ndomain": 16,
+        "ncover": 16,
+        "nmiss": 6,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-gm79ysjp",
+        "mismatches": [
+          [
+            0,
+            9659,
+            12951
+          ],
+          [
+            1,
+            909,
+            14345
+          ],
+          [
+            2,
+            9659,
+            12951
+          ],
+          [
+            3,
+            909,
+            14345
+          ],
+          [
+            6,
+            52114,
+            22268
+          ],
+          [
+            15,
+            38368,
+            20457
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 8,
+          "correct": 6,
+          "wrong": 2,
+          "abstained": 8
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 8,
+          "correct": 4,
+          "wrong": 4,
+          "abstained": 8
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        }
+      }
+    }
+  },
+  "plurality": {
+    "selected": {
+      "selected": [],
+      "test": {
+        "n": 48,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 48,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": false,
+        "ndomain": 0,
+        "ncover": 0,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-6jzyllo3",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        }
+      }
+    },
+    "strict_guard": {
+      "selected": null,
+      "test": {
+        "n": 48,
+        "answered": 24,
+        "correct": 13,
+        "wrong": 11,
+        "abstained": 24,
+        "coverage": 0.5,
+        "precision": 0.5416666666666666,
+        "fidelity": 0.2708333333333333,
+        "confident_wrong": 0.22916666666666666,
+        "abstain": 0.5
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": false,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 11,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-axfdnrtu",
+        "mismatches": [
+          [
+            0,
+            9659,
+            12951
+          ],
+          [
+            1,
+            909,
+            14345
+          ],
+          [
+            2,
+            9659,
+            12951
+          ],
+          [
+            3,
+            909,
+            14345
+          ],
+          [
+            4,
+            20533,
+            12951
+          ],
+          [
+            5,
+            909,
+            14345
+          ],
+          [
+            8,
+            52114,
+            22268
+          ],
+          [
+            16,
+            15,
+            34219
+          ],
+          [
+            17,
+            1582,
+            38930
+          ],
+          [
+            21,
+            38368,
+            20457
+          ],
+          [
+            23,
+            38368,
+            20457
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 8,
+          "correct": 6,
+          "wrong": 2,
+          "abstained": 8
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 8,
+          "correct": 4,
+          "wrong": 4,
+          "abstained": 8
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 8,
+          "correct": 3,
+          "wrong": 5,
+          "abstained": 8
+        }
+      }
+    }
+  }
+}

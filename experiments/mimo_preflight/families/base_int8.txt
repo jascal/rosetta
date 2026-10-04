@@ -1,0 +1,16 @@
+=== probe_families · mimo-base-int8-probe === (detect ≥80% AND causal ≥80% ⇒ in the toolkit; succession format: comma)
+  copy/name-mover (IOI)        detect 10%  causal 10%
+  succession (days)            detect 100%  causal 100%  ← IN TOOLKIT
+  succession (months)          detect 100%  causal 100%  ← IN TOOLKIT
+  coreference (gender)         detect 100%  causal 100%  ← IN TOOLKIT
+  relation (capital-of)        detect 100%  causal 100%  ← IN TOOLKIT
+  antonym (opposite-of)        detect 100%  causal 100%  ← IN TOOLKIT
+  is-a transitivity            detect 100%  causal 100%  ← IN TOOLKIT
+  modus ponens                 detect 100%  causal 100%  ← IN TOOLKIT
+  temporal ordering            detect 100%  causal 100%  ← IN TOOLKIT
+  syllogism (instantiation)    detect 100%  causal 100%  ← IN TOOLKIT
+  spatial (left-of)            detect 100%  causal 100%  ← IN TOOLKIT
+  set membership (∩)           detect 90%  causal 90%  ← IN TOOLKIT
+  defeasible (exception)       detect 100%  causal 100%  ← IN TOOLKIT
+  analogy (a:b::c:?)           detect 100%  causal 100%  ← IN TOOLKIT
+  causal do-vs-see             detect 100%  causal 100%  ← IN TOOLKIT

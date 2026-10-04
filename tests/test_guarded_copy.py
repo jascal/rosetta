@@ -9,7 +9,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "py"))
-from benchmark_guarded_copy import GUARDS, admit, benchmark, generate, write_guard  # noqa: E402
+from benchmark_guarded_copy import GUARDS, admit, benchmark, emit_sparse_baseline, freeze_domain, generate, write_guard  # noqa: E402
 from certificate import replay  # noqa: E402
 
 pytestmark = pytest.mark.skipif(shutil.which("souffle") is None, reason="needs souffle")
@@ -53,6 +53,57 @@ def test_standalone_consensus_guard_and_abstentions(tmp_path):
     assert set((directory / "abstain.csv").read_text().splitlines()) == {"1", "2", "3"}
 
 
+def test_plurality_guard_resolves_one_conflicting_source_and_abstains_on_ties(tmp_path):
+    contexts = [
+        [1, 2, 3, 7, 1, 2, 3, 7, 1, 2, 3, 8, 1, 2, 3],  # 7 has two votes; 8 has one
+        [1, 2, 3, 7, 1, 2, 3, 8, 1, 2, 3],              # tie: abstain
+        [1, 2, 3, 7, 9, 1, 2, 3],                        # one source: insufficient support
+    ]
+    for policy, expected in (("plurality", {"0\t7"}), ("consensus", set())):
+        directory = tmp_path / policy
+        write_guard(directory, [(1, 3, 2)], policy=policy)
+        (directory / "tok.facts").write_text("".join(
+            f"{i}\t{p}\t{token}\n" for i, ctx in enumerate(contexts) for p, token in enumerate(ctx)))
+        subprocess.run(["souffle", "run.dl", "-F", ".", "-D", "."], cwd=directory,
+                       check=True, capture_output=True)
+        assert set((directory / "cdecide.csv").read_text().splitlines()) == expected
+        abstain = set((directory / "abstain.csv").read_text().splitlines())
+        assert abstain == ({"1", "2"} if policy == "plurality" else {"0", "1", "2"})
+
+
+def test_bounded_recency_ignores_stale_conflicting_source(tmp_path):
+    context = [1, 2, 3, 8, 9, 9, 9, 9, 1, 2, 3, 7, 1, 2, 3, 7, 1, 2, 3]
+    outputs = {}
+    for policy, horizons in (("consensus", None), ("recent", {1: 12})):
+        directory = tmp_path / policy
+        write_guard(directory, [(1, 3, 2)], policy=policy, horizons=horizons)
+        (directory / "tok.facts").write_text("".join(
+            f"0\t{position}\t{token}\n" for position, token in enumerate(context)))
+        subprocess.run(["souffle", "run.dl", "-F", ".", "-D", "."], cwd=directory,
+                       check=True, capture_output=True)
+        outputs[policy] = set((directory / "cdecide.csv").read_text().splitlines())
+    assert outputs == {"consensus": set(), "recent": {"0\t7"}}
+
+
+def test_ranked_copy_prefers_specificity_then_nearest_source(tmp_path):
+    # Case 0: the nearer occurrence matches only three tokens; the older
+    # occurrence's four-token match wins despite its more distant position.
+    # Case 1: both sources match four tokens, so the nearest one wins.
+    contexts = [
+        [1, 2, 3, 4, 7, 2, 3, 4, 8, 1, 2, 3, 4],
+        [1, 2, 3, 4, 7, 9, 9, 1, 2, 3, 4, 8, 1, 2, 3, 4],
+    ]
+    directory = tmp_path / "ranked"
+    write_guard(directory, [(1, 4, 1)], policy="ranked", horizons={1: 32})
+    (directory / "tok.facts").write_text("".join(
+        f"{instance}\t{position}\t{token}\n"
+        for instance, context in enumerate(contexts)
+        for position, token in enumerate(context)))
+    subprocess.run(["souffle", "run.dl", "-F", ".", "-D", "."], cwd=directory,
+                   check=True, capture_output=True)
+    assert set((directory / "cdecide.csv").read_text().splitlines()) == {"0\t7", "1\t8"}
+
+
 @pytest.mark.parametrize("corrupt_final", [False, True])
 def test_firing_domain_frozen_before_test_and_cannot_hide_errors(tmp_path, corrupt_final):
     rows = generate(groups=(2, 2, 2))
@@ -88,6 +139,30 @@ def test_constant_oracle_rejects_every_guard_and_empty_proof(tmp_path):
     assert chosen["scores"]["test"]["answered"] == 0
     assert chosen["certificates"]["frozen_guard_domain"]["ndomain"] == 0
     assert not chosen["certificates"]["frozen_guard_domain"]["certified"]
+
+
+def test_empty_guard_freezes_full_sized_domain_and_abstains(tmp_path):
+    rows = [row for row in generate() if row["part"] == "test"]
+    candidate = write_guard(tmp_path / "empty", [])
+    out = tmp_path / "audit"
+    domain, audit = freeze_domain(out, candidate, rows, {})
+    assert domain == []
+    assert audit["certified"] and audit["ndomain"] == 0
+    abstained = (Path(audit["evidence"]) / "outputs" / "abstained.csv").read_text().splitlines()
+    assert len(abstained) == len(rows)
+
+
+def test_sparse_baseline_matches_longest_wide_suffix(tmp_path):
+    candidate = tmp_path / "circuits.dl"
+    emit_sparse_baseline(candidate, {(1,): 8, tuple(range(12)): 9}, False, {}, "test")
+    (tmp_path / "tok.facts").write_text("".join(
+        f"{i}\t{p}\t{token}\n"
+        for i, ctx in enumerate((list(range(12)), [5, 1], [7]))
+        for p, token in enumerate(ctx)))
+    subprocess.run(["souffle", "run.dl", "-F", ".", "-D", "."],
+                   cwd=tmp_path, check=True, capture_output=True)
+    assert (tmp_path / "cdecide.csv").read_text().splitlines() == ["0\t9", "1\t8"]
+    assert (tmp_path / "abstain.csv").read_text().splitlines() == ["2"]
 
 
 @pytest.mark.parametrize("defect", ["unrecorded-edit", "missing-reference", "leaked-group", "test-reference"])

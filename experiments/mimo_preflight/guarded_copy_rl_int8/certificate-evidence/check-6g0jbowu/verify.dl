@@ -1,0 +1,63 @@
+// Development-only selection. No oracle references enter the runtime guard.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(inst:number,group:symbol,part:symbol,hash:symbol) .input sample
+.decl intervention(base:number,edited:number) .input intervention
+.decl changed(base:number,edited:number,pos:number,replacement:number) .input changed
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- sample(_,_,S,_), S != "train", S != "validation".
+invalid() :- sample(I,_,_,_), !ref(I,_).
+invalid() :- sample(I,_,_,_), !tok(I,_,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- ref(I,_), !sample(I,_,_,_).
+invalid() :- tok(I,_,_), !sample(I,_,_,_).
+invalid() :- tok(I,P,A), tok(I,P,B), A != B.
+invalid() :- sample(_,G,A,_), sample(_,G,B,_), A != B.
+invalid() :- sample(_,_,A,H), sample(_,_,B,H), A != B.
+invalid() :- sample(I,G,_,_), sample(I,H,_,_), G != H.
+invalid() :- sample(I,_,_,A), sample(I,_,_,B), A != B.
+invalid() :- !sample(_,_,"train",_).
+invalid() :- !sample(_,_,"validation",_).
+invalid() :- intervention(B,E), sample(B,G,S,_), !sample(E,G,S,_).
+invalid() :- intervention(B,_), !sample(B,_,_,_).
+invalid() :- intervention(B,E), !changed(B,E,_,_).
+invalid() :- changed(B,E,_,_), !intervention(B,E).
+invalid() :- changed(B,E,P,X), !tok(E,P,X).
+invalid() :- changed(B,E,P,_), !tok(B,P,_).
+invalid() :- changed(B,E,P,X), tok(B,P,X).
+invalid() :- intervention(B,E), tok(B,P,_), !tok(E,P,_).
+invalid() :- intervention(B,E), tok(E,P,_), !tok(B,P,_).
+invalid() :- intervention(B,E), tok(B,P,X), tok(E,P,Y), X != Y, !changed(B,E,P,Y).
+.decl failure(g:number,inst:number) .output failure
+failure(G,I) :- guard_prediction(G,I,C), ref(I,R), C != R.
+.decl pair_active(g:number,base:number,edited:number)
+pair_active(G,B,E) :- intervention(B,E), guard_prediction(G,B,_).
+pair_active(G,B,E) :- intervention(B,E), guard_prediction(G,E,_).
+.decl bad_edit(g:number,base:number,edited:number)
+bad_edit(G,B,E) :- pair_active(G,B,E), changed(B,E,P,_), !guard_source(G,B,P-1,_).
+.decl pair_hit(g:number,base:number,edited:number) .output pair_hit
+pair_hit(G,B,E) :- pair_active(G,B,E), !bad_edit(G,B,E),
+                  guard_prediction(G,B,Y), guard_prediction(G,E,X), Y != X, ref(B,Y), ref(E,X).
+.decl pair_fail(g:number,base:number,edited:number) .output pair_fail
+pair_fail(G,B,E) :- pair_active(G,B,E), !pair_hit(G,B,E).
+.decl supported_group(g:number,part:symbol,group:symbol)
+supported_group(G,S,H) :- pair_hit(G,B,_), sample(B,H,S,_).
+.decl support_groups(g:number,part:symbol,n:number) .output support_groups
+support_groups(G,S,N) :- guard(G,_,_), sample(_,_,S,_),
+                        N = count : { supported_group(G,S,_) }.
+.decl coverage(g:number,n:number) .output coverage
+coverage(G,N) :- guard(G,_,_), N = count : { guard_prediction(G,_,_) }.
+.decl eligible(g:number) .output eligible
+eligible(G) :- guard(G,_,_), !invalid(), !failure(G,_), !pair_fail(G,_,_),
+               support_groups(G,"train",A), A >= 2, support_groups(G,"validation",B), B >= 2.
+.decl best_coverage(n:number)
+best_coverage(N) :- eligible(_), N = max C : { eligible(G), coverage(G,C) }.
+.decl best(g:number)
+best(G) :- eligible(G), coverage(G,N), best_coverage(N).
+.decl selected(g:number,k:number,m:number) .output selected
+selected(G,K,M) :- best(_), G = min H : { best(H) }, guard(G,K,M).
+.decl nselected(n:number) .output nselected
+nselected(N) :- N = count : { selected(_,_,_) }.
+.decl certified() .output certified
+certified() :- !invalid().

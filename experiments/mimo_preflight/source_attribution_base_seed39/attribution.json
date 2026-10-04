@@ -1,0 +1,1920 @@
+{
+  "tag": "empirical",
+  "run": "/home/allans/code/rosetta/experiments/mimo_preflight/ranked_search_base_int8/consensus",
+  "max_suffix": 16,
+  "dataset_sha256": "af9a6422c8da8e25cdb94cfa38e4fe2127c0391ddb4822bdae8d9473bb84c840",
+  "references_sha256": "842c2e14a4e98ed0893b403739160b52266bf359a2577cdbaa6ba577bc89d8c2",
+  "program_sha256": "2cdf99b992123c1dbf12e7ce9eaa6d89010a648036dcaea53cd9c02cc033a6a6",
+  "bundle_sha256": {
+    ".fieldrun.bin": "c0761a3ccb464dc3d59e44cf43ca8d74bf26fbc2690095764ddaca5a0f1bb85f",
+    ".fieldrun.json": "2e9cadd6c791b2d1fcbcfe6c2d8bf3683616ab44350d1b99e09bf17e884a65ba"
+  },
+  "test_summary_by_layout": {
+    "near_match_suffix12": {
+      "n": 16,
+      "answer_matches_any_source": 9,
+      "answer_matches_nearest_source": 2,
+      "answer_matches_best_specificity_source": 7,
+      "answer_matches_no_source": 7,
+      "matched_source_suffix_lengths": {
+        "16": 7,
+        "12": 2
+      },
+      "matched_source_distance_bins": {
+        "64+": 7,
+        "16-31": 2
+      }
+    },
+    "noise32": {
+      "n": 16,
+      "answer_matches_any_source": 7,
+      "answer_matches_nearest_source": 7,
+      "answer_matches_best_specificity_source": 7,
+      "answer_matches_no_source": 9,
+      "matched_source_suffix_lengths": {
+        "16": 7
+      },
+      "matched_source_distance_bins": {
+        "64+": 7
+      }
+    },
+    "plain": {
+      "n": 16,
+      "answer_matches_any_source": 6,
+      "answer_matches_nearest_source": 6,
+      "answer_matches_best_specificity_source": 6,
+      "answer_matches_no_source": 10,
+      "matched_source_suffix_lengths": {
+        "16": 6
+      },
+      "matched_source_distance_bins": {
+        "32-63": 6
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": 48,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 4445,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        47,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 4445
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 12431,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 22712
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 50,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 4445,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 4445
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 3011,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 22712
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 52,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 4677,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 4445
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5353
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 53,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 12431,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 22712
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5353
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 54,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 4445,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 4445
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 4445
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 56993,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 22712
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 22712
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 56,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 4445,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 4445
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 4445
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 22712,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 22712
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 22712
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 4445,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 4445
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 4445
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 4445
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5353
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 12431,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 22712
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 22712
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 22712
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5353
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 60,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 3950,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 5839
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 61,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 8967,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 7409
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 62,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 3950,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 5839
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 63,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 8967,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 7409
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 64,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 5839,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 5839
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 9214
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 261,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 7409
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 9214
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 66,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 3950,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 5839
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 5839
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 67,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 8967,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 7409
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 7409
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 68,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 3950,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 5839
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 5839
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 69,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 8967,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 7409
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 7409
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 70,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 5839,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 5839
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 5839
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 5839
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 9214
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 261,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 7409
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 7409
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 7409
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 9214
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 72,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 27375
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 73,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 42721,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 9637
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 74,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 27375
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 75,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 42721,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 9637
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 76,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 27375
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5893
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 77,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 5893,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": [
+        126,
+        12,
+        17
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 9637
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5893
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 27375
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 27375
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 79,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 42721,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 9637
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 9637
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 80,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 27375
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 27375
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 81,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 42721,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 9637
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 9637
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 82,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 88,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": null,
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 27375
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 27375
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 27375
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5893
+        }
+      ],
+      "matching_sources": []
+    },
+    {
+      "id": 83,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 5893,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": false,
+      "answer_source_attribution": [
+        190,
+        12,
+        17
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 9637
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 9637
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 9637
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 5893
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        47,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 36154
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        47,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 28026
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 36154
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 28026
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 36154
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 24226
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 28026
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        },
+        {
+          "position": 126,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 24226
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "layout": "plain",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 36154
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 36154
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "layout": "plain",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        79,
+        16,
+        32
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96,
+          "successor": 28026
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32,
+          "successor": 28026
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 96
+        },
+        {
+          "position": 47,
+          "match_length": 16,
+          "distance": 64
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 32
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "layout": "noise32",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 36154
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 36154
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "layout": "noise32",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": true,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 28026
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 28026
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "layout": "near_match_suffix12",
+      "kind": "repeat",
+      "answer": 36154,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 36154
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 36154
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 36154
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 24226
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "layout": "near_match_suffix12",
+      "kind": "intervention",
+      "answer": 28026,
+      "best_suffix": 16,
+      "best_source_count": 1,
+      "answer_matches_nearest_source": false,
+      "answer_matches_a_best_specificity_source": true,
+      "answer_source_attribution": [
+        143,
+        16,
+        64
+      ],
+      "source_observations": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192,
+          "successor": 28026
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128,
+          "successor": 28026
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64,
+          "successor": 28026
+        },
+        {
+          "position": 190,
+          "match_length": 12,
+          "distance": 17,
+          "successor": 24226
+        }
+      ],
+      "matching_sources": [
+        {
+          "position": 15,
+          "match_length": 16,
+          "distance": 192
+        },
+        {
+          "position": 79,
+          "match_length": 16,
+          "distance": 128
+        },
+        {
+          "position": 143,
+          "match_length": 16,
+          "distance": 64
+        }
+      ]
+    }
+  ]
+}

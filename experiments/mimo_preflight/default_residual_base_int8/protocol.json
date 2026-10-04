@@ -1,0 +1,14 @@
+{
+  "tag": "empirical",
+  "source": "fieldrun",
+  "selection": "most frequent answer on train only; lowest token ID breaks frequency ties",
+  "bundle_sha256": {
+    ".fieldrun.bin": "c0761a3ccb464dc3d59e44cf43ca8d74bf26fbc2690095764ddaca5a0f1bb85f",
+    ".fieldrun.json": "2e9cadd6c791b2d1fcbcfe6c2d8bf3683616ab44350d1b99e09bf17e884a65ba"
+  },
+  "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+  "mode_program_sha256": "943563a95c1263fc29eef152525c390c70be8d56f9258e4c5bdbde8963d19ce6",
+  "driver_sha256": "6f8b8a11ac97c045c43bfd09c2d51f8d8055d91999eb158e8529527d252c7a84",
+  "training_references_sha256": "b93422b272f0cbbc8dba823cb43e23c695fae0fac5727d724b7900f7c3905aa3",
+  "runtime": "standalone Datalog; no model, Python, or fieldrun dependency"
+}

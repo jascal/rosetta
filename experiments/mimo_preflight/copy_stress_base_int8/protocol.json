@@ -1,0 +1,32 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "source": "fieldrun",
+    "bundle_sha256": {
+      ".fieldrun.bin": "c0761a3ccb464dc3d59e44cf43ca8d74bf26fbc2690095764ddaca5a0f1bb85f",
+      ".fieldrun.json": "2e9cadd6c791b2d1fcbcfe6c2d8bf3683616ab44350d1b99e09bf17e884a65ba"
+    },
+    "generator_seeds": [
+      2,
+      3,
+      4
+    ],
+    "tokenizer_policy": "same tokenizer as paired MiMo runs; held-out token IDs excluded",
+    "excluded_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "experiments/mimo_preflight/guarded_copy_base_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd"
+    }
+  },
+  "dataset_sha256": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60",
+  "selection": "none; fixed strict diagnostic guard (suffix 9, 3 agreeing sources) and raw-copy circuit",
+  "driver_sha256": "d784d2fcafa201160a1c472e00b923ec50872e42e7722c2da4c1b1b84a47d8d3",
+  "source_sha256": {
+    "copy_core.dl": "34c44dd23c1fe91c3f812d53e72ba66a6c72201b20ae682ad4e810fd4eac8fd2",
+    "copy_guard.dl": "cbaee14cb5061b073744ddda119d76d4b2de5360a7064e2e3316ec605f6f7b7f",
+    "guard_domain.dl": "56391900ff484da316e949cc0571d7936a4ea7bb27f86ba78b2e5f50d8521d0b",
+    "holdout.dl": "bc1506ef4c4ed3262d571d19de531f474e12ae08c8c6bc343eb0ea890abeb945",
+    "holdout_strata.dl": "1801af48ce6d4a38e223d0bf639ee74dc01e51cfaa40fab404a39d15e16230ab",
+    "equiv.dl": "d0b11ff904f80d4454042b8f20ccf2a38083f91479a27d5b8b26d5bbc83d4966"
+  }
+}
