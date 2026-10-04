@@ -1,0 +1,67 @@
+// rosetta · layered circuit: n-gram -> idiom -> compiled TPR -> abstain. Soufflé-only.
+// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).
+// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…
+// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.
+// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.
+
+.decl ng_mp(inst:number,m:number)
+ng_mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl ng_cdecide(inst:number,out:number)
+
+// SVO copy-subject idiom: output the token at position 1 iff the verb (position 2) is whitelisted.
+.decl id_verb_ok(v:number)
+.decl id_cdecide(inst:number,out:number)
+id_cdecide(I,S) :- tok(I,1,S), tok(I,2,V), id_verb_ok(V).
+
+// rosetta · compiled TPR (pil experiments/compile_tpr.py), fixed point scale 2^16.
+.decl tc_tp_filler(id:number,f:number) .input tc_tp_filler
+.decl tc_tp_w(v:number,f:number,r:number,x:number) .input tc_tp_w
+.decl tc_tp_bias(v:number,b:number) .input tc_tp_bias
+.decl tc_tp_theta(t:number)
+tc_tp_theta(175647).
+.decl tc_tp_template(pos:number,id:number)
+tc_tp_template(0,464).
+tc_tp_template(3,262).
+tc_tp_template(5,13).
+tc_tp_template(6,464).
+tc_tp_template(8,373).
+tc_tp_template(10,416).
+tc_tp_template(11,262).
+// Role parse from tok facts: fixed template, subject/verb/object at positions 1/2/4.
+.decl tc_tp_len(inst:number,k:number)
+tc_tp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.
+.decl tc_tp_bad(inst:number)
+tc_tp_bad(I) :- tc_tp_len(I,K), K != 12.
+tc_tp_bad(I) :- tc_tp_template(P,T), tok(I,P,X), X != T.
+tc_tp_bad(I) :- tok(I,4,A), tok(I,7,B), A != B.
+tc_tp_bad(I) :- tok(I,2,A), tok(I,9,B), A != B.
+.decl tc_tp_pair(inst:number,f:number,r:number)
+tc_tp_pair(I,F,0) :- tc_tp_len(I,_), !tc_tp_bad(I), tok(I,1,X), tc_tp_filler(X,F).
+tc_tp_pair(I,F,1) :- tc_tp_len(I,_), !tc_tp_bad(I), tok(I,2,X), tc_tp_filler(X,F).
+tc_tp_pair(I,F,2) :- tc_tp_len(I,_), !tc_tp_bad(I), tok(I,4,X), tc_tp_filler(X,F).
+.decl tc_tp_full(inst:number)
+tc_tp_full(I) :- tc_tp_pair(I,_,0), tc_tp_pair(I,_,1), tc_tp_pair(I,_,2).
+// Weighted score: total(v) = bias(v) + sum over parsed pairs of w(v,f,r); argmax over the candidate set, margin.
+.decl tc_tp_total(inst:number,v:number,s:number)
+tc_tp_total(I,V,S) :- tc_tp_full(I), tc_tp_bias(V,B), S0 = sum X : { tc_tp_pair(I,F,R), tc_tp_w(V,F,R,X) }, S = S0 + B.
+.decl tc_tp_best(inst:number,m:number)
+tc_tp_best(I,M) :- tc_tp_full(I), M = max S : { tc_tp_total(I,_,S) }.
+.decl tc_tp_top(inst:number,v:number)
+tc_tp_top(I,V) :- tc_tp_best(I,M), V = min V2 : { tc_tp_total(I,V2,M) }.
+.decl tc_tp_second(inst:number,m:number)
+tc_tp_second(I,M2) :- tc_tp_top(I,V), M2 = max S : { tc_tp_total(I,V2,S), V2 != V }.
+.decl tc_tp_margin(inst:number,g:number)
+tc_tp_margin(I,G) :- tc_tp_best(I,M), tc_tp_second(I,M2), G = M - M2.
+.decl tc_cdecide(inst:number,out:number)
+tc_cdecide(I,V) :- tc_tp_top(I,V), tc_tp_margin(I,G), tc_tp_theta(T), G >= T.
+
+.decl ng_any(inst:number)
+ng_any(I) :- ng_cdecide(I,_).
+.decl id_any(inst:number)
+id_any(I) :- id_cdecide(I,_).
+.decl layer(inst:number,l:number,out:number)
+layer(I,1,T) :- ng_cdecide(I,T).
+layer(I,2,T) :- id_cdecide(I,T), !ng_any(I).
+layer(I,3,T) :- tc_cdecide(I,T), !ng_any(I), !id_any(I).
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- layer(I,_,T).

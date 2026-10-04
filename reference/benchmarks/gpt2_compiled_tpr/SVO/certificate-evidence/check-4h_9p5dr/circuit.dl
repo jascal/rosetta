@@ -1,0 +1,41 @@
+// rosetta · compiled TPR (pil experiments/compile_tpr.py), fixed point scale 2^16.
+.decl tp_filler(id:number,f:number) .input tp_filler
+.decl tp_w(v:number,f:number,r:number,x:number) .input tp_w
+.decl tp_bias(v:number,b:number) .input tp_bias
+.decl tp_theta(t:number)
+tp_theta(-1152921504606846976).
+.decl tp_template(pos:number,id:number)
+tp_template(0,464).
+tp_template(3,262).
+tp_template(5,13).
+tp_template(6,464).
+tp_template(8,373).
+tp_template(10,416).
+tp_template(11,262).
+// Role parse from tok facts: fixed template, subject/verb/object at positions 1/2/4.
+.decl tp_len(inst:number,k:number)
+tp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.
+.decl tp_bad(inst:number)
+tp_bad(I) :- tp_len(I,K), K != 12.
+tp_bad(I) :- tp_template(P,T), tok(I,P,X), X != T.
+tp_bad(I) :- tok(I,4,A), tok(I,7,B), A != B.
+tp_bad(I) :- tok(I,2,A), tok(I,9,B), A != B.
+.decl tp_pair(inst:number,f:number,r:number)
+tp_pair(I,F,0) :- tp_len(I,_), !tp_bad(I), tok(I,1,X), tp_filler(X,F).
+tp_pair(I,F,1) :- tp_len(I,_), !tp_bad(I), tok(I,2,X), tp_filler(X,F).
+tp_pair(I,F,2) :- tp_len(I,_), !tp_bad(I), tok(I,4,X), tp_filler(X,F).
+.decl tp_full(inst:number)
+tp_full(I) :- tp_pair(I,_,0), tp_pair(I,_,1), tp_pair(I,_,2).
+// Weighted score: total(v) = bias(v) + sum over parsed pairs of w(v,f,r); argmax over the candidate set, margin.
+.decl tp_total(inst:number,v:number,s:number)
+tp_total(I,V,S) :- tp_full(I), tp_bias(V,B), S0 = sum X : { tp_pair(I,F,R), tp_w(V,F,R,X) }, S = S0 + B.
+.decl tp_best(inst:number,m:number)
+tp_best(I,M) :- tp_full(I), M = max S : { tp_total(I,_,S) }.
+.decl tp_top(inst:number,v:number)
+tp_top(I,V) :- tp_best(I,M), V = min V2 : { tp_total(I,V2,M) }.
+.decl tp_second(inst:number,m:number)
+tp_second(I,M2) :- tp_top(I,V), M2 = max S : { tp_total(I,V2,S), V2 != V }.
+.decl tp_margin(inst:number,g:number)
+tp_margin(I,G) :- tp_best(I,M), tp_second(I,M2), G = M - M2.
+.decl tp_decide(inst:number,out:number)
+tp_decide(I,V) :- tp_top(I,V), tp_margin(I,G), tp_theta(T), G >= T.

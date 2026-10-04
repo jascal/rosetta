@@ -1,0 +1,6 @@
+Warning: No rules/facts defined for relation ng_cdecide in file circuit.dl at line 9
+.decl ng_cdecide(inst:number,out:number)
+------^----------------------------------
+Warning: No rules/facts defined for relation id_verb_ok in file circuit.dl at line 12
+.decl id_verb_ok(v:number)
+------^--------------------

@@ -1,0 +1,94 @@
+// rosetta · layered circuit: n-gram -> idiom -> compiled TPR -> abstain. Soufflé-only.
+// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).
+// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, ng_gram3=trigram,…
+// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.
+// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.
+
+.decl ng_mp(inst:number,m:number)
+ng_mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl ng_cdecide(inst:number,out:number)
+.decl ng_gram3(c0:number,c1:number,t:number)   // 3-gram: 2 context token(s) → next
+.decl ng_gram3_hit(inst:number,t:number)
+.decl ng_gram3_any(inst:number)
+ng_gram3(8801,7545,2975).
+ng_gram3(8824,5118,8701).
+ng_gram3(23887,5318,5916).
+ng_gram3(1637,5118,20697).
+ng_gram3(7696,4898,6891).
+ng_gram3_hit(I,T) :- ng_mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, ng_gram3(C0,C1,T).
+ng_gram3_any(I) :- ng_gram3_hit(I,_).
+ng_cdecide(I,T) :- ng_gram3_hit(I,T).
+
+// Standalone consensus-copy circuit; abstains without sufficient agreeing sources.
+.decl id_guard(g:number,k:number,m:number)
+id_guard(1,3,2).
+.decl id_copy_length(k:number)
+id_copy_length(K) :- id_guard(_,K,_).
+// Runtime copy primitive. Includer supplies tok(inst,pos,id) and id_copy_length(k).
+// Match the current k-token suffix, choose the most recent earlier match, copy its successor.
+.decl id_copy_last(inst:number,p:number)
+id_copy_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl id_copy_match(inst:number,j:number,k:number)
+id_copy_match(I,J,1) :- id_copy_last(I,P), tok(I,P,X), tok(I,J,X), J < P.
+id_copy_match(I,J,K+1) :- id_copy_match(I,J,K), id_copy_length(L), K < L,
+                      id_copy_last(I,P), tok(I,P-K,X), tok(I,J-K,X).
+.decl id_copy_source(k:number,inst:number,j:number)
+id_copy_source(K,I,J) :- id_copy_length(K), id_copy_match(I,_,K), J = max Q : { id_copy_match(I,Q,K) }.
+.decl id_copy_prediction(k:number,inst:number,out:number)
+id_copy_prediction(K,I,T) :- id_copy_source(K,I,J), tok(I,J+1,T).
+// Includer supplies copy_core.dl and id_guard(id, suffix_length, minimum_sources).
+// All earlier matches must agree on the successor; repeated support is a runtime structural id_guard.
+.decl id_guard_source(g:number,inst:number,j:number,out:number)
+id_guard_source(G,I,J,T) :- id_guard(G,K,_), id_copy_match(I,J,K), tok(I,J+1,T).
+.decl id_guard_conflict(g:number,inst:number)
+id_guard_conflict(G,I) :- id_guard_source(G,I,_,A), id_guard_source(G,I,_,B), A != B.
+.decl id_guard_support(g:number,inst:number,n:number)
+id_guard_support(G,I,N) :- id_guard_source(G,I,_,_), N = count : { id_guard_source(G,I,_,_) }.
+.decl id_guard_prediction(g:number,inst:number,out:number)
+id_guard_prediction(G,I,T) :- id_guard(G,_,M), id_guard_source(G,I,_,T), id_guard_support(G,I,N), N >= M,
+                          !id_guard_conflict(G,I).
+
+.decl id_cdecide(inst:number,out:number)
+id_cdecide(I,T) :- id_guard_prediction(_,I,T).
+
+// rosetta · compiled TPR (pil experiments/compile_tpr.py), fixed point scale 2^16.
+.decl tc_tp_filler(id:number,f:number) .input tc_tp_filler
+.decl tc_tp_w(v:number,f:number,r:number,x:number) .input tc_tp_w
+.decl tc_tp_bias(v:number,b:number) .input tc_tp_bias
+.decl tc_tp_theta(t:number)
+tc_tp_theta(376729).
+.decl tc_tp_template(pos:number,id:number)
+// Role parse from tok facts: role = distance from the end; every token must be a pool filler.
+.decl tc_tp_len(inst:number,k:number)
+tc_tp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.
+.decl tc_tp_bad(inst:number)
+tc_tp_bad(I) :- tok(I,_,X), !tc_tp_filler(X,_).
+tc_tp_bad(I) :- tc_tp_len(I,K), K > 36.
+.decl tc_tp_pair(inst:number,f:number,r:number)
+tc_tp_pair(I,F,R) :- tc_tp_len(I,K), !tc_tp_bad(I), tok(I,P,X), tc_tp_filler(X,F), R = K - 1 - P.
+.decl tc_tp_full(inst:number)
+tc_tp_full(I) :- tc_tp_len(I,_), !tc_tp_bad(I).
+// Weighted score: total(v) = bias(v) + sum over parsed pairs of w(v,f,r); argmax over the candidate set, margin.
+.decl tc_tp_total(inst:number,v:number,s:number)
+tc_tp_total(I,V,S) :- tc_tp_full(I), tc_tp_bias(V,B), S0 = sum X : { tc_tp_pair(I,F,R), tc_tp_w(V,F,R,X) }, S = S0 + B.
+.decl tc_tp_best(inst:number,m:number)
+tc_tp_best(I,M) :- tc_tp_full(I), M = max S : { tc_tp_total(I,_,S) }.
+.decl tc_tp_top(inst:number,v:number)
+tc_tp_top(I,V) :- tc_tp_best(I,M), V = min V2 : { tc_tp_total(I,V2,M) }.
+.decl tc_tp_second(inst:number,m:number)
+tc_tp_second(I,M2) :- tc_tp_top(I,V), M2 = max S : { tc_tp_total(I,V2,S), V2 != V }.
+.decl tc_tp_margin(inst:number,g:number)
+tc_tp_margin(I,G) :- tc_tp_best(I,M), tc_tp_second(I,M2), G = M - M2.
+.decl tc_cdecide(inst:number,out:number)
+tc_cdecide(I,V) :- tc_tp_top(I,V), tc_tp_margin(I,G), tc_tp_theta(T), G >= T.
+
+.decl ng_any(inst:number)
+ng_any(I) :- ng_cdecide(I,_).
+.decl id_any(inst:number)
+id_any(I) :- id_cdecide(I,_).
+.decl layer(inst:number,l:number,out:number)
+layer(I,1,T) :- ng_cdecide(I,T).
+layer(I,2,T) :- id_cdecide(I,T), !ng_any(I).
+layer(I,3,T) :- tc_cdecide(I,T), !ng_any(I), !id_any(I).
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- layer(I,_,T).
