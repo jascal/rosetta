@@ -4,7 +4,7 @@ The pre-registered router lets the idiom pre-empt the compiled TPR. This asks, w
 contexts (where the deployed n-gram + idiom layers do not decide GPT-2's answer), what does the compiled TPR layer
 alone decide, with its own dev-selected theta? Decisions are Soufflé query results; numbers are `empirical`.
 
-    python3 py/diagnose_compiled_tpr.py reference/benchmarks/gpt2_compiled_tpr
+    python3 py/diagnose_compiled_tpr.py reference/benchmarks/gpt2_compiled_tpr .../gpt2.tokenizer.json
 """
 import json
 from pathlib import Path
@@ -16,7 +16,7 @@ from benchmark_compiled_tpr import pairs_of, souffle_relation, tpr_facts, tpr_pr
 def main():
     out = Path(sys.argv[1])
     report = json.loads((out / "report.json").read_text())
-    vocab = {i: t for t, i in json.loads(Path("/home/allans/code/fieldrun/bundles/gpt2.tokenizer.json").read_text())
+    vocab = {i: t for t, i in json.loads(Path(sys.argv[2]).read_text())
              ["model"]["vocab"].items()}
     diag = {}
     for task, rep in report["tasks"].items():
@@ -34,7 +34,7 @@ def main():
                                             and layer_of[r["id"]][1] == refs[r["id"]])]
         program = tpr_program(task, rep["theta"], meta)
         tp = {i: t for i, t in souffle_relation(program, residual, "tp_decide", tpr_facts(tdir / "tpr"))}
-        unguarded = {i: t for i, t in souffle_relation(tpr_program(task, -(2 ** 60), meta), residual, "tp_decide",
+        unguarded = {i: t for i, t in souffle_relation(tpr_program(task, 0, meta), residual, "tp_decide",
                                                        tpr_facts(tdir / "tpr"))}
         cats = {}
         for r in residual:

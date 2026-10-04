@@ -1,6 +1,6 @@
 """Compiled TPR behind n-gram and idiom layers (pre-registered: docs/compiled-tpr-prereg.md).
 
-    python3 py/benchmark_compiled_tpr.py generate OUT                  # datasets (token ids), stdlib only
+    python3 py/benchmark_compiled_tpr.py generate OUT --tokenizer .../gpt2.tokenizer.json   # datasets, stdlib only
     # pil: experiments/compile_tpr.py trains the certificate-aware TPR and exports weighted facts to OUT/<task>/tpr
     fieldrun --bundle .../gpt2 --serve 8189
     python3 py/benchmark_compiled_tpr.py run OUT --port 8189 --bundle .../gpt2
@@ -22,7 +22,6 @@ from certificate import check, sha256
 from oracle import serve_decide
 
 ROOT = Path(__file__).resolve().parents[1]
-TOKENIZER = Path("/home/allans/code/fieldrun/bundles/gpt2.tokenizer.json")
 COPY_IDIOM = ROOT / "reference/benchmarks/qwen25_05b_guarded_seed1/selected/circuits.dl"
 OCCUPATIONS = """doctor lawyer teacher nurse pilot farmer baker chef judge poet painter singer dancer actor writer
 author editor banker soldier sailor driver student scientist engineer artist captain priest waiter guard coach player
@@ -42,8 +41,8 @@ SCALE = 2 ** 16
 COPY_RMAX = 36
 
 
-def vocab():
-    return json.loads(TOKENIZER.read_text())["model"]["vocab"]
+def vocab(tokenizer):
+    return json.loads(Path(tokenizer).read_text())["model"]["vocab"]
 
 
 def single(v, words, cap):
@@ -92,7 +91,7 @@ def cmd_generate(args):
             SEEDS[k] += 1000
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=False)
-    v = vocab()
+    v = vocab(args.tokenizer)
     for task, gen in (("SVO", generate_svo), ("COPY", generate_copy)):
         rows, meta = gen(v, random.Random(SEEDS[task]))
         order = list(range(len(rows)))
@@ -106,7 +105,7 @@ def cmd_generate(args):
         (out / task / "dataset.json").write_text(json.dumps(dict(task=task, meta=meta, rows=rows)) + "\n")
         print(f"{task}: {len(rows)} contexts, {len(meta['fillers'])} fillers")
     (out / "protocol.json").write_text(json.dumps(dict(prereg="docs/compiled-tpr-prereg.md", seeds=SEEDS,
-                                                       tokenizer_sha256=sha256(TOKENIZER),
+                                                       tokenizer_sha256=sha256(args.tokenizer),
                                                        driver_sha256=sha256(__file__)), indent=2) + "\n")
 
 
@@ -292,7 +291,7 @@ def select_theta(task, tpr_dir, meta, dev, refs, out):
     verifier = out / "theta.dl"
     verifier.write_text('.decl tok(inst:number,pos:number,id:number) .input tok\n#include "circuit.dl"\n' + THETA_DL)
     candidate = out / "tpr_unguarded.dl"
-    candidate.write_text(tpr_program(task, -(2 ** 60), meta))
+    candidate.write_text(tpr_program(task, 0, meta))  # unguarded: margins are >= 0; THETA_DL reads tp_margin
     result = check(verifier, candidate, staged, {}, evidence_dir=out / "certificate-evidence",
                    provenance={"stage": "theta selection on dev"})
     return int(result["relations"]["theta"][0][0])
@@ -304,7 +303,7 @@ def cmd_run(args):
     out = Path(args.out).resolve()
     provenance = {"source": "fieldrun", "bundle_sha256": {s: sha256(args.bundle + s)
                                                          for s in (".fieldrun.bin", ".fieldrun.json")}}
-    summary = dict(tag="empirical", prereg="docs/compiled-tpr-prereg.md", provenance=provenance, tasks={})
+    summary = dict(tag="empirical", tag_note="aggregate numbers are empirical; each certified/nmiss is a dl/equiv.dl query result", prereg="docs/compiled-tpr-prereg.md", provenance=provenance, tasks={})
     for task in ("SVO", "COPY"):
         tdir = out / task
         data = json.loads((tdir / "dataset.json").read_text())
@@ -338,9 +337,11 @@ def cmd_run(args):
         (tdir / "circuits.dl").write_text(router(ngram_dl, idiom_dl, tpr_dl))
         candidate = tdir / "circuits.dl"
         # ---- parse parity: Datalog role parse vs the pairs pil trained on (train contexts)
-        parsed = souffle_relation(tpr_dl, train[:500], "tp_pair", tpr_facts(tpr_dir))
+        parsed = souffle_relation(tpr_dl, train, "tp_pair", tpr_facts(tpr_dir))
         dl_pairs = {(i, f, r) for i, f, r in parsed}
-        py_pairs = {(row["id"], *p) for row in train[:500] for p in pairs_of(task, row, meta)}
+        py_pairs = {(row["id"], *p) for row in train for p in pairs_of(task, row, meta)}
+        if dl_pairs != py_pairs:
+            raise ValueError(f"{task}: Datalog/Python parse parity fails on train ({len(dl_pairs ^ py_pairs)} pairs)")
         # ---- freeze test firing domains BEFORE any test reference
         layers = souffle_relation((tdir / "circuits.dl").read_text(), test, "layer", extra)
         domain, audit = freeze_with(tdir, candidate, test, extra, provenance)
@@ -366,7 +367,7 @@ def cmd_run(args):
                                  provenance={**provenance, "layer": lname, "instance_ids": ids})
             certs[lname] = dict(ndomain=res["ndomain"], nmiss=res["nmiss"], nuncov=res["nuncov"],
                                 certified=res["certified"],
-                                mismatches=[list(m) for m in res["mismatches"][:50]])
+                                mismatches=[list(m) for m in res["mismatches"]])
         # ---- residual metric
         def category(r):
             ref = refs[r["id"]]
@@ -421,6 +422,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     g = sub.add_parser("generate")
     g.add_argument("out")
+    g.add_argument("--tokenizer", required=True, help="fieldrun gpt2.tokenizer.json")
     g.add_argument("--smoke", action="store_true", help="bug check: 600 contexts, seeds + 1000; NOT results")
     r = sub.add_parser("run")
     r.add_argument("out")

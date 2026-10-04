@@ -1,8 +1,12 @@
 # Compiled TPR behind n-gram and idiom layers — outcome
 
 **Pre-registration:** [`compiled-tpr-prereg.md`](compiled-tpr-prereg.md), pushed before any code (`8edc2ca`, 22:18).
-- Code was frozen before the real run: rosetta `e22f017` and pil `e2babef` (22:36). `--smoke` runs used non-study
-  data only (600 contexts, seeds + 1000).
+- Code was frozen before the real run: rosetta `e22f017` (`py/benchmark_compiled_tpr.py`, sha256 `33b938ae…`, as
+  pinned in `protocol.json`) and the pil twin `e2babef` (`experiments/compile_tpr.py`: HF GPT-2 decisions on train,
+  the `cert`-objective TPR fit, weighted-fact export) (22:36). `--smoke` runs used non-study data only (600
+  contexts, seeds + 1000).
+- The driver was edited **after** the run, in review (see *Post-run audit*). The edits change neither selection nor
+  verdicts. The run used the `e22f017` driver.
 - Artifacts are in [`reference/benchmarks/gpt2_compiled_tpr/`](../reference/benchmarks/gpt2_compiled_tpr/). COPY's
   certificate evidence is omitted for size (see that folder's `EVIDENCE.md`).
 - References are from the fieldrun GPT-2 bundle (`4edbcffe…`). Verdicts are `dl/equiv.dl` query results.
@@ -10,7 +14,11 @@
 ## Verdict
 
 **Q1 (a compiled TPR certifies GPT-2 decisions that n-grams and idioms cannot): NO, on both tasks** (overall:
-`no`).
+`no`). This matches the pre-registered rule. It is **not** a test of the compiled TPR on both tasks:
+
+- **SVO** is a real test. The TPR layer was consulted and failed zero-error on one counterexample.
+- **COPY** never consults the TPR. The frozen idiom fires on every test context, so the TPR domain is empty. COPY
+  says nothing about whether a compiled TPR can cover the COPY residual.
 
 ### SVO
 
@@ -22,7 +30,8 @@
   - idiom: 0, 0, certified = None
   - tpr: 469, 1, certified = False
   - composite: 469, 1, certified = False
-- Residual (the deployed n-gram + idiom do not decide GPT-2's answer): 3600. Split: R_in_sentence 2948 (TPR decides 468, agrees 468); R_obj 424 (TPR decides 1, agrees 0); R_other 228 (TPR decides 0, agrees 0).
+- Residual (the deployed n-gram + idiom do not decide GPT-2's answer): 3600. Split (`R_in_sentence` extends the
+  pre-registered §3 split, which names only `R_obj` and `R_other`): R_in_sentence 2948 (TPR decides 468, agrees 468); R_obj 424 (TPR decides 1, agrees 0); R_other 228 (TPR decides 0, agrees 0).
 - **Additional certified coverage: 0** (Q1 fails).
 
 ### COPY
@@ -67,6 +76,49 @@ TPR decide **alone**, with its dev-selected θ (guarded) and without θ (unguard
 | COPY | R_ctx/plain | 1 | 0 | 0 | 0 |
 | COPY | R_out/plain | 1 | 0 | 0 | 0 |
 
+## Post-run audit (review follow-up; re-selects nothing)
+
+`py/audit_compiled_tpr.py` → [`audit.json`](../reference/benchmarks/gpt2_compiled_tpr/audit.json). It reads back the
+stored datasets, circuits, frozen domains, θ and references, and recomputes what the frozen run left out. Each check
+fails the script if it disagrees with `report.json`.
+
+- **Full mismatch lists.** `report.json` kept only the first 50 per certificate. `audit.json` lists all of them,
+  re-derived by `dl/equiv.dl` on the frozen domains, with identical `ndomain`/`nmiss`/`certified`.
+  - COPY idiom: 122 (120 `near_match8`, 2 `plain`).
+  - SVO TPR: 1.
+- **HF/fieldrun disagreements (pre-reg §1, unmet in the run).** The run did not report these. Greedy next token,
+  HF GPT-2 vs the fieldrun bundle `4edbcffe…` references:
+
+  | task | train | dev | test |
+  |---|---:|---:|---:|
+  | SVO | 5 / 7200 | 0 / 1200 | 2 / 3600 |
+  | COPY | 0 / 7200 | 0 / 1200 | 1 / 3600 |
+
+  pil trained on HF decisions, so 5 SVO training targets differ from fieldrun. Certificates use fieldrun only.
+- **Parse parity on the full train split.** The run checked `train[:500]` and recorded the result without gating.
+  The audit checks all train contexts: SVO 7200 contexts and 21,600 pairs, COPY 7200 contexts and 220,992 pairs.
+  Datalog and Python agree exactly on both.
+- **Unguarded θ literal.** The unguarded program used `tp_theta(-2**60)`. That fits the 64-bit Soufflé used here,
+  but it would wrap on a 32-bit `number`. θ selection reads `tp_margin`, not `tp_decide`, so the literal had no
+  effect. Re-selecting with `tp_theta(0)` gives the same θ on both tasks (175647, 376729). The post-hoc diagnostic
+  re-run with `tp_theta(0)` is byte-identical.
+
+Driver edits after the run (for re-runs, not this result):
+
+- `--tokenizer` is now an argument (it was a machine-local path). The diagnostic takes it as `argv[2]`.
+- The unguarded program uses `tp_theta(0)`.
+- Every mismatch is stored.
+- Parse parity covers full train and aborts the run on mismatch.
+- `report.json` gets a `tag_note`: the aggregates are `empirical`, but each `certified`/`nmiss` is an `equiv.dl`
+  query result.
+
+`tests/test_compiled_tpr.py` locks the protocol pieces on synthetic data:
+
+- the role parse, Python vs Datalog, including rejection of off-template contexts;
+- COPY role numbering;
+- the whitelist rule;
+- router precedence (n-gram, then idiom, then TPR).
+
 ## Reading (interpretation)
 
 1. **Where the compiled TPR is confident, it reproduces the idiom, not the residual.**
@@ -74,14 +126,16 @@ TPR decide **alone**, with its dev-selected θ (guarded) and without θ (unguard
    - On the decisions no crisp rule predicts, the unguarded TPR is right sometimes: object choice 228/424, other
      tokens 52/228, decoy-following 10/120. But its margins there never clear a zero-error θ.
    - The structure it learned carries some signal about the residual, but not with margins that survive the guard.
-2. **The answer to the open question is no, at this scale and on these tasks.** A learned, compiled TPR adds **no**
-   certified coverage beyond n-grams and idioms.
+2. **On SVO, the answer is no at this scale.** A learned, compiled TPR adds **no** certified coverage beyond
+   n-grams and idioms. On COPY the question was not asked (see *Verdict*). The only COPY evidence on the TPR is the
+   post-hoc table: unguarded 10/120 on decoy-following contexts, guarded 0.
    - What it certifies empirically is what an idiom already expresses.
    - The idiom-defying decisions are where it is least confident.
    - This matches pil #136: certification needs margins, and the residual is exactly the low-margin part of GPT-2's
      behaviour.
 3. **Two design weaknesses are visible, and both are reported rather than repaired.**
-   - (i) A verb-level, all-correct whitelist is too strict for an idiom that is right 83% of the time, so no idiom
+   - (i) A verb-level, all-correct whitelist is too strict for an idiom that is right about 82% of the time (GPT-2
+     outputs the subject on 981/1200 dev and 2948/3600 test contexts; `audit.json` `subject_copy_rate`), so no idiom
      coverage survived.
    - (ii) The frozen copy guard pre-empts every COPY context, so a layer-order design that lets the TPR veto low-margin
      idiom answers was not tested.
