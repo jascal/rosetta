@@ -13,16 +13,29 @@ import argparse
 import json
 from pathlib import Path
 import random
+from contextlib import contextmanager
+import json as _json
 import re
 import subprocess
 import tempfile
+import time
+import urllib.request
 
 from benchmark_induction import DL, learn_baseline
 from certificate import check, sha256
 from oracle import serve_decide
 
 ROOT = Path(__file__).resolve().parents[1]
-TOKENIZER = Path("/home/allans/code/fieldrun/bundles/gpt2.tokenizer.json")
+HF = Path.home() / ".cache/huggingface/hub"
+MODELS = {  # pinned in pil docs/notes/beyond_gpt2_prereg.md; BOS is prepended to every context when present
+    "gpt2": dict(tokenizer=Path("/home/allans/code/fieldrun/bundles/gpt2.tokenizer.json"), bos=None),
+    "Qwen/Qwen2.5-1.5B-Instruct": dict(tokenizer=HF / "models--Qwen--Qwen2.5-1.5B-Instruct/snapshots/"
+                                       "989aa7980e4cf806f80c7fef2b1adb7bc71aa306/tokenizer.json", bos=None),
+    "meta-llama/Llama-3.2-1B": dict(tokenizer=HF / "models--meta-llama--Llama-3.2-1B/snapshots/"
+                                    "4e20de362430cd3b72f300e6b0f18e50e7166e08/tokenizer.json", bos=128000),
+}
+MODEL = "gpt2"
+PARITY_SEED, PARITY_N, PARITY_MIN = 61, 400, 0.995
 COPY_IDIOM = ROOT / "reference/benchmarks/qwen25_05b_guarded_seed1/selected/circuits.dl"
 OCCUPATIONS = """doctor lawyer teacher nurse pilot farmer baker chef judge poet painter singer dancer actor writer
 author editor banker soldier sailor driver student scientist engineer artist captain priest waiter guard coach player
@@ -43,7 +56,12 @@ COPY_RMAX = 36
 
 
 def vocab():
-    return json.loads(TOKENIZER.read_text())["model"]["vocab"]
+    return json.loads(Path(MODELS[MODEL]["tokenizer"]).read_text())["model"]["vocab"]
+
+
+def with_bos(ctx):
+    bos = MODELS[MODEL]["bos"]
+    return ([bos] if bos is not None else []) + ctx
 
 
 def single(v, words, cap):
@@ -57,35 +75,47 @@ def generate_svo(v, rng):
     THE, the, dot, was, by = v["The"], v["Ġthe"], v["."], v["Ġwas"], v["Ġby"]
     combos = [(s, vb, o) for s in occ for o in occ if s != o for vb in verbs]
     rng.shuffle(combos)
-    rows = [dict(ctx=[THE, s, vb, the, o, dot, THE, o, was, vb, by, the], subject=s, verb=vb, object=o)
-            for s, vb, o in combos[:N_CONTEXTS]]
-    meta = dict(fillers=occ + verbs, n_role=3, template={"0": THE, "3": the, "5": dot, "6": THE, "8": was,
-                                                          "10": by, "11": the})
+    rows = [dict(ctx=with_bos([THE, s, vb, the, o, dot, THE, o, was, vb, by, the]), subject=s, verb=vb, object=o)
+            for s, vb, o in combos[:N_CONTEXTS + PARITY_N]]
+    off = 1 if MODELS[MODEL]["bos"] is not None else 0
+    meta = dict(fillers=occ + verbs, n_role=3, offset=off, bos=MODELS[MODEL]["bos"],
+                template={str(k + off): t for k, t in
+                          {0: THE, 3: the, 5: dot, 6: THE, 8: was, 10: by, 11: the}.items()})
     return rows, meta
 
 
+def copy_row(rng, pool, layout):
+    vals = rng.sample(pool, 8 + 1 + 16)
+    seq, decoy, noise = vals[:8], vals[8], [vals[9:17], vals[17:25]]
+    ctx = []
+    for b in range(2):
+        ctx += seq
+        gap = [] if layout == "plain" else list(noise[b])
+        if layout == "near_match8":
+            gap[-3:] = [seq[2], seq[3], decoy]
+        ctx += gap
+    ctx += seq[:4]
+    return dict(ctx=with_bos(ctx), layout=layout, target=seq[4])
+
+
 def generate_copy(v, rng):
+    """Study rows exactly as in the GPT-2 run (N/3 per layout, then shuffled); parity rows drawn AFTER them from the
+    continuing stream, so adding the parity set never changes the study data."""
     pool = single(v, NOUNS, 120)
-    rows = []
-    for layout in ("plain", "noise8", "near_match8"):
-        for _ in range(N_CONTEXTS // 3):
-            vals = rng.sample(pool, 8 + 1 + 16)
-            seq, decoy, noise = vals[:8], vals[8], [vals[9:17], vals[17:25]]
-            ctx = []
-            for b in range(2):
-                ctx += seq
-                gap = [] if layout == "plain" else list(noise[b])
-                if layout == "near_match8":
-                    gap[-3:] = [seq[2], seq[3], decoy]
-                ctx += gap
-            ctx += seq[:4]
-            rows.append(dict(ctx=ctx, layout=layout, target=seq[4]))
+    rows = [copy_row(rng, pool, layout) for layout in ("plain", "noise8", "near_match8")
+            for _ in range(N_CONTEXTS // 3)]
     rng.shuffle(rows)
-    return rows, dict(fillers=pool, n_role=COPY_RMAX)
+    rows += [copy_row(rng, pool, ("plain", "noise8", "near_match8")[i % 3]) for i in range(2 * PARITY_N)]
+    off = 1 if MODELS[MODEL]["bos"] is not None else 0
+    return rows, dict(fillers=pool, n_role=COPY_RMAX, offset=off, bos=MODELS[MODEL]["bos"])
 
 
 def cmd_generate(args):
-    global N_CONTEXTS
+    global N_CONTEXTS, MODEL
+    MODEL = args.model
+    for k, val in (("SVO", args.svo_seed), ("COPY", args.copy_seed), ("split", args.split_seed)):
+        if val is not None:
+            SEEDS[k] = val
     if args.smoke:
         N_CONTEXTS = 600
         for k in SEEDS:
@@ -95,51 +125,66 @@ def cmd_generate(args):
     v = vocab()
     for task, gen in (("SVO", generate_svo), ("COPY", generate_copy)):
         rows, meta = gen(v, random.Random(SEEDS[task]))
+        # Frozen parity set (seed 61): extra contexts drawn from the same generator stream, disjoint from the study
+        # rows by construction (distinct positions in a shuffled stream of distinct contexts) and never used for
+        # selection; it only decides whether the fieldrun bundle may serve as the reference source.
+        prng = random.Random(PARITY_SEED)
+        pool_rows = rows[N_CONTEXTS:]
+        rows = rows[:N_CONTEXTS]
+        study_keys = {tuple(r["ctx"]) for r in rows}
+        parity = [r for r in pool_rows if tuple(r["ctx"]) not in study_keys]
+        prng.shuffle(parity)
+        parity = parity[:PARITY_N]
         order = list(range(len(rows)))
         random.Random(SEEDS["split"]).shuffle(order)
         n_tr, n_dev = int(0.6 * len(rows)), int(0.1 * len(rows))
         for rank, i in enumerate(order):
             rows[i]["part"] = "train" if rank < n_tr else ("dev" if rank < n_tr + n_dev else "test")
+        for row in parity:
+            row["part"] = "parity"
+        rows = rows + parity
         for i, row in enumerate(rows):
             row["id"], row["group"] = i, f"{task}-{i}"
         (out / task).mkdir()
         (out / task / "dataset.json").write_text(json.dumps(dict(task=task, meta=meta, rows=rows)) + "\n")
         print(f"{task}: {len(rows)} contexts, {len(meta['fillers'])} fillers")
-    (out / "protocol.json").write_text(json.dumps(dict(prereg="docs/compiled-tpr-prereg.md", seeds=SEEDS,
-                                                       tokenizer_sha256=sha256(TOKENIZER),
+    (out / "protocol.json").write_text(json.dumps(dict(prereg=args.prereg, model=MODEL, seeds=SEEDS,
+                                                       parity=dict(seed=PARITY_SEED, n=PARITY_N, min=PARITY_MIN),
+                                                       tokenizer_sha256=sha256(MODELS[MODEL]["tokenizer"]),
                                                        driver_sha256=sha256(__file__)), indent=2) + "\n")
 
 
 # ---------------------------------------------------------------- the compiled TPR (Soufflé-only runtime)
 
-PARSE = {
-    "SVO": """// Role parse from tok facts: fixed template, subject/verb/object at positions 1/2/4.
-.decl tp_len(inst:number,k:number)
-tp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.
-.decl tp_bad(inst:number)
-tp_bad(I) :- tp_len(I,K), K != 12.
+def parse_program(task, offset, bos):
+    """Role parse from tok facts. `offset` = 1 when a BOS token (checked) occupies position 0."""
+    o = offset
+    head = ".decl tp_len(inst:number,k:number)\ntp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.\n" \
+           ".decl tp_bad(inst:number)\n"
+    if o:
+        head += f"tp_bad(I) :- tp_len(I,_), !tok(I,0,{bos}).\n"
+    if task == "SVO":
+        return ("// Role parse from tok facts: fixed template, subject/verb/object at positions 1/2/4 (+offset).\n"
+                + head + f"""tp_bad(I) :- tp_len(I,K), K != {12 + o}.
 tp_bad(I) :- tp_template(P,T), tok(I,P,X), X != T.
-tp_bad(I) :- tok(I,4,A), tok(I,7,B), A != B.
-tp_bad(I) :- tok(I,2,A), tok(I,9,B), A != B.
+tp_bad(I) :- tok(I,{4 + o},A), tok(I,{7 + o},B), A != B.
+tp_bad(I) :- tok(I,{2 + o},A), tok(I,{9 + o},B), A != B.
 .decl tp_pair(inst:number,f:number,r:number)
-tp_pair(I,F,0) :- tp_len(I,_), !tp_bad(I), tok(I,1,X), tp_filler(X,F).
-tp_pair(I,F,1) :- tp_len(I,_), !tp_bad(I), tok(I,2,X), tp_filler(X,F).
-tp_pair(I,F,2) :- tp_len(I,_), !tp_bad(I), tok(I,4,X), tp_filler(X,F).
+tp_pair(I,F,0) :- tp_len(I,_), !tp_bad(I), tok(I,{1 + o},X), tp_filler(X,F).
+tp_pair(I,F,1) :- tp_len(I,_), !tp_bad(I), tok(I,{2 + o},X), tp_filler(X,F).
+tp_pair(I,F,2) :- tp_len(I,_), !tp_bad(I), tok(I,{4 + o},X), tp_filler(X,F).
 .decl tp_full(inst:number)
 tp_full(I) :- tp_pair(I,_,0), tp_pair(I,_,1), tp_pair(I,_,2).
-""",
-    "COPY": """// Role parse from tok facts: role = distance from the end; every token must be a pool filler.
-.decl tp_len(inst:number,k:number)
-tp_len(I,K) :- tok(I,_,_), K = count : { tok(I,_,_) }.
-.decl tp_bad(inst:number)
-tp_bad(I) :- tok(I,_,X), !tp_filler(X,_).
-tp_bad(I) :- tp_len(I,K), K > %d.
+""")
+    return ("// Role parse from tok facts: role = distance from the end; every content token a pool filler.\n"
+            + head + f"""tp_bad(I) :- tok(I,P,X), P >= {o}, !tp_filler(X,_).
+tp_bad(I) :- tp_len(I,K), K > {COPY_RMAX + o}.
 .decl tp_pair(inst:number,f:number,r:number)
-tp_pair(I,F,R) :- tp_len(I,K), !tp_bad(I), tok(I,P,X), tp_filler(X,F), R = K - 1 - P.
+tp_pair(I,F,R) :- tp_len(I,K), !tp_bad(I), tok(I,P,X), P >= {o}, tp_filler(X,F), R = K - 1 - P.
 .decl tp_full(inst:number)
 tp_full(I) :- tp_len(I,_), !tp_bad(I).
-""" % COPY_RMAX,
-}
+""")
+
 
 SCORE = """// Weighted score: total(v) = bias(v) + sum over parsed pairs of w(v,f,r); argmax over the candidate set, margin.
 .decl tp_total(inst:number,v:number,s:number)
@@ -166,7 +211,7 @@ def tpr_program(task, theta, meta):
          ".decl tp_bias(v:number,b:number) .input tp_bias",
          ".decl tp_theta(t:number)", f"tp_theta({theta}).", ".decl tp_template(pos:number,id:number)"]
     L += [f"tp_template({p},{t})." for p, t in meta.get("template", {}).items()]
-    return "\n".join(L) + "\n" + PARSE[task] + SCORE
+    return "\n".join(L) + "\n" + parse_program(task, int(meta.get("offset", 0)), meta.get("bos")) + SCORE
 
 
 def tpr_facts(tpr_dir, prefix=""):
@@ -212,11 +257,11 @@ def namespace(text, prefix):
     return text
 
 
-def svo_idiom(whitelist):
+def svo_idiom(whitelist, offset=0):
     return ("// SVO copy-subject idiom: output the token at position 1 iff the verb (position 2) is whitelisted.\n"
             ".decl verb_ok(v:number)\n" + "".join(f"verb_ok({x}).\n" for x in sorted(whitelist)) +
             ".decl cdecide(inst:number,out:number)\n"
-            "cdecide(I,S) :- tok(I,1,S), tok(I,2,V), verb_ok(V).\n")
+            f"cdecide(I,S) :- tok(I,{1 + offset},S), tok(I,{2 + offset},V), verb_ok(V).\n")
 
 
 def router(ngram_dl, idiom_dl, tpr_dl):
@@ -300,11 +345,48 @@ def select_theta(task, tpr_dir, meta, dev, refs, out):
 
 # ---------------------------------------------------------------- run
 
+@contextmanager
+def _nullcontext():
+    yield
+
+
+@contextmanager
+def reference_server(args):
+    """Run the fieldrun server only while references are being collected (memory: an f32 1-2B bundle holds 5-6 GB).
+    Without --manage-server the caller's already-running server on --port is used, as before."""
+    if not args.manage_server:
+        yield
+        return
+    proc = subprocess.Popen([args.fieldrun, "--bundle", args.bundle, "--serve", str(args.port)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        body = _json.dumps({"ids": [0]}).encode()
+        for _ in range(600):
+            try:
+                req = urllib.request.Request(f"http://127.0.0.1:{args.port}/predict", data=body,
+                                             headers={"Content-Type": "application/json"})
+                urllib.request.urlopen(req, timeout=30).read()
+                break
+            except Exception:
+                if proc.poll() is not None:
+                    raise RuntimeError("fieldrun server exited during startup")
+                time.sleep(1)
+        else:
+            raise RuntimeError("fieldrun server did not become ready")
+        yield
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=60)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
 def cmd_run(args):
     out = Path(args.out).resolve()
     provenance = {"source": "fieldrun", "bundle_sha256": {s: sha256(args.bundle + s)
                                                          for s in (".fieldrun.bin", ".fieldrun.json")}}
-    summary = dict(tag="empirical", prereg="docs/compiled-tpr-prereg.md", provenance=provenance, tasks={})
+    summary = dict(tag="empirical", prereg=args.prereg, provenance=provenance, tasks={})
     for task in ("SVO", "COPY"):
         tdir = out / task
         data = json.loads((tdir / "dataset.json").read_text())
@@ -316,9 +398,20 @@ def cmd_run(args):
         test_all = part("test")
         seen = set(map(tuple, tmeta["train_pairs_seen"]))
         test = [r for r in test_all if all(tuple(p) in seen for p in pairs_of(task, r, meta))]
+        # Reference source (pre-registered): the fieldrun bundle iff its argmax matches HF fp32 on >= PARITY_MIN
+        # of the frozen parity set; otherwise HF fp32 (from pil compile_tpr.py's hf_refs.json), labelled.
+        hf_path = tdir / "hf_refs.json"
+        hf = {int(k): v for k, v in json.loads(hf_path.read_text()).items()} if hf_path.exists() else {}
+        parity_rows = part("parity")
         refs = {}
-        for r in train + dev:
-            refs[r["id"]] = serve_decide(args.port, r["ctx"])
+        # Collection window 1 (before any selection): parity, then train + dev references.
+        with reference_server(args):
+            agree = sum(serve_decide(args.port, r["ctx"]) == hf[r["id"]] for r in parity_rows)
+            parity_frac = agree / len(parity_rows) if parity_rows else 1.0
+            use_fieldrun = parity_frac >= PARITY_MIN
+            ref_of = (lambda r: serve_decide(args.port, r["ctx"])) if use_fieldrun else (lambda r: hf[r["id"]])
+            for r in train + dev:
+                refs[r["id"]] = ref_of(r)
         # ---- layers and guards: train + dev only
         ngram_all, n_rules, _ = learn_baseline(train, refs, tdir)
         kept, _ = ngram_dev_filter(ngram_all, train, dev, refs)
@@ -328,7 +421,7 @@ def cmd_run(args):
         ngram_dl = (tdir / "ngram" / "circuits.dl").read_text()
         if task == "SVO":
             whitelist = svo_whitelist(dev, refs)
-            idiom_dl = svo_idiom(whitelist)
+            idiom_dl = svo_idiom(whitelist, int(meta.get("offset", 0)))
         else:
             whitelist = None
             idiom_dl = COPY_IDIOM.read_text()
@@ -348,8 +441,10 @@ def cmd_run(args):
                       dataset_sha256=sha256(tdir / "dataset.json"))
         (tdir / "frozen.json").write_text(json.dumps(frozen) + "\n")
         frozen_hash = sha256(tdir / "frozen.json")
-        for r in test:
-            refs[r["id"]] = serve_decide(args.port, r["ctx"])
+        # Collection window 2 (after the test domains are frozen): test references.
+        with reference_server(args) if use_fieldrun else _nullcontext():
+            for r in test:
+                refs[r["id"]] = ref_of(r)
         if sha256(tdir / "frozen.json") != frozen_hash or sha256(candidate) != frozen["circuit_sha256"]:
             raise ValueError("frozen inputs changed during reference collection")
         (tdir / "references.json").write_text(json.dumps(refs) + "\n")
@@ -387,6 +482,8 @@ def cmd_run(args):
         add = sum(s["tpr_decides"] for s in split.values()) if tpr_clean else 0
         q1 = tpr_clean and add >= 10 and add >= 0.05 * len(residual)
         summary["tasks"][task] = dict(
+            reference_source="fieldrun" if use_fieldrun else "hf-fp32", parity=dict(n=len(parity_rows), agree=agree,
+                                                                                      fraction=parity_frac),
             n_test=len(test), test_dropped_unseen_pair=len(test_all) - len(test),
             ngram_rules_learned=n_rules, ngram_rules_kept=len(kept),
             idiom_whitelist=sorted(whitelist) if whitelist is not None else "frozen copy guard",
@@ -406,13 +503,14 @@ def cmd_run(args):
 
 
 def pairs_of(task, row, meta):
-    """Python twin of the Datalog role parse (pairs as (filler, role)); fillers by token id unless as_index."""
+    """Python twin of the Datalog role parse: (filler_index, role); skips a BOS at position 0 when present."""
     fidx = {t: i for i, t in enumerate(meta["fillers"])}
+    o = int(meta.get("offset", 0))
     if task == "SVO":
-        toks = [(row["ctx"][1], 0), (row["ctx"][2], 1), (row["ctx"][4], 2)]
+        toks = [(row["ctx"][1 + o], 0), (row["ctx"][2 + o], 1), (row["ctx"][4 + o], 2)]
     else:
         n = len(row["ctx"])
-        toks = [(t, n - 1 - p) for p, t in enumerate(row["ctx"])]
+        toks = [(t, n - 1 - p) for p, t in enumerate(row["ctx"]) if p >= o]
     return [(fidx[t], r) for t, r in toks]
 
 
@@ -421,11 +519,20 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     g = sub.add_parser("generate")
     g.add_argument("out")
+    g.add_argument("--model", default="gpt2", choices=sorted(MODELS))
+    g.add_argument("--svo-seed", type=int)
+    g.add_argument("--copy-seed", type=int)
+    g.add_argument("--split-seed", type=int)
+    g.add_argument("--prereg", default="docs/compiled-tpr-prereg.md")
     g.add_argument("--smoke", action="store_true", help="bug check: 600 contexts, seeds + 1000; NOT results")
     r = sub.add_parser("run")
     r.add_argument("out")
     r.add_argument("--port", type=int, required=True)
     r.add_argument("--bundle", required=True)
+    r.add_argument("--prereg", default="docs/compiled-tpr-prereg.md")
+    r.add_argument("--manage-server", action="store_true",
+                   help="start/stop the fieldrun server around the two reference-collection windows")
+    r.add_argument("--fieldrun", default="/home/allans/code/fieldrun/target/release/fieldrun")
     args = ap.parse_args()
     {"generate": cmd_generate, "run": cmd_run}[args.cmd](args)
 
