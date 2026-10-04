@@ -1,0 +1,11 @@
+.decl tok(inst:number,pos:number,id:number) .input tok
+#include "circuit.dl"
+// theta = 1 + the largest compiled-TPR margin among dev ERRORS (fire iff margin >= theta); 0 if no errors.
+.decl ref(inst:number,out:number) .input ref
+.decl err_margin(g:number)
+err_margin(G) :- tp_top(I,V), ref(I,R), V != R, tp_margin(I,G).
+.decl theta(t:number) .output theta
+theta(T) :- M = max G : { err_margin(G) }, T = M + 1.
+theta(0) :- !err_margin(_).
+.decl certified() .output certified
+certified() :- theta(_).

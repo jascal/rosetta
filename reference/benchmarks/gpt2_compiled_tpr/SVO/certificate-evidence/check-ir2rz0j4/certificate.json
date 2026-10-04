@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "fieldrun",
+    "bundle_sha256": {
+      ".fieldrun.bin": "4edbcffed3bc19d571e679896ab3efebaa3802f8d7c9db3bdad31ff2416490f1",
+      ".fieldrun.json": "322d79629f2e121c446560f57b71c5199e0d8a2a912c3a396137ca7eb207692c"
+    },
+    "stage": "domain before test references"
+  },
+  "scalars": {
+    "ndomain": "int"
+  },
+  "result": {
+    "certified": true,
+    "ndomain": 469
+  },
+  "sha256": {
+    "circuit.dl": "a93546066f42379466dcf3579fdbb7bf101296c9bcd418a1d7ca46cf63dcfb5a",
+    "facts/sample.facts": "07cc640c674ffa924d84cccceefea9c9002a87b2381f2bf14bcd37a846fd1763",
+    "facts/tc_tp_bias.facts": "968fc7c46a4d44ad673fe300790264c8a2c53d95edea7347da8085eb0b6110d3",
+    "facts/tc_tp_filler.facts": "edb56fcdd7a766f80ae7441f61b5b0e047e83ae441c148797f2a5f3c7044ce04",
+    "facts/tc_tp_w.facts": "f3ea9c319d012fd7b9b8dbecb64c1b7502a45f6e253588fd12b09a77e84c54b7",
+    "facts/tok.facts": "f8f63033f25185860ec61261185377e6dbcfa8273a189313d7eb29e69193df65",
+    "outputs/abstained.csv": "172f7f155672a4cd5950b7048351eef25d31cffa521e12968456a5206a71921d",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/domain.csv": "0ed6e448d00fa8a4b8cc8d39e24752028ae0d2acec00da1b525fc94075c4e3d1",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ndomain.csv": "3f82e52c0de8601ad3400aa80af6abb724eb1e04ab3b64b7310c8776017b82dc",
+    "stderr.txt": "d9875fe13d39ff9aa406278ad0215a8cb38b9313abd0457aab147189555c6467",
+    "verify.dl": "56391900ff484da316e949cc0571d7936a4ea7bb27f86ba78b2e5f50d8521d0b"
+  }
+}

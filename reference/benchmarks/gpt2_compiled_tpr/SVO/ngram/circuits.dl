@@ -1,0 +1,8 @@
+// rosetta · circuits.dl — the model as certified next-token rules. Numbers are TOKEN IDS (model vocab).
+// gramN(c1,…,c_{N-1}, t): the last N-1 tokens (c_{N-1} = most recent) predict t — gram2=bigram, gram3=trigram,…
+// Routing: composed circuit (if any) wins; else the LONGEST matching n-gram wins; uncovered contexts abstain.
+// Runtime: souffle only (see run.dl). Decoded view: circuits.human.md.
+
+.decl mp(inst:number,m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number,out:number)

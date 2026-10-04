@@ -1,0 +1,22 @@
+// dev-filtered n-gram — circuits.symbols.dl: the legible, runnable twin of circuits.dl (token STRINGS, not ids).
+// Same rules; a transliteration via the lexicon, so it inherits circuits.dl's certificate. gramN = N-gram
+// (N-1 context tokens → next); longest match wins; uncovered → abstain. Run on symbol input:
+//   souffle circuits.symbols.dl -F <dir with tok.facts: inst<TAB>pos<TAB>"token"> -D out  →  cdecide.csv
+
+.decl tok(inst:number, pos:number, sym:symbol)
+.input tok
+.decl mp(inst:number, m:number)
+mp(I,M) :- tok(I,_,_), M = max P : { tok(I,P,_) }.
+.decl cdecide(inst:number, out:symbol)
+.output cdecide
+.decl gram3(c0:symbol,c1:symbol,t:symbol)   // 3-gram
+.decl gram3_hit(inst:number,t:symbol)
+.decl gram3_any(inst:number)
+gram3("id8801","id7545","id2975").
+gram3("id8824","id5118","id8701").
+gram3("id23887","id5318","id5916").
+gram3("id1637","id5118","id20697").
+gram3("id7696","id4898","id6891").
+gram3_hit(I,T) :- mp(I,P), tok(I,P1,C0), tok(I,P,C1), P1=P-1, gram3(C0,C1,T).
+gram3_any(I) :- gram3_hit(I,_).
+cdecide(I,T) :- gram3_hit(I,T).

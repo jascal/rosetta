@@ -1,0 +1,60 @@
+{
+  "post_hoc": true,
+  "tag": "empirical",
+  "tasks": {
+    "SVO": {
+      "residual": 3600,
+      "by_category": {
+        "R_in_sentence": {
+          "n": 2948,
+          "guarded_fires": 468,
+          "guarded_agrees": 468,
+          "unguarded_agrees": 2853
+        },
+        "R_obj": {
+          "n": 424,
+          "guarded_fires": 1,
+          "guarded_agrees": 0,
+          "unguarded_agrees": 228
+        },
+        "R_other": {
+          "n": 228,
+          "guarded_fires": 0,
+          "guarded_agrees": 0,
+          "unguarded_agrees": 52
+        }
+      },
+      "tpr_mismatches_decoded": [
+        {
+          "id": 4986,
+          "ref": "\u0120captain",
+          "tpr": "\u0120butcher"
+        }
+      ]
+    },
+    "COPY": {
+      "residual": 122,
+      "by_category": {
+        "R_ctx/near_match8": {
+          "n": 120,
+          "guarded_fires": 0,
+          "guarded_agrees": 0,
+          "unguarded_agrees": 10
+        },
+        "R_ctx/plain": {
+          "n": 1,
+          "guarded_fires": 0,
+          "guarded_agrees": 0,
+          "unguarded_agrees": 0
+        },
+        "R_out/plain": {
+          "n": 1,
+          "guarded_fires": 0,
+          "guarded_agrees": 0,
+          "unguarded_agrees": 0
+        }
+      },
+      "tpr_mismatches_decoded": []
+    }
+  }
+}

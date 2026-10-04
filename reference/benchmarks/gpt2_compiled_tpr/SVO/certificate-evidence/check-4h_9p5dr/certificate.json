@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "stage": "theta selection on dev"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "c1dd6cecdb64aad85b31e64e48486ca06d5aa9618ac37fd375bc7d3e147c19c9",
+    "facts/ref.facts": "c204777ff571133bcebd2e7bc4806863334a55fcb48972a192a2e6c6c80cc194",
+    "facts/tok.facts": "664b318a4293331c458f7bb2103c8019e01d25306b7a7a8a812a5dc3dde36198",
+    "facts/tp_bias.facts": "968fc7c46a4d44ad673fe300790264c8a2c53d95edea7347da8085eb0b6110d3",
+    "facts/tp_filler.facts": "edb56fcdd7a766f80ae7441f61b5b0e047e83ae441c148797f2a5f3c7044ce04",
+    "facts/tp_w.facts": "f3ea9c319d012fd7b9b8dbecb64c1b7502a45f6e253588fd12b09a77e84c54b7",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/theta.csv": "d1e2e441b28d33dc2ce180c4dea98c6b6708f74a725a737e1cd64701d8ca64d9",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "15bb8ec2eeea0ce26e972b4cdab6b9f6140fe06bef8a7cfdb4eb7b7afa1d19a2"
+  }
+}
