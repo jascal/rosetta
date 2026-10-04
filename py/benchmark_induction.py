@@ -74,7 +74,7 @@ def evaluate(candidate, rows, refs, evidence_dir, provenance):
     return {"audit": result, "scores": scores}
 
 
-def learn_baseline(rows, refs, out):
+def learn_baseline(rows, refs, out, emitter=emit):
     train = [r for r in rows if r["part"] == "train"]
     staged = facts(train, refs)
     staged["ctx"] = staged.pop("tok")
@@ -89,7 +89,7 @@ def learn_baseline(rows, refs, out):
     rules = {tuple(by_id[int(i)]["ctx"][-int(k):]): refs[int(i)] for i, k in learned["relations"]["minorder"]}
     directory = out / "baseline"
     directory.mkdir()
-    emit(str(directory / "circuits.dl"), rules, False, {}, "train-only n-gram baseline")
+    emitter(str(directory / "circuits.dl"), rules, False, {}, "train-only n-gram baseline")
     learned.pop("relations")
     return directory / "circuits.dl", len(rules), learned
 

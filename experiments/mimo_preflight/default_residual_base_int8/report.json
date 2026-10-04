@@ -1,0 +1,649 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "tag": "empirical",
+    "source": "fieldrun",
+    "selection": "most frequent answer on train only; lowest token ID breaks frequency ties",
+    "bundle_sha256": {
+      ".fieldrun.bin": "c0761a3ccb464dc3d59e44cf43ca8d74bf26fbc2690095764ddaca5a0f1bb85f",
+      ".fieldrun.json": "2e9cadd6c791b2d1fcbcfe6c2d8bf3683616ab44350d1b99e09bf17e884a65ba"
+    },
+    "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+    "mode_program_sha256": "943563a95c1263fc29eef152525c390c70be8d56f9258e4c5bdbde8963d19ce6",
+    "driver_sha256": "6f8b8a11ac97c045c43bfd09c2d51f8d8055d91999eb158e8529527d252c7a84",
+    "training_references_sha256": "b93422b272f0cbbc8dba823cb43e23c695fae0fac5727d724b7900f7c3905aa3",
+    "runtime": "standalone Datalog; no model, Python, or fieldrun dependency"
+  },
+  "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+  "references_sha256": "2f0c940919d34d0a14ac671b470677c64d4a0fd44e5d846155bab449fc0c952c",
+  "selected_token": 25091,
+  "train_support": 6,
+  "selected_token_mode_query": {
+    "train_count": [
+      [
+        "831",
+        "1"
+      ],
+      [
+        "14809",
+        "1"
+      ],
+      [
+        "4314",
+        "2"
+      ],
+      [
+        "31566",
+        "3"
+      ],
+      [
+        "17443",
+        "5"
+      ],
+      [
+        "25091",
+        "6"
+      ],
+      [
+        "36910",
+        "6"
+      ]
+    ],
+    "selected_count": 6
+  },
+  "results": {
+    "train": {
+      "score": {
+        "n": 24,
+        "answered": 24,
+        "correct": 6,
+        "wrong": 18,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.25,
+        "fidelity": 0.25,
+        "confident_wrong": 0.75,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": false,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 18,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_base_int8/certificate-evidence/check-4u1oyqv6",
+        "mismatches": [
+          [
+            1,
+            36910,
+            25091
+          ],
+          [
+            3,
+            36910,
+            25091
+          ],
+          [
+            5,
+            36910,
+            25091
+          ],
+          [
+            7,
+            36910,
+            25091
+          ],
+          [
+            9,
+            36910,
+            25091
+          ],
+          [
+            11,
+            36910,
+            25091
+          ],
+          [
+            12,
+            31566,
+            25091
+          ],
+          [
+            13,
+            17443,
+            25091
+          ],
+          [
+            14,
+            31566,
+            25091
+          ],
+          [
+            15,
+            17443,
+            25091
+          ],
+          [
+            16,
+            4314,
+            25091
+          ],
+          [
+            17,
+            17443,
+            25091
+          ],
+          [
+            18,
+            31566,
+            25091
+          ],
+          [
+            19,
+            17443,
+            25091
+          ],
+          [
+            20,
+            831,
+            25091
+          ],
+          [
+            21,
+            17443,
+            25091
+          ],
+          [
+            22,
+            4314,
+            25091
+          ],
+          [
+            23,
+            14809,
+            25091
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "validation": {
+      "score": {
+        "n": 24,
+        "answered": 24,
+        "correct": 0,
+        "wrong": 24,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.0,
+        "fidelity": 0.0,
+        "confident_wrong": 1.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": false,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 24,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_base_int8/certificate-evidence/check-47urnmuj",
+        "mismatches": [
+          [
+            0,
+            25425,
+            25091
+          ],
+          [
+            1,
+            31727,
+            25091
+          ],
+          [
+            2,
+            25425,
+            25091
+          ],
+          [
+            3,
+            31727,
+            25091
+          ],
+          [
+            4,
+            25425,
+            25091
+          ],
+          [
+            5,
+            12240,
+            25091
+          ],
+          [
+            6,
+            25425,
+            25091
+          ],
+          [
+            7,
+            31727,
+            25091
+          ],
+          [
+            8,
+            25425,
+            25091
+          ],
+          [
+            9,
+            31727,
+            25091
+          ],
+          [
+            10,
+            25425,
+            25091
+          ],
+          [
+            11,
+            31727,
+            25091
+          ],
+          [
+            12,
+            11173,
+            25091
+          ],
+          [
+            13,
+            35450,
+            25091
+          ],
+          [
+            14,
+            11173,
+            25091
+          ],
+          [
+            15,
+            35450,
+            25091
+          ],
+          [
+            16,
+            5945,
+            25091
+          ],
+          [
+            17,
+            1862,
+            25091
+          ],
+          [
+            18,
+            11173,
+            25091
+          ],
+          [
+            19,
+            35450,
+            25091
+          ],
+          [
+            20,
+            11173,
+            25091
+          ],
+          [
+            21,
+            35450,
+            25091
+          ],
+          [
+            22,
+            5945,
+            25091
+          ],
+          [
+            23,
+            1862,
+            25091
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "test": {
+      "score": {
+        "n": 48,
+        "answered": 48,
+        "correct": 0,
+        "wrong": 48,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.0,
+        "fidelity": 0.0,
+        "confident_wrong": 1.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": false,
+        "ndomain": 48,
+        "ncover": 48,
+        "nmiss": 48,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_base_int8/certificate-evidence/check-x2cbvr59",
+        "mismatches": [
+          [
+            0,
+            32190,
+            25091
+          ],
+          [
+            1,
+            745,
+            25091
+          ],
+          [
+            2,
+            31021,
+            25091
+          ],
+          [
+            3,
+            745,
+            25091
+          ],
+          [
+            4,
+            10,
+            25091
+          ],
+          [
+            5,
+            12892,
+            25091
+          ],
+          [
+            6,
+            32190,
+            25091
+          ],
+          [
+            7,
+            745,
+            25091
+          ],
+          [
+            8,
+            7325,
+            25091
+          ],
+          [
+            9,
+            745,
+            25091
+          ],
+          [
+            10,
+            7325,
+            25091
+          ],
+          [
+            11,
+            745,
+            25091
+          ],
+          [
+            12,
+            24771,
+            25091
+          ],
+          [
+            13,
+            8062,
+            25091
+          ],
+          [
+            14,
+            24771,
+            25091
+          ],
+          [
+            15,
+            18370,
+            25091
+          ],
+          [
+            16,
+            35439,
+            25091
+          ],
+          [
+            17,
+            18370,
+            25091
+          ],
+          [
+            18,
+            24771,
+            25091
+          ],
+          [
+            19,
+            8062,
+            25091
+          ],
+          [
+            20,
+            24771,
+            25091
+          ],
+          [
+            21,
+            18370,
+            25091
+          ],
+          [
+            22,
+            35439,
+            25091
+          ],
+          [
+            23,
+            18370,
+            25091
+          ],
+          [
+            24,
+            15568,
+            25091
+          ],
+          [
+            25,
+            28340,
+            25091
+          ],
+          [
+            26,
+            46,
+            25091
+          ],
+          [
+            27,
+            28340,
+            25091
+          ],
+          [
+            28,
+            15852,
+            25091
+          ],
+          [
+            29,
+            56260,
+            25091
+          ],
+          [
+            30,
+            15568,
+            25091
+          ],
+          [
+            31,
+            28340,
+            25091
+          ],
+          [
+            32,
+            46,
+            25091
+          ],
+          [
+            33,
+            5180,
+            25091
+          ],
+          [
+            34,
+            3785,
+            25091
+          ],
+          [
+            35,
+            56260,
+            25091
+          ],
+          [
+            36,
+            14044,
+            25091
+          ],
+          [
+            37,
+            24611,
+            25091
+          ],
+          [
+            38,
+            14044,
+            25091
+          ],
+          [
+            39,
+            24611,
+            25091
+          ],
+          [
+            40,
+            31944,
+            25091
+          ],
+          [
+            41,
+            628,
+            25091
+          ],
+          [
+            42,
+            14044,
+            25091
+          ],
+          [
+            43,
+            24611,
+            25091
+          ],
+          [
+            44,
+            14044,
+            25091
+          ],
+          [
+            45,
+            24611,
+            25091
+          ],
+          [
+            46,
+            31944,
+            25091
+          ],
+          [
+            47,
+            628,
+            25091
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "off_domain": {
+      "score": {
+        "n": 6,
+        "answered": 6,
+        "correct": 0,
+        "wrong": 6,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 0.0,
+        "fidelity": 0.0,
+        "confident_wrong": 1.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": false,
+        "ndomain": 6,
+        "ncover": 6,
+        "nmiss": 6,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_base_int8/certificate-evidence/check-a85yhijr",
+        "mismatches": [
+          [
+            0,
+            32,
+            25091
+          ],
+          [
+            1,
+            5658,
+            25091
+          ],
+          [
+            2,
+            41302,
+            25091
+          ],
+          [
+            3,
+            15,
+            25091
+          ],
+          [
+            4,
+            22948,
+            25091
+          ],
+          [
+            5,
+            29453,
+            25091
+          ]
+        ],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    }
+  },
+  "scope": "constant-output residual hypothesis on a finite random-token corpus"
+}

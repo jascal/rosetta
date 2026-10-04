@@ -1,0 +1,99 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "cc389d084ec322aeaa5be7a094167a5e35850973882e608d10449a6b0d2c7441",
+  "bundle_sha256": null,
+  "source": "copy-control",
+  "search": "expanded 48-candidate family",
+  "consensus": {
+    "selected": [
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "test": {
+      "n": 48,
+      "answered": 32,
+      "correct": 32,
+      "wrong": 0,
+      "abstained": 16,
+      "coverage": 0.6666666666666666,
+      "precision": 1.0,
+      "fidelity": 0.6666666666666666,
+      "confident_wrong": 0.0,
+      "abstain": 0.3333333333333333
+    },
+    "off_domain": {
+      "n": 6,
+      "answered": 2,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 4,
+      "coverage": 0.3333333333333333,
+      "precision": 1.0,
+      "fidelity": 0.3333333333333333,
+      "confident_wrong": 0.0,
+      "abstain": 0.6666666666666666
+    },
+    "firing_domain_certificate": {
+      "certified": true,
+      "ndomain": 32,
+      "ncover": 32,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-m6jy9uga",
+      "mismatches": [],
+      "uncovered": [],
+      "missing_refs": []
+    }
+  },
+  "plurality": {
+    "selected": [
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "test": {
+      "n": 48,
+      "answered": 32,
+      "correct": 32,
+      "wrong": 0,
+      "abstained": 16,
+      "coverage": 0.6666666666666666,
+      "precision": 1.0,
+      "fidelity": 0.6666666666666666,
+      "confident_wrong": 0.0,
+      "abstain": 0.3333333333333333
+    },
+    "off_domain": {
+      "n": 6,
+      "answered": 2,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 4,
+      "coverage": 0.3333333333333333,
+      "precision": 1.0,
+      "fidelity": 0.3333333333333333,
+      "confident_wrong": 0.0,
+      "abstain": 0.6666666666666666
+    },
+    "firing_domain_certificate": {
+      "certified": true,
+      "ndomain": 32,
+      "ncover": 32,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-qmi8wmcu",
+      "mismatches": [],
+      "uncovered": [],
+      "missing_refs": []
+    }
+  }
+}

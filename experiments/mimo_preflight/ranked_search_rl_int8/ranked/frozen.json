@@ -1,0 +1,110 @@
+{
+  "protocol_sha256": "44f14512d52c2e4b2018ec55b91701668d4d129438e5260d7580f1c12d09c168",
+  "dataset_sha256": "af9a6422c8da8e25cdb94cfa38e4fe2127c0391ddb4822bdae8d9473bb84c840",
+  "selected": [],
+  "artifacts": {
+    "baseline": {
+      "sha256": "b32023f53fa95e1c07f95dd361edddfe6faeef8f3a588b3d6cb5909e54844aa6",
+      "domain": [],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 0,
+        "evidence": "certificate-evidence/check-lv_zgqmy"
+      }
+    },
+    "raw_copy": {
+      "sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed",
+      "domain": [
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 48,
+        "evidence": "certificate-evidence/check-54wia_tx"
+      }
+    },
+    "strict_guard": {
+      "sha256": "d44ab62dd0e610a18247751e553e68163a09e72424d14a0bd8d755ea274591fd",
+      "domain": [
+        48,
+        49,
+        54,
+        55,
+        60,
+        61,
+        66,
+        67,
+        72,
+        73,
+        78,
+        79,
+        84,
+        85,
+        90,
+        91
+      ],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 16,
+        "evidence": "certificate-evidence/check-curx70aq"
+      }
+    },
+    "selected": {
+      "sha256": "c79a14cb505f31889274cf8feba7e43c9b5c0639f36545539b8623ac0a469401",
+      "domain": [],
+      "domain_audit": {
+        "certified": true,
+        "ndomain": 0,
+        "evidence": "certificate-evidence/check-7kb1f0g6"
+      }
+    }
+  },
+  "development_references_sha256": "c39eaea41757fe09d2fa500d7b6cd64dbf52835c5ae4e331d978850edd6dad30"
+}

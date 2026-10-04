@@ -1,0 +1,5 @@
+// Standalone constant default. Build-time mode selection is recorded separately.
+.decl default_token(out:number)
+default_token(50000).
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- tok(I,_,_), default_token(T).

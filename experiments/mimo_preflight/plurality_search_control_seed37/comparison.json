@@ -1,0 +1,99 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "db28ae0e204ed0e80d403250e23ef60be4903d30fd3f07b9b1bf3049e3d60cdc",
+  "bundle_sha256": null,
+  "source": "copy-control",
+  "search": "expanded 48-candidate family",
+  "consensus": {
+    "selected": [
+      [
+        37,
+        10,
+        1
+      ]
+    ],
+    "test": {
+      "n": 48,
+      "answered": 48,
+      "correct": 48,
+      "wrong": 0,
+      "abstained": 0,
+      "coverage": 1.0,
+      "precision": 1.0,
+      "fidelity": 1.0,
+      "confident_wrong": 0.0,
+      "abstain": 0.0
+    },
+    "off_domain": {
+      "n": 6,
+      "answered": 2,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 4,
+      "coverage": 0.3333333333333333,
+      "precision": 1.0,
+      "fidelity": 0.3333333333333333,
+      "confident_wrong": 0.0,
+      "abstain": 0.6666666666666666
+    },
+    "firing_domain_certificate": {
+      "certified": true,
+      "ndomain": 48,
+      "ncover": 48,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-8xjpwnjo",
+      "mismatches": [],
+      "uncovered": [],
+      "missing_refs": []
+    }
+  },
+  "plurality": {
+    "selected": [
+      [
+        37,
+        10,
+        1
+      ]
+    ],
+    "test": {
+      "n": 48,
+      "answered": 48,
+      "correct": 48,
+      "wrong": 0,
+      "abstained": 0,
+      "coverage": 1.0,
+      "precision": 1.0,
+      "fidelity": 1.0,
+      "confident_wrong": 0.0,
+      "abstain": 0.0
+    },
+    "off_domain": {
+      "n": 6,
+      "answered": 2,
+      "correct": 2,
+      "wrong": 0,
+      "abstained": 4,
+      "coverage": 0.3333333333333333,
+      "precision": 1.0,
+      "fidelity": 0.3333333333333333,
+      "confident_wrong": 0.0,
+      "abstain": 0.6666666666666666
+    },
+    "firing_domain_certificate": {
+      "certified": true,
+      "ndomain": 48,
+      "ncover": 48,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "evidence": "certificate-evidence/check-qwansr0v",
+      "mismatches": [],
+      "uncovered": [],
+      "missing_refs": []
+    }
+  }
+}

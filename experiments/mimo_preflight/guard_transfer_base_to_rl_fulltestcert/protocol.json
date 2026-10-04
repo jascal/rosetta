@@ -1,0 +1,54 @@
+{
+  "tag": "empirical",
+  "source_candidate": "Base development only; relaxed near-miss rank, not Rosetta admission",
+  "base_candidate_id": 27,
+  "suffix_length": 7,
+  "minimum_agreeing_sources": 3,
+  "selection_metrics": {
+    "development_errors": 2,
+    "development_pair_failures": 1,
+    "development_coverage": 14,
+    "candidate_count_with_coverage": 33,
+    "rank": "fewest dev errors, fewest causal-pair failures, highest coverage, shortest suffix, lowest support"
+  },
+  "dataset_sha256": "73d6f38ffe62f9727ca2fc03bab8edc72760d50a68d7dca1033e70c864232bff",
+  "candidate_sha256": "34709ff376fb655b673ac53a9d864329b5867de52dab2409b810c5340eba5605",
+  "models": {
+    "Base": {
+      "source": "fieldrun",
+      "seed": 19,
+      "synthetic": false,
+      "prior_dataset_sha256": {
+        "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+        "experiments/mimo_preflight/guarded_copy_base_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+        "experiments/mimo_preflight/guarded_copy_rl_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+        "experiments/mimo_preflight/copy_stress_base_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60",
+        "experiments/mimo_preflight/copy_stress_rl_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60"
+      },
+      "prior_usage": "discovery only; all previous token IDs excluded",
+      "search": "suffix lengths 1..12, agreeing-source support 1..4",
+      "bundle_sha256": {
+        ".fieldrun.bin": "c0761a3ccb464dc3d59e44cf43ca8d74bf26fbc2690095764ddaca5a0f1bb85f",
+        ".fieldrun.json": "2e9cadd6c791b2d1fcbcfe6c2d8bf3683616ab44350d1b99e09bf17e884a65ba"
+      }
+    },
+    "RL": {
+      "source": "fieldrun",
+      "seed": 19,
+      "synthetic": false,
+      "prior_dataset_sha256": {
+        "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+        "experiments/mimo_preflight/guarded_copy_base_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+        "experiments/mimo_preflight/guarded_copy_rl_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd",
+        "experiments/mimo_preflight/copy_stress_base_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60",
+        "experiments/mimo_preflight/copy_stress_rl_int8/dataset.json": "de24284ad2de19452d7f56f7fa173654f79a419cbce478570e36e892674ffb60"
+      },
+      "prior_usage": "discovery only; all previous token IDs excluded",
+      "search": "suffix lengths 1..12, agreeing-source support 1..4",
+      "bundle_sha256": {
+        ".fieldrun.bin": "bb51a546061d016d74026a74484631e912137a186d2aefdaec134d3c7145eb7e",
+        ".fieldrun.json": "1db26d98a918adf13aa2d838b469d5cd94dc2f3bc8ede0b47ee27461f00294b9"
+      }
+    }
+  }
+}

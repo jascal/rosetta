@@ -1,0 +1,651 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "1cd1bd8504a8b0992eae9050abddc009d956776241f5805b7f16d18014f32d34",
+  "bundle_sha256": {
+    ".fieldrun.bin": "bb51a546061d016d74026a74484631e912137a186d2aefdaec134d3c7145eb7e",
+    ".fieldrun.json": "1db26d98a918adf13aa2d838b469d5cd94dc2f3bc8ede0b47ee27461f00294b9"
+  },
+  "source": "fieldrun",
+  "policies": {
+    "consensus": {
+      "search": "suffix lengths 1..12, support 1..4",
+      "selected": {
+        "selected": [],
+        "test": {
+          "n": 48,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 48,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 0,
+          "ncover": 0,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-si3qrdmq",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          }
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 16,
+          "correct": 7,
+          "wrong": 9,
+          "abstained": 32,
+          "coverage": 0.3333333333333333,
+          "precision": 0.4375,
+          "fidelity": 0.14583333333333334,
+          "confident_wrong": 0.1875,
+          "abstain": 0.6666666666666666
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 16,
+          "ncover": 16,
+          "nmiss": 9,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-qtdu4alc",
+          "mismatches": [
+            [
+              0,
+              3876,
+              2357
+            ],
+            [
+              1,
+              14544,
+              14475
+            ],
+            [
+              2,
+              378,
+              2357
+            ],
+            [
+              3,
+              14544,
+              14475
+            ],
+            [
+              4,
+              26256,
+              17731
+            ],
+            [
+              6,
+              26256,
+              17731
+            ],
+            [
+              8,
+              6371,
+              9780
+            ],
+            [
+              13,
+              54792,
+              38198
+            ],
+            [
+              15,
+              54792,
+              38198
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 8,
+            "correct": 3,
+            "wrong": 5,
+            "abstained": 8
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 8,
+            "correct": 4,
+            "wrong": 4,
+            "abstained": 8
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          }
+        }
+      }
+    },
+    "plurality": {
+      "search": "suffix lengths 1..12, support 1..4",
+      "selected": {
+        "selected": [],
+        "test": {
+          "n": 48,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 48,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 0,
+          "ncover": 0,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-0ltku5u4",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          }
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 24,
+          "correct": 9,
+          "wrong": 15,
+          "abstained": 24,
+          "coverage": 0.5,
+          "precision": 0.375,
+          "fidelity": 0.1875,
+          "confident_wrong": 0.3125,
+          "abstain": 0.5
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 24,
+          "ncover": 24,
+          "nmiss": 15,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-_ja_2r_w",
+          "mismatches": [
+            [
+              0,
+              3876,
+              2357
+            ],
+            [
+              1,
+              14544,
+              14475
+            ],
+            [
+              2,
+              378,
+              2357
+            ],
+            [
+              3,
+              14544,
+              14475
+            ],
+            [
+              4,
+              378,
+              2357
+            ],
+            [
+              5,
+              14544,
+              14475
+            ],
+            [
+              6,
+              26256,
+              17731
+            ],
+            [
+              8,
+              26256,
+              17731
+            ],
+            [
+              10,
+              26256,
+              17731
+            ],
+            [
+              12,
+              6371,
+              9780
+            ],
+            [
+              16,
+              55913,
+              9780
+            ],
+            [
+              19,
+              54792,
+              38198
+            ],
+            [
+              21,
+              54792,
+              38198
+            ],
+            [
+              22,
+              1007,
+              27641
+            ],
+            [
+              23,
+              54792,
+              38198
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 8,
+            "correct": 3,
+            "wrong": 5,
+            "abstained": 8
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 8,
+            "correct": 4,
+            "wrong": 4,
+            "abstained": 8
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 8,
+            "correct": 2,
+            "wrong": 6,
+            "abstained": 8
+          }
+        }
+      }
+    },
+    "recent": {
+      "search": "suffix lengths 1..12, support 1..3, horizons 16/32/64/128",
+      "selected": {
+        "selected": [],
+        "test": {
+          "n": 48,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 48,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 0,
+          "ncover": 0,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-bhytqgz5",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          }
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 32,
+          "correct": 6,
+          "wrong": 26,
+          "abstained": 16,
+          "coverage": 0.6666666666666666,
+          "precision": 0.1875,
+          "fidelity": 0.125,
+          "confident_wrong": 0.5416666666666666,
+          "abstain": 0.3333333333333333
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 2,
+          "correct": 1,
+          "wrong": 1,
+          "abstained": 4,
+          "coverage": 0.3333333333333333,
+          "precision": 0.5,
+          "fidelity": 0.16666666666666666,
+          "confident_wrong": 0.16666666666666666,
+          "abstain": 0.6666666666666666
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 32,
+          "ncover": 32,
+          "nmiss": 26,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-xepnh87p",
+          "mismatches": [
+            [
+              0,
+              378,
+              2357
+            ],
+            [
+              1,
+              14544,
+              14475
+            ],
+            [
+              2,
+              378,
+              23039
+            ],
+            [
+              3,
+              14544,
+              23039
+            ],
+            [
+              4,
+              3876,
+              2357
+            ],
+            [
+              5,
+              14544,
+              14475
+            ],
+            [
+              6,
+              378,
+              23039
+            ],
+            [
+              7,
+              14544,
+              23039
+            ],
+            [
+              8,
+              26256,
+              17731
+            ],
+            [
+              10,
+              26256,
+              22168
+            ],
+            [
+              11,
+              271,
+              22168
+            ],
+            [
+              12,
+              26256,
+              17731
+            ],
+            [
+              14,
+              26256,
+              22168
+            ],
+            [
+              15,
+              27352,
+              22168
+            ],
+            [
+              16,
+              16138,
+              9780
+            ],
+            [
+              18,
+              55913,
+              39414
+            ],
+            [
+              19,
+              2506,
+              39414
+            ],
+            [
+              20,
+              6371,
+              9780
+            ],
+            [
+              22,
+              55913,
+              39414
+            ],
+            [
+              23,
+              13096,
+              39414
+            ],
+            [
+              25,
+              54792,
+              38198
+            ],
+            [
+              26,
+              15494,
+              33785
+            ],
+            [
+              27,
+              54792,
+              33785
+            ],
+            [
+              29,
+              54792,
+              38198
+            ],
+            [
+              30,
+              1007,
+              33785
+            ],
+            [
+              31,
+              54792,
+              33785
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "firing_by_layout": {
+          "plain": {
+            "n": 16,
+            "fired": 16,
+            "correct": 6,
+            "wrong": 10,
+            "abstained": 0
+          },
+          "noise32": {
+            "n": 16,
+            "fired": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 16
+          },
+          "near_match_suffix12": {
+            "n": 16,
+            "fired": 16,
+            "correct": 0,
+            "wrong": 16,
+            "abstained": 0
+          }
+        }
+      }
+    }
+  }
+}

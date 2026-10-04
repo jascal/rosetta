@@ -1,0 +1,24 @@
+{
+  "tag": "empirical",
+  "diagnostic_only": true,
+  "n": 144,
+  "reference_top1_matches": 144,
+  "dataset_sha256": "73d6f38ffe62f9727ca2fc03bab8edc72760d50a68d7dca1033e70c864232bff",
+  "bundle": "/tmp/rosetta-mimo7b-rl-int8",
+  "margin_by_task_result": {
+    "task_correct": {
+      "n": 113,
+      "median_margin": 6.314060211181641,
+      "mean_margin": 5.961949010865879,
+      "min_margin": 0.09581375122070312,
+      "max_margin": 11.08271598815918
+    },
+    "task_wrong": {
+      "n": 31,
+      "median_margin": 0.5668582916259766,
+      "mean_margin": 0.6897878646850586,
+      "min_margin": 0.04852485656738281,
+      "max_margin": 2.164261817932129
+    }
+  }
+}

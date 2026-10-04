@@ -1,0 +1,516 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "1cd1bd8504a8b0992eae9050abddc009d956776241f5805b7f16d18014f32d34",
+  "bundle_sha256": null,
+  "source": "copy-control",
+  "policies": {
+    "consensus": {
+      "selected": {
+        "selected": [
+          [
+            1,
+            3,
+            2
+          ]
+        ],
+        "test": {
+          "n": 48,
+          "answered": 32,
+          "correct": 32,
+          "wrong": 0,
+          "abstained": 16,
+          "coverage": 0.6666666666666666,
+          "precision": 1.0,
+          "fidelity": 0.6666666666666666,
+          "confident_wrong": 0.0,
+          "abstain": 0.3333333333333333
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": true,
+          "ndomain": 32,
+          "ncover": 32,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-fuj_fblq",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 32,
+          "coverage": 0.3333333333333333,
+          "precision": 1.0,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.0,
+          "abstain": 0.6666666666666666
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": true,
+          "ndomain": 16,
+          "ncover": 16,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-5ajyvf7x",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      }
+    },
+    "plurality": {
+      "selected": {
+        "selected": [
+          [
+            1,
+            3,
+            2
+          ]
+        ],
+        "test": {
+          "n": 48,
+          "answered": 48,
+          "correct": 48,
+          "wrong": 0,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 1.0,
+          "fidelity": 1.0,
+          "confident_wrong": 0.0,
+          "abstain": 0.0
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": true,
+          "ndomain": 48,
+          "ncover": 48,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-u5d2qi76",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 24,
+          "correct": 24,
+          "wrong": 0,
+          "abstained": 24,
+          "coverage": 0.5,
+          "precision": 1.0,
+          "fidelity": 0.5,
+          "confident_wrong": 0.0,
+          "abstain": 0.5
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": true,
+          "ndomain": 24,
+          "ncover": 24,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-f6cyvlda",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      }
+    },
+    "recent": {
+      "selected": {
+        "selected": [
+          [
+            12,
+            1,
+            3
+          ]
+        ],
+        "test": {
+          "n": 48,
+          "answered": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 40,
+          "coverage": 0.16666666666666666,
+          "precision": 1.0,
+          "fidelity": 0.16666666666666666,
+          "confident_wrong": 0.0,
+          "abstain": 0.8333333333333334
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": true,
+          "ndomain": 8,
+          "ncover": 8,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-2057pn7i",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 32,
+          "correct": 16,
+          "wrong": 16,
+          "abstained": 16,
+          "coverage": 0.6666666666666666,
+          "precision": 0.5,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.3333333333333333,
+          "abstain": 0.3333333333333333
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 2,
+          "correct": 2,
+          "wrong": 0,
+          "abstained": 4,
+          "coverage": 0.3333333333333333,
+          "precision": 1.0,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.0,
+          "abstain": 0.6666666666666666
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 32,
+          "ncover": 32,
+          "nmiss": 16,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-p62buh1m",
+          "mismatches": [
+            [
+              2,
+              2357,
+              23039
+            ],
+            [
+              3,
+              14475,
+              23039
+            ],
+            [
+              6,
+              2357,
+              23039
+            ],
+            [
+              7,
+              14475,
+              23039
+            ],
+            [
+              10,
+              17731,
+              22168
+            ],
+            [
+              11,
+              27352,
+              22168
+            ],
+            [
+              14,
+              17731,
+              22168
+            ],
+            [
+              15,
+              27352,
+              22168
+            ],
+            [
+              18,
+              9780,
+              39414
+            ],
+            [
+              19,
+              13096,
+              39414
+            ],
+            [
+              22,
+              9780,
+              39414
+            ],
+            [
+              23,
+              13096,
+              39414
+            ],
+            [
+              26,
+              27641,
+              33785
+            ],
+            [
+              27,
+              38198,
+              33785
+            ],
+            [
+              30,
+              27641,
+              33785
+            ],
+            [
+              31,
+              38198,
+              33785
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      }
+    },
+    "ranked": {
+      "selected": {
+        "selected": [],
+        "test": {
+          "n": 48,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 48,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 6,
+          "coverage": 0.0,
+          "precision": null,
+          "fidelity": 0.0,
+          "confident_wrong": 0.0,
+          "abstain": 1.0
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 0,
+          "ncover": 0,
+          "nmiss": 0,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-8d2htekp",
+          "mismatches": [],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "strict_guard": {
+        "selected": null,
+        "test": {
+          "n": 48,
+          "answered": 32,
+          "correct": 16,
+          "wrong": 16,
+          "abstained": 16,
+          "coverage": 0.6666666666666666,
+          "precision": 0.5,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.3333333333333333,
+          "abstain": 0.3333333333333333
+        },
+        "off_domain": {
+          "n": 6,
+          "answered": 2,
+          "correct": 2,
+          "wrong": 0,
+          "abstained": 4,
+          "coverage": 0.3333333333333333,
+          "precision": 1.0,
+          "fidelity": 0.3333333333333333,
+          "confident_wrong": 0.0,
+          "abstain": 0.6666666666666666
+        },
+        "firing_domain_certificate": {
+          "certified": false,
+          "ndomain": 32,
+          "ncover": 32,
+          "nmiss": 16,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-ito6iu23",
+          "mismatches": [
+            [
+              2,
+              2357,
+              23039
+            ],
+            [
+              3,
+              14475,
+              23039
+            ],
+            [
+              6,
+              2357,
+              23039
+            ],
+            [
+              7,
+              14475,
+              23039
+            ],
+            [
+              10,
+              17731,
+              22168
+            ],
+            [
+              11,
+              27352,
+              22168
+            ],
+            [
+              14,
+              17731,
+              22168
+            ],
+            [
+              15,
+              27352,
+              22168
+            ],
+            [
+              18,
+              9780,
+              39414
+            ],
+            [
+              19,
+              13096,
+              39414
+            ],
+            [
+              22,
+              9780,
+              39414
+            ],
+            [
+              23,
+              13096,
+              39414
+            ],
+            [
+              26,
+              27641,
+              33785
+            ],
+            [
+              27,
+              38198,
+              33785
+            ],
+            [
+              30,
+              27641,
+              33785
+            ],
+            [
+              31,
+              38198,
+              33785
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      }
+    }
+  }
+}

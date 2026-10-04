@@ -1,0 +1,14 @@
+// Variable-length n-gram baseline. The host serializes Datalog-selected suffixes
+// as facts; all matching and longest-suffix routing run in Souffle.
+.decl gram(r:number,k:number,out:number)
+.decl gram_token(r:number,offset:number,id:number)
+.decl last_pos(inst:number,pos:number)
+last_pos(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl missing(r:number,inst:number)
+missing(R,I) :- gram_token(R,O,T), last_pos(I,P), !tok(I,P-O,T).
+.decl hit(inst:number,r:number,k:number,out:number)
+hit(I,R,K,T) :- gram(R,K,T), last_pos(I,P), P+1 >= K, !missing(R,I).
+.decl longest(inst:number,k:number)
+longest(I,K) :- hit(I,_,_,_), K = max L : { hit(I,_,L,_) }.
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- hit(I,_,K,T), longest(I,K).

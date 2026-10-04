@@ -1,0 +1,47 @@
+// Build-time diagnostic: relate each model answer to prior occurrences that
+// match the current suffix. This module emits evidence only; it is not a
+// runtime replacement rule.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl max_suffix(k:number) .input max_suffix
+
+.decl copy_last(inst:number,p:number)
+copy_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+
+.decl source_match(inst:number,j:number,k:number)
+source_match(I,J,1) :- copy_last(I,P), tok(I,P,X), tok(I,J,X), J < P.
+source_match(I,J,K+1) :- source_match(I,J,K), max_suffix(L), K < L,
+                         copy_last(I,P), tok(I,P-K,X), tok(I,J-K,X).
+
+.decl source_best(inst:number,j:number,k:number)
+source_best(I,J,K) :- source_match(I,J,K),
+                       K = max Q : { source_match(I,J,Q) }.
+
+.decl best_specificity(inst:number,k:number) .output best_specificity
+best_specificity(I,K) :- source_best(I,_,K),
+                          K = max Q : { source_best(I,_,Q) }.
+
+.decl best_source_count(inst:number,n:number) .output best_source_count
+best_source_count(I,N) :- best_specificity(I,_),
+                          N = count : { source_best(I,_,K), best_specificity(I,K) }.
+
+.decl source_observation(inst:number,j:number,k:number,distance:number,successor:number) .output source_observation
+source_observation(I,J,K,D,T) :- source_best(I,J,K), copy_last(I,P), D = P-J,
+                                 tok(I,J+1,T).
+
+.decl source_hit(inst:number,j:number,k:number,distance:number) .output source_hit
+source_hit(I,J,K,D) :- source_observation(I,J,K,D,T), ref(I,T).
+
+.decl nearest_source(inst:number,j:number,k:number,distance:number,successor:number)
+nearest_source(I,J,K,D,T) :- source_observation(I,J,K,D,T),
+                              J = max Q : { source_observation(I,Q,_,_,_) }.
+.decl nearest_source_hit(inst:number) .output nearest_source_hit
+nearest_source_hit(I) :- nearest_source(I,_,_,_,T), ref(I,T).
+
+.decl longest_source_hit(inst:number) .output longest_source_hit
+longest_source_hit(I) :- source_observation(I,J,K,_,T), best_specificity(I,K), ref(I,T).
+
+.decl answer_source(inst:number,j:number,k:number,distance:number) .output answer_source
+answer_source(I,J,K,D) :- source_hit(I,J,K,D),
+                           K = max Q : { source_hit(I,_,Q,_) },
+                           J = max R : { source_hit(I,R,K,_) }.

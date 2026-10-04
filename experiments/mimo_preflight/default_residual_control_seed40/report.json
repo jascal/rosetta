@@ -1,0 +1,138 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "tag": "empirical",
+    "source": "constant-control",
+    "selection": "most frequent answer on train only; lowest token ID breaks frequency ties",
+    "bundle_sha256": null,
+    "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+    "mode_program_sha256": "943563a95c1263fc29eef152525c390c70be8d56f9258e4c5bdbde8963d19ce6",
+    "driver_sha256": "6f8b8a11ac97c045c43bfd09c2d51f8d8055d91999eb158e8529527d252c7a84",
+    "training_references_sha256": "47bd316a6e01c6efdae3f32aad186fc2980ffa9e56e0f4ff4f06a8d6d0b6222e",
+    "runtime": "standalone Datalog; no model, Python, or fieldrun dependency"
+  },
+  "dataset_sha256": "9cf57f2ea242399c91c172feebd9784be44200d218946bbebd52259768b4c4e0",
+  "references_sha256": "cdb4537696fde04b5dbc2ba63f9f495adfe13c88ebbd1d257df23f368ffccf05",
+  "selected_token": 50000,
+  "train_support": 24,
+  "selected_token_mode_query": {
+    "train_count": [
+      [
+        "50000",
+        "24"
+      ]
+    ],
+    "selected_count": 24
+  },
+  "results": {
+    "train": {
+      "score": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0,
+        "fidelity": 1.0,
+        "confident_wrong": 0.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": true,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_control_seed40/certificate-evidence/check-etuum260",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "validation": {
+      "score": {
+        "n": 24,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0,
+        "fidelity": 1.0,
+        "confident_wrong": 0.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": true,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_control_seed40/certificate-evidence/check-c2shy7a2",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "test": {
+      "score": {
+        "n": 48,
+        "answered": 48,
+        "correct": 48,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0,
+        "fidelity": 1.0,
+        "confident_wrong": 0.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": true,
+        "ndomain": 48,
+        "ncover": 48,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_control_seed40/certificate-evidence/check-b3vnxkrw",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    },
+    "off_domain": {
+      "score": {
+        "n": 6,
+        "answered": 6,
+        "correct": 6,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0,
+        "fidelity": 1.0,
+        "confident_wrong": 0.0,
+        "abstain": 0.0
+      },
+      "certificate": {
+        "certified": true,
+        "ndomain": 6,
+        "ncover": 6,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "/home/allans/code/rosetta/experiments/mimo_preflight/default_residual_control_seed40/certificate-evidence/check-6hqg7hu8",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      }
+    }
+  },
+  "scope": "constant-output residual hypothesis on a finite random-token corpus"
+}

@@ -1,0 +1,275 @@
+{
+  "tag": "empirical",
+  "dataset_sha256": "d730de85475d6e30cc2bfa78cae31c0055f356817b31a4ca2b520a239c796d72",
+  "bundle_sha256": null,
+  "source": "copy-control",
+  "search": "suffix lengths 1..12, support 1..4",
+  "consensus": {
+    "selected": {
+      "selected": [
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "test": {
+        "n": 48,
+        "answered": 32,
+        "correct": 32,
+        "wrong": 0,
+        "abstained": 16,
+        "coverage": 0.6666666666666666,
+        "precision": 1.0,
+        "fidelity": 0.6666666666666666,
+        "confident_wrong": 0.0,
+        "abstain": 0.3333333333333333
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 2,
+        "correct": 2,
+        "wrong": 0,
+        "abstained": 4,
+        "coverage": 0.3333333333333333,
+        "precision": 1.0,
+        "fidelity": 0.3333333333333333,
+        "confident_wrong": 0.0,
+        "abstain": 0.6666666666666666
+      },
+      "firing_domain_certificate": {
+        "certified": true,
+        "ndomain": 32,
+        "ncover": 32,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-s4a_lpij",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 0
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 0
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        }
+      }
+    },
+    "strict_guard": {
+      "selected": null,
+      "test": {
+        "n": 48,
+        "answered": 16,
+        "correct": 16,
+        "wrong": 0,
+        "abstained": 32,
+        "coverage": 0.3333333333333333,
+        "precision": 1.0,
+        "fidelity": 0.3333333333333333,
+        "confident_wrong": 0.0,
+        "abstain": 0.6666666666666666
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": true,
+        "ndomain": 16,
+        "ncover": 16,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-nazgoxkw",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 8
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 8
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 16
+        }
+      }
+    }
+  },
+  "plurality": {
+    "selected": {
+      "selected": [
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "test": {
+        "n": 48,
+        "answered": 48,
+        "correct": 48,
+        "wrong": 0,
+        "abstained": 0,
+        "coverage": 1.0,
+        "precision": 1.0,
+        "fidelity": 1.0,
+        "confident_wrong": 0.0,
+        "abstain": 0.0
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 2,
+        "correct": 2,
+        "wrong": 0,
+        "abstained": 4,
+        "coverage": 0.3333333333333333,
+        "precision": 1.0,
+        "fidelity": 0.3333333333333333,
+        "confident_wrong": 0.0,
+        "abstain": 0.6666666666666666
+      },
+      "firing_domain_certificate": {
+        "certified": true,
+        "ndomain": 48,
+        "ncover": 48,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-tdb4daxd",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 0
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 0
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 16,
+          "correct": 16,
+          "wrong": 0,
+          "abstained": 0
+        }
+      }
+    },
+    "strict_guard": {
+      "selected": null,
+      "test": {
+        "n": 48,
+        "answered": 24,
+        "correct": 24,
+        "wrong": 0,
+        "abstained": 24,
+        "coverage": 0.5,
+        "precision": 1.0,
+        "fidelity": 0.5,
+        "confident_wrong": 0.0,
+        "abstain": 0.5
+      },
+      "off_domain": {
+        "n": 6,
+        "answered": 0,
+        "correct": 0,
+        "wrong": 0,
+        "abstained": 6,
+        "coverage": 0.0,
+        "precision": null,
+        "fidelity": 0.0,
+        "confident_wrong": 0.0,
+        "abstain": 1.0
+      },
+      "firing_domain_certificate": {
+        "certified": true,
+        "ndomain": 24,
+        "ncover": 24,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "evidence": "certificate-evidence/check-u4xsdeda",
+        "mismatches": [],
+        "uncovered": [],
+        "missing_refs": []
+      },
+      "firing_by_layout": {
+        "plain": {
+          "n": 16,
+          "fired": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 8
+        },
+        "noise32": {
+          "n": 16,
+          "fired": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 8
+        },
+        "near_match_suffix12": {
+          "n": 16,
+          "fired": 8,
+          "correct": 8,
+          "wrong": 0,
+          "abstained": 8
+        }
+      }
+    }
+  }
+}

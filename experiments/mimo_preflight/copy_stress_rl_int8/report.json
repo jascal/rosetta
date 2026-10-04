@@ -1,0 +1,5267 @@
+{
+  "tag": "empirical",
+  "provenance": {
+    "source": "fieldrun",
+    "bundle_sha256": {
+      ".fieldrun.bin": "bb51a546061d016d74026a74484631e912137a186d2aefdaec134d3c7145eb7e",
+      ".fieldrun.json": "1db26d98a918adf13aa2d838b469d5cd94dc2f3bc8ede0b47ee27461f00294b9"
+    },
+    "generator_seeds": [
+      2,
+      3,
+      4
+    ],
+    "tokenizer_policy": "same tokenizer as paired MiMo runs; held-out token IDs excluded",
+    "excluded_dataset_sha256": {
+      "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+      "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+      "experiments/mimo_preflight/guarded_copy_base_int8/dataset.json": "01a9d7003ffe3b711c3161cc6b619c9cfcce1e937626ef790f5978c041304fbd"
+    }
+  },
+  "results": {
+    "strict_guard": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-xk7kd3vc"
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 48,
+          "correct": 35,
+          "wrong": 13,
+          "abstained": 240,
+          "coverage": 0.16666666666666666,
+          "precision": 0.7291666666666666
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 0,
+          "correct": 0,
+          "wrong": 0,
+          "abstained": 54,
+          "coverage": 0.0,
+          "precision": null
+        }
+      },
+      "strata": {
+        "seed": {
+          "2": {
+            "n": 96,
+            "answered": 16,
+            "correct": 8,
+            "wrong": 8,
+            "abstained": 80,
+            "coverage": 0.16666666666666666,
+            "precision": 0.5
+          },
+          "3": {
+            "n": 96,
+            "answered": 16,
+            "correct": 14,
+            "wrong": 2,
+            "abstained": 80,
+            "coverage": 0.16666666666666666,
+            "precision": 0.875
+          },
+          "4": {
+            "n": 96,
+            "answered": 16,
+            "correct": 13,
+            "wrong": 3,
+            "abstained": 80,
+            "coverage": 0.16666666666666666,
+            "precision": 0.8125
+          }
+        },
+        "length": {
+          "8": {
+            "n": 96,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 96,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "12": {
+            "n": 96,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 96,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "24": {
+            "n": 96,
+            "answered": 48,
+            "correct": 35,
+            "wrong": 13,
+            "abstained": 48,
+            "coverage": 0.5,
+            "precision": 0.7291666666666666
+          }
+        },
+        "layout": {
+          "plain": {
+            "n": 72,
+            "answered": 12,
+            "correct": 9,
+            "wrong": 3,
+            "abstained": 60,
+            "coverage": 0.16666666666666666,
+            "precision": 0.75
+          },
+          "noise8": {
+            "n": 72,
+            "answered": 12,
+            "correct": 9,
+            "wrong": 3,
+            "abstained": 60,
+            "coverage": 0.16666666666666666,
+            "precision": 0.75
+          },
+          "noise32": {
+            "n": 72,
+            "answered": 12,
+            "correct": 7,
+            "wrong": 5,
+            "abstained": 60,
+            "coverage": 0.16666666666666666,
+            "precision": 0.5833333333333334
+          },
+          "near_match8": {
+            "n": 72,
+            "answered": 12,
+            "correct": 10,
+            "wrong": 2,
+            "abstained": 60,
+            "coverage": 0.16666666666666666,
+            "precision": 0.8333333333333334
+          }
+        },
+        "exposures": {
+          "2": {
+            "n": 144,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 144,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "3": {
+            "n": 144,
+            "answered": 48,
+            "correct": 35,
+            "wrong": 13,
+            "abstained": 96,
+            "coverage": 0.3333333333333333,
+            "precision": 0.7291666666666666
+          }
+        },
+        "kind": {
+          "repeat": {
+            "n": 144,
+            "answered": 24,
+            "correct": 18,
+            "wrong": 6,
+            "abstained": 120,
+            "coverage": 0.16666666666666666,
+            "precision": 0.75
+          },
+          "intervention": {
+            "n": 144,
+            "answered": 24,
+            "correct": 17,
+            "wrong": 7,
+            "abstained": 120,
+            "coverage": 0.16666666666666666,
+            "precision": 0.7083333333333334
+          }
+        },
+        "negative": {
+          "no_repeat": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "one_source": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "conflicting_sources": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          }
+        }
+      },
+      "counterexamples": [
+        {
+          "id": 100,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 101,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 102,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 103,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 104,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 3266,
+          "prediction": 29883
+        },
+        {
+          "id": 105,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 106,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 107,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 198,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 43236,
+          "prediction": 14915
+        },
+        {
+          "id": 219,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15598,
+          "prediction": 32575
+        },
+        {
+          "id": 331,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15595,
+          "prediction": 20283
+        },
+        {
+          "id": 332,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 15133,
+          "prediction": 7155
+        },
+        {
+          "id": 333,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15595,
+          "prediction": 20283
+        }
+      ],
+      "firing_domain_size": 48,
+      "certificates": {
+        "full_test": {
+          "certified": false,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 13,
+          "nuncov": 240,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-wfeutucm",
+          "mismatches": [
+            [
+              88,
+              55348,
+              29883
+            ],
+            [
+              89,
+              32272,
+              16247
+            ],
+            [
+              90,
+              55348,
+              29883
+            ],
+            [
+              91,
+              32272,
+              16247
+            ],
+            [
+              92,
+              3266,
+              29883
+            ],
+            [
+              93,
+              32272,
+              16247
+            ],
+            [
+              94,
+              55348,
+              29883
+            ],
+            [
+              95,
+              32272,
+              16247
+            ],
+            [
+              168,
+              43236,
+              14915
+            ],
+            [
+              189,
+              15598,
+              32575
+            ],
+            [
+              283,
+              15595,
+              20283
+            ],
+            [
+              284,
+              15133,
+              7155
+            ],
+            [
+              285,
+              15595,
+              20283
+            ]
+          ],
+          "uncovered": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ],
+            [
+              7
+            ],
+            [
+              8
+            ],
+            [
+              9
+            ],
+            [
+              10
+            ],
+            [
+              11
+            ],
+            [
+              12
+            ],
+            [
+              13
+            ],
+            [
+              14
+            ],
+            [
+              15
+            ],
+            [
+              16
+            ],
+            [
+              17
+            ],
+            [
+              18
+            ],
+            [
+              19
+            ],
+            [
+              20
+            ],
+            [
+              21
+            ],
+            [
+              22
+            ],
+            [
+              23
+            ],
+            [
+              24
+            ],
+            [
+              25
+            ],
+            [
+              26
+            ],
+            [
+              27
+            ],
+            [
+              28
+            ],
+            [
+              29
+            ],
+            [
+              30
+            ],
+            [
+              31
+            ],
+            [
+              32
+            ],
+            [
+              33
+            ],
+            [
+              34
+            ],
+            [
+              35
+            ],
+            [
+              36
+            ],
+            [
+              37
+            ],
+            [
+              38
+            ],
+            [
+              39
+            ],
+            [
+              40
+            ],
+            [
+              41
+            ],
+            [
+              42
+            ],
+            [
+              43
+            ],
+            [
+              44
+            ],
+            [
+              45
+            ],
+            [
+              46
+            ],
+            [
+              47
+            ],
+            [
+              48
+            ],
+            [
+              49
+            ],
+            [
+              50
+            ],
+            [
+              51
+            ],
+            [
+              52
+            ],
+            [
+              53
+            ],
+            [
+              54
+            ],
+            [
+              55
+            ],
+            [
+              56
+            ],
+            [
+              57
+            ],
+            [
+              58
+            ],
+            [
+              59
+            ],
+            [
+              60
+            ],
+            [
+              61
+            ],
+            [
+              62
+            ],
+            [
+              63
+            ],
+            [
+              64
+            ],
+            [
+              65
+            ],
+            [
+              66
+            ],
+            [
+              67
+            ],
+            [
+              68
+            ],
+            [
+              69
+            ],
+            [
+              70
+            ],
+            [
+              71
+            ],
+            [
+              80
+            ],
+            [
+              81
+            ],
+            [
+              82
+            ],
+            [
+              83
+            ],
+            [
+              84
+            ],
+            [
+              85
+            ],
+            [
+              86
+            ],
+            [
+              87
+            ],
+            [
+              96
+            ],
+            [
+              97
+            ],
+            [
+              98
+            ],
+            [
+              99
+            ],
+            [
+              100
+            ],
+            [
+              101
+            ],
+            [
+              102
+            ],
+            [
+              103
+            ],
+            [
+              104
+            ],
+            [
+              105
+            ],
+            [
+              106
+            ],
+            [
+              107
+            ],
+            [
+              108
+            ],
+            [
+              109
+            ],
+            [
+              110
+            ],
+            [
+              111
+            ],
+            [
+              112
+            ],
+            [
+              113
+            ],
+            [
+              114
+            ],
+            [
+              115
+            ],
+            [
+              116
+            ],
+            [
+              117
+            ],
+            [
+              118
+            ],
+            [
+              119
+            ],
+            [
+              120
+            ],
+            [
+              121
+            ],
+            [
+              122
+            ],
+            [
+              123
+            ],
+            [
+              124
+            ],
+            [
+              125
+            ],
+            [
+              126
+            ],
+            [
+              127
+            ],
+            [
+              128
+            ],
+            [
+              129
+            ],
+            [
+              130
+            ],
+            [
+              131
+            ],
+            [
+              132
+            ],
+            [
+              133
+            ],
+            [
+              134
+            ],
+            [
+              135
+            ],
+            [
+              136
+            ],
+            [
+              137
+            ],
+            [
+              138
+            ],
+            [
+              139
+            ],
+            [
+              140
+            ],
+            [
+              141
+            ],
+            [
+              142
+            ],
+            [
+              143
+            ],
+            [
+              144
+            ],
+            [
+              145
+            ],
+            [
+              146
+            ],
+            [
+              147
+            ],
+            [
+              148
+            ],
+            [
+              149
+            ],
+            [
+              150
+            ],
+            [
+              151
+            ],
+            [
+              152
+            ],
+            [
+              153
+            ],
+            [
+              154
+            ],
+            [
+              155
+            ],
+            [
+              156
+            ],
+            [
+              157
+            ],
+            [
+              158
+            ],
+            [
+              159
+            ],
+            [
+              160
+            ],
+            [
+              161
+            ],
+            [
+              162
+            ],
+            [
+              163
+            ],
+            [
+              164
+            ],
+            [
+              165
+            ],
+            [
+              166
+            ],
+            [
+              167
+            ],
+            [
+              176
+            ],
+            [
+              177
+            ],
+            [
+              178
+            ],
+            [
+              179
+            ],
+            [
+              180
+            ],
+            [
+              181
+            ],
+            [
+              182
+            ],
+            [
+              183
+            ],
+            [
+              192
+            ],
+            [
+              193
+            ],
+            [
+              194
+            ],
+            [
+              195
+            ],
+            [
+              196
+            ],
+            [
+              197
+            ],
+            [
+              198
+            ],
+            [
+              199
+            ],
+            [
+              200
+            ],
+            [
+              201
+            ],
+            [
+              202
+            ],
+            [
+              203
+            ],
+            [
+              204
+            ],
+            [
+              205
+            ],
+            [
+              206
+            ],
+            [
+              207
+            ],
+            [
+              208
+            ],
+            [
+              209
+            ],
+            [
+              210
+            ],
+            [
+              211
+            ],
+            [
+              212
+            ],
+            [
+              213
+            ],
+            [
+              214
+            ],
+            [
+              215
+            ],
+            [
+              216
+            ],
+            [
+              217
+            ],
+            [
+              218
+            ],
+            [
+              219
+            ],
+            [
+              220
+            ],
+            [
+              221
+            ],
+            [
+              222
+            ],
+            [
+              223
+            ],
+            [
+              224
+            ],
+            [
+              225
+            ],
+            [
+              226
+            ],
+            [
+              227
+            ],
+            [
+              228
+            ],
+            [
+              229
+            ],
+            [
+              230
+            ],
+            [
+              231
+            ],
+            [
+              232
+            ],
+            [
+              233
+            ],
+            [
+              234
+            ],
+            [
+              235
+            ],
+            [
+              236
+            ],
+            [
+              237
+            ],
+            [
+              238
+            ],
+            [
+              239
+            ],
+            [
+              240
+            ],
+            [
+              241
+            ],
+            [
+              242
+            ],
+            [
+              243
+            ],
+            [
+              244
+            ],
+            [
+              245
+            ],
+            [
+              246
+            ],
+            [
+              247
+            ],
+            [
+              248
+            ],
+            [
+              249
+            ],
+            [
+              250
+            ],
+            [
+              251
+            ],
+            [
+              252
+            ],
+            [
+              253
+            ],
+            [
+              254
+            ],
+            [
+              255
+            ],
+            [
+              256
+            ],
+            [
+              257
+            ],
+            [
+              258
+            ],
+            [
+              259
+            ],
+            [
+              260
+            ],
+            [
+              261
+            ],
+            [
+              262
+            ],
+            [
+              263
+            ],
+            [
+              272
+            ],
+            [
+              273
+            ],
+            [
+              274
+            ],
+            [
+              275
+            ],
+            [
+              276
+            ],
+            [
+              277
+            ],
+            [
+              278
+            ],
+            [
+              279
+            ]
+          ],
+          "missing_refs": []
+        },
+        "frozen_firing_domain": {
+          "certified": false,
+          "ndomain": 48,
+          "ncover": 48,
+          "nmiss": 13,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-g0k1peds",
+          "mismatches": [
+            [
+              8,
+              55348,
+              29883
+            ],
+            [
+              9,
+              32272,
+              16247
+            ],
+            [
+              10,
+              55348,
+              29883
+            ],
+            [
+              11,
+              32272,
+              16247
+            ],
+            [
+              12,
+              3266,
+              29883
+            ],
+            [
+              13,
+              32272,
+              16247
+            ],
+            [
+              14,
+              55348,
+              29883
+            ],
+            [
+              15,
+              32272,
+              16247
+            ],
+            [
+              16,
+              43236,
+              14915
+            ],
+            [
+              29,
+              15598,
+              32575
+            ],
+            [
+              43,
+              15595,
+              20283
+            ],
+            [
+              44,
+              15133,
+              7155
+            ],
+            [
+              45,
+              15595,
+              20283
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "sha256": "91c500cc22195dceaff946dd4c01ee3ab4dfcc0dccb6f1e27cf9b8fbfc773f62"
+    },
+    "raw_copy": {
+      "audit": {
+        "certified": true,
+        "ninvalid": 0,
+        "nleak": 0,
+        "evidence": "certificate-evidence/check-p2y9x12h"
+      },
+      "scores": {
+        "test": {
+          "n": 288,
+          "answered": 288,
+          "correct": 130,
+          "wrong": 158,
+          "abstained": 0,
+          "coverage": 1.0,
+          "precision": 0.4513888888888889
+        },
+        "off_domain": {
+          "n": 54,
+          "answered": 36,
+          "correct": 11,
+          "wrong": 25,
+          "abstained": 18,
+          "coverage": 0.6666666666666666,
+          "precision": 0.3055555555555556
+        }
+      },
+      "strata": {
+        "seed": {
+          "2": {
+            "n": 96,
+            "answered": 96,
+            "correct": 44,
+            "wrong": 52,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4583333333333333
+          },
+          "3": {
+            "n": 96,
+            "answered": 96,
+            "correct": 47,
+            "wrong": 49,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4895833333333333
+          },
+          "4": {
+            "n": 96,
+            "answered": 96,
+            "correct": 39,
+            "wrong": 57,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.40625
+          }
+        },
+        "length": {
+          "8": {
+            "n": 96,
+            "answered": 96,
+            "correct": 51,
+            "wrong": 45,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.53125
+          },
+          "12": {
+            "n": 96,
+            "answered": 96,
+            "correct": 30,
+            "wrong": 66,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.3125
+          },
+          "24": {
+            "n": 96,
+            "answered": 96,
+            "correct": 49,
+            "wrong": 47,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.5104166666666666
+          }
+        },
+        "layout": {
+          "plain": {
+            "n": 72,
+            "answered": 72,
+            "correct": 52,
+            "wrong": 20,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.7222222222222222
+          },
+          "noise8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 47,
+            "wrong": 25,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.6527777777777778
+          },
+          "noise32": {
+            "n": 72,
+            "answered": 72,
+            "correct": 31,
+            "wrong": 41,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4305555555555556
+          },
+          "near_match8": {
+            "n": 72,
+            "answered": 72,
+            "correct": 0,
+            "wrong": 72,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.0
+          }
+        },
+        "exposures": {
+          "2": {
+            "n": 144,
+            "answered": 144,
+            "correct": 63,
+            "wrong": 81,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4375
+          },
+          "3": {
+            "n": 144,
+            "answered": 144,
+            "correct": 67,
+            "wrong": 77,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4652777777777778
+          }
+        },
+        "kind": {
+          "repeat": {
+            "n": 144,
+            "answered": 144,
+            "correct": 65,
+            "wrong": 79,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4513888888888889
+          },
+          "intervention": {
+            "n": 144,
+            "answered": 144,
+            "correct": 65,
+            "wrong": 79,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.4513888888888889
+          }
+        },
+        "negative": {
+          "no_repeat": {
+            "n": 18,
+            "answered": 0,
+            "correct": 0,
+            "wrong": 0,
+            "abstained": 18,
+            "coverage": 0.0,
+            "precision": null
+          },
+          "one_source": {
+            "n": 18,
+            "answered": 18,
+            "correct": 9,
+            "wrong": 9,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.5
+          },
+          "conflicting_sources": {
+            "n": 18,
+            "answered": 18,
+            "correct": 2,
+            "wrong": 16,
+            "abstained": 0,
+            "coverage": 1.0,
+            "precision": 0.1111111111111111
+          }
+        }
+      },
+      "counterexamples": [
+        {
+          "id": 4,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 66,
+          "prediction": 11539
+        },
+        {
+          "id": 5,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 27926,
+          "prediction": 2594
+        },
+        {
+          "id": 6,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 11539,
+          "prediction": 39127
+        },
+        {
+          "id": 7,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 4736,
+          "prediction": 39127
+        },
+        {
+          "id": 14,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 11539,
+          "prediction": 39127
+        },
+        {
+          "id": 15,
+          "part": "test",
+          "group": "seed2-length8-test-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2594,
+          "prediction": 39127
+        },
+        {
+          "id": 22,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 11746,
+          "prediction": 4726
+        },
+        {
+          "id": 23,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 7944,
+          "prediction": 4726
+        },
+        {
+          "id": 30,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 11746,
+          "prediction": 4726
+        },
+        {
+          "id": 31,
+          "part": "test",
+          "group": "seed2-length8-test-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 7944,
+          "prediction": 4726
+        },
+        {
+          "id": 33,
+          "part": "off_domain",
+          "group": "seed2-length8-off_domain-0",
+          "seed": 2,
+          "length": 8,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 378,
+          "prediction": 14520
+        },
+        {
+          "id": 37,
+          "part": "off_domain",
+          "group": "seed2-length8-off_domain-1",
+          "seed": 2,
+          "length": 8,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 20149,
+          "prediction": 35571
+        },
+        {
+          "id": 38,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 3435,
+          "prediction": 36626
+        },
+        {
+          "id": 39,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 40,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 3435,
+          "prediction": 36626
+        },
+        {
+          "id": 41,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 42,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 3435,
+          "prediction": 36626
+        },
+        {
+          "id": 43,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 44,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1093,
+          "prediction": 9247
+        },
+        {
+          "id": 45,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 48080,
+          "prediction": 9247
+        },
+        {
+          "id": 46,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1331,
+          "prediction": 36626
+        },
+        {
+          "id": 47,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 48,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 3435,
+          "prediction": 36626
+        },
+        {
+          "id": 49,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 50,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 3435,
+          "prediction": 36626
+        },
+        {
+          "id": 51,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 39934,
+          "prediction": 33919
+        },
+        {
+          "id": 52,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 50256,
+          "prediction": 9247
+        },
+        {
+          "id": 53,
+          "part": "test",
+          "group": "seed2-length12-test-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 48080,
+          "prediction": 9247
+        },
+        {
+          "id": 60,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 10434,
+          "prediction": 14079
+        },
+        {
+          "id": 61,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 9868,
+          "prediction": 14079
+        },
+        {
+          "id": 68,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 10434,
+          "prediction": 14079
+        },
+        {
+          "id": 69,
+          "part": "test",
+          "group": "seed2-length12-test-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 9868,
+          "prediction": 14079
+        },
+        {
+          "id": 71,
+          "part": "off_domain",
+          "group": "seed2-length12-off_domain-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 637,
+          "prediction": 25998
+        },
+        {
+          "id": 72,
+          "part": "off_domain",
+          "group": "seed2-length12-off_domain-0",
+          "seed": 2,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 34988,
+          "prediction": 25998
+        },
+        {
+          "id": 75,
+          "part": "off_domain",
+          "group": "seed2-length12-off_domain-1",
+          "seed": 2,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 271,
+          "prediction": 21209
+        },
+        {
+          "id": 80,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 20047,
+          "prediction": 24809
+        },
+        {
+          "id": 81,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32416,
+          "prediction": 29890
+        },
+        {
+          "id": 82,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 24809,
+          "prediction": 755
+        },
+        {
+          "id": 83,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 29890,
+          "prediction": 755
+        },
+        {
+          "id": 90,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24809,
+          "prediction": 755
+        },
+        {
+          "id": 91,
+          "part": "test",
+          "group": "seed2-length24-test-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 29890,
+          "prediction": 755
+        },
+        {
+          "id": 92,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 93,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 94,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 95,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 96,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 3266,
+          "prediction": 29883
+        },
+        {
+          "id": 97,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 98,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 55348,
+          "prediction": 12160
+        },
+        {
+          "id": 99,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32272,
+          "prediction": 12160
+        },
+        {
+          "id": 100,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 101,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 102,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 29883
+        },
+        {
+          "id": 103,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 104,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 3266,
+          "prediction": 29883
+        },
+        {
+          "id": 105,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 16247
+        },
+        {
+          "id": 106,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 55348,
+          "prediction": 12160
+        },
+        {
+          "id": 107,
+          "part": "test",
+          "group": "seed2-length24-test-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32272,
+          "prediction": 12160
+        },
+        {
+          "id": 109,
+          "part": "off_domain",
+          "group": "seed2-length24-off_domain-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 612,
+          "prediction": 5439
+        },
+        {
+          "id": 110,
+          "part": "off_domain",
+          "group": "seed2-length24-off_domain-0",
+          "seed": 2,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 20332,
+          "prediction": 5439
+        },
+        {
+          "id": 113,
+          "part": "off_domain",
+          "group": "seed2-length24-off_domain-1",
+          "seed": 2,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 80,
+          "prediction": 21874
+        },
+        {
+          "id": 118,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 4839,
+          "prediction": 33076
+        },
+        {
+          "id": 119,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1212,
+          "prediction": 18203
+        },
+        {
+          "id": 120,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 33076,
+          "prediction": 38411
+        },
+        {
+          "id": 121,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 18203,
+          "prediction": 38411
+        },
+        {
+          "id": 126,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 4839,
+          "prediction": 33076
+        },
+        {
+          "id": 127,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 40566,
+          "prediction": 18203
+        },
+        {
+          "id": 128,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 33076,
+          "prediction": 38411
+        },
+        {
+          "id": 129,
+          "part": "test",
+          "group": "seed3-length8-test-0",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 18203,
+          "prediction": 38411
+        },
+        {
+          "id": 130,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 67,
+          "prediction": 35462
+        },
+        {
+          "id": 133,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 58532,
+          "prediction": 21134
+        },
+        {
+          "id": 136,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 35462,
+          "prediction": 30598
+        },
+        {
+          "id": 137,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 21134,
+          "prediction": 30598
+        },
+        {
+          "id": 141,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 58532,
+          "prediction": 21134
+        },
+        {
+          "id": 144,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 35462,
+          "prediction": 30598
+        },
+        {
+          "id": 145,
+          "part": "test",
+          "group": "seed3-length8-test-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 21134,
+          "prediction": 30598
+        },
+        {
+          "id": 151,
+          "part": "off_domain",
+          "group": "seed3-length8-off_domain-1",
+          "seed": 3,
+          "length": 8,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 374,
+          "prediction": 15907
+        },
+        {
+          "id": 152,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 24080,
+          "prediction": 10293
+        },
+        {
+          "id": 153,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 154,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 24080,
+          "prediction": 10293
+        },
+        {
+          "id": 155,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 156,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 386,
+          "prediction": 10293
+        },
+        {
+          "id": 157,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 158,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 386,
+          "prediction": 33949
+        },
+        {
+          "id": 159,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 2758,
+          "prediction": 33949
+        },
+        {
+          "id": 160,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24080,
+          "prediction": 10293
+        },
+        {
+          "id": 161,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 162,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24080,
+          "prediction": 10293
+        },
+        {
+          "id": 163,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 164,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 386,
+          "prediction": 10293
+        },
+        {
+          "id": 165,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2758,
+          "prediction": 2151
+        },
+        {
+          "id": 166,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 24080,
+          "prediction": 33949
+        },
+        {
+          "id": 167,
+          "part": "test",
+          "group": "seed3-length12-test-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 2758,
+          "prediction": 33949
+        },
+        {
+          "id": 172,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 27180,
+          "prediction": 9821
+        },
+        {
+          "id": 174,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 9821,
+          "prediction": 25092
+        },
+        {
+          "id": 175,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 36412,
+          "prediction": 25092
+        },
+        {
+          "id": 180,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 23546,
+          "prediction": 9821
+        },
+        {
+          "id": 182,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 9821,
+          "prediction": 25092
+        },
+        {
+          "id": 183,
+          "part": "test",
+          "group": "seed3-length12-test-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 36412,
+          "prediction": 25092
+        },
+        {
+          "id": 186,
+          "part": "off_domain",
+          "group": "seed3-length12-off_domain-0",
+          "seed": 3,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 271,
+          "prediction": 21685
+        },
+        {
+          "id": 188,
+          "part": "off_domain",
+          "group": "seed3-length12-off_domain-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 65464,
+          "prediction": 38936
+        },
+        {
+          "id": 189,
+          "part": "off_domain",
+          "group": "seed3-length12-off_domain-1",
+          "seed": 3,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 19502,
+          "prediction": 38936
+        },
+        {
+          "id": 190,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 43236,
+          "prediction": 14915
+        },
+        {
+          "id": 196,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 4750,
+          "prediction": 1471
+        },
+        {
+          "id": 197,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 20909,
+          "prediction": 1471
+        },
+        {
+          "id": 198,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 43236,
+          "prediction": 14915
+        },
+        {
+          "id": 204,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 14915,
+          "prediction": 1471
+        },
+        {
+          "id": 205,
+          "part": "test",
+          "group": "seed3-length24-test-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 20909,
+          "prediction": 1471
+        },
+        {
+          "id": 211,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 15598,
+          "prediction": 32575
+        },
+        {
+          "id": 212,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 26606,
+          "prediction": 20020
+        },
+        {
+          "id": 213,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 32575,
+          "prediction": 20020
+        },
+        {
+          "id": 219,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15598,
+          "prediction": 32575
+        },
+        {
+          "id": 220,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 26606,
+          "prediction": 20020
+        },
+        {
+          "id": 221,
+          "part": "test",
+          "group": "seed3-length24-test-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 32575,
+          "prediction": 20020
+        },
+        {
+          "id": 223,
+          "part": "off_domain",
+          "group": "seed3-length24-off_domain-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 2440,
+          "prediction": 25361
+        },
+        {
+          "id": 224,
+          "part": "off_domain",
+          "group": "seed3-length24-off_domain-0",
+          "seed": 3,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 7626,
+          "prediction": 25361
+        },
+        {
+          "id": 226,
+          "part": "off_domain",
+          "group": "seed3-length24-off_domain-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 14976,
+          "prediction": 26766
+        },
+        {
+          "id": 227,
+          "part": "off_domain",
+          "group": "seed3-length24-off_domain-1",
+          "seed": 3,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 12017,
+          "prediction": 26766
+        },
+        {
+          "id": 230,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1820,
+          "prediction": 34637
+        },
+        {
+          "id": 232,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 13698,
+          "prediction": 34637
+        },
+        {
+          "id": 233,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 11001,
+          "prediction": 1610
+        },
+        {
+          "id": 234,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 59212,
+          "prediction": 29050
+        },
+        {
+          "id": 235,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1610,
+          "prediction": 29050
+        },
+        {
+          "id": 236,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 13698,
+          "prediction": 34637
+        },
+        {
+          "id": 238,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1820,
+          "prediction": 34637
+        },
+        {
+          "id": 241,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 11001,
+          "prediction": 1610
+        },
+        {
+          "id": 242,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 34637,
+          "prediction": 29050
+        },
+        {
+          "id": 243,
+          "part": "test",
+          "group": "seed4-length8-test-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1610,
+          "prediction": 29050
+        },
+        {
+          "id": 246,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 38449,
+          "prediction": 870
+        },
+        {
+          "id": 248,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 38449,
+          "prediction": 870
+        },
+        {
+          "id": 249,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 4596,
+          "prediction": 12433
+        },
+        {
+          "id": 250,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 38449,
+          "prediction": 26525
+        },
+        {
+          "id": 251,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 3464,
+          "prediction": 26525
+        },
+        {
+          "id": 254,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 38449,
+          "prediction": 870
+        },
+        {
+          "id": 256,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 38449,
+          "prediction": 870
+        },
+        {
+          "id": 257,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 4596,
+          "prediction": 12433
+        },
+        {
+          "id": 258,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1562,
+          "prediction": 26525
+        },
+        {
+          "id": 259,
+          "part": "test",
+          "group": "seed4-length8-test-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 4596,
+          "prediction": 26525
+        },
+        {
+          "id": 262,
+          "part": "off_domain",
+          "group": "seed4-length8-off_domain-0",
+          "seed": 4,
+          "length": 8,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 10691,
+          "prediction": 34318
+        },
+        {
+          "id": 265,
+          "part": "off_domain",
+          "group": "seed4-length8-off_domain-1",
+          "seed": 4,
+          "length": 8,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 378,
+          "prediction": 26225
+        },
+        {
+          "id": 269,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1278,
+          "prediction": 823
+        },
+        {
+          "id": 271,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1278,
+          "prediction": 823
+        },
+        {
+          "id": 272,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 6444,
+          "prediction": 34896
+        },
+        {
+          "id": 273,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 1278,
+          "prediction": 34896
+        },
+        {
+          "id": 277,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1278,
+          "prediction": 823
+        },
+        {
+          "id": 279,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1278,
+          "prediction": 823
+        },
+        {
+          "id": 280,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 6444,
+          "prediction": 34896
+        },
+        {
+          "id": 281,
+          "part": "test",
+          "group": "seed4-length12-test-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 1278,
+          "prediction": 34896
+        },
+        {
+          "id": 282,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 283,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 284,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 285,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 286,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 287,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 288,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 1244,
+          "prediction": 7163
+        },
+        {
+          "id": 289,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 27204,
+          "prediction": 7163
+        },
+        {
+          "id": 290,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "plain",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 291,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "plain",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 292,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 293,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 294,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1244,
+          "prediction": 778
+        },
+        {
+          "id": 295,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 27204,
+          "prediction": 38108
+        },
+        {
+          "id": 296,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 1244,
+          "prediction": 7163
+        },
+        {
+          "id": 297,
+          "part": "test",
+          "group": "seed4-length12-test-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 27204,
+          "prediction": 7163
+        },
+        {
+          "id": 300,
+          "part": "off_domain",
+          "group": "seed4-length12-off_domain-0",
+          "seed": 4,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 19099,
+          "prediction": 23214
+        },
+        {
+          "id": 302,
+          "part": "off_domain",
+          "group": "seed4-length12-off_domain-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 54961,
+          "prediction": 22518
+        },
+        {
+          "id": 303,
+          "part": "off_domain",
+          "group": "seed4-length12-off_domain-1",
+          "seed": 4,
+          "length": 12,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 39398,
+          "prediction": 22518
+        },
+        {
+          "id": 310,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 31953,
+          "prediction": 28568
+        },
+        {
+          "id": 311,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 36320,
+          "prediction": 28568
+        },
+        {
+          "id": 318,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 31953,
+          "prediction": 28568
+        },
+        {
+          "id": 319,
+          "part": "test",
+          "group": "seed4-length24-test-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 36320,
+          "prediction": 28568
+        },
+        {
+          "id": 324,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 15133,
+          "prediction": 7155
+        },
+        {
+          "id": 325,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 15595,
+          "prediction": 20283
+        },
+        {
+          "id": 326,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 2,
+          "reference": 7155,
+          "prediction": 666
+        },
+        {
+          "id": 327,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 2,
+          "reference": 20283,
+          "prediction": 666
+        },
+        {
+          "id": 331,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15595,
+          "prediction": 20283
+        },
+        {
+          "id": 332,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 15133,
+          "prediction": 7155
+        },
+        {
+          "id": 333,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "noise32",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 15595,
+          "prediction": 20283
+        },
+        {
+          "id": 334,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "repeat",
+          "exposures": 3,
+          "reference": 7155,
+          "prediction": 666
+        },
+        {
+          "id": 335,
+          "part": "test",
+          "group": "seed4-length24-test-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "near_match8",
+          "kind": "intervention",
+          "exposures": 3,
+          "reference": 20283,
+          "prediction": 666
+        },
+        {
+          "id": 337,
+          "part": "off_domain",
+          "group": "seed4-length24-off_domain-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 9882,
+          "prediction": 15146
+        },
+        {
+          "id": 338,
+          "part": "off_domain",
+          "group": "seed4-length24-off_domain-0",
+          "seed": 4,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 1648,
+          "prediction": 15146
+        },
+        {
+          "id": 340,
+          "part": "off_domain",
+          "group": "seed4-length24-off_domain-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "negative",
+          "kind": "one_source",
+          "exposures": 0,
+          "reference": 27264,
+          "prediction": 10035
+        },
+        {
+          "id": 341,
+          "part": "off_domain",
+          "group": "seed4-length24-off_domain-1",
+          "seed": 4,
+          "length": 24,
+          "layout": "negative",
+          "kind": "conflicting_sources",
+          "exposures": 0,
+          "reference": 10,
+          "prediction": 10035
+        }
+      ],
+      "firing_domain_size": 288,
+      "certificates": {
+        "full_test": {
+          "certified": false,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 158,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-lekyw604",
+          "mismatches": [
+            [
+              4,
+              66,
+              11539
+            ],
+            [
+              5,
+              27926,
+              2594
+            ],
+            [
+              6,
+              11539,
+              39127
+            ],
+            [
+              7,
+              4736,
+              39127
+            ],
+            [
+              14,
+              11539,
+              39127
+            ],
+            [
+              15,
+              2594,
+              39127
+            ],
+            [
+              22,
+              11746,
+              4726
+            ],
+            [
+              23,
+              7944,
+              4726
+            ],
+            [
+              30,
+              11746,
+              4726
+            ],
+            [
+              31,
+              7944,
+              4726
+            ],
+            [
+              32,
+              3435,
+              36626
+            ],
+            [
+              33,
+              39934,
+              33919
+            ],
+            [
+              34,
+              3435,
+              36626
+            ],
+            [
+              35,
+              39934,
+              33919
+            ],
+            [
+              36,
+              3435,
+              36626
+            ],
+            [
+              37,
+              39934,
+              33919
+            ],
+            [
+              38,
+              1093,
+              9247
+            ],
+            [
+              39,
+              48080,
+              9247
+            ],
+            [
+              40,
+              1331,
+              36626
+            ],
+            [
+              41,
+              39934,
+              33919
+            ],
+            [
+              42,
+              3435,
+              36626
+            ],
+            [
+              43,
+              39934,
+              33919
+            ],
+            [
+              44,
+              3435,
+              36626
+            ],
+            [
+              45,
+              39934,
+              33919
+            ],
+            [
+              46,
+              50256,
+              9247
+            ],
+            [
+              47,
+              48080,
+              9247
+            ],
+            [
+              54,
+              10434,
+              14079
+            ],
+            [
+              55,
+              9868,
+              14079
+            ],
+            [
+              62,
+              10434,
+              14079
+            ],
+            [
+              63,
+              9868,
+              14079
+            ],
+            [
+              68,
+              20047,
+              24809
+            ],
+            [
+              69,
+              32416,
+              29890
+            ],
+            [
+              70,
+              24809,
+              755
+            ],
+            [
+              71,
+              29890,
+              755
+            ],
+            [
+              78,
+              24809,
+              755
+            ],
+            [
+              79,
+              29890,
+              755
+            ],
+            [
+              80,
+              55348,
+              29883
+            ],
+            [
+              81,
+              32272,
+              16247
+            ],
+            [
+              82,
+              55348,
+              29883
+            ],
+            [
+              83,
+              32272,
+              16247
+            ],
+            [
+              84,
+              3266,
+              29883
+            ],
+            [
+              85,
+              32272,
+              16247
+            ],
+            [
+              86,
+              55348,
+              12160
+            ],
+            [
+              87,
+              32272,
+              12160
+            ],
+            [
+              88,
+              55348,
+              29883
+            ],
+            [
+              89,
+              32272,
+              16247
+            ],
+            [
+              90,
+              55348,
+              29883
+            ],
+            [
+              91,
+              32272,
+              16247
+            ],
+            [
+              92,
+              3266,
+              29883
+            ],
+            [
+              93,
+              32272,
+              16247
+            ],
+            [
+              94,
+              55348,
+              12160
+            ],
+            [
+              95,
+              32272,
+              12160
+            ],
+            [
+              100,
+              4839,
+              33076
+            ],
+            [
+              101,
+              1212,
+              18203
+            ],
+            [
+              102,
+              33076,
+              38411
+            ],
+            [
+              103,
+              18203,
+              38411
+            ],
+            [
+              108,
+              4839,
+              33076
+            ],
+            [
+              109,
+              40566,
+              18203
+            ],
+            [
+              110,
+              33076,
+              38411
+            ],
+            [
+              111,
+              18203,
+              38411
+            ],
+            [
+              112,
+              67,
+              35462
+            ],
+            [
+              115,
+              58532,
+              21134
+            ],
+            [
+              118,
+              35462,
+              30598
+            ],
+            [
+              119,
+              21134,
+              30598
+            ],
+            [
+              123,
+              58532,
+              21134
+            ],
+            [
+              126,
+              35462,
+              30598
+            ],
+            [
+              127,
+              21134,
+              30598
+            ],
+            [
+              128,
+              24080,
+              10293
+            ],
+            [
+              129,
+              2758,
+              2151
+            ],
+            [
+              130,
+              24080,
+              10293
+            ],
+            [
+              131,
+              2758,
+              2151
+            ],
+            [
+              132,
+              386,
+              10293
+            ],
+            [
+              133,
+              2758,
+              2151
+            ],
+            [
+              134,
+              386,
+              33949
+            ],
+            [
+              135,
+              2758,
+              33949
+            ],
+            [
+              136,
+              24080,
+              10293
+            ],
+            [
+              137,
+              2758,
+              2151
+            ],
+            [
+              138,
+              24080,
+              10293
+            ],
+            [
+              139,
+              2758,
+              2151
+            ],
+            [
+              140,
+              386,
+              10293
+            ],
+            [
+              141,
+              2758,
+              2151
+            ],
+            [
+              142,
+              24080,
+              33949
+            ],
+            [
+              143,
+              2758,
+              33949
+            ],
+            [
+              148,
+              27180,
+              9821
+            ],
+            [
+              150,
+              9821,
+              25092
+            ],
+            [
+              151,
+              36412,
+              25092
+            ],
+            [
+              156,
+              23546,
+              9821
+            ],
+            [
+              158,
+              9821,
+              25092
+            ],
+            [
+              159,
+              36412,
+              25092
+            ],
+            [
+              160,
+              43236,
+              14915
+            ],
+            [
+              166,
+              4750,
+              1471
+            ],
+            [
+              167,
+              20909,
+              1471
+            ],
+            [
+              168,
+              43236,
+              14915
+            ],
+            [
+              174,
+              14915,
+              1471
+            ],
+            [
+              175,
+              20909,
+              1471
+            ],
+            [
+              181,
+              15598,
+              32575
+            ],
+            [
+              182,
+              26606,
+              20020
+            ],
+            [
+              183,
+              32575,
+              20020
+            ],
+            [
+              189,
+              15598,
+              32575
+            ],
+            [
+              190,
+              26606,
+              20020
+            ],
+            [
+              191,
+              32575,
+              20020
+            ],
+            [
+              194,
+              1820,
+              34637
+            ],
+            [
+              196,
+              13698,
+              34637
+            ],
+            [
+              197,
+              11001,
+              1610
+            ],
+            [
+              198,
+              59212,
+              29050
+            ],
+            [
+              199,
+              1610,
+              29050
+            ],
+            [
+              200,
+              13698,
+              34637
+            ],
+            [
+              202,
+              1820,
+              34637
+            ],
+            [
+              205,
+              11001,
+              1610
+            ],
+            [
+              206,
+              34637,
+              29050
+            ],
+            [
+              207,
+              1610,
+              29050
+            ],
+            [
+              210,
+              38449,
+              870
+            ],
+            [
+              212,
+              38449,
+              870
+            ],
+            [
+              213,
+              4596,
+              12433
+            ],
+            [
+              214,
+              38449,
+              26525
+            ],
+            [
+              215,
+              3464,
+              26525
+            ],
+            [
+              218,
+              38449,
+              870
+            ],
+            [
+              220,
+              38449,
+              870
+            ],
+            [
+              221,
+              4596,
+              12433
+            ],
+            [
+              222,
+              1562,
+              26525
+            ],
+            [
+              223,
+              4596,
+              26525
+            ],
+            [
+              227,
+              1278,
+              823
+            ],
+            [
+              229,
+              1278,
+              823
+            ],
+            [
+              230,
+              6444,
+              34896
+            ],
+            [
+              231,
+              1278,
+              34896
+            ],
+            [
+              235,
+              1278,
+              823
+            ],
+            [
+              237,
+              1278,
+              823
+            ],
+            [
+              238,
+              6444,
+              34896
+            ],
+            [
+              239,
+              1278,
+              34896
+            ],
+            [
+              240,
+              1244,
+              778
+            ],
+            [
+              241,
+              27204,
+              38108
+            ],
+            [
+              242,
+              1244,
+              778
+            ],
+            [
+              243,
+              27204,
+              38108
+            ],
+            [
+              244,
+              1244,
+              778
+            ],
+            [
+              245,
+              27204,
+              38108
+            ],
+            [
+              246,
+              1244,
+              7163
+            ],
+            [
+              247,
+              27204,
+              7163
+            ],
+            [
+              248,
+              1244,
+              778
+            ],
+            [
+              249,
+              27204,
+              38108
+            ],
+            [
+              250,
+              1244,
+              778
+            ],
+            [
+              251,
+              27204,
+              38108
+            ],
+            [
+              252,
+              1244,
+              778
+            ],
+            [
+              253,
+              27204,
+              38108
+            ],
+            [
+              254,
+              1244,
+              7163
+            ],
+            [
+              255,
+              27204,
+              7163
+            ],
+            [
+              262,
+              31953,
+              28568
+            ],
+            [
+              263,
+              36320,
+              28568
+            ],
+            [
+              270,
+              31953,
+              28568
+            ],
+            [
+              271,
+              36320,
+              28568
+            ],
+            [
+              276,
+              15133,
+              7155
+            ],
+            [
+              277,
+              15595,
+              20283
+            ],
+            [
+              278,
+              7155,
+              666
+            ],
+            [
+              279,
+              20283,
+              666
+            ],
+            [
+              283,
+              15595,
+              20283
+            ],
+            [
+              284,
+              15133,
+              7155
+            ],
+            [
+              285,
+              15595,
+              20283
+            ],
+            [
+              286,
+              7155,
+              666
+            ],
+            [
+              287,
+              20283,
+              666
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        },
+        "frozen_firing_domain": {
+          "certified": false,
+          "ndomain": 288,
+          "ncover": 288,
+          "nmiss": 158,
+          "nuncov": 0,
+          "nmissing": 0,
+          "ninvalid": 0,
+          "evidence": "certificate-evidence/check-vu6zg8ke",
+          "mismatches": [
+            [
+              4,
+              66,
+              11539
+            ],
+            [
+              5,
+              27926,
+              2594
+            ],
+            [
+              6,
+              11539,
+              39127
+            ],
+            [
+              7,
+              4736,
+              39127
+            ],
+            [
+              14,
+              11539,
+              39127
+            ],
+            [
+              15,
+              2594,
+              39127
+            ],
+            [
+              22,
+              11746,
+              4726
+            ],
+            [
+              23,
+              7944,
+              4726
+            ],
+            [
+              30,
+              11746,
+              4726
+            ],
+            [
+              31,
+              7944,
+              4726
+            ],
+            [
+              32,
+              3435,
+              36626
+            ],
+            [
+              33,
+              39934,
+              33919
+            ],
+            [
+              34,
+              3435,
+              36626
+            ],
+            [
+              35,
+              39934,
+              33919
+            ],
+            [
+              36,
+              3435,
+              36626
+            ],
+            [
+              37,
+              39934,
+              33919
+            ],
+            [
+              38,
+              1093,
+              9247
+            ],
+            [
+              39,
+              48080,
+              9247
+            ],
+            [
+              40,
+              1331,
+              36626
+            ],
+            [
+              41,
+              39934,
+              33919
+            ],
+            [
+              42,
+              3435,
+              36626
+            ],
+            [
+              43,
+              39934,
+              33919
+            ],
+            [
+              44,
+              3435,
+              36626
+            ],
+            [
+              45,
+              39934,
+              33919
+            ],
+            [
+              46,
+              50256,
+              9247
+            ],
+            [
+              47,
+              48080,
+              9247
+            ],
+            [
+              54,
+              10434,
+              14079
+            ],
+            [
+              55,
+              9868,
+              14079
+            ],
+            [
+              62,
+              10434,
+              14079
+            ],
+            [
+              63,
+              9868,
+              14079
+            ],
+            [
+              68,
+              20047,
+              24809
+            ],
+            [
+              69,
+              32416,
+              29890
+            ],
+            [
+              70,
+              24809,
+              755
+            ],
+            [
+              71,
+              29890,
+              755
+            ],
+            [
+              78,
+              24809,
+              755
+            ],
+            [
+              79,
+              29890,
+              755
+            ],
+            [
+              80,
+              55348,
+              29883
+            ],
+            [
+              81,
+              32272,
+              16247
+            ],
+            [
+              82,
+              55348,
+              29883
+            ],
+            [
+              83,
+              32272,
+              16247
+            ],
+            [
+              84,
+              3266,
+              29883
+            ],
+            [
+              85,
+              32272,
+              16247
+            ],
+            [
+              86,
+              55348,
+              12160
+            ],
+            [
+              87,
+              32272,
+              12160
+            ],
+            [
+              88,
+              55348,
+              29883
+            ],
+            [
+              89,
+              32272,
+              16247
+            ],
+            [
+              90,
+              55348,
+              29883
+            ],
+            [
+              91,
+              32272,
+              16247
+            ],
+            [
+              92,
+              3266,
+              29883
+            ],
+            [
+              93,
+              32272,
+              16247
+            ],
+            [
+              94,
+              55348,
+              12160
+            ],
+            [
+              95,
+              32272,
+              12160
+            ],
+            [
+              100,
+              4839,
+              33076
+            ],
+            [
+              101,
+              1212,
+              18203
+            ],
+            [
+              102,
+              33076,
+              38411
+            ],
+            [
+              103,
+              18203,
+              38411
+            ],
+            [
+              108,
+              4839,
+              33076
+            ],
+            [
+              109,
+              40566,
+              18203
+            ],
+            [
+              110,
+              33076,
+              38411
+            ],
+            [
+              111,
+              18203,
+              38411
+            ],
+            [
+              112,
+              67,
+              35462
+            ],
+            [
+              115,
+              58532,
+              21134
+            ],
+            [
+              118,
+              35462,
+              30598
+            ],
+            [
+              119,
+              21134,
+              30598
+            ],
+            [
+              123,
+              58532,
+              21134
+            ],
+            [
+              126,
+              35462,
+              30598
+            ],
+            [
+              127,
+              21134,
+              30598
+            ],
+            [
+              128,
+              24080,
+              10293
+            ],
+            [
+              129,
+              2758,
+              2151
+            ],
+            [
+              130,
+              24080,
+              10293
+            ],
+            [
+              131,
+              2758,
+              2151
+            ],
+            [
+              132,
+              386,
+              10293
+            ],
+            [
+              133,
+              2758,
+              2151
+            ],
+            [
+              134,
+              386,
+              33949
+            ],
+            [
+              135,
+              2758,
+              33949
+            ],
+            [
+              136,
+              24080,
+              10293
+            ],
+            [
+              137,
+              2758,
+              2151
+            ],
+            [
+              138,
+              24080,
+              10293
+            ],
+            [
+              139,
+              2758,
+              2151
+            ],
+            [
+              140,
+              386,
+              10293
+            ],
+            [
+              141,
+              2758,
+              2151
+            ],
+            [
+              142,
+              24080,
+              33949
+            ],
+            [
+              143,
+              2758,
+              33949
+            ],
+            [
+              148,
+              27180,
+              9821
+            ],
+            [
+              150,
+              9821,
+              25092
+            ],
+            [
+              151,
+              36412,
+              25092
+            ],
+            [
+              156,
+              23546,
+              9821
+            ],
+            [
+              158,
+              9821,
+              25092
+            ],
+            [
+              159,
+              36412,
+              25092
+            ],
+            [
+              160,
+              43236,
+              14915
+            ],
+            [
+              166,
+              4750,
+              1471
+            ],
+            [
+              167,
+              20909,
+              1471
+            ],
+            [
+              168,
+              43236,
+              14915
+            ],
+            [
+              174,
+              14915,
+              1471
+            ],
+            [
+              175,
+              20909,
+              1471
+            ],
+            [
+              181,
+              15598,
+              32575
+            ],
+            [
+              182,
+              26606,
+              20020
+            ],
+            [
+              183,
+              32575,
+              20020
+            ],
+            [
+              189,
+              15598,
+              32575
+            ],
+            [
+              190,
+              26606,
+              20020
+            ],
+            [
+              191,
+              32575,
+              20020
+            ],
+            [
+              194,
+              1820,
+              34637
+            ],
+            [
+              196,
+              13698,
+              34637
+            ],
+            [
+              197,
+              11001,
+              1610
+            ],
+            [
+              198,
+              59212,
+              29050
+            ],
+            [
+              199,
+              1610,
+              29050
+            ],
+            [
+              200,
+              13698,
+              34637
+            ],
+            [
+              202,
+              1820,
+              34637
+            ],
+            [
+              205,
+              11001,
+              1610
+            ],
+            [
+              206,
+              34637,
+              29050
+            ],
+            [
+              207,
+              1610,
+              29050
+            ],
+            [
+              210,
+              38449,
+              870
+            ],
+            [
+              212,
+              38449,
+              870
+            ],
+            [
+              213,
+              4596,
+              12433
+            ],
+            [
+              214,
+              38449,
+              26525
+            ],
+            [
+              215,
+              3464,
+              26525
+            ],
+            [
+              218,
+              38449,
+              870
+            ],
+            [
+              220,
+              38449,
+              870
+            ],
+            [
+              221,
+              4596,
+              12433
+            ],
+            [
+              222,
+              1562,
+              26525
+            ],
+            [
+              223,
+              4596,
+              26525
+            ],
+            [
+              227,
+              1278,
+              823
+            ],
+            [
+              229,
+              1278,
+              823
+            ],
+            [
+              230,
+              6444,
+              34896
+            ],
+            [
+              231,
+              1278,
+              34896
+            ],
+            [
+              235,
+              1278,
+              823
+            ],
+            [
+              237,
+              1278,
+              823
+            ],
+            [
+              238,
+              6444,
+              34896
+            ],
+            [
+              239,
+              1278,
+              34896
+            ],
+            [
+              240,
+              1244,
+              778
+            ],
+            [
+              241,
+              27204,
+              38108
+            ],
+            [
+              242,
+              1244,
+              778
+            ],
+            [
+              243,
+              27204,
+              38108
+            ],
+            [
+              244,
+              1244,
+              778
+            ],
+            [
+              245,
+              27204,
+              38108
+            ],
+            [
+              246,
+              1244,
+              7163
+            ],
+            [
+              247,
+              27204,
+              7163
+            ],
+            [
+              248,
+              1244,
+              778
+            ],
+            [
+              249,
+              27204,
+              38108
+            ],
+            [
+              250,
+              1244,
+              778
+            ],
+            [
+              251,
+              27204,
+              38108
+            ],
+            [
+              252,
+              1244,
+              778
+            ],
+            [
+              253,
+              27204,
+              38108
+            ],
+            [
+              254,
+              1244,
+              7163
+            ],
+            [
+              255,
+              27204,
+              7163
+            ],
+            [
+              262,
+              31953,
+              28568
+            ],
+            [
+              263,
+              36320,
+              28568
+            ],
+            [
+              270,
+              31953,
+              28568
+            ],
+            [
+              271,
+              36320,
+              28568
+            ],
+            [
+              276,
+              15133,
+              7155
+            ],
+            [
+              277,
+              15595,
+              20283
+            ],
+            [
+              278,
+              7155,
+              666
+            ],
+            [
+              279,
+              20283,
+              666
+            ],
+            [
+              283,
+              15595,
+              20283
+            ],
+            [
+              284,
+              15133,
+              7155
+            ],
+            [
+              285,
+              15595,
+              20283
+            ],
+            [
+              286,
+              7155,
+              666
+            ],
+            [
+              287,
+              20283,
+              666
+            ]
+          ],
+          "uncovered": [],
+          "missing_refs": []
+        }
+      },
+      "sha256": "f4388c20c559c6b480654e6a1e6d495217c9b95cdaa378ef245bc02afd228fed"
+    }
+  },
+  "frozen_sha256": "15d9d31222390c843429158620acd12021021943b02050609b998ca95fe431d6",
+  "references_sha256": "f9e6c0fc2b701e7be880ec4f5f43b88ff921aac9ed962692cad35fb5e1249ea1",
+  "observations_sha256": "9e2526d67ff1d85ef0ac7df57bcc8c14860d2c61ffadb01620b669bb00715878"
+}

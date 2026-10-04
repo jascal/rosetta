@@ -1,0 +1,3 @@
+Warning: Variable I only occurs once in file circuit.dl at line 46
+orderhist(K, N) :- minorder(_, K), N = count : { minorder(I, K) }.
+----------------------------------------------------------^--------
