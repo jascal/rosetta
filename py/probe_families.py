@@ -56,27 +56,26 @@ def family_ioi(tok, port, n=40):
 
 def family_succession(tok, port, seq, label, n=30):
     """succession / greater-than: an ordered run 'X Y Z' → the next item. Causal: shift the window's start → the
-    predicted successor shifts with it (the model tracks ordinal position, not a memorized token). FORMAT-ROBUST: models
-    differ in list-format prior (a code model reads bare-space ' Mon Tue Wed' as a token list → predicts a number/comma,
-    but reads 'Mon, Tue, Wed,' as a sequence → the successor), so try both joins and report the best — the CIRCUIT is what
-    we test, not one surface format; a 0% under one format is a probe artifact, not an architectural absence."""
+    predicted successor shifts with it (the model tracks ordinal position, not a memorized token). Uses a single
+    comma-separated format across models; do not choose formats by the evaluation scores."""
     s = single(tok, seq)
     items = [w for w in seq if w in s]
     if len(items) < 5:
         return None
-    fmts = [lambda a, b, c: f"{a}{b}{c}", lambda a, b, c: f"{a},{b},{c},"]   # bare-space vs comma-separated
-    best = (0.0, 0.0)
-    for fmt in fmts:
-        rng = random.Random(1)
-        det = cfollow = trials = 0
-        for _ in range(n):
-            i = rng.randint(0, len(items) - 4)
-            det += (serve_decide(port, tok.encode(fmt(items[i], items[i + 1], items[i + 2])).ids) == s[items[i + 3]])
-            j = (i + 1) % (len(items) - 3)                          # shift the window → successor must shift
-            cfollow += (serve_decide(port, tok.encode(fmt(items[j], items[j + 1], items[j + 2])).ids) == s[items[j + 3]])
-            trials += 1
-        best = max(best, (det / trials, cfollow / trials), key=lambda t: t[0])
-    return best
+    # Freeze one representation across models before scoring. Previously this
+    # function chose whichever of bare-space or comma-separated scored better
+    # on the same trials, inflating the reported result.
+    def fmt(a, b, c):
+        return f"{a},{b},{c},"
+    rng = random.Random(1)
+    det = cfollow = trials = 0
+    for _ in range(n):
+        i = rng.randint(0, len(items) - 4)
+        det += (serve_decide(port, tok.encode(fmt(items[i], items[i + 1], items[i + 2])).ids) == s[items[i + 3]])
+        j = (i + 1) % (len(items) - 3)                          # shift the window → successor must shift
+        cfollow += (serve_decide(port, tok.encode(fmt(items[j], items[j + 1], items[j + 2])).ids) == s[items[j + 3]])
+        trials += 1
+    return det / trials, cfollow / trials
 
 
 CAPITALS = [(" France", " Paris"), (" Germany", " Berlin"), (" Japan", " Tokyo"), (" Italy", " Rome"),
@@ -285,7 +284,7 @@ def main():
     port = int(os.environ["FIELDRUN_SERVE"])
     tok = Tokenizer.from_file(os.path.join(md, "bundle.tokenizer.json"))
     name = os.path.basename(md.rstrip("/"))
-    print(f"=== probe_families · {name} === (detect ≥80% AND causal ≥80% ⇒ in the toolkit)")
+    print(f"=== probe_families · {name} === (detect ≥80% AND causal ≥80% ⇒ in the toolkit; succession format: comma)")
     probes = [("copy/name-mover (IOI)", lambda: family_ioi(tok, port, n)),
               ("succession (days)", lambda: family_succession(tok, port, DAYS, "days", n)),
               ("succession (months)", lambda: family_succession(tok, port, MONTHS, "months", n)),

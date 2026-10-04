@@ -36,7 +36,9 @@ The apparent NeoX "failures" at 160m **decompose into scale and probe-format, no
   recover to 100% at 1.4b NeoX* (and hold at llama/qwen ~1B). The 160m "arch failure" was capacity, not NeoX.
 - **Architecture-independent but probe-format-sensitive:** succession. A code model reads bare-space `Mon Tue Wed`
   as a token list and predicts a number; with commas it predicts the successor (logit 18.5). **A 0% can be the probe,
-  not the model** — `family_succession` is now format-robust (tries both joins, takes the best).
+  not the model.** The succession scores in the table were produced by a probe that tried both joins and reported
+  whichever scored better on the same trials, which inflates them. `family_succession` now uses one frozen
+  comma-separated format for every model; the table has not been re-run under it.
 
 Two genuine residuals (honest exceptions, not explained away):
 
