@@ -1,0 +1,78 @@
+// Training ranking followed by fixed-budget validation admission. The caller
+// supplies only train/validation rows; no final-test labels enter this query.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(i:number,group:symbol,part:symbol,hash:symbol) .input sample
+.decl pair(b:number,e:number) .input pair
+.decl feature(f:number,threshold:float,polarity:number) .input feature
+.decl trace(i:number,f:number,v:float) .input trace
+.decl permutation(i:number,j:number) .input permutation
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- sample(_,_,P,_), P != "train", P != "validation".
+invalid() :- sample(I,_,_,_), !ref(I,_).
+invalid() :- ref(I,_), !sample(I,_,_,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- sample(_,G,A,_), sample(_,G,B,_), A != B.
+invalid() :- sample(_,_,A,H), sample(_,_,B,H), A != B.
+invalid() :- sample(I,_,_,_), !tok(I,_,_).
+invalid() :- tok(I,P,A), tok(I,P,B), A != B.
+invalid() :- tok(I,_,_), !sample(I,_,_,_).
+invalid() :- pair(B,E), sample(B,G,P,_), !sample(E,G,P,_).
+invalid() :- pair(B,_), !sample(B,_,_,_).
+invalid() :- pair(_,E), !sample(E,_,_,_).
+invalid() :- sample(I,_,"train",_), feature(F,_,_), !trace(I,F,_).
+invalid() :- trace(I,_,_), !sample(I,_,"train",_).
+invalid() :- trace(_,F,_), !feature(F,_,_).
+invalid() :- trace(I,F,A), trace(I,F,B), A != B.
+invalid() :- sample(I,_,"train",_), !permutation(I,_).
+invalid() :- sample(I,_,"train",_), !permutation(_,I).
+invalid() :- permutation(I,A), permutation(I,B), A != B.
+invalid() :- permutation(A,I), permutation(B,I), A != B.
+invalid() :- permutation(I,J), !sample(I,_,"train",_).
+invalid() :- permutation(I,J), !sample(J,_,"train",_).
+invalid() :- !sample(_,_,"train",_).
+invalid() :- !sample(_,_,"validation",_).
+.decl arm(a:number)
+arm(0). arm(1). arm(2).
+.decl votes(i:number,f:number)
+votes(I,F) :- trace(I,F,V), feature(F,T,P), (V-T)*to_float(P)>0.0.
+.decl trace_good(i:number)
+trace_good(I) :- sample(I,_,"train",_), N = count : { votes(I,_) },
+                 D = count : { feature(_,_,_) }, D>0, N*2>D.
+.decl train_count(c:number,correct:number,wrong:number)
+train_count(C,H,E) :- candidate(C,_,_,_),
+ H = count : { nt_candidate(C,I,T), sample(I,_,"train",_), ref(I,T) },
+ E = count : { nt_candidate(C,I,T), sample(I,_,"train",_), ref(I,R), T != R }.
+.decl signature(a:number,i:number)
+signature(1,I) :- trace_good(I).
+signature(2,I) :- permutation(I,J), trace_good(J).
+.decl trace_count(a:number,c:number,good:number,bad:number)
+trace_count(A,C,H,E) :- arm(A), A>0, candidate(C,_,_,_), feature(_,_,_),
+ H = count : { nt_candidate(C,I,_), sample(I,_,"train",_), signature(A,I) },
+ E = count : { nt_candidate(C,I,_), sample(I,_,"train",_), !signature(A,I) }.
+.decl score(a:number,c:number,s:number) .output score
+score(0,C,H-4*E) :- train_count(C,H,E), H+E>0.
+score(A,C,H-4*E+G-4*B) :- train_count(C,H,E), H+E>0, trace_count(A,C,G,B).
+score(A,C,H-4*E) :- arm(A), A>0, train_count(C,H,E), H+E>0, !feature(_,_,_).
+.decl better(a:number,c:number,d:number)
+better(A,C,D) :- score(A,C,S), score(A,D,T), T>S.
+better(A,C,D) :- score(A,C,S), score(A,D,S), D<C.
+.decl proposed(a:number,rank:number,c:number) .output proposed
+proposed(A,R,C) :- !invalid(), score(A,C,_), N = count : { better(A,C,_) }, N<12, R=N+1.
+.decl fails(c:number,i:number) .output fails
+fails(C,I) :- proposed(_,_,C), nt_candidate(C,I,T), ref(I,R), T != R.
+fails(C,I) :- proposed(_,_,C), nt_candidate(C,I,A), nt_candidate(C,I,B), A != B.
+.decl firing_group(c:number,p:symbol,g:symbol)
+firing_group(C,P,G) :- nt_candidate(C,I,_), sample(I,G,P,_).
+.decl follows_group(c:number,p:symbol,g:symbol)
+follows_group(C,P,G) :- pair(B,E), sample(B,G,P,_), nt_candidate(C,B,X), nt_candidate(C,E,Y),
+                       X != Y, ref(B,X), ref(E,Y).
+.decl support(c:number,p:symbol,n:number,m:number) .output support
+support(C,P,N,M) :- proposed(_,_,C), sample(_,_,P,_),
+ N = count : { firing_group(C,P,_) }, M = count : { follows_group(C,P,_) }.
+.decl admitted(a:number,rank:number,c:number) .output admitted
+admitted(A,R,C) :- proposed(A,R,C), !fails(C,_),
+ support(C,"train",N,M), N>=2, M>=2, support(C,"validation",J,K), J>=2, K>=2.
+.decl certified() .output certified
+certified() :- !invalid().
