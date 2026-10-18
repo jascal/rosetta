@@ -1,0 +1,12 @@
+Warning: No rules/facts defined for relation selected in file circuit.dl at line 4
+.decl selected(rank:number,c:number)
+------^------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 57
+invalid() :- permutation(I,J), !sample(I,_,"sign",_).
+---------------------------^--------------------------
+Warning: Variable I only occurs once in file verify.dl at line 58
+invalid() :- permutation(I,J), !sample(J,_,"sign",_).
+-------------------------^----------------------------
+Warning: Variable N only occurs once in file verify.dl at line 80
+n_sign_good(K) :- n_sign(N), K = count : { sample(I,_,"sign",_), trace_good(I) }.
+-------------------------^--------------------------------------------------------

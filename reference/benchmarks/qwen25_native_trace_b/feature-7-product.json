@@ -1,0 +1,43 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "size": [
+      [
+        "0",
+        "18"
+      ],
+      [
+        "1",
+        "96"
+      ]
+    ],
+    "eligible": [
+      [
+        "()"
+      ]
+    ],
+    "gate_mean": [
+      [
+        "1835",
+        "1.5772473406896257"
+      ]
+    ],
+    "chosen": [
+      [
+        "1835",
+        "3.5143628965040663",
+        "0.039940956449653536",
+        "1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "no_vote": []
+  },
+  "evidence": "certificate-evidence/feature-7-product/check-yj5116px",
+  "wall_seconds": 1.2032491970458068
+}

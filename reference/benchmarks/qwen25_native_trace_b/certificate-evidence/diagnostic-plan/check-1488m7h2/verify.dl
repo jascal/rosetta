@@ -1,0 +1,17 @@
+// Select discovery interventions without host-side causal decisions.
+.decl label(i:number,c:number) .input label
+.decl chosen_unit(l:number,n:number,width:number) .input chosen_unit
+.decl product(i:number,l:number,n:number,v:float) .input product
+.decl invalid() .output invalid
+invalid() :- label(I,A), label(I,B), A != B.
+invalid() :- chosen_unit(L,N,_), label(I,_), !product(I,L,N,_).
+.decl ranked(i:number,c:number,r:number)
+ranked(I,C,R) :- label(I,C), N = count : { label(J,C), J<I }, R=N+1, N<8.
+.decl plan(i:number,l:number,n:number,mode:symbol,donor:number,value:float) .output plan
+plan(I,L,N,"zero",I,0.0) :- ranked(I,_,_), chosen_unit(L,N,_), !invalid().
+plan(I,L,(N+1)%W,"control_zero",I,0.0) :- ranked(I,_,_), chosen_unit(L,N,W), !invalid().
+plan(I,L,N,"identity",I,V) :- ranked(I,_,_), chosen_unit(L,N,_), product(I,L,N,V), !invalid().
+plan(I,L,N,"swap",J,V) :- ranked(I,C,R), ranked(J,D,R), C!=D,
+                         chosen_unit(L,N,_), product(J,L,N,V), !invalid().
+.decl certified() .output certified
+certified() :- !invalid().

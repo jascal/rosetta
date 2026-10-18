@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "stage": "feature-23-value",
+    "source": "native-trace run B"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "d1365940ea439214038bbf75d4e66323d463eac9ec9b392030ebd4f7ac873586",
+    "facts/gate.facts": "2f0be4ac8633a122128f219e0ce0672c581d36765ddb73138a1e7fa91223dd9d",
+    "facts/observation.facts": "20ffa5046ebbf48e5862b2cf35886d28cdf8aba2962d3bd41d20d01df082b35b",
+    "facts/sample.facts": "4c67711932a82d30607b9f479bfbdb4947065ac840da62f17083dc9d8cd30d2a",
+    "facts/unit.facts": "c5eadfa6eb06b36f1b1acbd5e0b9c4569644aca6cbd5218a3af55adf00fd4c44",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/chosen.csv": "e104d2ebaa33ace4b898b9e6db101976af24844a116669db427dccb686e9724a",
+    "outputs/eligible.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/gate_mean.csv": "368dfc9fdd78a5abf0f2bdea5ef06a0853115d016b6d22791f7a67ce815068af",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/no_vote.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/size.csv": "7503b598475039e8ca93b2ffa0ec3c2e1bc68cde22fad02ffc4afe007fbea09a",
+    "stderr.txt": "be759c77a278b93fd50c00d23a2d165145b8d87a30d73fa675435bb05cfff67c",
+    "verify.dl": "889918df805512f74daa1cf3238f83c82c4f52f12dc69fbd77ae75887ce31aa5"
+  }
+}
