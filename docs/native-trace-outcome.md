@@ -3,7 +3,8 @@
 **Completed; empirical result: zero incremental certified coverage.** All three
 arms admitted zero candidates and abstain on all 114 final inputs. This is the
 negative outcome allowed by the unchanged [preregistration](native-trace-prereg.md).
-The evidence does not support a native-trace advantage for this fixed search.
+The evidence does not support a native-trace advantage for this fixed search —
+which is not a claim that native neurons are uninformative in general.
 Freeze commit: `a59f553`, created before the first final oracle request.
 
 ## Motivation and relation to fieldrun
@@ -79,6 +80,11 @@ No rejected rule was replaced or relaxed.
 | Behavior | 12 | 0 | 0/114 | 0 / 0 | 114/114 | 0/114 |
 | Trace | 12 | 0 | 0/114 | 0 / 0 | 114/114 | 0/114 |
 | Shuffled trace | 12 | 0 | 0/114 | 0 / 0 | 114/114 | 0/114 |
+
+**Scope of this table:** it is a null result for one discovery-class threshold
+prior over one fixed predicate library on one checkpoint. It is not a claim
+that copy behavior is impossible to capture, and not a claim that native
+neurons are uninformative in general.
 
 Both incremental certified-domain sets are empty. All arms abstain on the 96
 positive and 18 negative-control final inputs. No final mismatch counterexample
