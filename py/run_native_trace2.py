@@ -227,7 +227,9 @@ def select(out):
         for f in features_ if not f["unweighted"])
     trace, gate = "", ""
     for r in signing:
-        units = {(o["layer"], o["neuron"]): o for o in records[r["id"]]["observations"]}
+        last = len(r["ctx"]) - 1
+        units = {(o["layer"], o["neuron"]): o for o in records[r["id"]]["observations"]
+                 if o["position"] == last}
         for f in features_:
             if f["unweighted"]:
                 continue
@@ -379,9 +381,15 @@ def collect(out, args, stage):
             record = {"id": i, "input_sha256": digest(row["ctx"]),
                       "seconds": time.monotonic() - start, **answer}
             if stage == "select":
-                vectors = {f"{l}_{c}": np.asarray([o[c] for o in native if o["layer"] == l],
-                                                  dtype=np.float32)
-                           for l in LAYERS for c in CHANNELS}
+                # The probe contract returns the LAST input position. Filter to it
+                # explicitly: concatenating every returned position would silently
+                # build one feature vector out of mixed positions, which reads as a
+                # plausible-looking number rather than as an error.
+                last = len(row["ctx"]) - 1
+                vectors = {f"{l}_{c}": np.asarray(
+                    [o[c] for o in native if o["layer"] == l and o["position"] == last],
+                    dtype=np.float32)
+                    for l in LAYERS for c in CHANNELS}
                 tracefile = out / "select-traces" / f"{i}.npz"
                 tracefile.parent.mkdir(exist_ok=True)
                 np.savez_compressed(tracefile, **vectors)
