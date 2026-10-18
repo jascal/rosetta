@@ -1,0 +1,10 @@
+// Observation cost is reported separately from the fixed symbolic search budget.
+.decl observation(stage:symbol,request:number,seconds:float) .input observation
+.decl invalid() .output invalid
+invalid() :- observation(_,_,S), S<0.0.
+invalid() :- observation(S,I,A), observation(S,I,B), A!=B.
+.decl cost(stage:symbol,requests:number,seconds:float) .output cost
+cost(S,N,T) :- observation(S,_,_), N = count : { observation(S,_,_) },
+ T = sum V : { observation(S,_,V) }.
+.decl certified() .output certified
+certified() :- !invalid().

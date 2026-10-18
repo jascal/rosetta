@@ -1,0 +1,92 @@
+[
+  {
+    "id": 0,
+    "layer": 7,
+    "channel": "gate",
+    "neuron": 4392,
+    "score": 6.562167307777686,
+    "threshold": 0.5266490597090977,
+    "polarity": -1,
+    "width": 4864
+  },
+  {
+    "id": 1,
+    "layer": 7,
+    "channel": "value",
+    "neuron": 3999,
+    "score": 5.848310346563857,
+    "threshold": 0.27794658241626846,
+    "polarity": -1,
+    "width": 4864
+  },
+  {
+    "id": 2,
+    "layer": 7,
+    "channel": "product",
+    "neuron": 604,
+    "score": 12.59599143304671,
+    "threshold": -0.37679767404369674,
+    "polarity": 1,
+    "width": 4864
+  },
+  {
+    "id": 3,
+    "layer": 15,
+    "channel": "gate",
+    "neuron": 1509,
+    "score": 10.261646973235692,
+    "threshold": -0.455520374621731,
+    "polarity": 1,
+    "width": 4864
+  },
+  {
+    "id": 4,
+    "layer": 15,
+    "channel": "value",
+    "neuron": 1673,
+    "score": 11.151519918567338,
+    "threshold": 0.01249492726492113,
+    "polarity": -1,
+    "width": 4864
+  },
+  {
+    "id": 5,
+    "layer": 15,
+    "channel": "product",
+    "neuron": 1171,
+    "score": 20.735950399764366,
+    "threshold": -0.2454261999751716,
+    "polarity": 1,
+    "width": 4864
+  },
+  {
+    "id": 6,
+    "layer": 23,
+    "channel": "gate",
+    "neuron": 3070,
+    "score": 12.552808667008073,
+    "threshold": -1.0339933393337497,
+    "polarity": 1,
+    "width": 4864
+  },
+  {
+    "id": 7,
+    "layer": 23,
+    "channel": "value",
+    "neuron": 2271,
+    "score": 7.6582878797675615,
+    "threshold": 0.11690932917606017,
+    "polarity": -1,
+    "width": 4864
+  },
+  {
+    "id": 8,
+    "layer": 23,
+    "channel": "product",
+    "neuron": 468,
+    "score": 18.20535801028528,
+    "threshold": 0.8912993428069592,
+    "polarity": -1,
+    "width": 4864
+  }
+]

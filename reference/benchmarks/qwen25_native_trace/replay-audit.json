@@ -1,0 +1,172 @@
+{
+  "evidence": [
+    {
+      "evidence": "certificate-evidence/diagnostic-plan/check-5suj1rl6",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/diagnostic-summary/check-qhf8mn4u",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/discovery-predictions/check-x3gc06be",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior/check-_ywt006p",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled/check-ngmskg5s",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace/check-hcm8ytru",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-firing/check-uypu26et",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-full/check-bz2n3bm3",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-firing/check-wzuzhkqf",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-full/check-40uhq3o9",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-firing/check-1pcwllym",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-full/check-d4q72pew",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-gate/check-8a0ya6mx",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-product/check-pe12io54",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-value/check-dli2tk02",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-gate/check-fcwfvdjm",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-product/check-vuw0x7xb",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-value/check-85eb21gm",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-gate/check-jucp3ht5",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-product/check-vrls_j0_",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-value/check-_f18jcq3",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/final-summary/check-tfrvfupa",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/observation-cost/check-1ob0jzue",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/selection/check-iit68_8m",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/selection/check-y18gvk1j",
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "certified": true
+    }
+  ],
+  "standalone": [
+    {
+      "arm": "behavior",
+      "only_program_and_token_domain_facts": true,
+      "all_domain_instances_abstain": true
+    },
+    {
+      "arm": "trace",
+      "only_program_and_token_domain_facts": true,
+      "all_domain_instances_abstain": true
+    },
+    {
+      "arm": "shuffled",
+      "only_program_and_token_domain_facts": true,
+      "all_domain_instances_abstain": true
+    }
+  ],
+  "frozen_hashes_unchanged": true
+}

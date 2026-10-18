@@ -1,0 +1,98 @@
+{
+  "certified": true,
+  "relations": {
+    "finite_proved": [],
+    "counterexample": [],
+    "invalid": [],
+    "stratum": [
+      [
+        "behavior",
+        "0",
+        "96",
+        "0",
+        "0"
+      ],
+      [
+        "behavior",
+        "1",
+        "18",
+        "0",
+        "0"
+      ],
+      [
+        "shuffled",
+        "0",
+        "96",
+        "0",
+        "0"
+      ],
+      [
+        "shuffled",
+        "1",
+        "18",
+        "0",
+        "0"
+      ],
+      [
+        "trace",
+        "0",
+        "96",
+        "0",
+        "0"
+      ],
+      [
+        "trace",
+        "1",
+        "18",
+        "0",
+        "0"
+      ]
+    ],
+    "improved": [],
+    "score": [
+      [
+        "behavior",
+        "114",
+        "0",
+        "0",
+        "0",
+        "114"
+      ],
+      [
+        "shuffled",
+        "114",
+        "0",
+        "0",
+        "0",
+        "114"
+      ],
+      [
+        "trace",
+        "114",
+        "0",
+        "0",
+        "0",
+        "114"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "extra": [],
+    "incremental": [
+      [
+        "behavior",
+        "0"
+      ],
+      [
+        "shuffled",
+        "0"
+      ]
+    ],
+    "wrong": []
+  },
+  "evidence": "certificate-evidence/final-summary/check-tfrvfupa",
+  "wall_seconds": 0.027189197979168966
+}

@@ -1,0 +1,21 @@
+.decl result(i:number,l:number,n:number,mode:symbol,base:number,answer:number,base_logit:float,answer_logit:float,copy_base:float,copy_after:float) .input result
+.decl observation(i:number,l:number,n:number,gate:float,value:float,product:float) .input observation
+.decl invalid() .output invalid
+invalid() :- result(_,_,_,"identity",B,A,_,_,_,_), B!=A.
+invalid() :- result(_,_,_,"identity",_,_,B,A,_,_), B!=A.
+invalid() :- result(_,_,_,"identity",_,_,_,_,B,A), B!=A.
+.decl effect(i:number,l:number,n:number,mode:symbol,changed:number,answer_delta:float,copy_delta:float) .output effect
+effect(I,L,N,M,0,A-B,D-C) :- result(I,L,N,M,T,T,B,A,C,D).
+effect(I,L,N,M,1,A-B,D-C) :- result(I,L,N,M,T,U,B,A,C,D), T!=U.
+.decl summary(mode:symbol,n:number,flips:number) .output summary
+summary(M,N,F) :- result(_,_,_,M,_,_,_,_,_,_), N = count : { result(_,_,_,M,_,_,_,_,_,_) },
+ F = count : { effect(_,_,_,M,1,_,_) }.
+.decl regime(l:number,n:number,sign:symbol,total:number) .output regime
+.decl sign(i:number,l:number,n:number,s:symbol)
+sign(I,L,N,"++") :- observation(I,L,N,G,V,_), G>=0.0, V>=0.0.
+sign(I,L,N,"+-") :- observation(I,L,N,G,V,_), G>=0.0, V<0.0.
+sign(I,L,N,"-+") :- observation(I,L,N,G,V,_), G<0.0, V>=0.0.
+sign(I,L,N,"--") :- observation(I,L,N,G,V,_), G<0.0, V<0.0.
+regime(L,N,S,C) :- sign(_,L,N,S), C = count : { sign(_,L,N,S) }.
+.decl certified() .output certified
+certified() :- !invalid().

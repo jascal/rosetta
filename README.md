@@ -56,6 +56,7 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 | `py/certificate.py` | Isolated verifier I/O, retained evidence with hashes, and model-free replay. |
 | `py/benchmark_induction.py` | Grouped train/validation/test benchmark; Datalog copy admission, frozen artifacts, train-only n-gram baseline, and exact finite-domain certificates. [Results and replay](docs/induction-benchmark.md). |
 | `py/benchmark_guarded_copy.py` | Consensus copy guards with Datalog selection; freezes the firing domain before fresh test references. [Protocol and results](docs/guarded-copy-benchmark.md). |
+| `py/run_native_trace.py` | Preregistered native-neuron prior versus behavior/shuffled controls; frozen Souffle-only artifacts and retained failed certificates. [Completed experiment: no incremental certified coverage](docs/native-trace-outcome.md). |
 | `py/benchmark_copy_generalization.py` | Keeps the guard unchanged across fresh seeds, lengths, and distractors; Datalog reports strata and counterexamples. [Protocol and results](docs/copy-generalization.md). |
 | `py/diagnose_copy_targets.py` | Controlled target substitutions cross prefix length, sequence length, and gaps to investigate copy failures. [Diagnostic protocol](docs/copy-target-diagnosis.md). |
 | `dl/{ngram,induction,master}.dl` | **reference / legacy** hand-coded Datalog detectors — *subsumed* by the learner, which discovers these circuits unsupervised and inlines them into the emitted `circuits.dl`. Not on the live path. |

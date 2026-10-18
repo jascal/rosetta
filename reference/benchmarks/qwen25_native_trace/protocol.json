@@ -1,0 +1,40 @@
+{
+  "prereg_sha256": "a08643029af1c7e6d95cff75553f19e418755df92078848d0d872dbe078910da",
+  "prereg_commit": "0719246",
+  "dataset_sha256": "c9a190bebec4c27d51129a1867db854d19ed2f011fbaf2a77355cba5870b80d6",
+  "discovery_sha256": "250a61c3d1ba8bb8ceef048ae0eda0f404f00bf5838b6886a1ec7b85fb78eb22",
+  "historical_dataset_hashes": {
+    "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705",
+    "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+    "reference/benchmarks/qwen25_05b_int8_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807",
+    "reference/benchmarks/qwen25_05b_target_diagnostic/dataset.json": "20e175ac57969982dc0fd08417b889a211e3ca0cc4841947853c1cceab7fa1f6",
+    "reference/benchmarks/qwen25_05b_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807"
+  },
+  "layers": [
+    7,
+    15,
+    23
+  ],
+  "channels": [
+    "gate",
+    "value",
+    "product"
+  ],
+  "budget_per_arm": 12,
+  "hypotheses_sha256": "d1365940ea439214038bbf75d4e66323d463eac9ec9b392030ebd4f7ac873586",
+  "nbase": 24,
+  "ncandidates": 1344,
+  "counts": {
+    "train": 114,
+    "validation": 114,
+    "test": 114
+  },
+  "source_sha256": {
+    "native_trace_runtime.dl": "4fb527adb0c9a8338b3118ab357f031d0f7c692cb43a61335e3c6d6ac0ba6646",
+    "native_trace_features.dl": "de9ff71a0da3b09db46eb75463c227b15a436f81b8f7e4d000594adc963e0910",
+    "native_trace_select.dl": "ad1ce205331b6c92140f26d192f0437b644a438b9f7df3c977e9d7d62f28f7c5"
+  },
+  "driver_sha256": "3d9a58287121da3b36b3dfbb57c57086bb625275f24a2f470adeb019b81366b6",
+  "note": "Inputs fixed before model observations; final harness/source hashes are frozen again before test references."
+}

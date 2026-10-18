@@ -1,0 +1,42 @@
+// One layer/channel per run bounds memory. All numeric/statistical decisions
+// are made here. The driver merely stages the scalar channel observations.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(i:number) .input sample
+.decl unit(n:number) .input unit
+.decl observation(i:number,n:number,v:float) .input observation
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- sample(I), !ref(I,_).
+invalid() :- sample(I), !cdecide(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- observation(I,_,_), !sample(I).
+invalid() :- observation(_,N,_), !unit(N).
+invalid() :- sample(I), unit(N), !observation(I,N,_).
+invalid() :- observation(I,N,A), observation(I,N,B), A != B.
+invalid() :- !sample(_).
+invalid() :- !unit(_).
+.decl label(i:number,c:number) .output label
+label(I,1) :- sample(I), cdecide(I,T), ref(I,T).
+label(I,0) :- sample(I), cdecide(I,T), ref(I,R), T != R.
+.decl size(c:number,n:number) .output size
+size(C,N) :- label(_,C), N = count : { label(_,C) }.
+.decl class_mean(n:number,c:number,m:float)
+class_mean(N,C,M) :- unit(N), size(C,S),
+               V = sum X : { observation(I,N,X), label(I,C) }, M = V / to_float(S).
+.decl variance(n:number,v:float)
+variance(N,V) :- class_mean(N,0,A), class_mean(N,1,B), size(0,NA), size(1,NB),
+                 M = (A*to_float(NA)+B*to_float(NB))/to_float(NA+NB),
+                 S = sum X*X : { observation(_,N,X) }, V = max(0.0,S/to_float(NA+NB)-M*M).
+.decl merit(n:number,s:float,t:float,p:number)
+merit(N,S,(A+B)/2.0,1) :- class_mean(N,0,A), class_mean(N,1,B), variance(N,V), B>A,
+                          S=(B-A)*(B-A)/(V+0.000000000001).
+merit(N,S,(A+B)/2.0,-1) :- class_mean(N,0,A), class_mean(N,1,B), variance(N,V), B<A,
+                           S=(B-A)*(B-A)/(V+0.000000000001).
+.decl best_score(s:float)
+best_score(S) :- merit(_,_,_,_), S = max X : { merit(_,X,_,_) }.
+.decl chosen(n:number,score:float,threshold:float,polarity:number) .output chosen
+chosen(N,S,T,P) :- !invalid(), best_score(S), S>0.0,
+                   N = min U : { merit(U,S,_,_) }, merit(N,S,T,P).
+.decl certified() .output certified
+certified() :- !invalid().
