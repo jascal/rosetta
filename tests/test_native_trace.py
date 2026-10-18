@@ -12,6 +12,9 @@ sys.path.insert(0, str(ROOT / "py"))
 from benchmark_guarded_copy import guard_program
 from certificate import check
 from native_trace import DL, emit, grammar, program
+from native_trace import write_json
+from certificate import sha256, replay
+from run_native_trace import select, freeze, validate_freeze, evaluate
 
 pytestmark = pytest.mark.skipif(shutil.which("souffle") is None, reason="needs souffle")
 
@@ -55,6 +58,7 @@ def test_native_trace_features_use_class_means_not_unit_scale(tmp_path):
     chosen = result["relations"]["chosen"]
     assert len(chosen) == 1 and chosen[0][0] == "1"
     assert float(chosen[0][2]) == 0 and chosen[0][3] == "1"
+    assert float(chosen[0][1]) == pytest.approx(3.6)
     # Missing observations fail closed rather than selectively dropping a bad row.
     staged["observation"] = staged["observation"].replace("3\t1\t-4\n", "")
     assert not check(DL / "native_trace_features.dl", candidate, staged, {})["certified"]
@@ -130,3 +134,81 @@ def test_frozen_study_inputs_are_group_and_token_disjoint():
         for i, a in enumerate(values):
             for b in values[i+1:]:
                 assert not a & b
+
+
+def control_run(out):
+    from benchmark_copy_generalization import generate
+    out.mkdir()
+    rows = []
+    used = set()
+    for seed,part in ((901,"train"),(902,"validation"),(903,"test")):
+        batch = generate(seeds=(seed,), lengths=(8,), groups=2, exclude=used)
+        mapping = {r["id"]:len(rows)+n for n,r in enumerate(batch)}
+        for row in batch:
+            row["negative"] = row["part"] == "off_domain"
+            row["part"] = part
+            row["id"] = mapping[row["id"]]
+            if "base" in row:
+                row["base"] = mapping[row["base"]]
+            used.update(row["ctx"])
+        rows.extend(batch)
+    write_json(out / "dataset.json", rows)
+    write_json(out / "discovery.json", [])
+    (out / "hypotheses.dl").write_text(program())
+    write_json(out / "protocol.json", {"dataset_sha256":sha256(out / "dataset.json"),
+        "discovery_sha256":sha256(out / "discovery.json"), "hypotheses_sha256":sha256(out / "hypotheses.dl"),
+        "prereg_sha256":sha256(ROOT / "docs/native-trace-prereg.md")})
+    development = [r for r in rows if r["part"] != "test"]
+    write_json(out / "development-references.json", {str(r["id"]): -1 if r["negative"] else r["expected"] for r in development})
+    (out / "development-observations.jsonl").write_text("".join(json.dumps({"id":r["id"],"observations":[]})+"\n" for r in development))
+    write_json(out / "features.json", [])
+    write_json(out / "diagnostic-summary.json", {"certified":True,"fixture":True})
+    select(out)
+    freeze(out)
+    return rows
+
+
+@pytest.mark.parametrize("corrupt", [False,True])
+def test_full_pipeline_preserves_final_counterexamples_and_abstentions(tmp_path, corrupt):
+    out = tmp_path / "control"
+    rows = control_run(out)
+    frozen = validate_freeze(out)
+    assert not (out / "final-references.json").exists()
+    domain = frozen["artifacts"]["trace"]["domain"]
+    assert domain  # do not pass vacuously through empty selection
+    refs = {str(r["id"]): -1 if r["negative"] else r["expected"] for r in rows if r["part"] == "test"}
+    if corrupt:
+        refs[str(domain[0])] = -999
+    write_json(out / "final-references.json", refs)
+    evaluate(out)
+    result = json.loads((out / "report.json").read_text())
+    cert = result["certificates"]["trace"]["firing"]
+    assert cert["certified"] is (not corrupt)
+    assert cert["nmiss"] == int(corrupt)
+    assert replay(out / cert["evidence"])["certified"] is (not corrupt)
+    assert not result["certificates"]["trace"]["full"]["certified"]  # negatives abstain
+    assert not result["summary"]["relations"]["improved"]  # identical arms are not improvement
+    if corrupt:
+        assert any(int(i)==domain[0] and int(ref)==-999 for p,i,ref,_ in result["summary"]["relations"]["counterexample"] if p=="trace")
+    candidate = out / frozen["artifacts"]["trace"]["path"]
+    candidate.write_text(candidate.read_text()+"\n// modification after freeze\n")
+    with pytest.raises(ValueError,match="frozen file changed"):
+        validate_freeze(out)
+
+
+def test_diagnostic_plan_patches_opposite_class_and_detects_broken_identity(tmp_path):
+    empty = tmp_path / "empty.dl"
+    empty.write_text("")
+    plan = check(DL / "native_trace_diagnostic_plan.dl", empty,
+        {"label":"0\t0\n1\t1\n", "chosen_unit":"7\t1\t4\n",
+         "product":"0\t7\t1\t-2\n1\t7\t1\t3\n"}, {})
+    assert plan["certified"], plan
+    assert ["0","7","1","swap","1","3"] in plan["relations"]["plan"]
+    assert ["1","7","2","control_zero","1","0"] in plan["relations"]["plan"]
+    good = {"result":"0\t7\t1\tidentity\t8\t8\t1.5\t1.5\t2\t2\n", "observation":"0\t7\t1\t-1\t-2\t0.5\n"}
+    result = check(DL / "native_trace_diagnostic.dl", empty, good, {})
+    assert result["certified"], result
+    assert result["relations"]["regime"] == [["7","1","--","1"]]
+    good["result"] = good["result"].replace("1.5\t1.5", "1.5\t1.6")
+    result = check(DL / "native_trace_diagnostic.dl", empty, good, {})
+    assert not result["certified"] and not result.get("error"), result

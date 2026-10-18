@@ -1,0 +1,20 @@
+{
+  "fieldrun_commit": "0948cbef96f8bcb09a12c25bab75706f2c23a1af",
+  "build_command": "cargo build --offline --release --no-default-features",
+  "sources": {
+    "src/model.rs": "7a794315f7448f331393a42d3119e003991e77859f2e9fd48d03408dae1dba38",
+    "src/rope.rs": "9d439fd09718a8373a3969a0ec792b5968c69b2bdf985e06a647f7a02849e6bb",
+    "src/api.rs": "1289fbf978315aea1c828700d4200eb3168a3c1a3210058cd1fc506dbdce9b77",
+    "scripts/validate_mlp_probe.py": "bb69c76d48cce5e4cc4b1c1e7aae6c5d4f5ed8b0012135f4cf8e4f6f2f12fc6d",
+    "Cargo.lock": "9e9efca51e3906bc44ae2986bbd0c3964e4f7a730df6329ab3ef7748b654a43b"
+  },
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+  "tests": {
+    "default_library": 14,
+    "default_binary": 138,
+    "minimal_library": 14,
+    "minimal_binary": 114
+  },
+  "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+  "converter_binary_sha256": "43d6aafb46820c57a4fc87dbe3bc145bae121a080f9d46fc6344a03c946dfcf2"
+}
