@@ -1,0 +1,174 @@
+// Run-B ranking, the non-degeneracy gate, and fixed-budget admission.
+//
+// Split discipline (docs/native-trace-prereg2.md):
+//   "select" split  fits feature parameters only; never ranks.
+//   "sign"   split  computes the signature and ranks; never fits a parameter.
+//   "test"   split  absent from this query entirely.
+// A trace value is therefore never summed on a row whose threshold, polarity or
+// gate mean was fitted from it.
+//
+// The gate below is run A's missing precondition. Run A ranked a uniform
+// signature and only afterwards noticed trace and shuffled had become
+// elementwise identical. Here a uniform signature, or one covering every
+// negative control, STOPS ranking: no fallback to behavior-only, no
+// threshold adjustment, no feature substitution.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(i:number,group:symbol,part:symbol,hash:symbol) .input sample
+.decl negmark(i:number) .input negmark
+.decl pair(b:number,e:number) .input pair
+.decl feature(f:number,threshold:float,polarity:number) .input feature
+.decl trace(i:number,f:number,v:float) .input trace
+.decl gate(i:number,f:number,g:float) .input gate
+.decl permutation(i:number,j:number) .input permutation
+#include "circuit.dl"
+
+.decl invalid() .output invalid
+invalid() :- sample(_,_,P,_), P != "select", P != "sign".
+invalid() :- sample(I,_,_,_), !ref(I,_).
+invalid() :- ref(I,_), !sample(I,_,_,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- sample(_,G,A,_), sample(_,G,B,_), A != B.
+invalid() :- sample(_,_,A,H), sample(_,_,B,H), A != B.
+invalid() :- sample(I,_,_,_), !tok(I,_,_).
+invalid() :- tok(I,P,A), tok(I,P,B), A != B.
+invalid() :- tok(I,_,_), !sample(I,_,_,_).
+invalid() :- negmark(I), !sample(I,_,_,_).
+invalid() :- pair(B,E), sample(B,G,P,_), !sample(E,G,P,_).
+invalid() :- pair(B,_), !sample(B,_,_,_).
+invalid() :- pair(_,E), !sample(E,_,_,_).
+invalid() :- !sample(_,_,"select",_).
+invalid() :- !sample(_,_,"sign",_).
+// Traces exist on the sign split only; a trace anywhere else is a leak.
+invalid() :- trace(I,_,_), !sample(I,_,"sign",_).
+invalid() :- gate(I,_,_), !sample(I,_,"sign",_).
+invalid() :- trace(_,F,_), !feature(F,_,_).
+invalid() :- gate(_,F,_), !feature(F,_,_).
+invalid() :- trace(I,F,A), trace(I,F,B), A != B.
+invalid() :- gate(I,F,A), gate(I,F,B), A != B.
+// Every sign row must carry every feature's value and gate, or the aggregate
+// would silently drop a feature on exactly the rows that matter.
+invalid() :- sample(I,_,"sign",_), feature(F,_,_), !trace(I,F,_).
+invalid() :- sample(I,_,"sign",_), feature(F,_,_), !gate(I,F,_).
+invalid() :- sample(I,_,"sign",_), !permutation(I,_).
+invalid() :- sample(I,_,"sign",_), !permutation(_,I).
+invalid() :- permutation(I,A), permutation(I,B), A != B.
+invalid() :- permutation(A,I), permutation(B,I), A != B.
+invalid() :- permutation(I,J), !sample(I,_,"sign",_).
+invalid() :- permutation(I,J), !sample(J,_,"sign",_).
+
+.decl arm(a:number)
+arm(0). arm(1). arm(2).
+
+// ---------------------------------------------------------------- trace term
+// Registered pre-collection amendment: plain signed margins, including negative
+// values and zero. Raw gate observations are retained but never weight the score.
+.decl margin(i:number,f:number,m:float)
+margin(I,F,to_float(P)*(V-T)) :- trace(I,F,V), feature(F,T,P).
+.decl signature_sum(i:number,s:float) .output signature_sum
+signature_sum(I,S) :- sample(I,_,"sign",_), S = sum M : { margin(I,_,M) }.
+.decl trace_good(i:number) .output trace_good
+trace_good(I) :- signature_sum(I,S), S>0.0.
+.decl perm_sum(a:number,i:number,s:float) .output perm_sum
+perm_sum(1,I,S) :- signature_sum(I,S).
+perm_sum(2,I,S) :- permutation(I,J), signature_sum(J,S).
+
+// ------------------------------------------------------------- the gate
+.decl n_sign(n:number)
+n_sign(K) :- K = count : { sample(_,_,"sign",_) }.
+.decl n_sign_good(n:number)
+n_sign_good(K) :- n_sign(N), K = count : { sample(I,_,"sign",_), trace_good(I) }.
+
+.decl sign_negative(i:number)
+sign_negative(I) :- sample(I,_,"sign",_), negmark(I).
+.decl n_negative(n:number)
+n_negative(K) :- K = count : { sign_negative(_) }.
+.decl n_negative_good(n:number)
+n_negative_good(L) :- n_negative(_), L = count : { sign_negative(I), trace_good(I) }.
+
+.decl degenerate_uniform() .output degenerate_uniform
+degenerate_uniform() :- n_sign(N), N>0, n_sign_good(N).
+degenerate_uniform() :- n_sign(N), N>0, n_sign_good(0).
+
+.decl degenerate_all_negatives() .output degenerate_all_negatives
+degenerate_all_negatives() :- n_negative(K), K>0, n_negative_good(K).
+
+.decl degenerate() .output degenerate
+degenerate() :- degenerate_uniform().
+degenerate() :- degenerate_all_negatives().
+
+.decl non_degenerate() .output non_degenerate
+non_degenerate() :- !degenerate(), n_sign(N), N>0.
+
+// ---------------------------------------------------------------- ranking
+.decl sign_count(c:number,correct:number,wrong:number)
+sign_count(C,H,E) :- candidate(C,_,_,_),
+ H = count : { nt_candidate(C,I,T), sample(I,_,"sign",_), ref(I,T) },
+ E = count : { nt_candidate(C,I,T), sample(I,_,"sign",_), ref(I,R), T != R }.
+
+.decl select_count(c:number,correct:number,wrong:number)
+select_count(C,H,E) :- candidate(C,_,_,_),
+ H = count : { nt_candidate(C,I,T), sample(I,_,"select",_), ref(I,T) },
+ E = count : { nt_candidate(C,I,T), sample(I,_,"select",_), ref(I,R), T != R }.
+
+.decl trace_term(a:number,c:number,t:float) .output trace_term
+trace_term(A,C,T) :- arm(A), A>0, candidate(C,_,_,_),
+ T = sum M : { nt_candidate(C,I,_), sample(I,_,"sign",_), perm_sum(A,I,M) }.
+
+.decl score(a:number,c:number,s:float) .output score
+score(0,C,to_float(H)-4.0*to_float(E)) :- !invalid(), !degenerate(), sign_count(C,H,E), H+E>0.
+score(A,C,to_float(H)-4.0*to_float(E)+T) :- !invalid(), !degenerate(), arm(A), A>0, sign_count(C,H,E), H+E>0, trace_term(A,C,T).
+score(A,C,to_float(H)-4.0*to_float(E)) :- !invalid(), !degenerate(), arm(A), A>0, sign_count(C,H,E), H+E>0, !feature(_,_,_).
+
+.decl better(a:number,c:number,d:number)
+better(A,C,D) :- score(A,C,S), score(A,D,T), T>S.
+better(A,C,D) :- score(A,C,S), score(A,D,S), D<C.
+
+// The gate stops ranking. A degenerate run proposes nothing and is reported.
+.decl proposed(a:number,rank:number,c:number) .output proposed
+proposed(A,R,C) :- !invalid(), !degenerate(), score(A,C,_), N = count : { better(A,C,_) }, N<12, R=N+1.
+
+.decl fails(c:number,i:number)
+fails(C,I) :- proposed(_,_,C), nt_candidate(C,I,T), ref(I,R), T != R.
+fails(C,I) :- proposed(_,_,C), nt_candidate(C,I,A), nt_candidate(C,I,B), A != B.
+
+.decl firing_group(c:number,p:symbol,g:symbol)
+firing_group(C,P,G) :- nt_candidate(C,I,_), sample(I,G,P,_).
+.decl follows_group(c:number,p:symbol,g:symbol)
+follows_group(C,P,G) :- pair(B,E), sample(B,G,P,_), nt_candidate(C,B,X), nt_candidate(C,E,Y),
+                       X != Y, ref(B,X), ref(E,Y).
+.decl support(c:number,p:symbol,n:number,m:number) .output support
+support(C,P,N,M) :- proposed(_,_,C), sample(_,_,P,_),
+ N = count : { firing_group(C,P,_) }, M = count : { follows_group(C,P,_) }.
+
+// Zero errors on BOTH select and sign, and group/substitution support on both.
+.decl admitted(a:number,rank:number,c:number) .output admitted
+admitted(A,R,C) :- proposed(A,R,C), !fails(C,_),
+ support(C,"sign",N,M), N>=2, M>=2, support(C,"select",J,K), J>=2, K>=2.
+
+.decl arm_summary(a:number,proposals:number,admissions:number) .output arm_summary
+arm_summary(A,P,N) :- arm(A), P = count : { proposed(A,_,_) }, N = count : { admitted(A,_,_) }.
+
+.decl signature_summary(sign_rows:number,good:number,negative_rows:number,negative_good:number) .output signature_summary
+signature_summary(N,G,K,L) :- n_sign(N), n_sign_good(G), n_negative(K), n_negative_good(L).
+
+.decl rejection(a:number,c:number,select_errors:number,sign_errors:number) .output rejection
+rejection(A,C,S,V) :- proposed(A,_,C), !admitted(A,_,C),
+ S = count : { fails(C,I), sample(I,_,"select",_) },
+ V = count : { fails(C,I), sample(I,_,"sign",_) }.
+
+.decl failure_detail(c:number,i:number,part:symbol,reference:number,predicted:number) .output failure_detail
+failure_detail(C,I,P,R,T) :- proposed(_,_,C), nt_candidate(C,I,T), ref(I,R), T!=R, sample(I,_,P,_).
+
+.decl certified() .output certified
+certified() :- !invalid().
+// Continuous signature distribution by task stratum, including all-bad controls.
+.decl sign_class(i:number,negative:number)
+sign_class(I,1) :- sample(I,_,"sign",_), negmark(I).
+sign_class(I,0) :- sample(I,_,"sign",_), !negmark(I).
+.decl signature_stratum(negative:number,total:number,good:number,lo:float,hi:float,average:float) .output signature_stratum
+signature_stratum(C,N,G,L,H,T/to_float(N)) :- sign_class(_,C),
+ N=count : { sign_class(_,C) }, G=count : { sign_class(I,C), trace_good(I) },
+ L=min V : { sign_class(I,C), signature_sum(I,V) },
+ H=max V : { sign_class(I,C), signature_sum(I,V) },
+ T=sum V : { sign_class(I,C), signature_sum(I,V) }.

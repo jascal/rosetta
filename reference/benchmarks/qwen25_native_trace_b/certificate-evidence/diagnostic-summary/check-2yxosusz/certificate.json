@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "stage": "diagnostic-summary",
+    "source": "native-trace run B"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "d1365940ea439214038bbf75d4e66323d463eac9ec9b392030ebd4f7ac873586",
+    "facts/expected.facts": "1436c268095948210ce3c270cb2c0c5f9e218a1471a010b77f6255899690fdb7",
+    "facts/observation.facts": "44d98ac03150e8df36802fe3a3df502f6bb758959fb9ca6b36f88acc72bdb2cd",
+    "facts/result.facts": "a9098e96e55f039036c0e4a38cc36327f6ee002d28088b6bf796da5a6d5f48df",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/effect.csv": "824a8c486387e232fc18b695077130ff65f3c91ab46f541d6835aca2b2272565",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/regime.csv": "62fb4b8ff6c1d217b9f819a096aa7fe856070909c69350b5d0d6fbfbd9041397",
+    "outputs/summary.csv": "b9cd3529cbaa74ac942f0d4574df1d84086b52f24f1b329dcb10e74094ab5b2b",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "d22be9faf0f277507c3d966e813100eab80f73d411c6f3d2f799c3b4d5fea17c"
+  }
+}

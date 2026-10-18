@@ -1,0 +1,43 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "size": [
+      [
+        "0",
+        "18"
+      ],
+      [
+        "1",
+        "96"
+      ]
+    ],
+    "eligible": [
+      [
+        "()"
+      ]
+    ],
+    "gate_mean": [
+      [
+        "3",
+        "0.47720651949445408"
+      ]
+    ],
+    "chosen": [
+      [
+        "3",
+        "4.0625311530596973",
+        "0.61270489636808634",
+        "1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "no_vote": []
+  },
+  "evidence": "certificate-evidence/feature-7-value/check-1xl99a6s",
+  "wall_seconds": 1.246012121962849
+}

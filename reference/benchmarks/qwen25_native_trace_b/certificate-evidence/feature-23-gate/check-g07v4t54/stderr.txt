@@ -1,0 +1,6 @@
+Warning: Variable I0 only occurs once in file verify.dl at line 83
+                 V = sum X : { gmag(I,N,X) }, C = count : { gate(I,N,_) },
+------------------------------------^--------------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 83
+                 V = sum X : { gmag(I,N,X) }, C = count : { gate(I,N,_) },
+-----------------------------------------------------------------^---------

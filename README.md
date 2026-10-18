@@ -57,6 +57,11 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 | `py/benchmark_induction.py` | Grouped train/validation/test benchmark; Datalog copy admission, frozen artifacts, train-only n-gram baseline, and exact finite-domain certificates. [Results and replay](docs/induction-benchmark.md). |
 | `py/benchmark_guarded_copy.py` | Consensus copy guards with Datalog selection; freezes the firing domain before fresh test references. [Protocol and results](docs/guarded-copy-benchmark.md). |
 | `py/run_native_trace.py` | Preregistered native-neuron prior versus behavior/shuffled controls; frozen Souffle-only artifacts and retained failed certificates. [Completed experiment: no incremental certified coverage](docs/native-trace-outcome.md). |
+| — | Post-hoc mechanism analysis of that null: the feature-selection negative class held no negative controls, so the threshold extrapolated off-manifold and labelled all 18/18 train negatives trace-good. [Why run A degenerated](docs/native-trace-diagnosis.md). |
+| — | Operational handoff for run B: what is built and verified, the one open design decision, the exact collection commands, and the traps. Not evidence. [Handoff](docs/native-trace-runb-handoff.md). |
+| — | Run B, registered before any collection: negative-bearing selection split disjoint from signing, a plain signed-margin sum with no gate weighting, and a non-degeneracy gate that stops a uniform signature. [Preregistration](docs/native-trace-prereg2.md). |
+| `py/run_native_trace2.py` | Run-B input generator: fresh seeds 201/202/203 as select/sign/test, excluding every token shared with the historical datasets or run A. Committed inputs, not a hand-assembled artifact. [Inputs](reference/benchmarks/qwen25_native_trace_b/protocol.json). |
+| — | **Run B result: the gate passes and 31 circuits certify over nonempty firing domains — the first such domains in the program — but the trace arm still adds zero incremental certified coverage and is strictly worse in raw coverage (96 vs 102). Zeroing the selected neurons flips nothing in 144 interventions.** [Outcome](docs/native-trace-runb-outcome.md). |
 | `py/benchmark_copy_generalization.py` | Keeps the guard unchanged across fresh seeds, lengths, and distractors; Datalog reports strata and counterexamples. [Protocol and results](docs/copy-generalization.md). |
 | `py/diagnose_copy_targets.py` | Controlled target substitutions cross prefix length, sequence length, and gaps to investigate copy failures. [Diagnostic protocol](docs/copy-target-diagnosis.md). |
 | `dl/{ngram,induction,master}.dl` | **reference / legacy** hand-coded Datalog detectors — *subsumed* by the learner, which discovers these circuits unsupervised and inlines them into the emitted `circuits.dl`. Not on the live path. |
@@ -130,6 +135,12 @@ an explicit nonempty domain with complete references. The canonical distribution
 retains replayable, hashed evidence. Its proof is restricted to the supplied reference logits at the listed finite
 temperature grid; it establishes neither an interval bound nor a bound on omitted model mass. Historical temperature
 reports have been relabeled accordingly. See [certificate scope and replay](docs/certificates.md).
+
+On the native-trace path, **run B is the first nonempty model-equivalence domain in the program**: 31 learned circuits
+certify at `nmiss=0 ∧ nuncov=0` over firing domains of 86–102 instances, with zero wrong answers on all 114 held-out
+test contexts, and 108/108 replayed query verdicts preserved with the model absent. That is a result about the
+minimization loop certifying, not about traces helping — the trace arm added zero incremental coverage over both
+controls and was strictly worse in raw coverage. [Outcome](docs/native-trace-runb-outcome.md).
 
 The original four-model experiment reported **`nmiss=0 ∧ nuncov=0` in-domain** (T=0 / greedy), via the fieldrun-refs path for
 the real models. Same generation budget (250×80, temp 0.8) so the comparison is fair; threx is the capped toy.

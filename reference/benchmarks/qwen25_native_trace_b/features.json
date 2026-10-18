@@ -1,0 +1,110 @@
+[
+  {
+    "id": 0,
+    "layer": 7,
+    "channel": "gate",
+    "gate_channel": "gate",
+    "neuron": 1898,
+    "score": 3.857194765804279,
+    "threshold": -0.5504252788377926,
+    "polarity": 1,
+    "width": 4864,
+    "gate_mean": 0.374026163301447
+  },
+  {
+    "id": 1,
+    "layer": 7,
+    "channel": "value",
+    "gate_channel": "gate",
+    "neuron": 3,
+    "score": 4.062531153059697,
+    "threshold": 0.6127048963680863,
+    "polarity": 1,
+    "width": 4864,
+    "gate_mean": 0.4772065194944541
+  },
+  {
+    "id": 2,
+    "layer": 7,
+    "channel": "product",
+    "gate_channel": "gate",
+    "neuron": 1835,
+    "score": 3.5143628965040663,
+    "threshold": 0.039940956449653536,
+    "polarity": 1,
+    "width": 4864,
+    "gate_mean": 1.5772473406896257
+  },
+  {
+    "id": 3,
+    "layer": 15,
+    "channel": "gate",
+    "gate_channel": "gate",
+    "neuron": 788,
+    "score": 4.465433044706074,
+    "threshold": -0.4114230967954629,
+    "polarity": -1,
+    "width": 4864,
+    "gate_mean": 0.5925930276055608
+  },
+  {
+    "id": 4,
+    "layer": 15,
+    "channel": "value",
+    "gate_channel": "gate",
+    "neuron": 680,
+    "score": 4.355115398860917,
+    "threshold": -0.24825846230507723,
+    "polarity": -1,
+    "width": 4864,
+    "gate_mean": 0.35371797440344827
+  },
+  {
+    "id": 5,
+    "layer": 15,
+    "channel": "product",
+    "gate_channel": "gate",
+    "neuron": 992,
+    "score": 4.0840417170780166,
+    "threshold": 0.07352162336691334,
+    "polarity": 1,
+    "width": 4864,
+    "gate_mean": 1.0376819308128273
+  },
+  {
+    "id": 6,
+    "layer": 23,
+    "channel": "gate",
+    "gate_channel": "gate",
+    "neuron": 412,
+    "score": 3.00354118460647,
+    "threshold": -3.3697325036757517,
+    "polarity": 1,
+    "width": 4864,
+    "gate_mean": 2.834070419010363
+  },
+  {
+    "id": 7,
+    "layer": 23,
+    "channel": "value",
+    "gate_channel": "gate",
+    "neuron": 1650,
+    "score": 2.9675797452198167,
+    "threshold": -0.44233802757743335,
+    "polarity": -1,
+    "width": 4864,
+    "gate_mean": 0.512980302338276
+  },
+  {
+    "id": 8,
+    "layer": 23,
+    "channel": "product",
+    "gate_channel": "gate",
+    "neuron": 1792,
+    "score": 2.8856654066862335,
+    "threshold": -9.272768165502283,
+    "polarity": -1,
+    "width": 4864,
+    "gate_mean": 4.449870030085246
+  }
+]

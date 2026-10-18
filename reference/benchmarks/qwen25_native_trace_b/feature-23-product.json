@@ -1,0 +1,43 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "size": [
+      [
+        "0",
+        "18"
+      ],
+      [
+        "1",
+        "96"
+      ]
+    ],
+    "eligible": [
+      [
+        "()"
+      ]
+    ],
+    "gate_mean": [
+      [
+        "1792",
+        "4.4498700300852461"
+      ]
+    ],
+    "chosen": [
+      [
+        "1792",
+        "2.8856654066862335",
+        "-9.2727681655022831",
+        "-1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "no_vote": []
+  },
+  "evidence": "certificate-evidence/feature-23-product/check-mu2klyd6",
+  "wall_seconds": 3.45388012600597
+}

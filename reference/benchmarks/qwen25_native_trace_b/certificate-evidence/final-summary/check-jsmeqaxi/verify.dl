@@ -1,0 +1,40 @@
+// Final aggregate and certified set comparisons. No selection/rerouting here.
+.decl artifact(p:symbol) .input artifact
+.decl sample(i:number,negative:number) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl prediction(p:symbol,i:number,t:number) .input prediction
+.decl verdict(p:symbol,n:number,miss:number,uncovered:number,missing:number,invalid:number,cert:number) .input verdict
+.decl invalid() .output invalid
+invalid() :- sample(I,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- prediction(P,_,_), !artifact(P).
+invalid() :- prediction(_,I,_), !sample(I,_).
+invalid() :- artifact(P), !verdict(P,_,_,_,_,_,_).
+.decl answered(p:symbol,i:number)
+answered(P,I) :- prediction(P,I,_).
+.decl wrong(p:symbol,i:number) .output wrong
+wrong(P,I) :- prediction(P,I,T), ref(I,R), T != R.
+.decl counterexample(p:symbol,i:number,ref:number,pred:number) .output counterexample
+counterexample(P,I,R,T) :- prediction(P,I,T), ref(I,R), T != R.
+.decl correct(p:symbol,i:number)
+correct(P,I) :- prediction(P,I,T), ref(I,T), !wrong(P,I).
+.decl score(p:symbol,n:number,answered:number,correct:number,wrong:number,abstain:number) .output score
+score(P,N,A,C,W,N-A) :- artifact(P), N = count : { sample(_,_) },
+ A = count : { answered(P,_) }, C = count : { correct(P,_) }, W = count : { wrong(P,_) }.
+.decl stratum(p:symbol,negative:number,n:number,answered:number,wrong:number) .output stratum
+stratum(P,S,N,A,W) :- artifact(P), sample(_,S), N = count : { sample(_,S) },
+ A = count : { answered(P,I), sample(I,S) }, W = count : { wrong(P,I), sample(I,S) }.
+.decl finite_proved(p:symbol) .output finite_proved
+finite_proved(P) :- verdict(P,N,0,0,0,0,1), N>0, !invalid().
+.decl certified_case(p:symbol,i:number)
+certified_case(P,I) :- finite_proved(P), prediction(P,I,_).
+.decl extra(p:symbol,over:symbol,i:number) .output extra
+extra("trace","behavior",I) :- certified_case("trace",I), !certified_case("behavior",I).
+extra("trace","shuffled",I) :- certified_case("trace",I), !certified_case("shuffled",I).
+.decl incremental(over:symbol,n:number) .output incremental
+incremental("behavior",N) :- N = count : { extra("trace","behavior",_) }.
+incremental("shuffled",N) :- N = count : { extra("trace","shuffled",_) }.
+.decl improved() .output improved
+improved() :- incremental("behavior",A), A>0, incremental("shuffled",B), B>0, !invalid().
+.decl certified() .output certified
+certified() :- !invalid().

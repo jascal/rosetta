@@ -1,0 +1,102 @@
+{
+  "certified": false,
+  "ndomain": 114,
+  "nmiss": 0,
+  "nuncov": 18,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "18"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "114"
+      ]
+    ],
+    "certified": [],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "114"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": [
+      [
+        "260"
+      ],
+      [
+        "261"
+      ],
+      [
+        "262"
+      ],
+      [
+        "263"
+      ],
+      [
+        "264"
+      ],
+      [
+        "265"
+      ],
+      [
+        "298"
+      ],
+      [
+        "299"
+      ],
+      [
+        "300"
+      ],
+      [
+        "301"
+      ],
+      [
+        "302"
+      ],
+      [
+        "303"
+      ],
+      [
+        "336"
+      ],
+      [
+        "337"
+      ],
+      [
+        "338"
+      ],
+      [
+        "339"
+      ],
+      [
+        "340"
+      ],
+      [
+        "341"
+      ]
+    ]
+  },
+  "evidence": "certificate-evidence/equiv-trace-full/check-s94cfgv7",
+  "wall_seconds": 0.057713546033483
+}

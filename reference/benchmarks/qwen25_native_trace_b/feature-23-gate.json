@@ -1,0 +1,43 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "size": [
+      [
+        "0",
+        "18"
+      ],
+      [
+        "1",
+        "96"
+      ]
+    ],
+    "eligible": [
+      [
+        "()"
+      ]
+    ],
+    "gate_mean": [
+      [
+        "412",
+        "2.8340704190103629"
+      ]
+    ],
+    "chosen": [
+      [
+        "412",
+        "3.0035411846064699",
+        "-3.3697325036757517",
+        "1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "no_vote": []
+  },
+  "evidence": "certificate-evidence/feature-23-gate/check-g07v4t54",
+  "wall_seconds": 2.1977030750131235
+}
