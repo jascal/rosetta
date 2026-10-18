@@ -1,8 +1,6 @@
 """Driver phases end to end over a controlled synthetic study directory.
 
-Run A's driver had no committed generator for its inputs and no offline test of
-its feature/select staging. These exercise the run-B phases against authored
-native evidence, so the staging — split labels, negmark, the gate channel, and
+These exercise the run-B phases against authored native evidence, so the staging — split labels, negmark, the gate channel, and
 the select/sign split discipline — is checked rather than hoped for.
 
 No model: every "observation" here is authored. The study directory carries its
@@ -132,7 +130,7 @@ def _study(tmp_path):
                         "gate": signal, "value": signal, "product": signal}
                        for layer in LAYERS]
                 stream.write(json.dumps({"id": r["id"], "next": r["expected"],
-                                         "observations": obs}) + "\n")
+                                         "observations": obs, "seconds":0.25}) + "\n")
 
     _write_signing(lambda r: -4.0 if r["negative"] else 4.0)
     return out, rows, signing
@@ -149,11 +147,11 @@ def test_features_phase_selects_on_negative_controls_and_carries_gate_mean(tmp_p
     assert {f["neuron"] for f in chosen} == {1}
     assert {f["polarity"] for f in chosen} == {1}
     assert {f["threshold"] for f in chosen} == {0.0}
-    # a product feature is opened by the gate channel, and its mean |gate| is carried
+    # gate means are retained as descriptive metadata, never vote weights
     products = [f for f in chosen if f["channel"] == "product"]
     assert {f["gate_channel"] for f in products} == {"gate"}
     assert {f["gate_mean"] for f in products} == {4.0}
-    assert not any(f["unweighted"] for f in chosen)
+    assert {f["gate_channel"] for f in chosen} == {"gate"}
 
 
 def test_select_phase_passes_the_gate_and_runs_all_three_arms(tmp_path):
@@ -194,7 +192,7 @@ def test_select_phase_reports_the_gate_instead_of_ranking_a_uniform_signature(tm
             obs = [{"layer": layer, "position": 3, "neuron": 1,
                     "gate": 4.0, "value": 4.0, "product": 4.0} for layer in LAYERS]
             stream.write(json.dumps({"id": r["id"], "next": r["expected"],
-                                     "observations": obs}) + "\n")
+                                     "observations": obs, "seconds":0.25}) + "\n")
     select(out)
     rel = json.loads((out / "selection.json").read_text())["relations"]
     assert rel["degenerate"] == [["()"]]

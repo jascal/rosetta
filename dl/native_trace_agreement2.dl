@@ -1,0 +1,16 @@
+// Descriptive strict-copy agreement, separate from run B's task-class labels.
+.decl tok(inst:number,pos:number,id:number) .input tok
+.decl ref(inst:number,out:number) .input ref
+.decl sample(i:number,part:symbol,negative:number) .input sample
+#include "circuit.dl"
+.output cdecide
+.decl invalid() .output invalid
+invalid() :- sample(I,_,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A!=B.
+.decl mismatch(i:number,reference:number,predicted:number) .output mismatch
+mismatch(I,R,T) :- cdecide(I,T), ref(I,R), T!=R.
+.decl summary(part:symbol,negative:number,total:number,covered:number,wrong:number) .output summary
+summary(P,S,N,C,E) :- sample(_,P,S), N=count : {sample(_,P,S)},
+ C=count : {sample(I,P,S),cdecide(I,_)}, E=count : {sample(I,P,S),mismatch(I,_,_)}.
+.decl certified() .output certified
+certified() :- !invalid().

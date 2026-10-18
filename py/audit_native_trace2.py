@@ -62,10 +62,11 @@ def audit_evidence(study):
             results.append(entry)
             continue
         relations = result.get("relations", {})
-        mismatched = []
+        recorded_names = {p.stem for p in (directory / "outputs").glob("*.csv")}
+        mismatched = list(recorded_names ^ set(relations))
         for name, rows in relations.items():
             recorded = _norm_csv(directory, name)
-            if recorded is not None and _norm_relation(rows) != recorded:
+            if recorded is None or _norm_relation(rows) != recorded:
                 mismatched.append(name)
         entry.update(certified=bool(result["certified"]),
                      verdict_preserved=bool(result["certified"]) == expected_certified,
@@ -78,33 +79,40 @@ def audit_evidence(study):
 def audit_standalone(study):
     """Each artifact in Souffle alone: its program, its wrapper, and facts."""
     results = []
+    frozen_path = study / "frozen.json"
+    if not frozen_path.exists():
+        return [{"arm":arm,"present":False,"ran":False} for arm in ARMS]
+    frozen = _load(frozen_path)
+    if frozen.get("status") == "degenerate":
+        return []  # this registered terminal outcome has no runtime artifacts
+    rows = [r for r in _load(study / "dataset.json") if r["part"] == "test"]
+    ids = {str(r["id"]) for r in rows}
     for arm in ARMS:
         directory = study / "artifacts" / arm
-        if not (directory / "circuits.dl").exists():
-            results.append({"arm": arm, "present": False})
+        if not all((directory / name).exists() for name in ("circuits.dl","run.dl")):
+            results.append({"arm":arm,"present":False,"ran":False})
             continue
         with tempfile.TemporaryDirectory() as scratch:
             work = Path(scratch)
             for name in ("circuits.dl", "run.dl"):
                 (work / name).write_text((directory / name).read_text())
-            ids = range(8)
             (work / "tok.facts").write_text("".join(
-                f"{i}\t0\t{100+i}\n{i}\t1\t7\n" for i in ids))
-            (work / "domain.facts").write_text("".join(f"{i}\n" for i in ids))
+                f"{r['id']}\t{pos}\t{token}\n" for r in rows for pos,token in enumerate(r["ctx"])))
+            (work / "domain.facts").write_text("".join(f"{i}\n" for i in sorted(ids)))
             (work / "outputs").mkdir()
-            proc = subprocess.run(
-                ["souffle", "run.dl", "-I", ".", "-F", ".", "-D", "outputs"],
-                cwd=work, capture_output=True, text=True)
+            proc = subprocess.run(["souffle","run.dl","-I",".","-F",".","-D","outputs"],
+                                  cwd=work,capture_output=True,text=True)
             if proc.returncode:
-                results.append({"arm": arm, "present": True, "ran": False,
-                                "stderr": proc.stderr.strip()[:400]})
+                results.append({"arm":arm,"present":True,"ran":False,"stderr":proc.stderr})
                 continue
-            abstain = (work / "outputs" / "abstain.csv").read_text().split()
-            results.append({
-                "arm": arm, "present": True, "ran": True,
-                "only_program_and_token_domain_facts": True,
-                "all_domain_instances_abstain": sorted(abstain, key=int) == [str(i) for i in ids],
-            })
+            predictions = [line.split("\t") for line in (work / "outputs/cdecide.csv").read_text().splitlines()]
+            expected = frozen["artifacts"][arm]["predictions"]
+            abstain = set((work / "outputs/abstain.csv").read_text().split())
+            results.append({"arm":arm,"present":True,"ran":True,
+                "only_program_and_token_domain_facts":True,
+                "predictions_match":_norm_relation(predictions)==_norm_relation(expected),
+                "abstentions_match":abstain == ids-{str(i) for i,_ in expected},
+                "all_domain_instances_abstain":abstain == ids})
     return results
 
 
@@ -114,6 +122,8 @@ def audit_freeze(study):
         return False, {"frozen": "absent"}
     frozen = _load(frozen_path)
     changed = []
+    if not frozen.get("sha256") or not frozen.get("source_sha256"):
+        changed.append("empty freeze manifest")
     for name, expected in frozen.get("sha256", {}).items():
         path = study / name
         if not path.is_file() or sha256(path) != expected:
@@ -137,7 +147,25 @@ def main():
     evidence = audit_evidence(study)
     standalone = audit_standalone(study)
     unchanged, detail = audit_freeze(study)
-    report = {"evidence": evidence, "standalone": standalone,
+    missing = []
+    def references(value):
+        if isinstance(value, dict):
+            if "evidence" in value and isinstance(value["evidence"], str):
+                if not (study / value["evidence"] / "certificate.json").exists():
+                    missing.append(value["evidence"])
+            for item in value.values(): references(item)
+        elif isinstance(value, list):
+            for item in value: references(item)
+    for path in study.glob("*.json"):
+        if path.name != "replay-audit.json": references(_load(path))
+    final_report = _load(study / "report.json") if (study / "report.json").exists() else {}
+    frozen = _load(study / "frozen.json") if (study / "frozen.json").exists() else {}
+    degenerate = frozen.get("status") == "degenerate" and final_report.get("status") == "degenerate"
+    completed = degenerate or bool(final_report.get("certificates"))
+    runtime_ok = degenerate or (len(standalone)==3 and all(
+        r.get("ran") and r.get("predictions_match") and r.get("abstentions_match") for r in standalone))
+    report = {"missing_evidence":missing, "completed":completed, "runtime_ok":runtime_ok,
+              "evidence": evidence, "standalone": standalone,
               "frozen_hashes_unchanged": unchanged, "frozen_detail": detail}
 
     failed = [e for e in evidence
@@ -150,9 +178,10 @@ def main():
         "standalone_arms": sum(1 for s in standalone if s.get("ran")),
         "frozen_hashes_unchanged": unchanged,
         "mismatches": [e["evidence"] for e in failed],
+        "missing_evidence":missing, "runtime_ok":runtime_ok, "completed":completed,
     }
     print(json.dumps(summary, indent=2))
-    return 0 if not failed and unchanged else 1
+    return 0 if evidence and not failed and unchanged and not missing and completed and runtime_ok else 1
 
 
 if __name__ == "__main__":

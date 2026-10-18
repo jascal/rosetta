@@ -92,7 +92,7 @@ def test_features2_class_floor_is_enforced_and_reported(tmp_path):
     assert check(FEATURES2, _program(tmp_path), ok, {})["relations"]["chosen"]
 
 
-def test_features2_reports_a_chosen_unit_whose_gate_is_shut(tmp_path):
+def test_features2_keeps_a_chosen_unit_even_when_raw_gate_is_zero(tmp_path):
     facts = _selection_facts()
     facts["gate"] = "".join(f"{i}\t{n}\t0.0\n" for i, n, _ in
                             [(int(i), int(n), 0.0)
@@ -101,7 +101,7 @@ def test_features2_reports_a_chosen_unit_whose_gate_is_shut(tmp_path):
     result = check(FEATURES2, _program(tmp_path), facts, {})
     assert result["relations"]["chosen"]                       # still selected
     assert result["relations"]["gate_mean"] == [["1", "0"]]
-    assert result["relations"]["unweighted"] == [["1"]]        # and flagged, not substituted
+    assert "unweighted" not in result["relations"]  # gate magnitude never suppresses a vote
 
 
 def test_features2_fails_closed_on_incomplete_observations(tmp_path):
@@ -145,7 +145,7 @@ def _runb_fixture(tmp_path, *, uniform=False, margin_spec=None):
     # swap the two marker classes so the shuffled arm sees the opposite correlation
     for i in range(8):
         facts["permutation"] += f"{i}\t{i+8}\n{i+8}\t{i}\n"
-    facts["feature"] = "0\t0\t1\t1\n"                     # f, threshold, polarity, gate_mean
+    facts["feature"] = "0\t0\t1\n"                     # f, threshold, polarity, gate_mean
     return _program(tmp_path), facts
 
 
@@ -186,7 +186,7 @@ def test_trace_arm_admits_what_behavior_and_shuffled_miss(tmp_path):
     # The trace term is signed: the good rule gains, the distractors are penalised.
     term = {int(c): float(t) for a, c, t in result["relations"]["trace_term"] if a == "1"}
     assert term[14] == pytest.approx(8.0)
-    assert term[1] == pytest.approx(-32.0)
+    assert term[1] == pytest.approx(-8.0)
 
 
 @pytest.mark.parametrize("defect", ["traces_on_select", "missing_trace", "bad_permutation", "leaked_test"])
@@ -223,7 +223,7 @@ def _margin_facts(values):
         tok += f"{100+j}\t0\t7\n{100+j}\t1\t{1 if j == 0 else 2}\n"
         ref += f"{100+j}\t7\n"
         sample += f"{100+j}\tgsel{j}\tselect\tinput-{100+j}\n"
-    feature = "".join(f"{f}\t0\t1\t1\n" for f in range(3))
+    feature = "".join(f"{f}\t0\t1\n" for f in range(3))
     trace = ""
     for i, v in enumerate(values):
         for f in range(3):
@@ -254,21 +254,22 @@ def test_weighted_vote_uses_magnitude_where_the_binary_majority_cannot(tmp_path)
     assert bad["relations"]["trace_good"] == []
 
 
-def test_gate_weight_suppresses_a_closed_gate_unit(tmp_path):
-    # Row 1 carries margins (+2, -1, -1): the signed sum is exactly 0, so it does
-    # not vote good. Shutting row 1's f1 gate scales that -1 to -0.01 and the sum
-    # becomes +0.99, flipping the vote on magnitude-weighted evidence alone.
-    base = check(SELECT2, _program(tmp_path), _margin_facts([3.0, 2.0, 2.0]), {})
-    assert base["certified"], base
-    assert float(base["relations"]["signature_sum"][1][1]) == pytest.approx(0.0)
-    assert base["relations"]["trace_good"] == [["0"]]
-
+def test_raw_gate_magnitude_and_sign_do_not_weight_margins(tmp_path):
     facts = _margin_facts([3.0, 2.0, 2.0])
-    rows = [tuple(line.split("\t")[:2]) for line in facts["gate"].splitlines()]
-    facts["gate"] = "".join(
-        f"{i}\t{f}\t{0.01 if (i == '1' and f == '1') else 1.0}\n" for i, f in rows
-    )
-    result = check(SELECT2, _program(tmp_path), facts, {})
-    assert result["certified"], result
-    assert float(result["relations"]["signature_sum"][1][1]) == pytest.approx(0.99)
-    assert result["relations"]["trace_good"] == [["0"], ["1"]]
+    base = check(SELECT2, _program(tmp_path), facts, {})
+    facts["gate"] = "".join(f"{i}\t{f}\t{-1000.0 if int(f)%2 else 0.0}\n"
+                              for i,f,_ in (line.split("\t") for line in facts["gate"].splitlines()))
+    changed = check(SELECT2, _program(tmp_path), facts, {})
+    assert changed["certified"]
+    for name in ("signature_sum", "score", "trace_term"):
+        assert changed["relations"][name] == base["relations"][name]
+
+
+def test_negative_margins_retain_magnitude_and_zero_is_neutral(tmp_path):
+    program, facts = _runb_fixture(tmp_path, margin_spec=[1.0]*8+[-0.25,-9.0,0.0,-1.0]*2)
+    result = check(SELECT2, program, facts, {})
+    assert result["certified"]
+    terms = {(int(a),int(c)):float(v) for a,c,v in result["relations"]["trace_term"]}
+    assert terms[1,1] == pytest.approx(-20.5)
+    assert terms[1,14] == pytest.approx(8.0)
+    assert terms[2,14] == pytest.approx(-20.5)

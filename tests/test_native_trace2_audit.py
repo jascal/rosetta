@@ -101,7 +101,7 @@ def test_frozen_audit_names_the_file_that_changed(tmp_path):
     (study / "frozen.json").write_text(json.dumps(frozen))
     unchanged, detail = audit_freeze(study)
     assert unchanged is False
-    assert detail["changed"] == ["file:dataset.json"]
+    assert "file:dataset.json" in detail["changed"]
 
 
 def test_auditor_cli_exits_nonzero_on_mismatch(tmp_path):

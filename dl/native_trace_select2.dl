@@ -17,7 +17,7 @@
 .decl sample(i:number,group:symbol,part:symbol,hash:symbol) .input sample
 .decl negmark(i:number) .input negmark
 .decl pair(b:number,e:number) .input pair
-.decl feature(f:number,threshold:float,polarity:number,gate_mean:float) .input feature
+.decl feature(f:number,threshold:float,polarity:number) .input feature
 .decl trace(i:number,f:number,v:float) .input trace
 .decl gate(i:number,f:number,g:float) .input gate
 .decl permutation(i:number,j:number) .input permutation
@@ -42,14 +42,14 @@ invalid() :- !sample(_,_,"sign",_).
 // Traces exist on the sign split only; a trace anywhere else is a leak.
 invalid() :- trace(I,_,_), !sample(I,_,"sign",_).
 invalid() :- gate(I,_,_), !sample(I,_,"sign",_).
-invalid() :- trace(_,F,_), !feature(F,_,_,_).
-invalid() :- gate(_,F,_), !feature(F,_,_,_).
+invalid() :- trace(_,F,_), !feature(F,_,_).
+invalid() :- gate(_,F,_), !feature(F,_,_).
 invalid() :- trace(I,F,A), trace(I,F,B), A != B.
 invalid() :- gate(I,F,A), gate(I,F,B), A != B.
 // Every sign row must carry every feature's value and gate, or the aggregate
 // would silently drop a feature on exactly the rows that matter.
-invalid() :- sample(I,_,"sign",_), feature(F,_,_,_), !trace(I,F,_).
-invalid() :- sample(I,_,"sign",_), feature(F,_,_,_), !gate(I,F,_).
+invalid() :- sample(I,_,"sign",_), feature(F,_,_), !trace(I,F,_).
+invalid() :- sample(I,_,"sign",_), feature(F,_,_), !gate(I,F,_).
 invalid() :- sample(I,_,"sign",_), !permutation(I,_).
 invalid() :- sample(I,_,"sign",_), !permutation(_,I).
 invalid() :- permutation(I,A), permutation(I,B), A != B.
@@ -61,36 +61,17 @@ invalid() :- permutation(I,J), !sample(J,_,"sign",_).
 arm(0). arm(1). arm(2).
 
 // ---------------------------------------------------------------- trace term
-// Per-feature signed margin in the feature's own channel units.
+// Registered pre-collection amendment: plain signed margins, including negative
+// values and zero. Raw gate observations are retained but never weight the score.
 .decl margin(i:number,f:number,m:float)
-margin(I,F,to_float(P)*(V-T)) :- trace(I,F,V), feature(F,T,P,_).
-
-// Gate weight: |gate| / mean|gate| on the select split. A closed gate should not
-// speak as loudly as an open one (cf. fieldrun PR #145, w_router . act). A
-// feature whose gate_mean is not positive contributes nothing.
-.decl gmag(i:number,f:number,m:float)
-gmag(I,F,M) :- gate(I,F,G), G >= 0.0, M = G.
-gmag(I,F,M) :- gate(I,F,G), G < 0.0, M = -G.
-
-.decl gweight(i:number,f:number,w:float) .output gweight
-gweight(I,F,W) :- gmag(I,F,M), feature(F,_,_,GM), GM > 0.0, W = M / GM.
-
-.decl wmargin(i:number,f:number,m:float)
-wmargin(I,F,MW) :- margin(I,F,MM), gweight(I,F,W), MW = MM * W.
-
+margin(I,F,to_float(P)*(V-T)) :- trace(I,F,V), feature(F,T,P).
 .decl signature_sum(i:number,s:float) .output signature_sum
-signature_sum(I,S) :- sample(I,_,"sign",_), S = sum M : { wmargin(I,_,M) }.
-
+signature_sum(I,S) :- sample(I,_,"sign",_), S = sum M : { margin(I,_,M) }.
 .decl trace_good(i:number) .output trace_good
-trace_good(I) :- signature_sum(I,S), S > 0.0.
-
-// An arm's per-row signature value: own row for trace, permuted row for shuffled.
+trace_good(I) :- signature_sum(I,S), S>0.0.
 .decl perm_sum(a:number,i:number,s:float) .output perm_sum
-perm_sum(1,I,S) :- trace_good(I), signature_sum(I,S).
-perm_sum(2,I,S) :- permutation(I,J), signature_sum(J,S), S > 0.0.
-
-.decl signature(a:number,i:number)
-signature(A,I) :- perm_sum(A,I,_).
+perm_sum(1,I,S) :- signature_sum(I,S).
+perm_sum(2,I,S) :- permutation(I,J), signature_sum(J,S).
 
 // ------------------------------------------------------------- the gate
 .decl n_sign(n:number)
@@ -130,22 +111,14 @@ select_count(C,H,E) :- candidate(C,_,_,_),
  H = count : { nt_candidate(C,I,T), sample(I,_,"select",_), ref(I,T) },
  E = count : { nt_candidate(C,I,T), sample(I,_,"select",_), ref(I,R), T != R }.
 
-// A row the arm's signature does not vouch for. Spelled out rather than negated
-// inline: Souffle 2.5 rejects an anonymous variable inside a negated atom within
-// an aggregate.
-.decl arm_bad(a:number,i:number)
-arm_bad(A,I) :- arm(A), A>0, sample(I,_,"sign",_), !perm_sum(A,I,_).
-
 .decl trace_term(a:number,c:number,t:float) .output trace_term
-trace_term(A,C,T) :- arm(A), A>0, candidate(C,_,_,_), feature(_,_,_,_),
- G = sum M : { nt_candidate(C,I,_), sample(I,_,"sign",_), perm_sum(A,I,M) },
- B = count : { nt_candidate(C,I,_), sample(I,_,"sign",_), arm_bad(A,I) },
- T = G - 4.0*to_float(B).
+trace_term(A,C,T) :- arm(A), A>0, candidate(C,_,_,_),
+ T = sum M : { nt_candidate(C,I,_), sample(I,_,"sign",_), perm_sum(A,I,M) }.
 
 .decl score(a:number,c:number,s:float) .output score
-score(0,C,to_float(H)-4.0*to_float(E)) :- sign_count(C,H,E), H+E>0.
-score(A,C,to_float(H)-4.0*to_float(E)+T) :- arm(A), A>0, sign_count(C,H,E), H+E>0, trace_term(A,C,T).
-score(A,C,to_float(H)-4.0*to_float(E)) :- arm(A), A>0, sign_count(C,H,E), H+E>0, !feature(_,_,_,_).
+score(0,C,to_float(H)-4.0*to_float(E)) :- !invalid(), !degenerate(), sign_count(C,H,E), H+E>0.
+score(A,C,to_float(H)-4.0*to_float(E)+T) :- !invalid(), !degenerate(), arm(A), A>0, sign_count(C,H,E), H+E>0, trace_term(A,C,T).
+score(A,C,to_float(H)-4.0*to_float(E)) :- !invalid(), !degenerate(), arm(A), A>0, sign_count(C,H,E), H+E>0, !feature(_,_,_).
 
 .decl better(a:number,c:number,d:number)
 better(A,C,D) :- score(A,C,S), score(A,D,T), T>S.
@@ -189,3 +162,13 @@ failure_detail(C,I,P,R,T) :- proposed(_,_,C), nt_candidate(C,I,T), ref(I,R), T!=
 
 .decl certified() .output certified
 certified() :- !invalid().
+// Continuous signature distribution by task stratum, including all-bad controls.
+.decl sign_class(i:number,negative:number)
+sign_class(I,1) :- sample(I,_,"sign",_), negmark(I).
+sign_class(I,0) :- sample(I,_,"sign",_), !negmark(I).
+.decl signature_stratum(negative:number,total:number,good:number,lo:float,hi:float,average:float) .output signature_stratum
+signature_stratum(C,N,G,L,H,T/to_float(N)) :- sign_class(_,C),
+ N=count : { sign_class(_,C) }, G=count : { sign_class(I,C), trace_good(I) },
+ L=min V : { sign_class(I,C), signature_sum(I,V) },
+ H=max V : { sign_class(I,C), signature_sum(I,V) },
+ T=sum V : { sign_class(I,C), signature_sum(I,V) }.

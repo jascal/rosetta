@@ -1,12 +1,10 @@
 // Run-B feature selection. One layer/channel per run; the driver stages that
 // channel as `observation` and the matching gate channel as `gate`.
 //
-// The contrast is positive-copy-context vs NEGATIVE CONTROL on the select
-// split. Run A selected against rule disagreement (native_trace_features.dl:19-21)
-// on a population that contained no negative controls at all, so its threshold
-// was an interpolation between two classes drawn only from positive copies and
-// extrapolated off-manifold on every negative control. See
-// docs/native-trace-diagnosis.md.
+// The contrast is positive-copy-context vs negative control on SELECT.
+// This changes the feature's task from run A's rule-agreement labels; it is not
+// an established causal explanation of that run's uniform training signature.
+// See docs/native-trace-diagnosis.md.
 //
 // Both classes must hold at least MINCLASS instances or this layer/channel
 // contributes no vote, and the shortfall is reported rather than silently
@@ -74,7 +72,7 @@ best_score(S) :- merit(_,_,_,_), S = max X : { merit(_,X,_,_) }.
 chosen(N,S,T,P) :- !invalid(), best_score(S), S>0.0,
                    N = min U : { merit(U,S,_,_) }, merit(N,S,T,P).
 
-// Gate weight denominator: mean |gate| of the chosen unit on the SELECT split.
+// Descriptive statistic only: mean |gate| on SELECT, never a score weight.
 // Souffle 2.5 has no abs(), so magnitude is split on sign.
 .decl gmag(i:number,n:number,m:float)
 gmag(I,N,M) :- gate(I,N,G), G >= 0.0, M = G.
@@ -84,12 +82,6 @@ gmag(I,N,M) :- gate(I,N,G), G < 0.0, M = -G.
 gate_mean(N,M) :- chosen(N,_,_,_),
                  V = sum X : { gmag(I,N,X) }, C = count : { gate(I,N,_) },
                  C>0, M = V / to_float(C).
-
-// A chosen unit whose gate is shut carries no weight; it is reported, never
-// quietly substituted with an unweighted vote.
-.decl unweighted(n:number) .output unweighted
-unweighted(N) :- chosen(N,_,_,_), !gate_mean(N,_).
-unweighted(N) :- gate_mean(N,M), M <= 0.0.
 
 .decl certified() .output certified
 certified() :- !invalid().

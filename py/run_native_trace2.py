@@ -5,9 +5,8 @@ phases mirror run A's staged I/O driver, but the two queries are
 `native_trace_features2.dl` and `native_trace_select2.dl` and the splits are
 select / sign / test rather than train / validation / test.
 
-Model phases (`collect`, `final`) start a pinned fieldrun process and are not
-implemented here yet; the offline phases below are, and every numeric or
-statistical decision stays in Datalog.
+Model phases start a pinned fieldrun process. Every numeric or statistical
+decision stays in Datalog; all queries retain replayable evidence.
 """
 
 import argparse
@@ -25,6 +24,7 @@ import urllib.request
 from benchmark_copy_generalization import generate
 from benchmark_induction import digest, facts
 from certificate import check, sha256
+from benchmark_guarded_copy import guard_program
 from native_trace import CHANNELS, DL, LAYERS, emit, grammar, program, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -126,6 +126,24 @@ def read(path):
     return json.loads(path.read_text())
 
 
+def checked(out, name, verifier, candidate, staged, scalars=None, *, allow_failure=False):
+    start = time.monotonic()
+    result = check(verifier, candidate, staged, scalars or {},
+                   evidence_dir=out / "certificate-evidence" / name,
+                   provenance={"stage": name, "source": "native-trace run B"})
+    result["evidence"] = str(Path(result["evidence"]).relative_to(out))
+    result["wall_seconds"] = time.monotonic() - start
+    write_json(out / f"{name}.json", result)
+    if result.get("error") or (not result["certified"] and not allow_failure):
+        raise ValueError(f"{name} query failed: {result.get('error', 'invalid inputs')}")
+    return result
+
+
+def before_freeze(out):
+    if (out / "frozen.json").exists() or (out / "test-observations.jsonl").exists():
+        raise ValueError("study is frozen or final collection began")
+
+
 def input_gate(out):
     """Refuse to proceed unless the committed inputs are the ones on disk."""
     protocol = read(out / "protocol.json")
@@ -153,13 +171,13 @@ def features(out):
     import numpy as np
 
     input_gate(out)
+    before_freeze(out)
     rows = [r for r in read(out / "dataset.json") if r["part"] == "select"]
     chosen = []
     for layer in LAYERS:
         for channel in CHANNELS:
-            # the SwiGLU gate is what opens the unit; a product channel is gated
-            # by the gate channel at the same neuron
-            gate_channel = "gate" if channel == "product" else channel
+            # Retain the actual gate as descriptive evidence, never a vote weight.
+            gate_channel = "gate"
             column, gate_column, width = [], [], None
             for row in rows:
                 path = out / "select-traces" / f"{row['id']}.npz"
@@ -180,11 +198,10 @@ def features(out):
                 "observation": "".join(column),
                 "gate": "".join(gate_column),
             }
-            result = check(DL / "native_trace_features2.dl", out / "hypotheses.dl", staged, {})
+            result = checked(out, f"feature-{layer}-{channel}", DL / "native_trace_features2.dl", out / "hypotheses.dl", staged)
             if not result["certified"] or result.get("error"):
                 raise ValueError(f"feature query failed: {result}")
             gate_mean = {int(n): float(m) for n, m in result["relations"].get("gate_mean", [])}
-            flagged = {int(n) for n, _ in result["relations"].get("unweighted", [])}
             for neuron, score, threshold, polarity in result["relations"]["chosen"]:
                 neuron = int(neuron)
                 chosen.append({
@@ -192,7 +209,7 @@ def features(out):
                     "gate_channel": gate_channel, "neuron": neuron,
                     "score": float(score), "threshold": float(threshold),
                     "polarity": int(polarity), "width": width,
-                    "gate_mean": gate_mean.get(neuron), "unweighted": neuron in flagged,
+                    "gate_mean": gate_mean.get(neuron),
                 })
             for reason, npos, nneg in result["relations"].get("no_vote", []):
                 print(f"  no vote ({reason}) at layer {layer} channel {channel}: "
@@ -203,6 +220,7 @@ def features(out):
 def select(out):
     """Rank candidates on the SIGN split; select split fits parameters only."""
     input_gate(out)
+    before_freeze(out)
     rows = [r for r in read(out / "dataset.json") if r["part"] in ("select", RANKING_SPLIT)]
     # References for BOTH staged splits. Selecting on sign only would leave every
     # select row unreferenced, which select2 correctly rejects as invalid.
@@ -214,6 +232,11 @@ def select(out):
     missing = [r["id"] for r in rows if r["id"] not in refs]
     if missing:
         raise ValueError(f"missing references for staged rows: {missing[:8]}")
+    guard = out / "strict-copy.dl"
+    guard.write_text(guard_program([(1,3,2)]))
+    agreement = facts(rows, refs)
+    agreement["sample"] = "".join(f"{r['id']}\t{r['part']}\t{int(r['negative'])}\n" for r in rows)
+    checked(out, "strict-copy-agreement", DL / "native_trace_agreement2.dl", guard, agreement)
     features_ = read(out / "features.json")
     records = {r["id"]: r for r in
                map(json.loads, (out / f"{RANKING_SPLIT}-observations.jsonl").read_text().splitlines())}
@@ -223,16 +246,14 @@ def select(out):
     staged["negmark"] = "".join(f"{r['id']}\n" for r in rows if r["negative"])
     staged["pair"] = "".join(f"{r['base']}\t{r['id']}\n" for r in rows if "base" in r)
     staged["feature"] = "".join(
-        f"{f['id']}\t{f['threshold']:.17g}\t{f['polarity']}\t{f['gate_mean']:.17g}\n"
-        for f in features_ if not f["unweighted"])
+        f"{f['id']}\t{f['threshold']:.17g}\t{f['polarity']}\n"
+        for f in features_)
     trace, gate = "", ""
     for r in signing:
         last = len(r["ctx"]) - 1
         units = {(o["layer"], o["neuron"]): o for o in records[r["id"]]["observations"]
                  if o["position"] == last}
         for f in features_:
-            if f["unweighted"]:
-                continue
             unit = units.get((f["layer"], f["neuron"]))
             if unit is None:
                 raise ValueError(f"missing probe unit L{f['layer']} n{f['neuron']} for {r['id']}")
@@ -244,7 +265,7 @@ def select(out):
     permuted = random.Random(204).sample([r["id"] for r in signing], len(signing))
     staged["trace"], staged["gate"] = trace, gate
     staged["permutation"] = "".join(f"{r['id']}\t{j}\n" for r, j in zip(signing, permuted))
-    result = check(DL / "native_trace_select2.dl", out / "hypotheses.dl", staged, {})
+    result = checked(out, "selection", DL / "native_trace_select2.dl", out / "hypotheses.dl", staged)
     if not result["certified"] or result.get("error"):
         raise ValueError(f"selection query failed: {result}")
     write_json(out / "selection.json", result)
@@ -252,6 +273,10 @@ def select(out):
         summary = result["relations"].get("signature_summary", [["?", "?", "?", "?"]])[0]
         print(f"  NON-DEGENERACY GATE FIRED: signature {summary[1]}/{summary[0]} good, "
               f"{summary[3]}/{summary[2]} negative controls good. Ranking did not run.")
+        write_json(out / "report.json", {"tag":"empirical", "status":"degenerate",
+                   "selection":result, "observation_cost":observation_cost(out),
+                   "note":"Stopped before ranking; no final references collected."})
+        seal(out, {}, status="degenerate")
         return
     summary = result["relations"]["signature_summary"][0]
     print(f"  signature {summary[1]}/{summary[0]} good, {summary[3]}/{summary[2]} negatives good")
@@ -347,9 +372,16 @@ def collect(out, args, stage):
     import numpy as np
 
     input_gate(out)
+    if stage not in ("select", "sign", "test"):
+        raise ValueError(f"unknown collection split: {stage}")
+    if stage != "test":
+        before_freeze(out)
     if stage == "test":
-        validate_freeze(out)
+        if validate_freeze(out).get("status") == "degenerate":
+            raise ValueError("degenerate run cannot collect final references")
     rows = [r for r in read(out / "dataset.json") if r["part"] == stage]
+    if not rows:
+        raise ValueError(f"empty collection split: {stage}")
     if stage == "select":
         probe = {"layers": list(LAYERS)}
     elif stage == "sign":
@@ -376,7 +408,10 @@ def collect(out, args, stage):
                     raise ValueError("cached context changed")
                 continue
             start = time.monotonic()
-            answer = post(port, row["ctx"], probe)
+            request_probe = dict(probe)
+            if stage == "sign":
+                request_probe["readouts"] = [row["expected"]]
+            answer = post(port, row["ctx"], request_probe)
             native = answer.pop("observations")
             record = {"id": i, "input_sha256": digest(row["ctx"]),
                       "seconds": time.monotonic() - start, **answer}
@@ -407,12 +442,79 @@ def collect(out, args, stage):
                {str(i): r["next"] for i, r in observations.items()})
 
 
+def diagnostic(out, args):
+    """Execute the Datalog intervention plan on sign rows; never admit a rule."""
+    input_gate(out)
+    before_freeze(out)
+    if read(out / "selection.json")["relations"]["degenerate"]:
+        raise ValueError("degenerate run stops before diagnostic collection")
+    rows = {r["id"]: r for r in read(out / "dataset.json") if r["part"] == "sign"}
+    records = {r["id"]: r for r in map(json.loads, (out / "sign-observations.jsonl").read_text().splitlines())}
+    if set(records) != set(rows):
+        raise ValueError("incomplete sign observations")
+    units = sorted({(f["layer"], f["neuron"], f["width"]) for f in read(out / "features.json")})
+    values = {}
+    for i, row in rows.items():
+        native = {(o["layer"], o["neuron"]): o for o in records[i]["observations"]
+                  if o["position"] == len(row["ctx"])-1}
+        for l,n,_ in units:
+            values[(i,l,n)] = native[(l,n)]
+    staged = {"label": "".join(f"{i}\t{1-int(r['negative'])}\n" for i,r in rows.items()),
+              "chosen_unit": "".join(f"{l}\t{n}\t{w}\n" for l,n,w in units),
+              "product": "".join(f"{i}\t{l}\t{n}\t{v['product']:.17g}\n" for (i,l,n),v in values.items())}
+    plan = checked(out, "diagnostic-plan", DL / "native_trace_diagnostic_plan.dl", out / "hypotheses.dl", staged)
+    requests = plan["relations"]["plan"]
+    journal = out / "diagnostic-observations.jsonl"
+    cached = {}
+    if journal.exists():
+        for line in journal.read_text().splitlines():
+            r = json.loads(line)
+            key = tuple(r[k] for k in ("id","layer","neuron","mode"))
+            if key in cached:
+                raise ValueError("duplicate diagnostic request")
+            cached[key] = r
+    planned = {(int(i),int(l),int(n),m) for i,l,n,m,_,_ in requests}
+    if not set(cached) <= planned:
+        raise ValueError("unexpected diagnostic request")
+    with server(out, args, "diagnostic") as port, journal.open("a") as stream:
+        for i,l,n,mode,donor,value in requests:
+            i,l,n,donor = map(int, (i,l,n,donor))
+            key = (i,l,n,mode)
+            patch = {"layer":l,"neuron":n,"position":len(rows[i]["ctx"])-1,"value":float(value)}
+            if key in cached:
+                if cached[key]["patch"] != patch or cached[key]["input_sha256"] != digest(rows[i]["ctx"]):
+                    raise ValueError("cached diagnostic request changed")
+                continue
+            start = time.monotonic()
+            result = post(port, rows[i]["ctx"], {"patches":[patch],
+                          "readouts":[records[i]["next"],rows[i]["expected"]]})
+            r = {"id":i,"layer":l,"neuron":n,"mode":mode,"donor":donor,"patch":patch,
+                 "input_sha256":digest(rows[i]["ctx"]),"next":result["next"],
+                 "logits":result["logits"],"seconds":time.monotonic()-start}
+            stream.write(json.dumps(r)+"\n")
+            stream.flush()
+            cached[key] = r
+    raw = []
+    for r in cached.values():
+        original = records[r["id"]]
+        after, before = dict(r["logits"]), dict(original["logits"])
+        target = rows[r["id"]]["expected"]
+        raw.append("\t".join(map(str, (r["id"],r["layer"],r["neuron"],r["mode"],
+            original["next"],r["next"],original["next_logit"],after[original["next"]],
+            before[target],after[target])))+"\n")
+    checked(out, "diagnostic-summary", DL / "native_trace_diagnostic2.dl", out / "hypotheses.dl",
+        {"result":"".join(raw),
+         "expected":"".join(f"{i}\t{l}\t{n}\t{m}\n" for i,l,n,m in sorted(planned)),
+         "observation":"".join(f"{i}\t{l}\t{n}\t{v['gate']:.17g}\t{v['value']:.17g}\t{v['product']:.17g}\n"
+                                  for (i,l,n),v in values.items())})
+
+
 def prediction_query(out, name, candidate, rows):
     verifier = out / "prediction-verifier.dl"
     verifier.write_text((DL / "guard_domain.dl").read_text() + "\n.output cdecide\n")
     staged = {"tok": facts(rows, {})["tok"],
               "sample": "".join(f"{r['id']}\n" for r in rows)}
-    result = check(verifier, candidate, staged, {"ndomain": int})
+    result = checked(out, name, verifier, candidate, staged, {"ndomain": int})
     return result
 
 
@@ -423,6 +525,11 @@ def freeze(out):
         raise ValueError("freeze already exists or test data collection began")
     if not read(out / "selection.json")["certified"]:
         raise ValueError("complete the selection query before freeze")
+    selection = read(out / "selection.json")
+    if selection["relations"]["degenerate"]:
+        raise ValueError("degenerate run stops before diagnostics/freeze/final")
+    if not read(out / "diagnostic-summary.json")["certified"]:
+        raise ValueError("complete diagnostic identity and coverage checks before freeze")
     rows = [r for r in read(out / "dataset.json") if r["part"] == "test"]
     artifacts = {}
     for path in sorted((out / "artifacts").glob("*/circuits.dl")):
@@ -430,20 +537,25 @@ def freeze(out):
         result = prediction_query(out, f"domain-{name}", path, rows)
         artifacts[name] = {
             "path": str(path.relative_to(out)), "sha256": sha256(path),
-            "domain": [int(i) for i in result["relations"]["domain"]],
-            "predictions": result["relations"]["cdecide"],
+            "domain": [int(i) for i, in result["relations"]["domain"]],
+            "predictions": result["relations"]["cdecide"], "domain_evidence": result["evidence"],
             "bytes": path.stat().st_size,
             "rule_lines": sum(":-" in line for line in path.read_text().splitlines())}
     if not set(ARMS.values()) <= set(artifacts):
         raise ValueError("missing arm composite")
+    seal(out, artifacts)
+
+
+def seal(out, artifacts, *, status="ready"):
     locked = {str(p.relative_to(out)): sha256(p) for p in sorted(out.rglob("*"))
               if p.is_file() and not p.name.startswith("server-")}
     sources = [Path(__file__), ROOT / "py/native_trace.py", ROOT / "py/certificate.py",
                ROOT / "py/benchmark_induction.py", ROOT / "py/benchmark_copy_generalization.py",
+               ROOT / "py/benchmark_guarded_copy.py", ROOT / "py/audit_native_trace2.py",
                ROOT / "docs/native-trace-prereg2.md",
                *sorted(DL.glob("native_trace_*.dl")), DL / "equiv.dl", DL / "guard_domain.dl"]
     write_json(out / "frozen.json", {
-        "artifacts": artifacts, "sha256": locked,
+        "status": status, "artifacts": artifacts, "sha256": locked,
         "source_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in sources},
         "note": "No test oracle reference was requested before this manifest."})
 
@@ -472,10 +584,10 @@ def evaluate(out):
             subset = [r for r in rows if r["id"] in set(ids)]
             staged = facts(subset, refs)
             staged["domain"] = "".join(f"{i}\n" for i in ids)
-            certs[name][scope] = check(
-                DL / "equiv.dl", path, staged,
+            certs[name][scope] = checked(
+                out, f"equiv-{name}-{scope}", DL / "equiv.dl", path, staged,
                 {"ndomain": int, "nmiss": int, "nuncov": int,
-                 "nmissing": int, "ninvalid": int})
+                 "nmissing": int, "ninvalid": int}, allow_failure=True)
         firing = certs[name]["firing"]
         verdicts.append(f"{name}\t" + "\t".join(
             str(firing[k]) for k in
@@ -486,15 +598,8 @@ def evaluate(out):
               "sample": "".join(f"{r['id']}\t{int(r['negative'])}\n" for r in rows),
               "ref": facts(rows, refs)["ref"],
               "prediction": "".join(predictions), "verdict": "".join(verdicts)}
-    summary = check(DL / "native_trace_report.dl", out / "hypotheses.dl", staged, {})
-    costs = []
-    for stage in ("select", "sign", "test"):
-        journal = out / f"{stage}-observations.jsonl"
-        if journal.exists():
-            costs.extend(f"{stage}\t{i}\t{json.loads(line)['seconds']:.17g}\n"
-                         for i, line in enumerate(journal.read_text().splitlines()))
-    cost = check(DL / "native_trace_cost.dl", out / "hypotheses.dl",
-                 {"observation": "".join(costs)})
+    summary = checked(out, "final-summary", DL / "native_trace_report.dl", out / "hypotheses.dl", staged)
+    cost = observation_cost(out)
     write_json(out / "report.json", {
         "tag": "empirical",
         "scope": "pinned f32 bundle, frozen finite domains, select/sign/test splits",
@@ -503,26 +608,42 @@ def evaluate(out):
         "artifacts": frozen["artifacts"], "certificates": certs})
 
 
+def observation_cost(out):
+    costs = []
+    for stage in ("select", "sign", "diagnostic", "test"):
+        journal = out / f"{stage}-observations.jsonl"
+        if journal.exists():
+            costs.extend(f"{stage}\t{i}\t{json.loads(line)['seconds']:.17g}\n"
+                         for i, line in enumerate(journal.read_text().splitlines()))
+    return checked(out, "observation-cost", DL / "native_trace_cost.dl", out / "hypotheses.dl",
+                   {"observation": "".join(costs)})
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("phase", choices=("inputs", "collect", "features", "select",
-                                     "freeze", "final", "evaluate"))
+                                     "diagnostic", "freeze", "final", "evaluate"))
     p.add_argument("out", type=Path)
+    p.add_argument("--split", choices=("select", "sign"), help="required with collect")
     p.add_argument("--write", action="store_true",
                    help="for phase=inputs: write the study files; otherwise only report")
     p.add_argument("--binary", type=Path)
     p.add_argument("--bundle", type=Path)
     p.add_argument("--preflight", type=Path,
-                   default=ROOT / "reference/benchmarks/native_trace_preflight_b")
+                   default=ROOT / "reference/benchmarks/native_trace_preflight")
     p.add_argument("--port", type=int, default=8392)
     a = p.parse_args()
     a.out = a.out.resolve()
     if a.phase == "inputs":
         return _inputs(a)
-    if a.phase in ("collect", "final"):
+    if a.phase in ("collect", "diagnostic", "final"):
         if not (a.binary and a.bundle):
             p.error("oracle stages need --binary and --bundle")
-        collect(a.out, a, "test" if a.phase == "final" else a.phase)
+        if a.phase == "diagnostic":
+            diagnostic(a.out, a)
+        else:
+            if a.phase == "collect" and a.split is None:
+                p.error("collect requires --split select or --split sign")
+            collect(a.out, a, "test" if a.phase == "final" else a.split)
     else:
         {"features": features, "select": select, "freeze": freeze, "evaluate": evaluate}[a.phase](a.out)
     return 0
@@ -551,17 +672,13 @@ def _inputs(a):
             print(f"refusing to write: {line}")
         return 1
 
+    before_freeze(a.out)
+    if list(a.out.glob("*-observations.jsonl")):
+        raise ValueError("cannot reseal inputs after observations")
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "dataset.json").write_text(json.dumps(rows, indent=1) + "\n")
-    # The fixed preregistered candidate universe, generated rather than committed
-    # as an opaque artifact. 24 bases x 56 guard compositions = 1,344 candidates.
     bases, universe = grammar()
-    (a.out / "hypotheses.dl").write_text(
-        "// Fixed preregistered universe. Selection, routing and admission stay in Datalog.\n"
-        ".decl base(b:number,kind:number,k:number,m:number)\n"
-        ".decl candidate(c:number,b:number,a:number,d:number)\n"
-        + "".join(f"base({','.join(map(str, r))}).\n" for r in bases)
-        + "".join(f"candidate({','.join(map(str, r))}).\n" for r in universe))
+    (a.out / "hypotheses.dl").write_text(program())
     protocol = dict(report)
     protocol["dataset_sha256"] = sha256(a.out / "dataset.json")
     protocol["hypotheses_sha256"] = sha256(a.out / "hypotheses.dl")

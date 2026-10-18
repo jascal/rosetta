@@ -1,26 +1,23 @@
 # Native traces as a prior for standalone circuit discovery — run B
 
-Status: **open, preregistered before any run-B model observation or any run-B
-implementation.** Written after run A completed and after its outcome was known;
-the reasons are recorded in [`native-trace-diagnosis.md`](native-trace-diagnosis.md).
-Run B is a separate experiment with new inputs. Run A is closed, its frozen
-evidence is immutable, and its result — zero incremental certified coverage —
-stands unchanged.
+Status: **open; amended before any run-B model observation.** The original
+registration is commit `8135116`; the pre-collection repair is documented in
+[`native-trace-runb-repair.md`](native-trace-runb-repair.md). Run A is closed and
+its frozen evidence and zero incremental certified coverage remain unchanged.
 
 ## Why run B exists
 
-Run A's trace arm was non-degenerate in principle and degenerate in fact. Its
-feature-selection negative class was the 7 positive copy contexts where the
-suffix-3 rule errs, because the discovery population contained no negative
-controls at all, while every evaluation split contains 18. The decision
-threshold was calibrated between two classes drawn only from positive copies, so
-on a negative control it extrapolated off-manifold — and labelled all 18/18
-train negative controls trace-good. A uniform signature made the trace term
-collapse to a firing count, which made the trace and shuffled scores elementwise
-identical.
+Run A fitted features to distinguish correct from incorrect strict-copy outputs
+on positive copy inputs only. Its fresh training majority signature was uniform,
+including all negative controls. Population mismatch is a plausible contributor,
+not an established causal explanation. Run B instead fits positive-copy versus
+negative-control labels on a fresh select split. This changes the feature's task:
+it tests whether task-class information improves rule discovery, not whether it
+predicts correctness by construction. Both controls and exact admission remain.
 
-Run B therefore differs from run A in exactly two pre-registered respects. Any
-other change to the protocol is out of scope.
+The changes below are registered together. A positive outcome would support
+this combined design on its stated domain; it would not isolate which change
+helped. No run-B answers have been collected or used to choose this amendment.
 
 ## Change 1 — a negative-bearing selection split, disjoint from signing
 
@@ -46,41 +43,30 @@ Run B's train and validation splits each carry 18 negative controls by
 construction, so the selection class is negative-bearing by design rather than by
 luck.
 
-## Change 2 — a magnitude-bearing, gate-weighted vote
+## Change 2 — a plain signed-margin prior
 
-Run A counted agreeing features and discarded magnitude
-(`N*2 > D`, `dl/native_trace_select.dl:42`). Run B sums signed margins.
+For chosen feature `f`, define `m(I,f) = P_f * (V(I,f) - T_f)` and
+`S(I) = sum_f m(I,f)`. Threshold and polarity are fitted on select only.
+A sign row is trace-good exactly when `S(I) > 0`. A zero margin contributes
+zero; negative margins retain their actual magnitudes. With no chosen features,
+`S(I)=0` and the non-degeneracy gate stops the run.
 
-For feature `f` on instance `I`, with selected channel value `V`, threshold `T`
-and polarity `P`:
+**Pre-collection amendment:** remove the proposed `|gate|/mean|gate|` multiplier.
+Raw preactivation magnitude is not SwiGLU openness: `SiLU(g)=g/(1+exp(-g))`
+suppresses strongly negative gates even when `|g|` is large. An MoE routing
+weight times an expert activation is a different quantity. Product observations
+already include SiLU gating. There is no extra gate weight in run B.
+Gate observations and their select means remain descriptive evidence, and the
+actual gate channel is recorded for every feature, including value features.
 
-```datalog
-% raw margin, in the feature's own channel units
-margin(I,F,P*(V-T)) :- trace(I,F,V), feature(F,T,P).
+Margins use their own raw channel units without normalization. Consequently
+higher-scale channels can dominate the sum. This is a declared limitation and
+fixed design choice, not a claim of causal attribution or comparable feature
+units. No post-collection rescaling, weighting, or threshold adjustment is allowed.
+Equal-magnitude margins reproduce a majority only in the absence of ties.
 
-% gate weight: the SwiGLU gate is the real gate on this unit, so a unit whose
-% gate is closed should not speak as loudly as one whose gate is open.
-gweight(I,F,W) :- trace(I,F,_,G), feature(F,T,P), gate_norm(F,G,W).
-gate_norm(F,G,W) :- feature_gate(F,M), W = abs(G) / M, M > 0.0.
-
-% aggregate signed margin; trace-good strictly above zero
-signature_sum(I,S) :- signature(I,0), S = sum W : { margin(I,_,_), gweight(I,_,W) }.
-trace_good(I) :- signature(I,0), signature_sum(I,S), S > 0.0.
-```
-
-`feature_gate(F,M)` is the mean `|gate|` over the **selection** split for that
-feature, so the weight is ~1 for a typical instance and suppresses a unit whose
-gate is closed. `M <= 0` makes that feature contribute nothing, and that is
-reported rather than silently dropped. This mirrors fieldrun's `w_router · act`
-(`fieldrun` PR #145): score a gated unit by what actually reaches the output, not
-by its raw magnitude.
-
-This is a strict generalisation, not a different rule: `sign(margin)` is run A's
-vote, and the aggregate reduces to a majority when all margins have equal
-magnitude. A feature at exactly its threshold contributes zero margin.
-
-All of the above is **Datalog**. Python stages facts and serialises. No numeric
-or statistical decision moves into Python.
+Feature selection, margins, sums, non-degeneracy checks, and ranking are Datalog.
+Python stages observations and serializes the resulting relations.
 
 ## Non-degeneracy gate — run A's missing precondition
 
@@ -88,8 +74,8 @@ Before the trace term is used to rank anything, assert on the signing split:
 
 - the signature is **not uniform** (both `trace_good` and its complement are
   nonempty), and
-- it is **not constant across the negative-control stratum** — specifically,
-  `trace_good` does not cover every negative control.
+- `trace_good` does not cover every negative control. All-negative-bad is
+  permitted; the condition does not require variation within that stratum.
 
 If either assertion fails, the run **stops and is reported as degenerate**. It
 does not proceed to ranking, does not fall back to behavior-only, and does not
@@ -158,15 +144,14 @@ candidate ID, and no replacement of rejected candidates. All three arms receive
 the identical universe and proposal budget.
 
 Behavior score `B = sign_correct - 4 * sign_wrong`, computed on the **sign**
-split. Trace score `= B + Σ_f (margin_f · gweight_f)` summed over candidate
-firings on that same sign split, using the features' thresholds, polarities and
-gate means fitted on the disjoint select split. The shuffled arm uses the
+split. Trace score `= B + sum_{I where candidate fires} S(I)`, using thresholds
+and polarities fitted on the disjoint select split. The shuffled arm uses the
 identical formula with signature rows permuted by seed 204. Scores and their
 relative weight are fixed.
 
 Note the split discipline this implies: the select split fits feature
 *parameters* and is never used to rank; the sign split computes the signature and
-ranks but never influences a threshold, polarity or gate mean; test is untouched
+ranks but never influences a threshold or polarity; test is untouched
 until after freeze. A trace value is therefore never summed on a row whose
 feature parameters were fitted from it.
 
@@ -176,8 +161,8 @@ Run A's shuffled arm is what made the degeneracy visible instead of leaving a
 uniform prior looking like weak-but-real signal. It is retained, unweakened, for
 run B. Specifically preregistered:
 
-- If trace and shuffled scores come out elementwise identical, that is the
-  degeneracy signature from run A and is reported as such.
+- If trace and shuffled scores come out elementwise identical, report the
+  identity. With continuous margins it need not imply constant signatures.
 - A run-B result where the trace arm beats shuffled is not sufficient on its own;
   the trace arm must also beat **behavior-only** on certified coverage.
 - If trace fails to separate shuffled, no reranking, threshold adjustment, or
@@ -189,10 +174,16 @@ Unchanged in spirit and now a genuine contrast: for every selected unit, zero
 its post-SwiGLU product at the last position on the first eight **positive** and
 eight **negative-control** sign-split rows by ID, plus an opposite-class patch
 and an identity patch, with a same-layer control neuron `(n+1) mod width`. Run A
-could not form this contrast — its "incorrect" class was 7 positive contexts.
+did not use this contrast — its "incorrect" class was 7 positive contexts.
 Run B's is a real negative-control population. Still a diagnostic, never an
 admission criterion; local causal influence only, never universal necessity or a
-unique mechanism. Nulls preserved.
+unique mechanism. Nulls preserved. The sign collection records the logit of the
+input generator's `expected` target; interventions read both that target and the
+unmodified greedy answer. For negative controls the generated target is only a
+readout, not an assertion about the correct model answer. The diagnostic checks
+identity equality and completeness against the Datalog plan before freeze.
+A degenerate selection stops before diagnostic/freeze/final and retains a
+terminal report plus replayable selection evidence.
 
 ## Admission, runtime, and certification
 
@@ -225,7 +216,7 @@ Per arm report proposed/admitted, firing and abstention, correct/wrong,
 positive/negative strata, individual and composite certificates, program bytes,
 rule counts, incremental certified-domain sets versus both controls, and
 observation/search cost. Additionally report the run-B non-degeneracy assertions
-and their values, the per-feature gate weights, and the signature distribution on
+and their values, the per-feature descriptive gate means, and the signature distribution on
 the sign split by stratum.
 
 Aggregation and set comparison are Datalog. Use `proved` / `empirical` / `open`

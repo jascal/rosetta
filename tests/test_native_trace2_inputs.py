@@ -1,8 +1,6 @@
 """Run-B inputs: generated from committed code, disjoint from run A by construction.
 
-Run A's inputs were committed as an artifact with no generator, so they could be
-hashed and replayed but not regenerated. These tests are the run-B equivalent of
-that guarantee, plus the property run A lacked and this experiment depends on:
+These tests check bit-for-bit regeneration and the new sampling condition:
 the SELECT split must carry negative controls, or change 1 is not implemented.
 """
 
