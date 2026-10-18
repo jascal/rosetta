@@ -1,24 +1,25 @@
-"""Run-B input generation: fresh seeds 201/202/203 as select / sign / test.
+"""Run-B driver.
 
-Run A's `dataset.json` was committed as an artifact with no committed generator,
-so it could be hashed and replayed but not regenerated. Run B generates its
-inputs from this file instead, which is the reproducibility improvement worth
-having before the design is locked.
+Phase `inputs` generates the fresh splits from committed code. The remaining
+phases mirror run A's staged I/O driver, but the two queries are
+`native_trace_features2.dl` and `native_trace_select2.dl` and the splits are
+select / sign / test rather than train / validation / test.
 
-Every token used by the historical Qwen copy datasets, and every token used by
-run A's own frozen inputs, is excluded. The generator additionally keeps each
-seed's vocabulary disjoint from the others as it draws, so select/sign/test are
-group- and token-disjoint by construction rather than by later filtering.
-
-No model, no weights, no network: this is data generation only.
+Model phases (`collect`, `final`) start a pinned fieldrun process and are not
+implemented here yet; the offline phases below are, and every numeric or
+statistical decision stays in Datalog.
 """
 
 import argparse
 import hashlib
+import random
 import json
 from pathlib import Path
 
 from benchmark_copy_generalization import generate
+from benchmark_induction import digest, facts
+from certificate import check, sha256
+from native_trace import CHANNELS, DL, LAYERS, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,6 +27,7 @@ SEEDS = (201, 202, 203)
 LENGTHS = (8, 12, 24)
 GROUPS = 2
 SPLIT_OF_SEED = {201: "select", 202: "sign", 203: "test"}
+RANKING_SPLIT = "sign"
 
 # The historical datasets run A excluded, per its own protocol.json. Run B must
 # also exclude run A's frozen inputs, so no input is shared with the completed run.
@@ -113,13 +115,150 @@ def check_disjoint(rows, exclude):
     return problems, counts
 
 
+def read(path):
+    return json.loads(path.read_text())
+
+
+def input_gate(out):
+    """Refuse to proceed unless the committed inputs are the ones on disk."""
+    protocol = read(out / "protocol.json")
+    if protocol.get("problems"):
+        raise ValueError("input generation reported problems")
+    if protocol["dataset_sha256"] != sha256(out / "dataset.json"):
+        raise ValueError("dataset.json does not match protocol.json")
+
+
+def features(out):
+    """Fit feature parameters on the SELECT split only.
+
+    One layer/channel per run, as in run A, but the selection contrast is
+    positive-copy-context vs negative control and the result carries gate_mean.
+    The select split's references are never consulted here: the class comes from
+    the `negative` flag, not from model agreement.
+
+    Reads the full trace sweep (`select-traces/<id>.npz`, keys `<layer>_<channel>`)
+    because every neuron must be scored, not just the probe units.
+    """
+    import numpy as np
+
+    input_gate(out)
+    rows = [r for r in read(out / "dataset.json") if r["part"] == "select"]
+    chosen = []
+    for layer in LAYERS:
+        for channel in CHANNELS:
+            # the SwiGLU gate is what opens the unit; a product channel is gated
+            # by the gate channel at the same neuron
+            gate_channel = "gate" if channel == "product" else channel
+            column, gate_column, width = [], [], None
+            for row in rows:
+                path = out / "select-traces" / f"{row['id']}.npz"
+                with np.load(path) as archive:
+                    values = archive[f"{layer}_{channel}"]
+                    opening = archive[f"{layer}_{gate_channel}"]
+                if width is None:
+                    width = len(values)
+                if len(values) != width or len(opening) != width:
+                    raise ValueError("neuron width changed")
+                column.extend(f"{row['id']}\t{n}\t{float(v):.17g}\n"
+                              for n, v in enumerate(values))
+                gate_column.extend(f"{row['id']}\t{n}\t{float(v):.17g}\n"
+                                   for n, v in enumerate(opening))
+            staged = {
+                "sample": "".join(f"{r['id']}\t{int(r['negative'])}\n" for r in rows),
+                "unit": "".join(f"{n}\n" for n in range(width)),
+                "observation": "".join(column),
+                "gate": "".join(gate_column),
+            }
+            result = check(DL / "native_trace_features2.dl", out / "hypotheses.dl", staged, {})
+            if not result["certified"] or result.get("error"):
+                raise ValueError(f"feature query failed: {result}")
+            gate_mean = {int(n): float(m) for n, m in result["relations"].get("gate_mean", [])}
+            flagged = {int(n) for n, _ in result["relations"].get("unweighted", [])}
+            for neuron, score, threshold, polarity in result["relations"]["chosen"]:
+                neuron = int(neuron)
+                chosen.append({
+                    "id": len(chosen), "layer": layer, "channel": channel,
+                    "gate_channel": gate_channel, "neuron": neuron,
+                    "score": float(score), "threshold": float(threshold),
+                    "polarity": int(polarity), "width": width,
+                    "gate_mean": gate_mean.get(neuron), "unweighted": neuron in flagged,
+                })
+            for reason, npos, nneg in result["relations"].get("no_vote", []):
+                print(f"  no vote ({reason}) at layer {layer} channel {channel}: "
+                      f"{npos} positive / {nneg} negative", flush=True)
+    write_json(out / "features.json", chosen)
+
+
+def select(out):
+    """Rank candidates on the SIGN split; select split fits parameters only."""
+    input_gate(out)
+    rows = [r for r in read(out / "dataset.json") if r["part"] in ("select", RANKING_SPLIT)]
+    # References for BOTH staged splits. Selecting on sign only would leave every
+    # select row unreferenced, which select2 correctly rejects as invalid.
+    refs = {}
+    for split in ("select", RANKING_SPLIT):
+        path = out / f"{split}-references.json"
+        if path.exists():
+            refs.update({int(k): v for k, v in read(path).items()})
+    missing = [r["id"] for r in rows if r["id"] not in refs]
+    if missing:
+        raise ValueError(f"missing references for staged rows: {missing[:8]}")
+    features_ = read(out / "features.json")
+    records = {r["id"]: r for r in
+               map(json.loads, (out / f"{RANKING_SPLIT}-observations.jsonl").read_text().splitlines())}
+    signing = [r for r in rows if r["part"] == RANKING_SPLIT]
+    staged = facts(rows, refs)
+    staged["sample"] = "".join(f"{r['id']}\t{r['group']}\t{r['part']}\t{digest(r['ctx'])}\n" for r in rows)
+    staged["negmark"] = "".join(f"{r['id']}\n" for r in rows if r["negative"])
+    staged["pair"] = "".join(f"{r['base']}\t{r['id']}\n" for r in rows if "base" in r)
+    staged["feature"] = "".join(
+        f"{f['id']}\t{f['threshold']:.17g}\t{f['polarity']}\t{f['gate_mean']:.17g}\n"
+        for f in features_ if not f["unweighted"])
+    trace, gate = "", ""
+    for r in signing:
+        units = {(o["layer"], o["neuron"]): o for o in records[r["id"]]["observations"]}
+        for f in features_:
+            if f["unweighted"]:
+                continue
+            unit = units.get((f["layer"], f["neuron"]))
+            if unit is None:
+                raise ValueError(f"missing probe unit L{f['layer']} n{f['neuron']} for {r['id']}")
+            trace += f"{r['id']}\t{f['id']}\t{float(unit[f['channel']]):.17g}\n"
+            gate += f"{r['id']}\t{f['id']}\t{float(unit[f['gate_channel']]):.17g}\n"
+    # Registered shuffle: seed 204, a genuine permutation of the signing rows,
+    # not a shift. A shift is not independent of the row ordering, which would
+    # let the control inherit part of the trace arm's correlation.
+    permuted = random.Random(204).sample([r["id"] for r in signing], len(signing))
+    staged["trace"], staged["gate"] = trace, gate
+    staged["permutation"] = "".join(f"{r['id']}\t{j}\n" for r, j in zip(signing, permuted))
+    result = check(DL / "native_trace_select2.dl", out / "hypotheses.dl", staged, {})
+    if not result["certified"] or result.get("error"):
+        raise ValueError(f"selection query failed: {result}")
+    write_json(out / "selection.json", result)
+    if result["relations"]["degenerate"]:
+        summary = result["relations"].get("signature_summary", [["?", "?", "?", "?"]])[0]
+        print(f"  NON-DEGENERACY GATE FIRED: signature {summary[1]}/{summary[0]} good, "
+              f"{summary[3]}/{summary[2]} negative controls good. Ranking did not run.")
+        return
+    summary = result["relations"]["signature_summary"][0]
+    print(f"  signature {summary[1]}/{summary[0]} good, {summary[3]}/{summary[2]} negatives good")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("out", type=Path, help="run-B study directory")
+    p.add_argument("phase", choices=("inputs", "features", "select"))
+    p.add_argument("out", type=Path)
     p.add_argument("--write", action="store_true",
-                   help="write dataset.json and protocol.json; otherwise only report")
+                   help="for phase=inputs: write the study files; otherwise only report")
     a = p.parse_args()
+    a.out = a.out.resolve()
+    if a.phase == "inputs":
+        return _inputs(a)
+    {"features": features, "select": select}[a.phase](a.out)
+    return 0
 
+
+def _inputs(a):
     rows, exclude = build()
     problems, counts = check_disjoint(rows, exclude)
 
@@ -145,8 +284,7 @@ def main():
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "dataset.json").write_text(json.dumps(rows, indent=1) + "\n")
     protocol = dict(report)
-    protocol["dataset_sha256"] = hashlib.sha256(
-        (a.out / "dataset.json").read_bytes()).hexdigest()
+    protocol["dataset_sha256"] = sha256(a.out / "dataset.json")
     protocol["note"] = ("Generated by py/run_native_trace2.py inputs before any "
                         "run-B model request. No token is shared with the "
                         "historical datasets or with run A's frozen inputs.")
