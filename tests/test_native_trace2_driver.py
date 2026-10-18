@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "py"))
 
 from run_native_trace2 import RANKING_SPLIT, features, select
+from native_trace import grammar, program
 
 LAYERS = (7, 15, 23)
 CHANNELS = ("gate", "value", "product")
@@ -34,13 +35,23 @@ PER_SPLIT = 24          # 12 positive + 12 negative, above the floor of 8 per cl
 def _hypotheses(out):
     """13 distractors firing on marker 2, one good rule firing on marker 1."""
     path = out / "hypotheses.dl"
+    bases, universe = grammar()
     path.write_text(
-        '.decl candidate(c:number,b:number,a:number,d:number)\n'
-        + "".join(f"candidate({c},0,0,0).\n" for c in range(1, 15))
-        + '.decl nt_candidate(c:number,i:number,t:number)\n'
-        'nt_candidate(C,I,T) :- candidate(C,_,_,_), C<14, tok(I,0,T), tok(I,1,2).\n'
-        'nt_candidate(14,I,T) :- tok(I,0,T), tok(I,1,1).\n')
+        # program() already includes native_trace_runtime.dl, which declares
+        # nt_candidate; distractors fire on marker 2, candidate 14 on marker 1
+        program(candidates=[u[0] for u in universe][:14])
+        + 'nt_candidate(C,I,T) :- candidate(C,_,_,_), C<14, tok(I,0,T), tok(I,1,2).\n'
+          'nt_candidate(14,I,T) :- tok(I,0,T), tok(I,1,1).\n')
     return path
+
+
+def _seal_protocol(out):
+    """Pin dataset, hypotheses and preregistration the way the real inputs phase does."""
+    protocol = json.loads((out / "protocol.json").read_text())
+    protocol["hypotheses_sha256"] = hashlib.sha256((out / "hypotheses.dl").read_bytes()).hexdigest()
+    protocol["prereg_sha256"] = hashlib.sha256(
+        (ROOT / "docs/native-trace-prereg2.md").read_bytes()).hexdigest()
+    (out / "protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
 
 
 def _rows():
@@ -83,6 +94,7 @@ def _study(tmp_path):
         "dataset_sha256": hashlib.sha256((out / "dataset.json").read_bytes()).hexdigest(),
         "note": "synthetic fixture",}, indent=2) + "\n")
     _hypotheses(out)
+    _seal_protocol(out)
 
     traces = out / "select-traces"
     traces.mkdir()

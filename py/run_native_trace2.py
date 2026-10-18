@@ -11,15 +11,21 @@ statistical decision stays in Datalog.
 """
 
 import argparse
+from contextlib import contextmanager
 import hashlib
-import random
 import json
 from pathlib import Path
+import random
+import socket
+import subprocess
+import time
+import urllib.error
+import urllib.request
 
 from benchmark_copy_generalization import generate
 from benchmark_induction import digest, facts
 from certificate import check, sha256
-from native_trace import CHANNELS, DL, LAYERS, write_json
+from native_trace import CHANNELS, DL, LAYERS, emit, grammar, program, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -28,6 +34,7 @@ LENGTHS = (8, 12, 24)
 GROUPS = 2
 SPLIT_OF_SEED = {201: "select", 202: "sign", 203: "test"}
 RANKING_SPLIT = "sign"
+ARMS = {0: "behavior", 1: "trace", 2: "shuffled"}
 
 # The historical datasets run A excluded, per its own protocol.json. Run B must
 # also exclude run A's frozen inputs, so no input is shared with the completed run.
@@ -126,6 +133,10 @@ def input_gate(out):
         raise ValueError("input generation reported problems")
     if protocol["dataset_sha256"] != sha256(out / "dataset.json"):
         raise ValueError("dataset.json does not match protocol.json")
+    if protocol["hypotheses_sha256"] != sha256(out / "hypotheses.dl"):
+        raise ValueError("hypotheses.dl does not match protocol.json")
+    if protocol["prereg_sha256"] != sha256(ROOT / "docs/native-trace-prereg2.md"):
+        raise ValueError("preregistration changed")
 
 
 def features(out):
@@ -242,19 +253,270 @@ def select(out):
         return
     summary = result["relations"]["signature_summary"][0]
     print(f"  signature {summary[1]}/{summary[0]} good, {summary[3]}/{summary[2]} negatives good")
+    # Emit each arm's composite and every admitted individual. An empty selection
+    # still emits, and still abstains: the Souffle-only artifact is the deliverable.
+    for arm, name in ARMS.items():
+        selected = [(int(rank), int(c)) for a, rank, c in result["relations"]["admitted"]
+                    if int(a) == arm]
+        emit(out / "artifacts" / name, selected)
+        for rank, c in selected:
+            emit(out / "artifacts" / f"{name}-candidate-{c}", [(rank, c)])
+
+
+def model_gate(out, args):
+    """The oracle must be the preflight-validated binary and bundle, unchanged."""
+    report = read(args.preflight / "report.json")
+    if not report["passed"]:
+        raise ValueError("upstream native activation/intervention gate failed")
+    identity = {
+        "binary_sha256": sha256(args.binary),
+        "bundle_sha256": {s: sha256(str(args.bundle) + s)
+                          for s in (".fieldrun.bin", ".fieldrun.json")},
+        "preflight_report_sha256": sha256(args.preflight / "report.json"),
+        "reference_sha256": sha256(args.preflight / "reference.json"),
+    }
+    if identity["binary_sha256"] != report["binary_sha256"] or \
+            identity["bundle_sha256"] != report["bundle_sha256"]:
+        raise ValueError("model/binary differs from validated oracle")
+    if (out / "model.json").exists():
+        if read(out / "model.json") != identity:
+            raise ValueError("model identity changed within experiment")
+    else:
+        write_json(out / "model.json", identity)
+
+
+def post(port, ids, probe):
+    request = urllib.request.Request(
+        f"http://127.0.0.1:{port}/probe/mlp",
+        json.dumps({"ids": ids, "probe": probe}).encode(),
+        {"Content-Type": "application/json"})
+    with urllib.request.urlopen(request, timeout=600) as response:
+        result = json.load(response)
+    if "error" in result:
+        raise ValueError(result)
+    return result
+
+
+@contextmanager
+def server(out, args, stage):
+    model_gate(out, args)
+    with socket.socket() as sock:
+        if sock.connect_ex(("127.0.0.1", args.port)) == 0:
+            raise ValueError("requested port already occupied; cannot attest another process")
+    command = [str(args.binary.resolve()), "--bundle", str(args.bundle.resolve()),
+               "--serve", str(args.port)]
+    with (out / f"server-{stage}.log").open("a") as log:
+        process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
+        try:
+            started = time.monotonic()
+            while True:
+                if process.poll() is not None:
+                    raise ValueError(f"fieldrun exited {process.returncode}; see {log.name}")
+                try:
+                    with urllib.request.urlopen(
+                            f"http://127.0.0.1:{args.port}/health", timeout=2) as r:
+                        if json.load(r).get("ok"):
+                            break
+                except (urllib.error.URLError, TimeoutError):
+                    if time.monotonic() - started > 300:
+                        raise TimeoutError("fieldrun did not become ready")
+                    time.sleep(0.2)
+            write_json(out / f"server-{stage}.json",
+                       {"command": command, "pid": process.pid,
+                        "model_sha256": sha256(out / "model.json")})
+            yield args.port
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+
+
+def collect(out, args, stage):
+    """Collect references, and native evidence where the phase needs it.
+
+    select: a full sweep of every neuron at LAYERS, because feature selection
+            scores all of them.
+    sign:   the chosen units only, and only after features.json exists.
+    test:   references only, and only after the freeze boundary.
+    """
+    import numpy as np
+
+    input_gate(out)
+    if stage == "test":
+        validate_freeze(out)
+    rows = [r for r in read(out / "dataset.json") if r["part"] == stage]
+    if stage == "select":
+        probe = {"layers": list(LAYERS)}
+    elif stage == "sign":
+        chosen = read(out / "features.json")
+        probe = {"units": sorted({(f["layer"], f["neuron"]) for f in chosen})}
+    else:
+        probe = {}
+    journal = out / f"{stage}-observations.jsonl"
+    observations = {}
+    if journal.exists():
+        for line in journal.read_text().splitlines():
+            record = json.loads(line)
+            if record["id"] in observations:
+                raise ValueError("duplicate observation")
+            observations[record["id"]] = record
+    expected = {r["id"] for r in rows}
+    if not set(observations) <= expected:
+        raise ValueError("unexpected observation IDs")
+    with server(out, args, stage) as port, journal.open("a") as stream:
+        for j, row in enumerate(rows):
+            i = row["id"]
+            if i in observations:
+                if observations[i]["input_sha256"] != digest(row["ctx"]):
+                    raise ValueError("cached context changed")
+                continue
+            start = time.monotonic()
+            answer = post(port, row["ctx"], probe)
+            native = answer.pop("observations")
+            record = {"id": i, "input_sha256": digest(row["ctx"]),
+                      "seconds": time.monotonic() - start, **answer}
+            if stage == "select":
+                vectors = {f"{l}_{c}": np.asarray([o[c] for o in native if o["layer"] == l],
+                                                  dtype=np.float32)
+                           for l in LAYERS for c in CHANNELS}
+                tracefile = out / "select-traces" / f"{i}.npz"
+                tracefile.parent.mkdir(exist_ok=True)
+                np.savez_compressed(tracefile, **vectors)
+                record.update(trace_file=str(tracefile.relative_to(out)),
+                              trace_sha256=sha256(tracefile))
+            elif stage == "sign":
+                record["observations"] = native
+            stream.write(json.dumps(record) + "\n")
+            stream.flush()
+            observations[i] = record
+            print(f"{stage}: {j+1}/{len(rows)}", flush=True)
+    if set(observations) != expected:
+        raise ValueError("incomplete observations")
+    write_json(out / f"{stage}-references.json",
+               {str(i): r["next"] for i, r in observations.items()})
+
+
+def prediction_query(out, name, candidate, rows):
+    verifier = out / "prediction-verifier.dl"
+    verifier.write_text((DL / "guard_domain.dl").read_text() + "\n.output cdecide\n")
+    staged = {"tok": facts(rows, {})["tok"],
+              "sample": "".join(f"{r['id']}\n" for r in rows)}
+    result = check(verifier, candidate, staged, {"ndomain": int})
+    return result
+
+
+def freeze(out):
+    """Hash every input, decision, native observation and artifact at the boundary."""
+    input_gate(out)
+    if (out / "frozen.json").exists() or (out / "test-observations.jsonl").exists():
+        raise ValueError("freeze already exists or test data collection began")
+    if not read(out / "selection.json")["certified"]:
+        raise ValueError("complete the selection query before freeze")
+    rows = [r for r in read(out / "dataset.json") if r["part"] == "test"]
+    artifacts = {}
+    for path in sorted((out / "artifacts").glob("*/circuits.dl")):
+        name = path.parent.name
+        result = prediction_query(out, f"domain-{name}", path, rows)
+        artifacts[name] = {
+            "path": str(path.relative_to(out)), "sha256": sha256(path),
+            "domain": [int(i) for i in result["relations"]["domain"]],
+            "predictions": result["relations"]["cdecide"],
+            "bytes": path.stat().st_size,
+            "rule_lines": sum(":-" in line for line in path.read_text().splitlines())}
+    if not set(ARMS.values()) <= set(artifacts):
+        raise ValueError("missing arm composite")
+    locked = {str(p.relative_to(out)): sha256(p) for p in sorted(out.rglob("*"))
+              if p.is_file() and not p.name.startswith("server-")}
+    sources = [Path(__file__), ROOT / "py/native_trace.py", ROOT / "py/certificate.py",
+               ROOT / "py/benchmark_induction.py", ROOT / "py/benchmark_copy_generalization.py",
+               ROOT / "docs/native-trace-prereg2.md",
+               *sorted(DL.glob("native_trace_*.dl")), DL / "equiv.dl", DL / "guard_domain.dl"]
+    write_json(out / "frozen.json", {
+        "artifacts": artifacts, "sha256": locked,
+        "source_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in sources},
+        "note": "No test oracle reference was requested before this manifest."})
+
+
+def validate_freeze(out):
+    frozen = read(out / "frozen.json")
+    for name, expected in frozen["sha256"].items():
+        if sha256(out / name) != expected:
+            raise ValueError(f"frozen file changed: {name}")
+    for name, expected in frozen["source_sha256"].items():
+        if sha256(ROOT / name) != expected:
+            raise ValueError(f"frozen source changed: {name}")
+    return frozen
+
+
+def evaluate(out):
+    """Equivalence checks over firing and full domains, then the summary report."""
+    frozen = validate_freeze(out)
+    rows = [r for r in read(out / "dataset.json") if r["part"] == "test"]
+    refs = {int(k): v for k, v in read(out / "test-references.json").items()}
+    certs, verdicts, predictions = {}, [], []
+    for name, artifact in frozen["artifacts"].items():
+        path = out / artifact["path"]
+        certs[name] = {}
+        for scope, ids in (("firing", artifact["domain"]), ("full", [r["id"] for r in rows])):
+            subset = [r for r in rows if r["id"] in set(ids)]
+            staged = facts(subset, refs)
+            staged["domain"] = "".join(f"{i}\n" for i in ids)
+            certs[name][scope] = check(
+                DL / "equiv.dl", path, staged,
+                {"ndomain": int, "nmiss": int, "nuncov": int,
+                 "nmissing": int, "ninvalid": int})
+        firing = certs[name]["firing"]
+        verdicts.append(f"{name}\t" + "\t".join(
+            str(firing[k]) for k in
+            ("ndomain", "nmiss", "nuncov", "nmissing", "ninvalid"))
+            + f"\t{int(firing['certified'])}\n")
+        predictions.extend(f"{name}\t{i}\t{t}\n" for i, t in artifact["predictions"])
+    staged = {"artifact": "".join(f"{n}\n" for n in frozen["artifacts"]),
+              "sample": "".join(f"{r['id']}\t{int(r['negative'])}\n" for r in rows),
+              "ref": facts(rows, refs)["ref"],
+              "prediction": "".join(predictions), "verdict": "".join(verdicts)}
+    summary = check(DL / "native_trace_report.dl", out / "hypotheses.dl", staged, {})
+    costs = []
+    for stage in ("select", "sign", "test"):
+        journal = out / f"{stage}-observations.jsonl"
+        if journal.exists():
+            costs.extend(f"{stage}\t{i}\t{json.loads(line)['seconds']:.17g}\n"
+                         for i, line in enumerate(journal.read_text().splitlines()))
+    cost = check(DL / "native_trace_cost.dl", out / "hypotheses.dl",
+                 {"observation": "".join(costs)})
+    write_json(out / "report.json", {
+        "tag": "empirical",
+        "scope": "pinned f32 bundle, frozen finite domains, select/sign/test splits",
+        "frozen_sha256": sha256(out / "frozen.json"),
+        "summary": summary, "observation_cost": cost,
+        "artifacts": frozen["artifacts"], "certificates": certs})
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("phase", choices=("inputs", "features", "select"))
+    p.add_argument("phase", choices=("inputs", "collect", "features", "select",
+                                     "freeze", "final", "evaluate"))
     p.add_argument("out", type=Path)
     p.add_argument("--write", action="store_true",
                    help="for phase=inputs: write the study files; otherwise only report")
+    p.add_argument("--binary", type=Path)
+    p.add_argument("--bundle", type=Path)
+    p.add_argument("--preflight", type=Path,
+                   default=ROOT / "reference/benchmarks/native_trace_preflight_b")
+    p.add_argument("--port", type=int, default=8392)
     a = p.parse_args()
     a.out = a.out.resolve()
     if a.phase == "inputs":
         return _inputs(a)
-    {"features": features, "select": select}[a.phase](a.out)
+    if a.phase in ("collect", "final"):
+        if not (a.binary and a.bundle):
+            p.error("oracle stages need --binary and --bundle")
+        collect(a.out, a, "test" if a.phase == "final" else a.phase)
+    else:
+        {"features": features, "select": select, "freeze": freeze, "evaluate": evaluate}[a.phase](a.out)
     return 0
 
 
@@ -283,14 +545,28 @@ def _inputs(a):
 
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "dataset.json").write_text(json.dumps(rows, indent=1) + "\n")
+    # The fixed preregistered candidate universe, generated rather than committed
+    # as an opaque artifact. 24 bases x 56 guard compositions = 1,344 candidates.
+    bases, universe = grammar()
+    (a.out / "hypotheses.dl").write_text(
+        "// Fixed preregistered universe. Selection, routing and admission stay in Datalog.\n"
+        ".decl base(b:number,kind:number,k:number,m:number)\n"
+        ".decl candidate(c:number,b:number,a:number,d:number)\n"
+        + "".join(f"base({','.join(map(str, r))}).\n" for r in bases)
+        + "".join(f"candidate({','.join(map(str, r))}).\n" for r in universe))
     protocol = dict(report)
     protocol["dataset_sha256"] = sha256(a.out / "dataset.json")
+    protocol["hypotheses_sha256"] = sha256(a.out / "hypotheses.dl")
+    protocol["prereg_sha256"] = sha256(ROOT / "docs/native-trace-prereg2.md")
+    protocol["ncandidates"] = len(universe)
+    protocol["nbase"] = len(bases)
     protocol["note"] = ("Generated by py/run_native_trace2.py inputs before any "
                         "run-B model request. No token is shared with the "
                         "historical datasets or with run A's frozen inputs.")
     (a.out / "protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
     print(json.dumps({k: protocol[k] for k in
-                      ("seeds", "split_of_seed", "excluded_tokens", "counts", "dataset_sha256")},
+                      ("seeds", "split_of_seed", "excluded_tokens", "counts",
+                       "ncandidates", "dataset_sha256", "hypotheses_sha256")},
                      indent=2))
     return 0
 
