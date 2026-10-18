@@ -83,10 +83,10 @@ No rejected rule was replaced or relaxed.
 Both incremental certified-domain sets are empty. All arms abstain on the 96
 positive and 18 negative-control final inputs. No final mismatch counterexample
 exists because no artifact answers; this must not be reported as perfect
-accuracy. Development counterexamples are in `selection.json`'s `failure_detail`
-and the retained `selection/*/outputs/failure_detail.csv`. For example, candidate
-171 predicts token 4833 instead of model token 51185 on training instance 102,
-and 21287 instead of 58263 on validation instance 171.
+accuracy. Development counterexamples are in `selection.json`'s `failure_detail` and the
+retained `certificate-evidence/selection/*/outputs/failure_detail.csv`. For example,
+candidate 171 predicts token 4833 instead of model token 51185 on training
+instance 102, and 21287 instead of 58263 on validation instance 171.
 
 Each composite has a 3,815-byte `circuits.dl` with 34 shared library rule lines
 and no selected candidate facts, plus its runtime wrapper. These are abstaining
