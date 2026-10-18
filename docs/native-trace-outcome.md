@@ -25,8 +25,10 @@ and corpus; it is not an equivalence certificate. Subsequent changes record the
 [unsupported scorers from deliberately declined routed layers](https://github.com/jascal/fieldrun/pull/143).
 Our [instrumentation PR](https://github.com/jascal/fieldrun/pull/144) adds gate,
 value, and product observations plus position-specific product replacements to
-dense RoPE models. The experiment is pinned to its validated `0948cbe` executable;
-the PR also incorporates current upstream work at merge `4c61d9d`.
+dense RoPE models; it is merged at fieldrun `8022152`. The experiment stays pinned
+to its validated `0948cbe` executable rather than to current `master`, and the PR
+incorporated upstream work at `4c61d9d`, so a recollection must re-derive and
+re-validate its own executable digest instead of assuming the merged head matches.
 
 **Open:** native mechanisms may suggest useful symbolic predicates. The claim to
 test is improved independently certified coverage, not neuron interpretability
@@ -211,7 +213,7 @@ To recollect in a new directory, copy the committed `dataset.json`,
 rather than generating against a changing set of historical datasets. Obtain the
 pinned checkpoint, convert to f32, build the recorded fieldrun revision, and run
 `scripts/validate_mlp_probe.py` as documented in fieldrun's
-[`docs/NATIVE_MLP_PROBES.md`](https://github.com/jascal/fieldrun/blob/feat/native-mlp-traces/docs/NATIVE_MLP_PROBES.md).
+[`docs/NATIVE_MLP_PROBES.md`](https://github.com/jascal/fieldrun/blob/master/docs/NATIVE_MLP_PROBES.md).
 Use a fresh `--preflight` directory for recollection: the driver verifies that its
 binary and bundle match that gate's hashes. A rebuilt binary need not have the
 original executable hash; recollection is a separate run with its own provenance.
