@@ -1,0 +1,9 @@
+Warning: No rules/facts defined for relation base in file circuit.dl at line 2
+.decl base(b:number,kind:number,k:number,m:number)
+------^--------------------------------------------
+Warning: No rules/facts defined for relation candidate in file circuit.dl at line 3
+.decl candidate(c:number,b:number,a:number,d:number)
+------^----------------------------------------------
+Warning: No rules/facts defined for relation selected in file circuit.dl at line 4
+.decl selected(rank:number,c:number)
+------^------------------------------
