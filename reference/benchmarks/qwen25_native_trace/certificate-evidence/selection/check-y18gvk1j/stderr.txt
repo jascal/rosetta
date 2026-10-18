@@ -1,0 +1,9 @@
+Warning: No rules/facts defined for relation selected in file circuit.dl at line 4
+.decl selected(rank:number,c:number)
+------^------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 32
+invalid() :- permutation(I,J), !sample(I,_,"train",_).
+---------------------------^---------------------------
+Warning: Variable I only occurs once in file verify.dl at line 33
+invalid() :- permutation(I,J), !sample(J,_,"train",_).
+-------------------------^-----------------------------

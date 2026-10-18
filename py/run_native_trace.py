@@ -30,8 +30,10 @@ def read(path):
 def checked(out, name, verifier, candidate, staged, *, scalars=None, allow_failure=False):
     """Persist a Datalog query and its verdict. Admission is never reconstructed."""
     destination = out / "certificate-evidence" / name
+    started = time.monotonic()
     result = check(verifier, candidate, staged, scalars or {}, evidence_dir=destination,
                    provenance={"stage": name, "source": "native-trace experiment"})
+    result["wall_seconds"] = time.monotonic() - started
     result["evidence"] = str(Path(result["evidence"]).relative_to(out))
     write_json(out / f"{name}.json", result)
     if result.get("error") or (not result["certified"] and not allow_failure):
@@ -370,8 +372,17 @@ def evaluate(out):
               "sample": "".join(f"{r['id']}\t{int(r['negative'])}\n" for r in rows),
               "ref": facts(rows,refs)["ref"], "prediction": "".join(predictions), "verdict": "".join(verdicts)}
     result = checked(out, "final-summary", DL / "native_trace_report.dl", out / "hypotheses.dl", staged)
+    costs = []
+    for stage in ("discovery", "development", "diagnostic", "final"):
+        journal = out / f"{stage}-observations.jsonl"
+        if journal.exists():
+            costs.extend(f"{stage}\t{i}\t{json.loads(line)['seconds']:.17g}\n"
+                         for i,line in enumerate(journal.read_text().splitlines()))
+    cost = checked(out, "observation-cost", DL / "native_trace_cost.dl", out / "hypotheses.dl",
+                   {"observation": "".join(costs)})
     write_json(out / "report.json", {"tag": "empirical", "scope": "pinned f32 bundle, frozen finite domains",
                "frozen_sha256": sha256(out / "frozen.json"), "summary": result,
+               "observation_cost": cost,
                "artifacts": frozen["artifacts"], "certificates": certs})
 
 

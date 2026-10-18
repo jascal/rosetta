@@ -38,6 +38,7 @@ arm(0). arm(1). arm(2).
 .decl votes(i:number,f:number)
 votes(I,F) :- trace(I,F,V), feature(F,T,P), (V-T)*to_float(P)>0.0.
 .decl trace_good(i:number)
+.output trace_good
 trace_good(I) :- sample(I,_,"train",_), N = count : { votes(I,_) },
                  D = count : { feature(_,_,_) }, D>0, N*2>D.
 .decl train_count(c:number,correct:number,wrong:number)
@@ -74,5 +75,15 @@ support(C,P,N,M) :- proposed(_,_,C), sample(_,_,P,_),
 .decl admitted(a:number,rank:number,c:number) .output admitted
 admitted(A,R,C) :- proposed(A,R,C), !fails(C,_),
  support(C,"train",N,M), N>=2, M>=2, support(C,"validation",J,K), J>=2, K>=2.
+.decl arm_summary(a:number,proposals:number,admissions:number) .output arm_summary
+arm_summary(A,P,N) :- arm(A), P = count : { proposed(A,_,_) }, N = count : { admitted(A,_,_) }.
+.decl trace_summary(good:number,bad:number) .output trace_summary
+trace_summary(G,N-G) :- G = count : { trace_good(_) }, N = count : { sample(_,_,"train",_) }.
+.decl rejection(a:number,c:number,train_errors:number,validation_errors:number) .output rejection
+rejection(A,C,T,V) :- proposed(A,_,C), !admitted(A,_,C),
+ T = count : { fails(C,I), sample(I,_,"train",_) },
+ V = count : { fails(C,I), sample(I,_,"validation",_) }.
+.decl failure_detail(c:number,i:number,part:symbol,reference:number,predicted:number) .output failure_detail
+failure_detail(C,I,P,R,T) :- proposed(_,_,C), nt_candidate(C,I,T), ref(I,R), T!=R, sample(I,_,P,_).
 .decl certified() .output certified
 certified() :- !invalid().

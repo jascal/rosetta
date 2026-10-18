@@ -160,7 +160,7 @@ def control_run(out):
         "prereg_sha256":sha256(ROOT / "docs/native-trace-prereg.md")})
     development = [r for r in rows if r["part"] != "test"]
     write_json(out / "development-references.json", {str(r["id"]): -1 if r["negative"] else r["expected"] for r in development})
-    (out / "development-observations.jsonl").write_text("".join(json.dumps({"id":r["id"],"observations":[]})+"\n" for r in development))
+    (out / "development-observations.jsonl").write_text("".join(json.dumps({"id":r["id"],"observations":[],"seconds":0.25})+"\n" for r in development))
     write_json(out / "features.json", [])
     write_json(out / "diagnostic-summary.json", {"certified":True,"fixture":True})
     select(out)
@@ -182,6 +182,9 @@ def test_full_pipeline_preserves_final_counterexamples_and_abstentions(tmp_path,
     write_json(out / "final-references.json", refs)
     evaluate(out)
     result = json.loads((out / "report.json").read_text())
+    n_development = len([r for r in rows if r["part"] != "test"])
+    stage,n,seconds = result["observation_cost"]["relations"]["cost"][0]
+    assert (stage,int(n),float(seconds)) == ("development",n_development,n_development*0.25)
     cert = result["certificates"]["trace"]["firing"]
     assert cert["certified"] is (not corrupt)
     assert cert["nmiss"] == int(corrupt)

@@ -16,5 +16,8 @@
     "minimal_binary": 114
   },
   "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
-  "converter_binary_sha256": "43d6aafb46820c57a4fc87dbe3bc145bae121a080f9d46fc6344a03c946dfcf2"
+  "conversion": {
+    "command": "fieldrun convert --model <pinned checkpoint directory> --arch rope --dtype f32 -o <bundle>",
+    "note": "Conversion used the sibling fieldrun executable before the probe build. Its digest was not recorded at invocation; the resulting bundle is hashed and passed the retained upstream gate."
+  }
 }
