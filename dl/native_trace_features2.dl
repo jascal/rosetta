@@ -1,0 +1,95 @@
+// Run-B feature selection. One layer/channel per run; the driver stages that
+// channel as `observation` and the matching gate channel as `gate`.
+//
+// The contrast is positive-copy-context vs NEGATIVE CONTROL on the select
+// split. Run A selected against rule disagreement (native_trace_features.dl:19-21)
+// on a population that contained no negative controls at all, so its threshold
+// was an interpolation between two classes drawn only from positive copies and
+// extrapolated off-manifold on every negative control. See
+// docs/native-trace-diagnosis.md.
+//
+// Both classes must hold at least MINCLASS instances or this layer/channel
+// contributes no vote, and the shortfall is reported rather than silently
+// producing a threshold from a degenerate population.
+.decl sample(i:number,negative:number) .input sample
+.decl unit(n:number) .input unit
+.decl observation(i:number,n:number,v:float) .input observation
+.decl gate(i:number,n:number,g:float) .input gate
+
+.decl invalid() .output invalid
+invalid() :- !sample(_,_).
+invalid() :- !unit(_).
+invalid() :- !gate(_,_,_).
+// Stronger than run A's equivalent: every (sample, unit) pair must be present.
+// Checking only "this sample has some observation" would silently drop a row from
+// a class mean when one unit is missing, which is the failure run A's own
+// comment claims to prevent.
+invalid() :- sample(I,_), unit(N), !observation(I,N,_).
+invalid() :- observation(I,_,_), !sample(I,_).
+invalid() :- observation(_,N,_), !unit(N).
+invalid() :- observation(I,N,A), observation(I,N,B), A != B.
+invalid() :- sample(I,_), unit(N), !gate(I,N,_).
+invalid() :- gate(I,_,_), !sample(I,_).
+invalid() :- gate(_,N,_), !unit(N).
+invalid() :- gate(I,N,A), gate(I,N,B), A != B.
+
+.decl label(i:number,c:number)
+label(I,1) :- sample(I,0).   // positive copy context
+label(I,0) :- sample(I,1).   // negative control
+
+.decl size(c:number,n:number) .output size
+size(1,N) :- N = count : { label(_,1) }.
+size(0,N) :- N = count : { label(_,0) }.
+
+// Registered floor: preregistration requires >= 8 instances in BOTH classes.
+.decl minclass(n:number)
+minclass(8).
+
+.decl eligible() .output eligible
+eligible() :- !invalid(), size(1,N1), size(0,N0), minclass(M), N1>=M, N0>=M.
+
+.decl no_vote(reason:symbol,have_positive:number,have_negative:number) .output no_vote
+no_vote("class_below_floor",N1,N0) :- !invalid(), !eligible(), size(1,N1), size(0,N0).
+
+.decl class_mean(n:number,c:number,m:float)
+class_mean(N,C,M) :- unit(N), size(C,S),
+               V = sum X : { observation(I,N,X), label(I,C) }, M = V / to_float(S).
+
+.decl variance(n:number,v:float)
+variance(N,V) :- class_mean(N,0,A), class_mean(N,1,B), size(0,NA), size(1,NB),
+                 M = (A*to_float(NA)+B*to_float(NB))/to_float(NA+NB),
+                 S = sum X*X : { observation(_,N,X) }, V = max(0.0,S/to_float(NA+NB)-M*M).
+
+.decl merit(n:number,s:float,t:float,p:number)
+merit(N,S,T,1) :- eligible(), class_mean(N,0,A), class_mean(N,1,B), variance(N,V),
+                 B>A, S=(B-A)*(B-A)/(V+0.000000000001), T=(A+B)/2.0.
+merit(N,S,T,-1) :- eligible(), class_mean(N,0,A), class_mean(N,1,B), variance(N,V),
+                 B<A, S=(B-A)*(B-A)/(V+0.000000000001), T=(A+B)/2.0.
+
+.decl best_score(s:float)
+best_score(S) :- merit(_,_,_,_), S = max X : { merit(_,X,_,_) }.
+
+// One neuron per run, ties by neuron id, as in run A.
+.decl chosen(n:number,score:float,threshold:float,polarity:number) .output chosen
+chosen(N,S,T,P) :- !invalid(), best_score(S), S>0.0,
+                   N = min U : { merit(U,S,_,_) }, merit(N,S,T,P).
+
+// Gate weight denominator: mean |gate| of the chosen unit on the SELECT split.
+// Souffle 2.5 has no abs(), so magnitude is split on sign.
+.decl gmag(i:number,n:number,m:float)
+gmag(I,N,M) :- gate(I,N,G), G >= 0.0, M = G.
+gmag(I,N,M) :- gate(I,N,G), G < 0.0, M = -G.
+
+.decl gate_mean(n:number,m:float) .output gate_mean
+gate_mean(N,M) :- chosen(N,_,_,_),
+                 V = sum X : { gmag(I,N,X) }, C = count : { gate(I,N,_) },
+                 C>0, M = V / to_float(C).
+
+// A chosen unit whose gate is shut carries no weight; it is reported, never
+// quietly substituted with an unweighted vote.
+.decl unweighted(n:number) .output unweighted
+unweighted(N) :- chosen(N,_,_,_), !gate_mean(N,_).
+unweighted(N) :- gate_mean(N,M), M <= 0.0.
+
+.decl certified() .output certified
+certified() :- !invalid().

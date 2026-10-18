@@ -133,10 +133,18 @@ guard compositions) in the same order, the same top-12 proposal budget, ties by
 candidate ID, and no replacement of rejected candidates. All three arms receive
 the identical universe and proposal budget.
 
-Behavior score `B = train_correct - 4 * train_wrong`. Trace score
-`= B + Σ_f (margin_f · gweight_f)` over train firings; the shuffled arm uses the
+Behavior score `B = sign_correct - 4 * sign_wrong`, computed on the **sign**
+split. Trace score `= B + Σ_f (margin_f · gweight_f)` summed over candidate
+firings on that same sign split, using the features' thresholds, polarities and
+gate means fitted on the disjoint select split. The shuffled arm uses the
 identical formula with signature rows permuted by seed 204. Scores and their
 relative weight are fixed.
+
+Note the split discipline this implies: the select split fits feature
+*parameters* and is never used to rank; the sign split computes the signature and
+ranks but never influences a threshold, polarity or gate mean; test is untouched
+until after freeze. A trace value is therefore never summed on a row whose
+feature parameters were fitted from it.
 
 ## The shuffled control is mandatory
 
@@ -164,11 +172,12 @@ unique mechanism. Nulls preserved.
 
 ## Admission, runtime, and certification
 
-Unchanged: zero train/validation errors, firing in at least two independent groups
-per split, correct paired-substitution following in at least two groups per
-split, controls included in the zero-error check and reported separately. Freeze
-every candidate, composite, wrapper, program hash, feature parameters, selection
-evidence, inputs, and firing domains before the first test oracle query.
+Unchanged: zero errors on both select and sign, firing in at least two
+independent groups per split, correct paired-substitution following in at least
+two groups per split, controls included in the zero-error check and reported
+separately. Freeze every candidate, composite, wrapper, program hash, feature
+parameters, selection evidence, inputs, and firing domains before the first test
+oracle query.
 
 **Runtime independence is absolute and unchanged.** Token facts and an explicit
 instance domain in; decisions and explicit abstentions out; Souffle alone. No
