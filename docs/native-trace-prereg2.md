@@ -102,10 +102,25 @@ line in this document.
 
 Unchanged from run A: Qwen/Qwen2.5-0.5B-Instruct revision
 `7ae557604adf67be50417f59c2c2f167def9a775`, f32 fieldrun bundle, greedy decoding.
-The upstream FP32/eager preflight gate is repeated for the new binary and
-recorded fresh; the checkpoint, tokenizer, bundle, binary, and toolchain hashes
-are pinned in the run-B manifest. Run A's preflight artefacts are not reused as
-run B's gate.
+
+Run B introduces **no new oracle**. It runs the same validated `0948cbe`
+executable and the same f32 bundle as run A, so run A's upstream FP32/eager
+preflight *is* run B's gate rather than being a separate one. This is stated
+because run B differs from run A only in selection and voting, never in what
+produces the answers — a different oracle would confound the comparison the
+experiment exists to make.
+
+The gate is therefore attested, not re-run: `py/run_native_trace2.py`'s
+`model_gate` hashes the binary, both bundle files, and the preflight
+`report.json` and `reference.json`, and refuses to collect unless they equal what
+the preflight recorded. `tests/test_native_trace2_oracle.py` checks the same
+identities, and additionally checks the refusal path so the attestation cannot
+pass vacuously.
+
+Verified on the pinned copy used for run A — binary
+`54de8fc8fd5acec0…67ea62`, bundle `3a2fb8e5…f77f8d` / `5c013a3a…aaa12`,
+preflight report `6d313afd…d3150`, reference `e58ed6ead6…da3b9c` — all matching
+run A's recorded `model.json`.
 
 ## Datasets and information boundaries
 
