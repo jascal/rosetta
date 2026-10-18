@@ -1,0 +1,51 @@
+{
+  "certified": true,
+  "ndomain": 96,
+  "nmiss": 0,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "96"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "96"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "certificate-evidence/equiv-behavior-candidate-225-firing/check-2y9xm7ks",
+  "wall_seconds": 0.05452418699860573
+}

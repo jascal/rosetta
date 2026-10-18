@@ -1,0 +1,51 @@
+{
+  "certified": true,
+  "ndomain": 102,
+  "nmiss": 0,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "102"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "102"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "certificate-evidence/equiv-shuffled-firing/check-l9spvntx",
+  "wall_seconds": 0.05417472100816667
+}

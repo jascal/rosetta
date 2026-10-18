@@ -1,0 +1,798 @@
+{
+  "missing_evidence": [],
+  "completed": true,
+  "runtime_ok": true,
+  "evidence": [
+    {
+      "evidence": "certificate-evidence/diagnostic-plan/check-1488m7h2",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/diagnostic-summary/check-2yxosusz",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior/check-ezqv9im6",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-169/check-n2201mwv",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-177/check-1d3fmm14",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-179/check-mg9trh0s",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-223/check-fpn91obg",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-225/check-erw081ip",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-233/check-ncenr17b",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-235/check-81y57myo",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-279/check-0xstcc2u",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-737/check-4vyskjmv",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-783/check-vg8z97v9",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-905/check-lt3msmzy",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-behavior-candidate-951/check-7xw5i8ej",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled/check-pr8d27cq",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled-candidate-169/check-3h9_t3sc",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled-candidate-171/check-b_o72x65",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled-candidate-179/check-ahtenmy1",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-shuffled-candidate-196/check-cqjqx_5_",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace/check-_pfklsyg",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-177/check-uyx6k_z0",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-223/check-muqmend2",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-225/check-itli0xvb",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-233/check-py9fovxw",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-235/check-mpi5d71t",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-279/check-_fsd5q0q",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-737/check-98pc9pba",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-783/check-mu6_6ihe",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-905/check-emiy_vpg",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-951/check-4gilib5t",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-953/check-24op5t9b",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/domain-trace-candidate-961/check-j2oh_wu9",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-169-firing/check-ggicz5q8",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-169-full/check-vs84n2zq",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-177-firing/check-nyn4b8rz",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-177-full/check-28lelkn7",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-179-firing/check-u7_1omxi",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-179-full/check-vxeehz4g",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-223-firing/check-hevpdc0m",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-223-full/check-14f3ssiz",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-225-firing/check-2y9xm7ks",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-225-full/check-am21n3kp",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-233-firing/check-1d1jxq3b",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-233-full/check-5o3aa53_",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-235-firing/check-0o_kn0sa",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-235-full/check-p0rljj64",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-279-firing/check-tovzu_ah",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-279-full/check-yltb5t1u",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-737-firing/check-wg6ml4e8",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-737-full/check-w7lturiq",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-783-firing/check-pxntspz3",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-783-full/check-jo4uscok",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-905-firing/check-j88m3562",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-905-full/check-vtst9v45",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-951-firing/check-jcj6sngz",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-candidate-951-full/check-u4y341vi",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-firing/check-_tmbfi11",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-behavior-full/check-is_ggfa4",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-169-firing/check-7cv4qu75",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-169-full/check-11yf81_3",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-171-firing/check-obbn0_o7",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-171-full/check-zfu_wz4f",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-179-firing/check-zpdv5h52",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-179-full/check-3246paf7",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-196-firing/check-l7ivu8hm",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-candidate-196-full/check-i_p3_j7l",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-firing/check-l9spvntx",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-shuffled-full/check-mb0fac14",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-177-firing/check-ditg_hwn",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-177-full/check-0ay4sq7a",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-223-firing/check-y_e_vl4t",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-223-full/check-h505wrl_",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-225-firing/check-lgydoede",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-225-full/check-5w0i90ei",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-233-firing/check-c9ugl0hh",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-233-full/check-r5_u6wb4",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-235-firing/check-v3c0lqfs",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-235-full/check-lq12nk4w",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-279-firing/check-45vsjxcb",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-279-full/check-cr6ak2we",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-737-firing/check-2bas5mtc",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-737-full/check-55t8yfgf",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-783-firing/check-q1j_xgu9",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-783-full/check-th3l65yp",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-905-firing/check-8m3eqap1",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-905-full/check-wypu62o8",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-951-firing/check-05bi4rm2",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-951-full/check-wx95qcuq",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-953-firing/check-pzoe2cz7",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-953-full/check-0fvbijba",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-961-firing/check-22zwr4zu",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-candidate-961-full/check-rx_uw0uc",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-firing/check-qp_uiwoi",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/equiv-trace-full/check-s94cfgv7",
+      "certified": false,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-gate/check-n345b8hr",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-product/check-rsgn3_22",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-15-value/check-cv6sl0m5",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-gate/check-g07v4t54",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-product/check-mu2klyd6",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-23-value/check-w4n6eg2f",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-gate/check-njenh__9",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-product/check-yj5116px",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/feature-7-value/check-1xl99a6s",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/final-summary/check-jsmeqaxi",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/observation-cost/check-d8qypmgq",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/selection/check-4mzpwuu5",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    },
+    {
+      "evidence": "certificate-evidence/strict-copy-agreement/check-e9y3dzir",
+      "certified": true,
+      "verdict_preserved": true,
+      "all_relations_identical": true,
+      "mismatched_relations": []
+    }
+  ],
+  "standalone": [
+    {
+      "arm": "behavior",
+      "present": true,
+      "ran": true,
+      "only_program_and_token_domain_facts": true,
+      "predictions_match": true,
+      "abstentions_match": true,
+      "all_domain_instances_abstain": false
+    },
+    {
+      "arm": "trace",
+      "present": true,
+      "ran": true,
+      "only_program_and_token_domain_facts": true,
+      "predictions_match": true,
+      "abstentions_match": true,
+      "all_domain_instances_abstain": false
+    },
+    {
+      "arm": "shuffled",
+      "present": true,
+      "ran": true,
+      "only_program_and_token_domain_facts": true,
+      "predictions_match": true,
+      "abstentions_match": true,
+      "all_domain_instances_abstain": false
+    }
+  ],
+  "frozen_hashes_unchanged": true,
+  "frozen_detail": {
+    "checked_files": 805,
+    "checked_sources": 21,
+    "changed": []
+  }
+}

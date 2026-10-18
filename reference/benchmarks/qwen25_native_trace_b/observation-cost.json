@@ -1,0 +1,35 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "cost": [
+      [
+        "select",
+        "114",
+        "30.827319436823018"
+      ],
+      [
+        "sign",
+        "114",
+        "31.82704026234569"
+      ],
+      [
+        "diagnostic",
+        "576",
+        "134.30533964297501"
+      ],
+      [
+        "test",
+        "114",
+        "33.498157515714411"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "certificate-evidence/observation-cost/check-d8qypmgq",
+  "wall_seconds": 0.030719907023012638
+}

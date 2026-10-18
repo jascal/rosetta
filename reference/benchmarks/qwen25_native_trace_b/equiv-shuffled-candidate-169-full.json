@@ -1,0 +1,84 @@
+{
+  "certified": false,
+  "ndomain": 114,
+  "nmiss": 0,
+  "nuncov": 12,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "12"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "114"
+      ]
+    ],
+    "certified": [],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "114"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": [
+      [
+        "260"
+      ],
+      [
+        "262"
+      ],
+      [
+        "263"
+      ],
+      [
+        "265"
+      ],
+      [
+        "298"
+      ],
+      [
+        "300"
+      ],
+      [
+        "301"
+      ],
+      [
+        "303"
+      ],
+      [
+        "336"
+      ],
+      [
+        "338"
+      ],
+      [
+        "339"
+      ],
+      [
+        "341"
+      ]
+    ]
+  },
+  "evidence": "certificate-evidence/equiv-shuffled-candidate-169-full/check-11yf81_3",
+  "wall_seconds": 0.051834730023983866
+}

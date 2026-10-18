@@ -1,0 +1,51 @@
+{
+  "certified": true,
+  "ndomain": 96,
+  "nmiss": 0,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "96"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "96"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "certificate-evidence/equiv-trace-candidate-951-firing/check-05bi4rm2",
+  "wall_seconds": 0.051491504011210054
+}

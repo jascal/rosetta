@@ -1,0 +1,51 @@
+{
+  "certified": true,
+  "ndomain": 86,
+  "nmiss": 0,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "86"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "86"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "certificate-evidence/equiv-shuffled-candidate-171-firing/check-obbn0_o7",
+  "wall_seconds": 0.04907853499753401
+}
