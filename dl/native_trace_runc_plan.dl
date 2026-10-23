@@ -1,0 +1,132 @@
+// Run-C intervention plan.
+//
+// The treatment is fixed in advance: nine (layer, neuron) coordinates taken from
+// run B's frozen features.json. This query decides only WHICH patches to apply
+// to WHICH row -- never what to measure afterwards, never which arm wins.
+// Everything a reader could call a decision lives here, not in the host.
+//
+// Arms (docs/native-trace-runc-prereg.md):
+//   zero  k=1..9   zero the product of the first k coordinates of the register
+//   rand  k=1..9   zero k non-target neurons with the same per-layer counts
+//   mean           replace all nine coordinates with their corpus mean
+//   ident          write each row's own nine values back (instrument control)
+//   write_copy_into_control / write_control_into_copy   the two write arms
+//
+// Fail closed: any inconsistency between the register, the rows, the
+// observations and the random control sets invalidates the whole plan.
+
+.decl unit(rank:number,l:number,n:number) .input unit
+.decl row(i:number,cls:number,gkey:symbol,len:number) .input row
+.decl obs(i:number,l:number,n:number,v:float) .input obs
+.decl rset(k:number,l:number,n:number) .input rset
+.decl klist(k:number) .input klist
+
+// ---------------------------------------------------------------- integrity
+.decl invalid() .output invalid
+invalid() :- !unit(_,_,_).
+invalid() :- !row(_,_,_,_).
+invalid() :- K = count : { unit(_,_,_) }, K != 9.
+invalid() :- unit(R,_,_), R < 1.
+invalid() :- unit(R,_,_), R > 9.
+// Two register entries may not claim the same neuron.
+invalid() :- unit(R,L,N), unit(S,L,N), R < S.
+// The register must be exactly 1..9, contiguous.
+.decl reg(r:number)
+reg(R) :- unit(R,_,_).
+invalid() :- reg(R), reg(S), R < S, !reg(R+1).
+invalid() :- row(I,C,_,_), C > 1.
+// Every row must carry every coordinate's value; a missing one would silently
+// drop a coordinate from exactly the arms that need it.
+invalid() :- row(I,_,_,_), unit(R,L,N), !obs(I,L,N,_).
+invalid() :- obs(I,L,N,_), !unit(_,L,N).
+invalid() :- obs(I,L,N,V), obs(I,L,N,W), V != W.
+// The random control sets may not touch a treated coordinate.
+invalid() :- rset(K,L,N), unit(_,L,N).
+invalid() :- rset(K,_,_), !klist(K).
+invalid() :- !klist(_).
+invalid() :- klist(K), K < 1.
+invalid() :- klist(K), K > 9.
+// Random sets must be nested, exactly as the treated sets are.
+invalid() :- rset(K,L,N), !rset(K+1,L,N), K < 9.
+
+// Per-layer counts must match the treated sets, so R_k is layer-matched to Z_k.
+.decl zcount(k:number,l:number,c:number)
+zcount(K,L,C) :- klist(K), unit(R,L,_), R <= K,
+                 C = count : { unit(R2,L,_), R2 <= K }.
+.decl rcount(k:number,l:number,c:number)
+rcount(K,L,C) :- zcount(K,L,_), C = count : { rset(K,L,_) }.
+invalid() :- zcount(K,L,C), rcount(K,L,D), C != D.
+
+// ------------------------------------------------------------------ donors
+// The donor is the opposite-class row in the MATCHED group (same seed, same
+// generator length, same group index), preferring the same context length,
+// lowest id otherwise. A label transformation plus an id tie-break; never a
+// host-side choice.
+.decl donor_same(d:number,i:number)
+donor_same(D,I) :- row(I,0,G,L), row(D,1,G,L), D = min E : { row(E,1,G,L) }.
+donor_same(D,I) :- row(I,1,G,L), row(D,0,G,L), D = min E : { row(E,0,G,L) }.
+.decl has_same_len(i:number)
+has_same_len(I) :- donor_same(_,I).
+.decl donor(d:number,i:number) .output donor
+donor(D,I) :- donor_same(D,I).
+donor(D,I) :- row(I,0,G,_), !has_same_len(I), row(D,1,G,_),
+              D = min E : { row(E,1,G,_) }.
+donor(D,I) :- row(I,1,G,_), !has_same_len(I), row(D,0,G,_),
+              D = min E : { row(E,0,G,_) }.
+invalid() :- row(I,C,_,_), C != 0, C != 1.
+invalid() :- row(I,_,_,_), !donor(_,I).
+invalid() :- donor(D,I), row(I,C,_,_), row(D,C,_,_).
+invalid() :- donor(D,I), row(I,_,G,_), row(D,_,H,_), G != H.
+
+// ------------------------------------------------------------- the arms
+// The corpus mean is computed here, not in the host: it is the scale-preserving
+// control's definition.
+.decl coord_mean(l:number,n:number,m:float) .output coord_mean
+coord_mean(L,N,M) :- unit(R,L,N),
+                     S = count : { obs(_,L,N,_) },
+                     V = sum X : { obs(_,L,N,X) },
+                     M = V / to_float(S).
+invalid() :- unit(R,L,N), !coord_mean(L,N,_).
+
+// Z_k is the first k coordinates of the register; k is the cumulative SIZE,
+// not a register rank. The membership relation is what makes that explicit.
+.decl zmember(k:number,rank:number,l:number,n:number)
+zmember(K,R,L,N) :- klist(K), unit(R,L,N), R <= K.
+
+.decl request(i:number,mode:symbol,k:number) .output request
+request(I,"zero",K) :- row(I,_,_,_), klist(K).
+request(I,"rand",K) :- row(I,_,_,_), klist(K).
+request(I,"mean",9) :- row(I,_,_,_).
+request(I,"ident",9) :- row(I,_,_,_).
+request(I,"write_copy_into_control",0) :- row(I,1,_,_).
+request(I,"write_control_into_copy",0) :- row(I,0,_,_).
+
+.decl patch(i:number,mode:symbol,k:number,l:number,n:number,v:float) .output patch
+patch(I,"zero",K,L,N,0.0) :- row(I,_,_,_), zmember(K,R,L,N).
+patch(I,"rand",K,L,N,0.0) :- row(I,_,_,_), rset(K,L,N).
+patch(I,"mean",9,L,N,M) :- row(I,_,_,_), unit(R,L,N), coord_mean(L,N,M).
+patch(I,"ident",9,L,N,V) :- row(I,_,_,_), unit(R,L,N), obs(I,L,N,V).
+patch(I,"write_copy_into_control",0,L,N,V) :- row(I,1,_,_), unit(R,L,N),
+                                             donor(D,I), obs(D,L,N,V).
+patch(I,"write_control_into_copy",0,L,N,V) :- row(I,0,_,_), unit(R,L,N),
+                                             donor(D,I), obs(D,L,N,V).
+
+invalid() :- patch(I,M,K,_,_,_), !request(I,M,K).
+invalid() :- request(I,M,K), P = count : { patch(I,M,K,_,_,_) }, P = 0.
+invalid() :- request(I,"zero",K), P = count : { patch(I,"zero",K,_,_,_) }, P != K.
+invalid() :- request(I,"rand",K), P = count : { patch(I,"rand",K,_,_,_) }, P != K.
+invalid() :- request(I,"mean",_), P = count : { patch(I,"mean",_,_,_,_) }, P != 9.
+invalid() :- request(I,"ident",_), P = count : { patch(I,"ident",_,_,_,_) }, P != 9.
+invalid() :- request(I,"write_copy_into_control",_),
+             P = count : { patch(I,"write_copy_into_control",_,_,_,_) }, P != 9.
+invalid() :- request(I,"write_control_into_copy",_),
+             P = count : { patch(I,"write_control_into_copy",_,_,_,_) }, P != 9.
+
+.decl nreq(n:number) .output nreq
+nreq(N) :- N = count : { request(_,_,_) }.
+.decl npatch(n:number) .output npatch
+npatch(N) :- N = count : { patch(_,_,_,_,_,_) }.
+.decl ndonor(n:number) .output ndonor
+ndonor(N) :- N = count : { donor(_,_) }.
+.decl certified() .output certified
+certified() :- !invalid().

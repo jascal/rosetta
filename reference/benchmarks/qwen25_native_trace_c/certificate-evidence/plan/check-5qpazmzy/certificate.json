@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "stage": "plan",
+    "source": "native-trace run C"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "f7c7e9e8288dc0fccb5b776440170d61cba267df16c2455457cb646b13b1234c",
+    "facts/klist.facts": "90cdaf13f564e4d2e76706f84226a554a2bbdb2542c2e48764d16bffd17bb38a",
+    "facts/obs.facts": "83c423d7111ed0953dcd6f0d663ee43dc3470f845497b13228634717db9342aa",
+    "facts/row.facts": "f54fe5b23738f302cdd299a26a0f67004bfd985e7f63ddd28f5e03179b72ee0a",
+    "facts/rset.facts": "115f1ce81c863cb8702b9321854f1be3f9f789b8385b1e00e752ab3e6fc6b41e",
+    "facts/unit.facts": "ab231e05d61dfa35e205390d1fb3f8f415ae2fe798bc5700f7606285a4765517",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/coord_mean.csv": "097e3cbc430a375153ad802b57790fe53e86e6a13087ed596cabb88889fa24b0",
+    "outputs/donor.csv": "edd13a126ae106bdbcaa028bb7b0652af98fb2ef2634c4134ac9eac23a2e62d3",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ndonor.csv": "e15cb49f231c64265cbcf05790aa5291ab7ee9f2efc092fbcafea2d58e5f83a8",
+    "outputs/npatch.csv": "0f637783409c8cec95060fccaba1e244f9cca272b34a9261872492c6ffac6e73",
+    "outputs/nreq.csv": "21def7501b66759003cf1df0d00fd3abcda3bf33fd8c2bf70695b3b6e87fbed1",
+    "outputs/patch.csv": "bc0547d1c19003d3b573095ad9ead2c096df72326f9b0bda022bf3d76cd5f05c",
+    "outputs/request.csv": "396890087c47927bea7c8fedd5b24b7ea19ce082d8c9b6155676ac1103aa4c46",
+    "stderr.txt": "2ca268c677fa1503c1ab8d8a8ca1501ce3080a421c8376b555971172dcd31adc",
+    "verify.dl": "f7c7e9e8288dc0fccb5b776440170d61cba267df16c2455457cb646b13b1234c"
+  }
+}

@@ -62,6 +62,10 @@ Two principles learned the hard way (in the fieldrun threx experiment that seede
 | — | Run B, registered before any collection: negative-bearing selection split disjoint from signing, a plain signed-margin sum with no gate weighting, and a non-degeneracy gate that stops a uniform signature. [Preregistration](docs/native-trace-prereg2.md). |
 | `py/run_native_trace2.py` | Run-B input generator: fresh seeds 201/202/203 as select/sign/test, excluding every token shared with the historical datasets or run A. Committed inputs, not a hand-assembled artifact. [Inputs](reference/benchmarks/qwen25_native_trace_b/protocol.json). |
 | — | **Run B result: the gate passes and 31 circuits certify over nonempty firing domains — the first such domains in the program — but the trace arm still adds zero incremental certified coverage and is strictly worse in raw coverage (96 vs 102). Zeroing the selected neurons flips nothing in 144 interventions.** [Outcome](docs/native-trace-runb-outcome.md). |
+| `dl/native_trace_runc_{plan,summary}.dl` | Run C's intervention plan and effect summary: the arms, the layer-matched random controls, the donor choice, the flips, and the hypothesis verdict, all in Datalog. |
+| `py/run_native_trace3.py` | Run-C driver: fresh inputs disjoint from every prior dataset, a treatment fixed in advance from run B's frozen evidence, a plan frozen before the first intervention request, and a model-free replay of both queries. [Inputs](reference/benchmarks/qwen25_native_trace_c/protocol.json). |
+| — | Run C, registered before any collection: is the trace signature the copy mechanism? Group and cumulative ablation, scale-preserving and random controls, and write arms — with the decision rules fixed in advance. [Preregistration](docs/native-trace-runc-prereg.md). |
+| — | **Run C result: no. Across 2,394 interventions on 114 fresh contexts, not one copy-row answer changed — not with all nine treated coordinates zeroed at once, and not with another instance's values written over a copy row's. Yet those coordinates move the logits ~19× more than layer-matched random neurons, so they are on the model's path and still not the mechanism.** [Outcome](docs/native-trace-runc-outcome.md). |
 | `py/benchmark_copy_generalization.py` | Keeps the guard unchanged across fresh seeds, lengths, and distractors; Datalog reports strata and counterexamples. [Protocol and results](docs/copy-generalization.md). |
 | `py/diagnose_copy_targets.py` | Controlled target substitutions cross prefix length, sequence length, and gaps to investigate copy failures. [Diagnostic protocol](docs/copy-target-diagnosis.md). |
 | `dl/{ngram,induction,master}.dl` | **reference / legacy** hand-coded Datalog detectors — *subsumed* by the learner, which discovers these circuits unsupervised and inlines them into the emitted `circuits.dl`. Not on the live path. |
@@ -141,6 +145,14 @@ certify at `nmiss=0 ∧ nuncov=0` over firing domains of 86–102 instances, wit
 test contexts, and 108/108 replayed query verdicts preserved with the model absent. That is a result about the
 minimization loop certifying, not about traces helping — the trace arm added zero incremental coverage over both
 controls and was strictly worse in raw coverage. [Outcome](docs/native-trace-runb-outcome.md).
+
+**Run C then asks why that bridge did not close**, holding run B's nine coordinates fixed in advance and ablating
+them as a group, cumulatively, and by writing other instances' values over a copy row's. Across 2,394 interventions
+on 114 fresh contexts, no copy-row answer ever changed, while those coordinates moved the model's logits about
+nineteen times more than layer-matched random neurons of the same layers. The signature is real and is not the
+mechanism — so the bridge points at the wrong coordinates, and a better one has to be built from necessity-and-
+sufficiency tests on a candidate mechanism rather than from ranking statistics over a fixed predicate library.
+[Outcome](docs/native-trace-runc-outcome.md).
 
 The original four-model experiment reported **`nmiss=0 ∧ nuncov=0` in-domain** (T=0 / greedy), via the fieldrun-refs path for
 the real models. Same generation budget (250×80, temp 0.8) so the comparison is fair; threx is the capped toy.
