@@ -1,0 +1,43 @@
+{
+  "status": "ready",
+  "sha256": {
+    "base.json": "97cac7e072ccfe913a3203710edad9e14471e53c9bf2bfce1f88ab859a029ebe",
+    "certificate-evidence/plan/check-5qpazmzy/certificate.json": "faf1b06b9030ca5292e4952661a023bb21e315c00b919cc44cf9141e0d01ca11",
+    "certificate-evidence/plan/check-5qpazmzy/circuit.dl": "f7c7e9e8288dc0fccb5b776440170d61cba267df16c2455457cb646b13b1234c",
+    "certificate-evidence/plan/check-5qpazmzy/facts/klist.facts": "90cdaf13f564e4d2e76706f84226a554a2bbdb2542c2e48764d16bffd17bb38a",
+    "certificate-evidence/plan/check-5qpazmzy/facts/obs.facts": "83c423d7111ed0953dcd6f0d663ee43dc3470f845497b13228634717db9342aa",
+    "certificate-evidence/plan/check-5qpazmzy/facts/row.facts": "f54fe5b23738f302cdd299a26a0f67004bfd985e7f63ddd28f5e03179b72ee0a",
+    "certificate-evidence/plan/check-5qpazmzy/facts/rset.facts": "115f1ce81c863cb8702b9321854f1be3f9f789b8385b1e00e752ab3e6fc6b41e",
+    "certificate-evidence/plan/check-5qpazmzy/facts/unit.facts": "ab231e05d61dfa35e205390d1fb3f8f415ae2fe798bc5700f7606285a4765517",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/coord_mean.csv": "097e3cbc430a375153ad802b57790fe53e86e6a13087ed596cabb88889fa24b0",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/donor.csv": "edd13a126ae106bdbcaa028bb7b0652af98fb2ef2634c4134ac9eac23a2e62d3",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/ndonor.csv": "e15cb49f231c64265cbcf05790aa5291ab7ee9f2efc092fbcafea2d58e5f83a8",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/npatch.csv": "0f637783409c8cec95060fccaba1e244f9cca272b34a9261872492c6ffac6e73",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/nreq.csv": "21def7501b66759003cf1df0d00fd3abcda3bf33fd8c2bf70695b3b6e87fbed1",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/patch.csv": "bc0547d1c19003d3b573095ad9ead2c096df72326f9b0bda022bf3d76cd5f05c",
+    "certificate-evidence/plan/check-5qpazmzy/outputs/request.csv": "396890087c47927bea7c8fedd5b24b7ea19ce082d8c9b6155676ac1103aa4c46",
+    "certificate-evidence/plan/check-5qpazmzy/stderr.txt": "2ca268c677fa1503c1ab8d8a8ca1501ce3080a421c8376b555971172dcd31adc",
+    "certificate-evidence/plan/check-5qpazmzy/verify.dl": "f7c7e9e8288dc0fccb5b776440170d61cba267df16c2455457cb646b13b1234c",
+    "collection.jsonl": "f967a2eadcd226035126833ddba1142c2d7f33f860cac4adbd405b79b61a3263",
+    "dataset.json": "1b54ab66f056295a87a8cd4e11a0c81ba47206043ac3db5696ac33ed675f6b44",
+    "model.json": "f8831110ce342360ccb0242e58f47654c888b508096479e64b6efec69a6205b5",
+    "plan.json": "338dd19f8fc2721f1fc836e2cc393c116a8a406bde34b3969aa6ac43f32e1b03",
+    "protocol.json": "399e44dbf6bf977f35c0c00147c1539d312962daf6b224ec3f0c17061d11d372",
+    "references.json": "8c5e4d64a7f12ad27100f39f6201c7d7c2b6d88434ee4e5e189ef761ab51a10e"
+  },
+  "source_sha256": {
+    "py/run_native_trace3.py": "ddce014a832609ddd43dcdb5bcfec44f482f090bacf297114ad12d2b8365cb4b",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "py/native_trace.py": "3d9a58287121da3b36b3dfbb57c57086bb625275f24a2f470adeb019b81366b6",
+    "py/benchmark_induction.py": "99ba7a71296e690dcbc6cd64c76db801542ccab54baffcfec52a5cc34e20baa9",
+    "py/benchmark_copy_generalization.py": "cf1deecbd41627bef5413979e7c44d49c020ec24d816552956218b4fce782d16",
+    "py/run_native_trace2.py": "539c6705d92dce76bb98088cd4b775470966ee38d0df532e845e76a2eac54094",
+    "docs/native-trace-runc-prereg.md": "2f6de4b4fbde0dc3e8ffdcce0044a085c89d83fc5e5d07af48456e7a6a410509",
+    "dl/native_trace_runc_plan.dl": "f7c7e9e8288dc0fccb5b776440170d61cba267df16c2455457cb646b13b1234c",
+    "dl/native_trace_runc_summary.dl": "9a79fcdecee2ed605ee0506de1e21544e1328e11f0887ec9bd91381cf8e28e4d",
+    "reference/benchmarks/qwen25_native_trace_b/features.json": "fe06adfa53badd035a84c735f9c98af19ca014aee63619037a8231172d6aea57"
+  },
+  "note": "The intervention plan was frozen before the first intervention request."
+}
