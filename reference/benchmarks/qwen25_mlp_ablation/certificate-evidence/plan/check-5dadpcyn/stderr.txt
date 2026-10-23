@@ -1,0 +1,15 @@
+Warning: Variable L only occurs once in file verify.dl at line 53
+invalid() :- cumul_member(K,L), !cumul_arm(K).
+----------------------------^------------------
+Warning: Variable K only occurs once in file verify.dl at line 54
+invalid() :- cumul_member(K,L), !layer(L,_).
+--------------------------^------------------
+Warning: Variable W only occurs once in file verify.dl at line 76
+invalid() :- layer(L,W), lo(L,N), N != 0.
+---------------------^--------------------
+Warning: Variable N only occurs once in file verify.dl at line 78
+invalid() :- neuron(L,N), !layer(L,_).
+----------------------^----------------
+Warning: Variable L only occurs once in file verify.dl at line 119
+invalid() :- plan(I,A,K,L,_,_), !req(I,A,K).
+------------------------^--------------------
