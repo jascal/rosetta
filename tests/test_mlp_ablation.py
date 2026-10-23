@@ -273,6 +273,30 @@ def test_summary_breaks_on_a_broken_instrument_or_a_missing_result():
     assert missing["relations"]["invalid"]
 
 
+def test_only_the_stage2_arm_covers_every_position(tmp_path):
+    """The 0/1 allpos column arrives as text: "0" is truthy, so it must be
+    compared numerically. Every stage-1 arm patches the answer position only."""
+    out, rows = _study(tmp_path)
+    facts = rund.arm_facts(out)
+    result = check(DL / "mlp_ablation_plan.dl", DL / "mlp_ablation_plan.dl", facts, {})
+    assert result["certified"], result.get("error")
+    by_arm = {}
+    for (i, arm, key, layer, mode, allpos) in result["relations"]["plan"]:
+        by_arm.setdefault(arm, set()).add(int(allpos))
+    assert by_arm["sweep"] == {0}
+    assert by_arm["cumul"] == {0}
+    assert by_arm["ident"] == {0}
+    assert by_arm["donor"] == {0}
+    # With a stage-2 layer registered, that arm alone covers every position.
+    facts = rund.arm_facts(out, stage2_layers=(1,))
+    result = check(DL / "mlp_ablation_plan.dl", DL / "mlp_ablation_plan.dl", facts, {})
+    assert result["certified"], result.get("error")
+    by_arm = {}
+    for (i, arm, key, layer, mode, allpos) in result["relations"]["plan"]:
+        by_arm.setdefault(arm, set()).add(int(allpos))
+    assert by_arm["full"] == {1}
+
+
 def test_patch_expansion_covers_exactly_the_neuron_universe(tmp_path):
     out, rows = _study(tmp_path)
     request = {"i": 0, "arm": "sweep", "key": 1, "layers": [1], "mode": "zero", "allpos": False}

@@ -204,7 +204,9 @@ def plan(a):
         entry = layers[(int(i), arm, int(key))]
         requests.append({"i": int(i), "arm": arm, "key": int(key),
                          "layers": sorted(entry["layers"]), "mode": entry["mode"],
-                         "allpos": bool(entry["allpos"])})
+                         # The relation carries 0/1 as text; "0" is truthy as a
+                         # string, so compare numerically.
+                         "allpos": int(entry["allpos"]) == 1})
     requests.sort(key=lambda r: (r["i"], r["arm"], r["key"]))
     write_json(out / "plan.json", {
         "requests": requests,
