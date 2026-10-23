@@ -1,0 +1,36 @@
+Warning: Variable I only occurs once in file verify.dl at line 30
+invalid() :- donor(D,I), !ref(D,_).
+---------------------^--------------
+Warning: Variable L only occurs once in file verify.dl at line 32
+invalid() :- result(I,A,K,_,_,_), req_layer(I,A,K,L), !row(I,_,_).
+--------------------------------------------------^----------------
+Warning: Variable I20 only occurs once in file verify.dl at line 76
+    N  = count : { req(I2,A,L) },
+-----------------------^----------
+Warning: Variable I21 only occurs once in file verify.dl at line 77
+    F  = count : { flip(I2,A,L) },
+------------------------^----------
+Warning: Variable I22 only occurs once in file verify.dl at line 78
+    FC = count : { flip_copy(I2,A,L) },
+-----------------------------^----------
+Warning: Variable I2 only occurs once in file verify.dl at line 79
+    C  = count : { answer_correct(I2,A,L) }.
+----------------------------------^----------
+Warning: Variable K only occurs once in file verify.dl at line 84
+identity_ok(I) :- result(I,"ident",K,X,_,_), ref(I,X).
+-----------------------------------^-------------------
+Warning: Variable K only occurs once in file verify.dl at line 86
+identity_broken(I) :- result(I,"ident",K,X,_,_), ref(I,R), X != R.
+---------------------------------------^---------------------------
+Warning: Variable RL1 only occurs once in file verify.dl at line 95
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), X1 != X0.
+-----------------------------------------------^-----------------------------------------------
+Warning: Variable RL0 only occurs once in file verify.dl at line 95
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), X1 != X0.
+-----------------------------------------------------------------------------^-----------------
+Warning: Variable X1 only occurs once in file verify.dl at line 96
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), RL1 != RL0.
+--------------------------------------------^----------------------------------------------------
+Warning: Variable X0 only occurs once in file verify.dl at line 96
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), RL1 != RL0.
+--------------------------------------------------------------------------^----------------------
