@@ -1,0 +1,28 @@
+.decl donor(i:number,d:number) .input donor
+.decl member(a:symbol,l:number,h:number) .input member
+.decl tok(i:number,p:number,t:number) .input tok
+.decl edit(i:number,p:number) .input edit
+.decl feature(k:symbol,q:number,t:number) .output feature
+feature("token",-1,T) :- edit(I,P), tok(I,P,T).
+feature("bigram",Q,T) :- edit(I,P), tok(I,P,T), tok(I,P-1,Q).
+.decl site(i:number,p:number,q:number,t:number) .output site
+site(I,P,Q,T) :- edit(I,P), tok(I,P,T), tok(I,P-1,Q).
+.decl head_set(a:symbol)
+head_set(A) :- member(A,_,_).
+.decl mode(m:symbol)
+mode("source_values"). mode("token_self"). mode("token_donor"). mode("bigram_self"). mode("bigram_donor").
+.decl request(i:number,a:symbol,m:symbol,d:number) .output request
+request(I,"none","baseline",I) :- donor(I,_).
+request(I,A,"identity",I) :- donor(I,_), head_set(A).
+request(I,A,M,D) :- donor(I,D), head_set(A), mode(M), M != "token_self", M != "bigram_self".
+request(I,A,M,I) :- donor(I,_), head_set(A), mode(M), M="token_self".
+request(I,A,M,I) :- donor(I,_), head_set(A), mode(M), M="bigram_self".
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- !member(_,_,_).
+invalid() :- donor(I,D), !donor(D,I).
+invalid() :- donor(I,_), !site(I,_,_,_).
+invalid() :- edit(I,P), !site(I,P,_,_).
+invalid() :- donor(I,D), edit(I,P), !edit(D,P).
+.decl certified() .output certified
+certified() :- !invalid().
