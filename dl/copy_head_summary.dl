@@ -1,0 +1,62 @@
+.decl sample(i:number,c:symbol,gold:number) .input sample
+.decl baseline(i:number,t:number,b:float,g:float) .input baseline
+.decl request(i:number,a:symbol) .input request
+.decl native(i:number,a:symbol,t:number,b:float,g:float,scope:symbol) .input native
+.decl upstream(i:number,a:symbol,t:number,b:float,g:float) .input upstream
+.decl invalid() .output invalid
+invalid() :- !request(_,_).
+invalid() :- request(I,A), !native(I,A,_,_,_,_).
+invalid() :- request(I,A), !upstream(I,A,_,_,_).
+invalid() :- native(I,A,_,_,_,_), !request(I,A).
+invalid() :- upstream(I,A,_,_,_), !request(I,A).
+invalid() :- request(I,_), !sample(I,_,_).
+invalid() :- request(I,_), !baseline(I,_,_,_).
+invalid() :- native(_,_,_,_,_,S), S != "all_positions".
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), T != U.
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), B != C.
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), G != D.
+.decl abs_upstream(i:number,a:symbol,b:float,g:float)
+abs_upstream(I,A,B,G) :- upstream(I,A,_,B,G), B >= 0.0, G >= 0.0.
+abs_upstream(I,A,-B,G) :- upstream(I,A,_,B,G), B < 0.0, G >= 0.0.
+abs_upstream(I,A,B,-G) :- upstream(I,A,_,B,G), B >= 0.0, G < 0.0.
+abs_upstream(I,A,-B,-G) :- upstream(I,A,_,B,G), B < 0.0, G < 0.0.
+.decl parity_bad(i:number,a:symbol) .output parity_bad
+parity_bad(I,A) :- native(I,A,T,_,_,_), upstream(I,A,U,_,_), T != U.
+parity_bad(I,A) :- native(I,A,_,B,_,_), upstream(I,A,_,C,_), abs_upstream(I,A,M,_), B-C > 0.002+0.002*M.
+parity_bad(I,A) :- native(I,A,_,B,_,_), upstream(I,A,_,C,_), abs_upstream(I,A,M,_), C-B > 0.002+0.002*M.
+parity_bad(I,A) :- native(I,A,_,_,B,_), upstream(I,A,_,_,C), abs_upstream(I,A,_,M), B-C > 0.002+0.002*M.
+parity_bad(I,A) :- native(I,A,_,_,B,_), upstream(I,A,_,_,C), abs_upstream(I,A,_,M), C-B > 0.002+0.002*M.
+.decl abs_base(i:number,b:float,g:float)
+abs_base(I,B,G) :- baseline(I,_,B,G), B >= 0.0, G >= 0.0.
+abs_base(I,-B,G) :- baseline(I,_,B,G), B < 0.0, G >= 0.0.
+abs_base(I,B,-G) :- baseline(I,_,B,G), B >= 0.0, G < 0.0.
+abs_base(I,-B,-G) :- baseline(I,_,B,G), B < 0.0, G < 0.0.
+.decl empty_bad(i:number) .output empty_bad
+empty_bad(I) :- native(I,"none",T,_,_,_), baseline(I,U,_,_), T != U.
+empty_bad(I) :- native(I,"none",_,B,_,_), baseline(I,_,C,_), abs_base(I,M,_), B-C > 0.002+0.002*M.
+empty_bad(I) :- native(I,"none",_,B,_,_), baseline(I,_,C,_), abs_base(I,M,_), C-B > 0.002+0.002*M.
+empty_bad(I) :- native(I,"none",_,_,B,_), baseline(I,_,_,C), abs_base(I,_,M), B-C > 0.002+0.002*M.
+empty_bad(I) :- native(I,"none",_,_,B,_), baseline(I,_,_,C), abs_base(I,_,M), C-B > 0.002+0.002*M.
+.decl flip(i:number,a:symbol) .output flip
+flip(I,A) :- native(I,A,T,_,_,_), baseline(I,U,_,_), T != U.
+.decl gold(i:number,a:symbol)
+gold(I,A) :- native(I,A,T,_,_,_), sample(I,_,T).
+.decl rescue(i:number,a:symbol) .output rescue
+rescue(I,A) :- gold(I,A), sample(I,_,T), baseline(I,U,_,_), T != U.
+.decl loss(i:number,a:symbol) .output loss
+loss(I,A) :- sample(I,_,T), baseline(I,T,_,_), native(I,A,U,_,_,_), T != U.
+.decl effect(i:number,a:symbol,base_delta:float,gold_delta:float) .output effect
+effect(I,A,B-C,G-D) :- native(I,A,_,B,G,_), native(I,"none",_,C,D,_).
+.decl counts(a:symbol,c:symbol,n:number,flip:number,gold:number,rescue:number,loss:number) .output counts
+counts(A,C,N,F,G,R,L) :- request(_,A), sample(_,C,_),
+    N = count : { sample(I,C,_), native(I,A,_,_,_,_) },
+    F = count : { sample(I,C,_), flip(I,A) },
+    G = count : { sample(I,C,_), gold(I,A) },
+    R = count : { sample(I,C,_), rescue(I,A) },
+    L = count : { sample(I,C,_), loss(I,A) }.
+.decl certified() .output certified
+// Only the empirical instrument gate; no model equivalence or mechanism proof.
+certified() :- !invalid(), !parity_bad(_,_), !empty_bad(_).

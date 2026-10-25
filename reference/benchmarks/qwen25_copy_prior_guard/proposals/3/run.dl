@@ -1,0 +1,9 @@
+.decl tok(i:number,p:number,t:number)
+.input tok
+.decl domain(i:number)
+.input domain
+#include "circuits.dl"
+.output cdecide
+.decl abstain(i:number)
+.output abstain
+abstain(I) :- domain(I), !cdecide(I,_).

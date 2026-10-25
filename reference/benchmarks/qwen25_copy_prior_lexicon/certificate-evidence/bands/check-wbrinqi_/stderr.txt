@@ -1,0 +1,6 @@
+Warning: Variable T only occurs once in file verify.dl at line 12
+invalid() :- score(Q,T,_), !query(Q).
+---------------------^----------------
+Warning: Variable Q only occurs once in file verify.dl at line 13
+invalid() :- score(Q,T,_), !target(T).
+-------------------^-------------------

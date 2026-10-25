@@ -1,0 +1,9 @@
+{
+  "checkout": "/tmp/rosetta-copy-attention",
+  "base": "0948cbef96f8bcb09a12c25bab75706f2c23a1af",
+  "files": {
+    "src/api.rs": "82e560bc10ae985ca3dc3fbd72c31267e19c1cd97df50e547792e5bf87851dbb",
+    "src/model.rs": "7a030d00fa9a83e6556578fea196b43dc6c08a0180a15acd9b5c72c2474b9422",
+    "src/rope.rs": "a2745f089b8ad4074b2e9590c52867a6c696c7d79d699a58a0c803bdae6fe93b"
+  }
+}

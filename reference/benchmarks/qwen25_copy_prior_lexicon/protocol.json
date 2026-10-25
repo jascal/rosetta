@@ -1,0 +1,56 @@
+{
+  "scope": "context-free finite lexical extraction before any new full contexts",
+  "seed": 910,
+  "sizes": {
+    "query": 512,
+    "target": 1024,
+    "decoy": 1024,
+    "background": 8192
+  },
+  "band_width": 1,
+  "tail_band": 63,
+  "files": {
+    "pools.json": "1197d24990a51c23a531e0c507155517e954ffca38f78e942567f6fb3f05d277",
+    "excluded-tokens.json": "9450e0ae2c6777e367a5e4eb9fd1b80e6618cd7d655685a5b399c74a54a84c13"
+  },
+  "sources": {
+    "py/build_copy_prior_lexicon.py": "deea851b6089125be802329b5cf27dbcf94241cc0564c8cb775fea40f9544921",
+    "py/run_copy_long_consensus.py": "974b0206500440ca3a45c75e64a1c330452876ced5ea165b0f2674555242ca51",
+    "py/run_copy_longest.py": "7a22cc8abb77f328f43e0b3475e12891077117be13616b8398b97149cc2bc078",
+    "py/run_copy_prefix.py": "be1f028837140d63b878c7ffe0d67a4adbb20a48f9aecb6ce072bcc7e20c22be",
+    "py/run_native_trace2.py": "539c6705d92dce76bb98088cd4b775470966ee38d0df532e845e76a2eac54094",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_prior_bands.dl": "54b646ec40b2cb95a450c334250f525d481f0013750f459ad9b9db1f4b7f48cd",
+    "docs/copy-prior-guard-plan.md": "1308ec3308e778a0afa697aba33730d3f11dc2ab0c586c800a0567357931c2b6"
+  },
+  "exclusions": {
+    "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705",
+    "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+    "reference/benchmarks/qwen25_05b_int8_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807",
+    "reference/benchmarks/qwen25_05b_target_diagnostic/dataset.json": "20e175ac57969982dc0fd08417b889a211e3ca0cc4841947853c1cceab7fa1f6",
+    "reference/benchmarks/qwen25_05b_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807",
+    "reference/benchmarks/qwen25_native_trace/dataset.json": "c9a190bebec4c27d51129a1867db854d19ed2f011fbaf2a77355cba5870b80d6",
+    "reference/benchmarks/qwen25_native_trace/discovery.json": "250a61c3d1ba8bb8ceef048ae0eda0f404f00bf5838b6886a1ec7b85fb78eb22",
+    "reference/benchmarks/qwen25_native_trace_b/dataset.json": "80bce2e349f8b67e3edc12b1fc89b94d5386b9f97d44fee78cbec116dead0634",
+    "reference/benchmarks/qwen25_native_trace_c/dataset.json": "1b54ab66f056295a87a8cd4e11a0c81ba47206043ac3db5696ac33ed675f6b44",
+    "reference/benchmarks/qwen25_copy_prefix/dataset.json": "1f690a1f9aa7f24a60137e307ded31fa1c452c698844ed6fcedaddeeb2772cf9",
+    "reference/benchmarks/qwen25_copy_corruption_pilot/dataset.json": "bca6053ecef88f89271a960bad97b2aa6718f00164ecb5bbfacad92f7a3c8bd2",
+    "reference/benchmarks/qwen25_copy_longest_pilot/dataset.json": "baf9f4cba988e77330aa73fb883a940334fc93c916d451d340347074bdd14fb6",
+    "reference/benchmarks/qwen25_copy_longest/dataset.json": "13cb3e089e928001e73e841b437bac3464f198d9ebd3cdf77f1460ceac72b7f3",
+    "reference/benchmarks/qwen25_copy_source_diagnosis/selected.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9",
+    "reference/benchmarks/qwen25_copy_heads/dataset.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9",
+    "reference/benchmarks/qwen25_copy_long_consensus/dataset.json": "ff0c946ac7be40efa2f3a71a4d5155d84c505e33069f84b80827b52ca873375c",
+    "reference/benchmarks/qwen25_copy_prior_pilot/dataset.json": "8f568c8bf4693231ecbbad660e44e84d325fdaab840aec39d61509771177e857"
+  },
+  "pinned_model": {
+    "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+    "bundle_sha256": {
+      ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+      ".fieldrun.json": "5c013a3a24ef13276d3c4d3fbd0a9007525bf4e9d720608b8db0176a391aaa12"
+    },
+    "preflight_report_sha256": "6d313afd02660343b805767919e6135630ed51e8acfe81bf115162bdabde3150",
+    "reference_sha256": "e58ed6ead6c36fe29cef72d424e274485f4a6ba4fff4c93e56829c45cada3b9c"
+  }
+}

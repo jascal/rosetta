@@ -1,0 +1,751 @@
+{
+  "scope": "finite development proofs; admission gates still apply",
+  "candidates": [
+    {
+      "option": [
+        1,
+        16,
+        2
+      ],
+      "certificate": {
+        "certified": false,
+        "ndomain": 159,
+        "nmiss": 38,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "159"
+            ]
+          ],
+          "certified": [],
+          "nmiss": [
+            [
+              "38"
+            ]
+          ],
+          "ndomain": [
+            [
+              "159"
+            ]
+          ],
+          "mismatch": [
+            [
+              "39",
+              "21559",
+              "6516"
+            ],
+            [
+              "55",
+              "21559",
+              "6516"
+            ],
+            [
+              "57",
+              "21559",
+              "6516"
+            ],
+            [
+              "73",
+              "22672",
+              "5326"
+            ],
+            [
+              "75",
+              "22672",
+              "5326"
+            ],
+            [
+              "89",
+              "22672",
+              "5326"
+            ],
+            [
+              "175",
+              "21497",
+              "15473"
+            ],
+            [
+              "183",
+              "21497",
+              "15473"
+            ],
+            [
+              "185",
+              "21497",
+              "15473"
+            ],
+            [
+              "199",
+              "21497",
+              "15473"
+            ],
+            [
+              "311",
+              "5699",
+              "28373"
+            ],
+            [
+              "327",
+              "5699",
+              "28373"
+            ],
+            [
+              "340",
+              "1305",
+              "7694"
+            ],
+            [
+              "342",
+              "1305",
+              "7694"
+            ],
+            [
+              "344",
+              "39745",
+              "7694"
+            ],
+            [
+              "346",
+              "39745",
+              "7694"
+            ],
+            [
+              "360",
+              "39745",
+              "7694"
+            ],
+            [
+              "362",
+              "39745",
+              "7694"
+            ],
+            [
+              "378",
+              "37825",
+              "23861"
+            ],
+            [
+              "379",
+              "37825",
+              "19533"
+            ],
+            [
+              "380",
+              "37825",
+              "23861"
+            ],
+            [
+              "381",
+              "37825",
+              "19533"
+            ],
+            [
+              "394",
+              "37825",
+              "23861"
+            ],
+            [
+              "395",
+              "37825",
+              "19533"
+            ],
+            [
+              "396",
+              "37825",
+              "23861"
+            ],
+            [
+              "397",
+              "37825",
+              "19533"
+            ],
+            [
+              "412",
+              "38236",
+              "4612"
+            ],
+            [
+              "414",
+              "38236",
+              "4612"
+            ],
+            [
+              "420",
+              "38236",
+              "4612"
+            ],
+            [
+              "422",
+              "38236",
+              "4612"
+            ],
+            [
+              "428",
+              "38236",
+              "4612"
+            ],
+            [
+              "436",
+              "38236",
+              "4612"
+            ],
+            [
+              "480",
+              "10048",
+              "25578"
+            ],
+            [
+              "482",
+              "10048",
+              "25578"
+            ],
+            [
+              "488",
+              "10048",
+              "25578"
+            ],
+            [
+              "490",
+              "10048",
+              "25578"
+            ],
+            [
+              "496",
+              "10048",
+              "25578"
+            ],
+            [
+              "504",
+              "10048",
+              "25578"
+            ]
+          ],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-1/check-_3xe8_69"
+      },
+      "artifact_sha256": "c124ab5d127d1a9cf6839071058cc3600b24599809a6d9f2edf538aaaffb544e"
+    },
+    {
+      "option": [
+        2,
+        16,
+        3
+      ],
+      "certificate": {
+        "certified": false,
+        "ndomain": 76,
+        "nmiss": 15,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "76"
+            ]
+          ],
+          "certified": [],
+          "nmiss": [
+            [
+              "15"
+            ]
+          ],
+          "ndomain": [
+            [
+              "76"
+            ]
+          ],
+          "mismatch": [
+            [
+              "55",
+              "21559",
+              "6516"
+            ],
+            [
+              "57",
+              "21559",
+              "6516"
+            ],
+            [
+              "89",
+              "22672",
+              "5326"
+            ],
+            [
+              "199",
+              "21497",
+              "15473"
+            ],
+            [
+              "327",
+              "5699",
+              "28373"
+            ],
+            [
+              "360",
+              "39745",
+              "7694"
+            ],
+            [
+              "362",
+              "39745",
+              "7694"
+            ],
+            [
+              "394",
+              "37825",
+              "23861"
+            ],
+            [
+              "395",
+              "37825",
+              "19533"
+            ],
+            [
+              "396",
+              "37825",
+              "23861"
+            ],
+            [
+              "397",
+              "37825",
+              "19533"
+            ],
+            [
+              "428",
+              "38236",
+              "4612"
+            ],
+            [
+              "436",
+              "38236",
+              "4612"
+            ],
+            [
+              "496",
+              "10048",
+              "25578"
+            ],
+            [
+              "504",
+              "10048",
+              "25578"
+            ]
+          ],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-2/check-ewqpooxt"
+      },
+      "artifact_sha256": "03825cfe4c92727d6be924acba85171a81471c84d1e0da45df628905f969bc8e"
+    },
+    {
+      "option": [
+        3,
+        24,
+        2
+      ],
+      "certificate": {
+        "certified": false,
+        "ndomain": 110,
+        "nmiss": 16,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "110"
+            ]
+          ],
+          "certified": [],
+          "nmiss": [
+            [
+              "16"
+            ]
+          ],
+          "ndomain": [
+            [
+              "110"
+            ]
+          ],
+          "mismatch": [
+            [
+              "175",
+              "21497",
+              "15473"
+            ],
+            [
+              "183",
+              "21497",
+              "15473"
+            ],
+            [
+              "185",
+              "21497",
+              "15473"
+            ],
+            [
+              "199",
+              "21497",
+              "15473"
+            ],
+            [
+              "412",
+              "38236",
+              "4612"
+            ],
+            [
+              "414",
+              "38236",
+              "4612"
+            ],
+            [
+              "420",
+              "38236",
+              "4612"
+            ],
+            [
+              "422",
+              "38236",
+              "4612"
+            ],
+            [
+              "428",
+              "38236",
+              "4612"
+            ],
+            [
+              "436",
+              "38236",
+              "4612"
+            ],
+            [
+              "480",
+              "10048",
+              "25578"
+            ],
+            [
+              "482",
+              "10048",
+              "25578"
+            ],
+            [
+              "488",
+              "10048",
+              "25578"
+            ],
+            [
+              "490",
+              "10048",
+              "25578"
+            ],
+            [
+              "496",
+              "10048",
+              "25578"
+            ],
+            [
+              "504",
+              "10048",
+              "25578"
+            ]
+          ],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-3/check-fdl3m18w"
+      },
+      "artifact_sha256": "96fd442a14406fb32b9649fd41d4dfb563dde531c5a9c650ec279a37f1409bbf"
+    },
+    {
+      "option": [
+        4,
+        24,
+        3
+      ],
+      "certificate": {
+        "certified": false,
+        "ndomain": 48,
+        "nmiss": 5,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "48"
+            ]
+          ],
+          "certified": [],
+          "nmiss": [
+            [
+              "5"
+            ]
+          ],
+          "ndomain": [
+            [
+              "48"
+            ]
+          ],
+          "mismatch": [
+            [
+              "199",
+              "21497",
+              "15473"
+            ],
+            [
+              "428",
+              "38236",
+              "4612"
+            ],
+            [
+              "436",
+              "38236",
+              "4612"
+            ],
+            [
+              "496",
+              "10048",
+              "25578"
+            ],
+            [
+              "504",
+              "10048",
+              "25578"
+            ]
+          ],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-4/check-mjkflurn"
+      },
+      "artifact_sha256": "2e7920789d6bf906943a26410487dea1735e68160c7a8896bd51e2e76fcc4241"
+    },
+    {
+      "option": [
+        5,
+        32,
+        2
+      ],
+      "certificate": {
+        "certified": true,
+        "ndomain": 54,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "54"
+            ]
+          ],
+          "certified": [
+            [
+              "()"
+            ]
+          ],
+          "nmiss": [
+            [
+              "0"
+            ]
+          ],
+          "ndomain": [
+            [
+              "54"
+            ]
+          ],
+          "mismatch": [],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-5/check-hacycei0"
+      },
+      "artifact_sha256": "e02b653f29114ab49a1cb27835e07a21e14049da597ab7b01553064d1dc9843a",
+      "runtime": {
+        "certified": true,
+        "relations": {
+          "invalid": [],
+          "certified": [
+            [
+              "()"
+            ]
+          ]
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/runtime-5/check-w9ora1z5"
+      },
+      "runtime_files": [
+        "circuits.dl",
+        "facts/domain.facts",
+        "facts/tok.facts",
+        "outputs/abstain.csv",
+        "outputs/cdecide.csv",
+        "run.dl"
+      ]
+    },
+    {
+      "option": [
+        6,
+        32,
+        3
+      ],
+      "certificate": {
+        "certified": true,
+        "ndomain": 16,
+        "nmiss": 0,
+        "nuncov": 0,
+        "nmissing": 0,
+        "ninvalid": 0,
+        "relations": {
+          "nuncov": [
+            [
+              "0"
+            ]
+          ],
+          "invalid": [],
+          "nmissing": [
+            [
+              "0"
+            ]
+          ],
+          "missing_ref": [],
+          "ncover": [
+            [
+              "16"
+            ]
+          ],
+          "certified": [
+            [
+              "()"
+            ]
+          ],
+          "nmiss": [
+            [
+              "0"
+            ]
+          ],
+          "ndomain": [
+            [
+              "16"
+            ]
+          ],
+          "mismatch": [],
+          "ninvalid": [
+            [
+              "0"
+            ]
+          ],
+          "uncovered": []
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/development-equiv-6/check-2hslfj2o"
+      },
+      "artifact_sha256": "6f58feaf17155dae065a7c8095b7447284372c765db8546975d6c48e06f74aa8",
+      "runtime": {
+        "certified": true,
+        "relations": {
+          "invalid": [],
+          "certified": [
+            [
+              "()"
+            ]
+          ]
+        },
+        "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard/certificate-evidence/runtime-6/check-4_2vio5h"
+      },
+      "runtime_files": [
+        "circuits.dl",
+        "facts/domain.facts",
+        "facts/tok.facts",
+        "outputs/abstain.csv",
+        "outputs/cdecide.csv",
+        "run.dl"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "scope": "frozen finite categorical prior module; no new full contexts yet",
+  "rows": 1048576,
+  "facts_bytes": 15033657,
+  "files": {
+    "observations.jsonl.gz": "b0cd202cd6b1cdd86bcd06b0b4e8b821178dbf9eefe85b5a22139bd58f292ae3",
+    "prior-bands.facts": "98241b24e7dd4c81b5c451eae553d5bfc5057a22abd506924761d2c45a95b5df",
+    "band-check.json": "d2d2509017763a4c70150a2e5a49894c0f31a52a53472a3e8bf0d1edb1fb4539",
+    "server-lexicon.json": "91dd8c664795b525feb218b6f5428992e909bafb601785e34877400ae9165da9",
+    "server-lexicon.log": "b8fedab33cd86b86e706b27e63987170550ae278ceb4373c0bd5d0b27b93b6c8",
+    "pools.json": "1197d24990a51c23a531e0c507155517e954ffca38f78e942567f6fb3f05d277",
+    "excluded-tokens.json": "9450e0ae2c6777e367a5e4eb9fd1b80e6618cd7d655685a5b399c74a54a84c13",
+    "protocol.json": "101481eb80d47a761e91158843e5ec9e807b15136bd69c2df49a157a7eb2b57b",
+    "certificate-evidence/bands/check-wbrinqi_/stderr.txt": "bbbec986bd014c01137ddde8f3d73088e38224cf53a0697828aaaeb515e2327f",
+    "certificate-evidence/bands/check-wbrinqi_/verify.dl": "54b646ec40b2cb95a450c334250f525d481f0013750f459ad9b9db1f4b7f48cd",
+    "certificate-evidence/bands/check-wbrinqi_/circuit.dl": "54b646ec40b2cb95a450c334250f525d481f0013750f459ad9b9db1f4b7f48cd",
+    "certificate-evidence/bands/check-wbrinqi_/certificate.json": "148d9eec0d18321469f3a4624ad06b0e890c47cbad0bacfba81aa050b822b747",
+    "certificate-evidence/bands/check-wbrinqi_/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/bands/check-wbrinqi_/outputs/nband.csv": "be3b3a973edc5f34763d5808c7d0866e068ff309898e83e80bb37674405ce7a7",
+    "certificate-evidence/bands/check-wbrinqi_/outputs/prior_band.csv": "98241b24e7dd4c81b5c451eae553d5bfc5057a22abd506924761d2c45a95b5df",
+    "certificate-evidence/bands/check-wbrinqi_/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/bands/check-wbrinqi_/facts/target.facts": "d110ce90c5ca83823e2a43b2fcc0b10573e14bafc7a6ab3a3047740773e24689",
+    "certificate-evidence/bands/check-wbrinqi_/facts/score.facts": "afe7b8c624db9e0c96f1195a9156978aac5df4d0207742e4c2cc71a212b277c0",
+    "certificate-evidence/bands/check-wbrinqi_/facts/query.facts": "c3f5dfbbc14a8ead23dacd5faed7c8ba4398ae2c1f2f620ea944c063bcf839a5",
+    "certificate-evidence/bands/check-wbrinqi_/facts/maximum.facts": "2e37062884db5460705884fc8cc18f270eadf0d4f29cedb1d72266f86874c3ae"
+  },
+  "sources": {
+    "py/build_copy_prior_lexicon.py": "deea851b6089125be802329b5cf27dbcf94241cc0564c8cb775fea40f9544921",
+    "py/run_copy_long_consensus.py": "974b0206500440ca3a45c75e64a1c330452876ced5ea165b0f2674555242ca51",
+    "py/run_copy_longest.py": "7a22cc8abb77f328f43e0b3475e12891077117be13616b8398b97149cc2bc078",
+    "py/run_copy_prefix.py": "be1f028837140d63b878c7ffe0d67a4adbb20a48f9aecb6ce072bcc7e20c22be",
+    "py/run_native_trace2.py": "539c6705d92dce76bb98088cd4b775470966ee38d0df532e845e76a2eac54094",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_prior_bands.dl": "54b646ec40b2cb95a450c334250f525d481f0013750f459ad9b9db1f4b7f48cd",
+    "docs/copy-prior-guard-plan.md": "1308ec3308e778a0afa697aba33730d3f11dc2ab0c586c800a0567357931c2b6"
+  }
+}

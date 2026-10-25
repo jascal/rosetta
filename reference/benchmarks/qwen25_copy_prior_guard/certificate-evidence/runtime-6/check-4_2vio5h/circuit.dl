@@ -1,0 +1,19 @@
+.decl expected_decision(i:number,t:number) .input expected_decision
+.decl actual_decision(i:number,t:number) .input actual_decision
+.decl actual_abstain(i:number) .input actual_abstain
+.decl domain(i:number) .input domain
+.decl expected_abstain(i:number)
+expected_abstain(I) :- domain(I), !expected_decision(I,_).
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- expected_decision(I,T), !actual_decision(I,T).
+invalid() :- actual_decision(I,T), !expected_decision(I,T).
+invalid() :- expected_abstain(I), !actual_abstain(I).
+invalid() :- actual_abstain(I), !expected_abstain(I).
+invalid() :- actual_decision(I,_), actual_abstain(I).
+invalid() :- actual_decision(I,T), actual_decision(I,U), T != U.
+invalid() :- domain(I), !actual_decision(I,_), !actual_abstain(I).
+invalid() :- actual_decision(I,_), !domain(I).
+invalid() :- actual_abstain(I), !domain(I).
+.decl certified() .output certified
+certified() :- !invalid().
