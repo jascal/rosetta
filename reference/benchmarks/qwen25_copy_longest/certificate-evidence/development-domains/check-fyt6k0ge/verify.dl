@@ -1,0 +1,27 @@
+// Reference-free domains for the complete candidate family and fixed baseline.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,split:symbol,g:symbol) .input sample
+#include "circuit.dl"
+.decl firing(c:number,i:number,t:number) .output firing
+firing(C,I,T) :- sample(I,_,_), ls_prediction(C,I,T).
+.decl incremental(c:number,i:number) .output incremental
+incremental(C,I) :- firing(C,I,_), !bdecide(I,_).
+.decl overlap(c:number,i:number) .output overlap
+overlap(C,I) :- firing(C,I,_), bdecide(I,_).
+.decl conflict(c:number,i:number) .output conflict
+conflict(C,I) :- firing(C,I,T), bdecide(I,U), T != U.
+.decl counts(c:number,s:symbol,n:number,incremental:number,overlap:number) .output counts
+counts(C,S,N,A,B) :- ls_option(C,_,_), sample(_,S,_),
+    N = count : { sample(I,S,_), firing(C,I,_) },
+    A = count : { sample(I,S,_), incremental(C,I) },
+    B = count : { sample(I,S,_), overlap(C,I) }.
+.decl baseline(i:number,t:number) .output baseline
+baseline(I,T) :- sample(I,_,_), bdecide(I,T).
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_).
+invalid() :- tok(I,_,_), !sample(I,_,_).
+invalid() :- sample(I,_,_), !tok(I,_,_).
+invalid() :- firing(C,I,T), firing(C,I,U), T != U.
+.decl certified() .output certified
+// Domain integrity, not model equivalence. No ref relation exists in this query.
+certified() :- !invalid().
