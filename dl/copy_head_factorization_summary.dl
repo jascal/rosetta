@@ -1,0 +1,31 @@
+// circuit.dl is the frozen previous checker, with its verdict renamed.
+#include "circuit.dl"
+.decl previous(i:number,a:symbol,m:symbol,d:number,t:number,r:float,g:float) .input previous
+.decl reconstruction(i:number,l:number,h:number,maxerr:float) .input reconstruction
+.decl expected_head(i:number,l:number,h:number) .input expected_head
+.decl repeated_bad(i:number,a:symbol,m:symbol) .output repeated_bad
+repeated_bad(I,A,M) :- previous(I,A,M,D,T,_,_), result(I,A,M,D,U,_,_,_), T != U.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,Y,_), result(I,A,M,D,_,X,_,_), previous_abs(I,A,M,Z,_), X-Y > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,Y,_), result(I,A,M,D,_,X,_,_), previous_abs(I,A,M,Z,_), Y-X > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,_,Y), result(I,A,M,D,_,_,X,_), previous_abs(I,A,M,_,Z), X-Y > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,_,Y), result(I,A,M,D,_,_,X,_), previous_abs(I,A,M,_,Z), Y-X > 0.002+0.002*Z.
+.decl previous_abs(i:number,a:symbol,m:symbol,r:float,g:float)
+previous_abs(I,A,M,R,G) :- previous(I,A,M,_,_,R,G), R >= 0.0, G >= 0.0.
+previous_abs(I,A,M,-R,G) :- previous(I,A,M,_,_,R,G), R < 0.0, G >= 0.0.
+previous_abs(I,A,M,R,-G) :- previous(I,A,M,_,_,R,G), R >= 0.0, G < 0.0.
+previous_abs(I,A,M,-R,-G) :- previous(I,A,M,_,_,R,G), R < 0.0, G < 0.0.
+.decl reconstruction_bad(i:number,l:number,h:number) .output reconstruction_bad
+reconstruction_bad(I,L,H) :- expected_head(I,L,H), !reconstruction(I,L,H,_).
+reconstruction_bad(I,L,H) :- reconstruction(I,L,H,E), E > 0.0001.
+reconstruction_bad(I,L,H) :- reconstruction(I,L,H,E), E < 0.0.
+.decl mode_transfer(i:number,a:symbol,m:symbol,t:number) .output mode_transfer
+mode_transfer(I,A,M,T) :- result(I,A,M,D,T,_,_,_), reference_eligible(I), historical(D,T,_,_,_), M != "identity", M != "baseline".
+.decl mode_target(i:number,a:symbol,m:symbol,t:number) .output mode_target
+mode_target(I,A,M,T) :- result(I,A,M,D,T,_,_,_), historical(D,_,T,_,_), historical(I,_,U,_,_), T != U.
+.decl mode_counts(a:symbol,m:symbol,n:number,flips:number,transfers:number,targets:number) .output mode_counts
+mode_counts(A,M,N,F,T,G) :- request(_,A,M,_), N = count : { request(_,A,M,_) },
+    F = count : { flip(_,A,M,_) }, T = count : { mode_transfer(_,A,M,_) }, G = count : { mode_target(_,A,M,_) }.
+.decl factorization_invalid() .output factorization_invalid
+factorization_invalid() :- request(I,A,M,D), M="exchange", !previous(I,A,M,D,_,_,_).
+.decl certified() .output certified
+certified() :- base_certified(), !repeated_bad(_,_,_), !reconstruction_bad(_,_,_), !factorization_invalid().

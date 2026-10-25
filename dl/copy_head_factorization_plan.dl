@@ -1,0 +1,18 @@
+.decl donor(i:number,d:number) .input donor
+.decl member(a:symbol,l:number,h:number) .input member
+.decl head_set(a:symbol)
+head_set(A) :- member(A,_,_).
+.decl mode(m:symbol)
+mode("identity"). mode("exchange"). mode("values"). mode("routing"). mode("source_values").
+.decl request(i:number,a:symbol,m:symbol,d:number) .output request
+request(I,"none","baseline",I) :- donor(I,_).
+request(I,A,"identity",I) :- donor(I,_), head_set(A).
+request(I,A,M,D) :- donor(I,D), head_set(A), mode(M), M != "identity".
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- !member(_,_,_).
+invalid() :- donor(I,D), !donor(D,I).
+invalid() :- donor(I,I).
+invalid() :- donor(I,D), donor(I,E), D != E.
+.decl certified() .output certified
+certified() :- !invalid().
