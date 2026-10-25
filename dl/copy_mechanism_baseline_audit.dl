@@ -1,0 +1,20 @@
+// Descriptive baseline census over historical discovery data, not a new test.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl row(i:number,negative:number) .input row
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl abstained(i:number) .output abstained
+abstained(I) :- row(I,_), !cdecide(I,_).
+.decl wrong(i:number,pred:number,actual:number) .output wrong
+wrong(I,T,R) :- row(I,_), cdecide(I,T), ref(I,R), T != R.
+.decl counts(negative:number,total:number,answered:number,wrong:number) .output counts
+counts(C,N,A,W) :- row(_,C), N = count : { row(_,C) },
+    A = count : { row(I,C), cdecide(I,_) },
+    W = count : { row(I,C), wrong(I,_,_) }.
+.decl invalid() .output invalid
+invalid() :- !row(_,_).
+invalid() :- row(I,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+.decl certified() .output certified
+// Integrity of the census only; inspect wrong and abstained independently.
+certified() :- !invalid().

@@ -1,0 +1,22 @@
+// OPEN: rejected development proposal, not a certified model replacement.
+.decl cp_option(c:number,k:number,minlen:number)
+cp_option(3,1,32).
+// Token-only short-suffix induction. Includer supplies tok and cp_option(c,k,minlen).
+.decl cp_last(i:number,p:number)
+cp_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl cp_match(i:number,j:number,k:number)
+cp_match(I,J,1) :- cp_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+cp_match(I,J,K+1) :- cp_match(I,J,K), K < 3, cp_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,T).
+.decl cp_source(c:number,i:number,j:number,t:number)
+cp_source(C,I,J,T) :- cp_option(C,K,_), cp_match(I,J,K), tok(I,J+1,T).
+.decl cp_conflict(c:number,i:number)
+cp_conflict(C,I) :- cp_source(C,I,_,A), cp_source(C,I,_,B), A != B.
+.decl cp_frequency(i:number,t:number,n:number)
+cp_frequency(I,T,N) :- cp_source(_,I,_,T), N = count : { tok(I,_,T) }.
+.decl cp_prediction(c:number,i:number,t:number)
+cp_prediction(C,I,T) :- cp_option(C,_,M), cp_last(I,P), P+1 >= M,
+    cp_source(C,I,_,T), cp_frequency(I,T,1), !cp_conflict(C,I), !cp_match(I,_,3).
+
+.decl cdecide(i:number,t:number)
+cdecide(I,T) :- cp_prediction(_,I,T).

@@ -1,0 +1,31 @@
+{
+  "scope": "model-free replay of discovery instrument queries; no equivalence claim",
+  "frozen_hashes_unchanged": true,
+  "checks": [
+    {
+      "evidence": "certificate-evidence/baseline-census/check-ozvceyfd",
+      "certified": true,
+      "query_error": false
+    },
+    {
+      "evidence": "certificate-evidence/donor-plan/check-1j2ulkib",
+      "certified": true,
+      "query_error": false
+    },
+    {
+      "evidence": "certificate-evidence/preflight/check-o30w191p",
+      "certified": false,
+      "query_error": true
+    },
+    {
+      "evidence": "certificate-evidence/preflight/check-rxzsltk0",
+      "certified": true,
+      "query_error": false
+    },
+    {
+      "evidence": "certificate-evidence/summary/check-r0hg5xrp",
+      "certified": true,
+      "query_error": false
+    }
+  ]
+}

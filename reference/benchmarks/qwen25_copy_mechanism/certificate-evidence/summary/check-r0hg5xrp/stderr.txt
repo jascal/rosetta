@@ -1,0 +1,51 @@
+Warning: Variable A only occurs once in file verify.dl at line 14
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), T != U.
+--------------------------^--------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 14
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), T != U.
+----------------------------^------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 14
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), T != U.
+---------------------------------------------^-------------
+Warning: Variable D only occurs once in file verify.dl at line 14
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), T != U.
+-----------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 15
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), A != C.
+------------------------^----------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 15
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), A != C.
+----------------------------^------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 15
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), A != C.
+-------------------------------------------^---------------
+Warning: Variable D only occurs once in file verify.dl at line 15
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), A != C.
+-----------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 16
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), B != D.
+------------------------^----------------------------------
+Warning: Variable A only occurs once in file verify.dl at line 16
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), B != D.
+--------------------------^--------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 16
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), B != D.
+-------------------------------------------^---------------
+Warning: Variable C only occurs once in file verify.dl at line 16
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), B != D.
+---------------------------------------------^-------------
+Warning: Variable I only occurs once in file verify.dl at line 20
+invalid() :- donor(I,D), !ref(D,_).
+-------------------^----------------
+Warning: Variable B only occurs once in file verify.dl at line 29
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), A != C.
+----------------------------------------------^------------------------
+Warning: Variable D only occurs once in file verify.dl at line 29
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), A != C.
+-----------------------------------------------------------^-----------
+Warning: Variable A only occurs once in file verify.dl at line 30
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), B != D.
+--------------------------------------------^--------------------------
+Warning: Variable C only occurs once in file verify.dl at line 30
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), B != D.
+---------------------------------------------------------^-------------

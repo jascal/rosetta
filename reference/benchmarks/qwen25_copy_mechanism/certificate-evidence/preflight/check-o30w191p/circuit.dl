@@ -1,0 +1,30 @@
+// New executable validation against retained run-C answers/logits.
+.decl row(i:number,last:number) .input row
+.decl ref(i:number,t:number,l:float) .input ref
+.decl observed(i:number,l:number,p:number,n:number) .input observed
+.decl answer(i:number,t:number,l:float) .input answer
+.decl invalid() .output invalid
+invalid() :- !row(_,_).
+invalid() :- row(I,_), !ref(I,_,_).
+invalid() :- row(I,_), !answer(I,_,_).
+invalid() :- answer(I,_,_), !row(I,_).
+invalid() :- ref(I,_,_), !row(I,_).
+invalid() :- answer(I,A,_), answer(I,B,_), A != B.
+invalid() :- answer(I,_,A), answer(I,_,B), A != B.
+invalid() :- ref(I,A,_), ref(I,B,_), A != B.
+invalid() :- ref(I,_,A), ref(I,_,B), A != B.
+.decl changed(i:number) .output changed
+changed(I) :- ref(I,A,_), answer(I,B,_), A != B.
+.decl logit_changed(i:number) .output logit_changed
+logit_changed(I) :- ref(I,_,A), answer(I,_,B), abs(A-B) > 0.002+0.002*abs(A).
+.decl nobs(i:number,n:number)
+nobs(I,N) :- row(I,_), N = count : { observed(I,_,_,_) }.
+invalid() :- nobs(_,N), N != 4864.
+invalid() :- observed(I,L,P,N), row(I,Q), L != 0.
+invalid() :- observed(I,L,P,N), row(I,Q), P != Q.
+invalid() :- observed(I,_,_,N), N < 0.
+invalid() :- observed(I,_,_,N), N >= 4864.
+invalid() :- observed(I,_,_,_), !row(I,_).
+.decl certified() .output certified
+// Finite empirical preflight only, not equivalence to upstream on all inputs.
+certified() :- !invalid(), !changed(_), !logit_changed(_).

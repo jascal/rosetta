@@ -1,0 +1,21 @@
+Warning: Variable P only occurs once in file verify.dl at line 27
+invalid() :- observed(I,L,P,N), row(I,Q), L != 0.
+--------------------------^-----------------------
+Warning: Variable N only occurs once in file verify.dl at line 27
+invalid() :- observed(I,L,P,N), row(I,Q), L != 0.
+----------------------------^---------------------
+Warning: Variable Q only occurs once in file verify.dl at line 27
+invalid() :- observed(I,L,P,N), row(I,Q), L != 0.
+--------------------------------------^-----------
+Warning: Variable L only occurs once in file verify.dl at line 28
+invalid() :- observed(I,L,P,N), row(I,Q), P != Q.
+------------------------^-------------------------
+Warning: Variable N only occurs once in file verify.dl at line 28
+invalid() :- observed(I,L,P,N), row(I,Q), P != Q.
+----------------------------^---------------------
+Warning: Variable I only occurs once in file verify.dl at line 29
+invalid() :- observed(I,_,_,N), N < 0.
+----------------------^----------------
+Warning: Variable I only occurs once in file verify.dl at line 30
+invalid() :- observed(I,_,_,N), N >= 4864.
+----------------------^--------------------

@@ -1,0 +1,7 @@
+.decl tok(i:number,p:number,t:number)
+.input tok
+#include "circuits.dl"
+.output cdecide
+.decl abstain(i:number)
+.output abstain
+abstain(I) :- tok(I,_,_), !cdecide(I,_).
