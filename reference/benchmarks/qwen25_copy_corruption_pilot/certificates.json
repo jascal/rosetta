@@ -1,0 +1,250 @@
+[
+  {
+    "candidate": 1,
+    "result": {
+      "certified": false,
+      "ndomain": 24,
+      "nmiss": 7,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "24"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "7"
+          ]
+        ],
+        "ndomain": [
+          [
+            "24"
+          ]
+        ],
+        "mismatch": [
+          [
+            "0",
+            "11",
+            "16469"
+          ],
+          [
+            "3",
+            "4002",
+            "9167"
+          ],
+          [
+            "6",
+            "262",
+            "26611"
+          ],
+          [
+            "9",
+            "262",
+            "33629"
+          ],
+          [
+            "12",
+            "315",
+            "7891"
+          ],
+          [
+            "18",
+            "1134",
+            "14851"
+          ],
+          [
+            "21",
+            "198",
+            "2546"
+          ]
+        ],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_corruption_pilot/certificate-evidence/equiv-1/check-k34bhyrg"
+    }
+  },
+  {
+    "candidate": 2,
+    "result": {
+      "certified": false,
+      "ndomain": 0,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "0"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "0"
+          ]
+        ],
+        "ndomain": [
+          [
+            "0"
+          ]
+        ],
+        "mismatch": [],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_corruption_pilot/certificate-evidence/equiv-2/check-rerprlg4"
+    }
+  },
+  {
+    "candidate": 3,
+    "result": {
+      "certified": false,
+      "ndomain": 12,
+      "nmiss": 3,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "12"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "3"
+          ]
+        ],
+        "ndomain": [
+          [
+            "12"
+          ]
+        ],
+        "mismatch": [
+          [
+            "12",
+            "315",
+            "7891"
+          ],
+          [
+            "18",
+            "1134",
+            "14851"
+          ],
+          [
+            "21",
+            "198",
+            "2546"
+          ]
+        ],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_corruption_pilot/certificate-evidence/equiv-3/check-6fjzmxmu"
+    }
+  },
+  {
+    "candidate": 4,
+    "result": {
+      "certified": false,
+      "ndomain": 0,
+      "nmiss": 0,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "0"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "0"
+          ]
+        ],
+        "ndomain": [
+          [
+            "0"
+          ]
+        ],
+        "mismatch": [],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_corruption_pilot/certificate-evidence/equiv-4/check-kcwlggg2"
+    }
+  }
+]

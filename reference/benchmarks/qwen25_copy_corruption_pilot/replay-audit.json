@@ -1,0 +1,25 @@
+{
+  "scope": "discovery only",
+  "checks": [
+    {
+      "path": "certificate-evidence/equiv-1/check-k34bhyrg",
+      "certified": false
+    },
+    {
+      "path": "certificate-evidence/equiv-2/check-rerprlg4",
+      "certified": false
+    },
+    {
+      "path": "certificate-evidence/equiv-3/check-6fjzmxmu",
+      "certified": false
+    },
+    {
+      "path": "certificate-evidence/equiv-4/check-kcwlggg2",
+      "certified": false
+    },
+    {
+      "path": "certificate-evidence/report/check-78wbdiki",
+      "certified": true
+    }
+  ]
+}
