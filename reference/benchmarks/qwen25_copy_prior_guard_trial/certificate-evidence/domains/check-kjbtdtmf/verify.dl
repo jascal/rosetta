@@ -1,0 +1,29 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl domain(i:number) .input domain
+.decl seed(i:number,s:number) .input seed
+#include "circuit.dl"
+.decl firing(i:number) .output firing
+firing(I) :- domain(I), pg_prediction(_,I,_).
+.decl incremental(i:number) .output incremental
+incremental(I) :- firing(I), !bdecide(I,_).
+.decl prediction(i:number,t:number) .output prediction
+prediction(I,T) :- domain(I), pg_prediction(_,I,T).
+.decl abstention(i:number) .output abstention
+abstention(I) :- domain(I), !firing(I).
+.decl baseline_prediction(i:number,t:number) .output baseline_prediction
+baseline_prediction(I,T) :- domain(I), bdecide(I,T).
+.decl baseline_only(i:number) .output baseline_only
+baseline_only(I) :- baseline_prediction(I,_), !firing(I).
+.decl conflict(i:number,candidate:number,baseline:number) .output conflict
+conflict(I,T,U) :- prediction(I,T), baseline_prediction(I,U), T != U.
+.decl seed_incremental(s:number,n:number) .output seed_incremental
+seed_incremental(S,N) :- seed(_,S), N = count : { seed(I,S), incremental(I) }.
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- domain(I), !seed(I,_).
+invalid() :- tok(I,_,_), !domain(I).
+invalid() :- domain(I), !tok(I,_,_).
+invalid() :- prediction(I,T), prediction(I,U), T != U.
+invalid() :- seed_incremental(_,0).
+.decl certified() .output certified
+certified() :- !invalid(), firing(_), incremental(_).

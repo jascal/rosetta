@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "frozen reference-free confirmation domains"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "f8f8c7b2162011df02349da7b9fbe3428d3ca2d242761548e950bb52b2cae7aa",
+    "facts/domain.facts": "904f64f19833266a205995d1b6d820281fa00598904e57c130b3cf1035cfcd46",
+    "facts/seed.facts": "a8be45a276290c536af6a2122ffeec897bf858f3b74c5e688f91bcfa9c8d81dc",
+    "facts/tok.facts": "6de21e3ad885f1eacce6e2bf2d4c6dddc635c2dc34f4ba245788ff6ca47a4c38",
+    "outputs/abstention.csv": "96d882b0b54e102a914fb38ea623ca0339f5ee0b69d977e82c26eeb7c414a6c6",
+    "outputs/baseline_only.csv": "0c83c6cc725cd963490825aac7b8cf8b87fc5b87cc9faaac48b9d106a94f4081",
+    "outputs/baseline_prediction.csv": "0ccbb02fc3c73525d148ca89440d64bf8b74face3b906d10abc33ad08e060e4e",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/conflict.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/firing.csv": "8a6e9bcc3ba2daee64382ad9c66287f360509ef18b7e96a88e2a900b619f978d",
+    "outputs/incremental.csv": "9a99be3fac20cdf6f3e2f15d5f9b85a5451c5f71ae056fc9eb12f6ac3041ab25",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/prediction.csv": "62c80c026c4413802ff084f7d7ca3fdf1831ac4ff42dc37005c887f67851a2a5",
+    "outputs/seed_incremental.csv": "825d7710db0061aa6798bd7f0bd417152b1c2990f297c3c6b7fd03927d96d883",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "cacccf2b446afd6cb9c8f6423edda4ad9e3d07e377de854b2b0e0dd24cfe5a33"
+  }
+}
