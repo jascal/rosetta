@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "caller-supplied references"
+  },
+  "scalars": {},
+  "result": {
+    "certified": false,
+    "error": "Error: syntax error, unexpected >, expecting . in file verify.dl at line 14\nparity_bad(I,\"native_ref_logit\") :- result(I,\"none\",\"baseline\",I,_,X,_,_), historical(I,_,_,Y,_), abs(X-Y)>0.002+0.002*abs(Y).\n----------------------------------------------------------------------------------------------------------^--------------------\n1 errors generated, evaluation aborted"
+  },
+  "sha256": {
+    "circuit.dl": "76bcc4fc68813c6614869c905136feb27a041b5db04be3c07ff108732794b8fa",
+    "facts/delta.facts": "1fe36b2408210d7a4c0c6a6518c72be1702a56978a7f2df939a809dfd443426e",
+    "facts/donor.facts": "2dd01bd53f96a75c966f8245468cbe61d32c2576f4c99df382142590149ee50c",
+    "facts/historical.facts": "78cb8b1e1e61dd9c7b2bc575c95550d67227eccb77f30815e936aa091beeb949",
+    "facts/request.facts": "4fab8f89648f47c97eb3991a39a3df515c5e181d8566fd93c7ecbb693e32d1ba",
+    "facts/result.facts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr.txt": "6e49bf73a0416c402f826e8a4499c284579302bc7fb23ba76c3015e49b1b86d8",
+    "verify.dl": "76bcc4fc68813c6614869c905136feb27a041b5db04be3c07ff108732794b8fa"
+  }
+}

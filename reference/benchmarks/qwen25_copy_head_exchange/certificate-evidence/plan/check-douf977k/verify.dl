@@ -1,0 +1,43 @@
+.decl selected(i:number) .input selected
+.decl known(i:number) .input known
+.decl pairing(a:number,b:number) .input pairing
+.decl control(l:number,h:number) .input control
+.decl chosen_pair(a:number,b:number) .output chosen_pair
+chosen_pair(A,B) :- pairing(A,B), selected(A).
+chosen_pair(A,B) :- pairing(A,B), selected(B).
+.decl donor(i:number,d:number) .output donor
+donor(A,B) :- chosen_pair(A,B).
+donor(B,A) :- chosen_pair(A,B).
+.decl member(a:symbol,l:number,h:number) .output member
+member("copy",16,9). member("copy",16,12).
+member("semantic",21,2). member("semantic",21,13).
+member("joint",L,H) :- member("copy",L,H).
+member("joint",L,H) :- member("semantic",L,H).
+member("control_copy",16,H) :- control(16,H).
+member("control_semantic",21,H) :- control(21,H).
+member("control_joint",L,H) :- control(L,H).
+.decl head_set(a:symbol) .output head_set
+head_set(A) :- member(A,_,_).
+.decl request(i:number,a:symbol,m:symbol,d:number) .output request
+request(I,"none","baseline",I) :- donor(I,_).
+request(I,A,"identity",I) :- donor(I,_), head_set(A).
+request(I,A,"zero",I) :- donor(I,_), head_set(A).
+request(I,A,"exchange",D) :- donor(I,D), head_set(A).
+.decl invalid() .output invalid
+invalid() :- !selected(_).
+invalid() :- selected(I), !donor(I,_).
+invalid() :- donor(I,D), !known(I).
+invalid() :- donor(I,D), !known(D).
+invalid() :- donor(I,I).
+invalid() :- donor(I,D), donor(I,E), D != E.
+.decl control_count(l:number,n:number)
+control_count(L,N) :- control(L,_), N = count : { control(L,_) }.
+invalid() :- control_count(_,N), N != 2.
+invalid() :- !control(16,_).
+invalid() :- !control(21,_).
+invalid() :- control(L,_), L != 16, L != 21.
+invalid() :- control(_,H), H < 0.
+invalid() :- control(_,H), H >= 14.
+invalid() :- member("joint",L,H), control(L,H).
+.decl certified() .output certified
+certified() :- !invalid(), request(_,_,_,_).

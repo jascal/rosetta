@@ -1,0 +1,4 @@
+Error: syntax error, unexpected >, expecting . in file verify.dl at line 14
+parity_bad(I,"native_ref_logit") :- result(I,"none","baseline",I,_,X,_,_), historical(I,_,_,Y,_), abs(X-Y)>0.002+0.002*abs(Y).
+----------------------------------------------------------------------------------------------------------^--------------------
+1 errors generated, evaluation aborted

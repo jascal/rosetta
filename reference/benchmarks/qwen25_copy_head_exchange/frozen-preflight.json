@@ -1,0 +1,54 @@
+{
+  "scope": "historical empirical answer-position exchange; not a final circuit test",
+  "files": {
+    "pairs.json": "a0d46a9fc6e6558dd912b41fcd49c49ee7ba9748cb01afb862d4b01d5568a9ad",
+    "historical.json": "bcb50bf14a9802764e11917e3e5152a2cfc9cb02319415b5ccb5bbe34b682369",
+    "dataset.json": "c53f78554b48628af2910f46eb6833423956b20e20ccfeec908a63ea64d42b38",
+    "plan.json": "8182ea05d381dacfd0e69944b78e9be8d65f288de4bb3b93c7fa0e2bed1c03f3",
+    "certificate-evidence/plan/check-douf977k/stderr.txt": "8b3eaa6fcc783ea495cd6692c45beb6ef0b6a0db7ea7bb0626e5e85007c65901",
+    "certificate-evidence/plan/check-douf977k/verify.dl": "fe8d00dd2120b6365113952c6859eed1207b322b4e1cf97024388693046a6a18",
+    "certificate-evidence/plan/check-douf977k/circuit.dl": "fe8d00dd2120b6365113952c6859eed1207b322b4e1cf97024388693046a6a18",
+    "certificate-evidence/plan/check-douf977k/certificate.json": "55567bf49d5dd4b44d2b4791be8366a3a59c11a7d334726f226f5168553f5ae8",
+    "certificate-evidence/plan/check-douf977k/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-douf977k/outputs/member.csv": "457deb70a610aef72f5b5c9ac14575b0958fb018224529061335ed80f17c49f5",
+    "certificate-evidence/plan/check-douf977k/outputs/donor.csv": "dbe3ed1f1b56bcdea5d91fb7063ea9898792fd0fc82b73f191bf9bc14c14e1a0",
+    "certificate-evidence/plan/check-douf977k/outputs/chosen_pair.csv": "6109e956beb99541a8c11e9824845c2b667303ef0c3dc1519d5baca1f768e88f",
+    "certificate-evidence/plan/check-douf977k/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-douf977k/outputs/head_set.csv": "e84073bc0e1d60914053661c4b25542b116a098606a88194b33117093c281dc2",
+    "certificate-evidence/plan/check-douf977k/outputs/request.csv": "a95b1e0336e0758c9829cbb37c6a0d833eb86007c2316f81ee3f52573f268987",
+    "certificate-evidence/plan/check-douf977k/facts/selected.facts": "17aaf84553f7dc08ac86f84b61748b937f81efb589339d1d9fd405639020d6a6",
+    "certificate-evidence/plan/check-douf977k/facts/pairing.facts": "dc8260d9607908bbb63f49307b82f5a1f4298d351f6de54b873d65acecf864da",
+    "certificate-evidence/plan/check-douf977k/facts/known.facts": "ea4ac5254873171993ad8d2c297057bdb7f0203c40cfe25fec75204bb4701002",
+    "certificate-evidence/plan/check-douf977k/facts/control.facts": "7895773b927e075fb066e5b7eff0a506ee43e9855ecdde9088038b4634fdd7fa"
+  },
+  "sources": {
+    "py/run_copy_head_exchange.py": "4ef0b1eb5fe16d505303498a53c0fb4ed6aa97f43ad30c657dc7c27ece25da13",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "dl/copy_head_exchange_plan.dl": "fe8d00dd2120b6365113952c6859eed1207b322b4e1cf97024388693046a6a18",
+    "dl/copy_head_exchange_summary.dl": "76bcc4fc68813c6614869c905136feb27a041b5db04be3c07ff108732794b8fa",
+    "docs/copy-head-exchange-plan.md": "913bf10220bf9f00ba3d065cb388dfebb11f563aeb5ef160aa037c617734a2a2"
+  },
+  "historical": {
+    "reference/benchmarks/qwen25_copy_longest/dataset.json": "13cb3e089e928001e73e841b437bac3464f198d9ebd3cdf77f1460ceac72b7f3",
+    "reference/benchmarks/qwen25_copy_longest/pairs.json": "ead38e142f3e646dfcd6f885986bee2207db58b85ad19c45690035eddd82ec37",
+    "reference/benchmarks/qwen25_copy_longest/observations.jsonl": "e598b74374dcabcbe91f8c7ea96fd32186c4ae9d1d85c1ba60b678b0151a93a8",
+    "reference/benchmarks/qwen25_copy_heads/plan.json": "ed18b2ecd20da6e57345366a5fd0466454a933b5e0fe43826a801ff705f06d9e",
+    "reference/benchmarks/qwen25_copy_heads/frozen.json": "af4383f51cf8fa4bf7b7ff099dc27afeb888c602585c76d3ad666b79cda7124b",
+    "reference/benchmarks/qwen25_copy_source_diagnosis/selected.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9"
+  },
+  "checkpoint": "/home/allans/.cache/huggingface/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+  "checkpoint_sha256": {
+    "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+    "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+  },
+  "oracle": {
+    "precision": "float32",
+    "attention": "eager",
+    "threads": 2
+  }
+}

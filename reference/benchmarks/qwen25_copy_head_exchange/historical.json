@@ -1,0 +1,134 @@
+{
+  "0": {
+    "next": 39804,
+    "next_logit": 10.08005,
+    "observations": [],
+    "logits": [
+      [
+        39804,
+        10.08005
+      ]
+    ]
+  },
+  "1": {
+    "next": 30854,
+    "next_logit": 12.997861,
+    "observations": [],
+    "logits": [
+      [
+        30854,
+        12.997861
+      ]
+    ]
+  },
+  "12": {
+    "next": 39804,
+    "next_logit": 8.492815,
+    "observations": [],
+    "logits": [
+      [
+        39804,
+        8.492815
+      ]
+    ]
+  },
+  "13": {
+    "next": 45537,
+    "next_logit": 10.351897,
+    "observations": [],
+    "logits": [
+      [
+        30854,
+        9.072692
+      ]
+    ]
+  },
+  "14": {
+    "next": 31568,
+    "next_logit": 7.197628,
+    "observations": [],
+    "logits": [
+      [
+        39804,
+        7.1362376
+      ]
+    ]
+  },
+  "15": {
+    "next": 45537,
+    "next_logit": 9.481943,
+    "observations": [],
+    "logits": [
+      [
+        30854,
+        6.706784
+      ]
+    ]
+  },
+  "38": {
+    "next": 22277,
+    "next_logit": 17.121376,
+    "observations": [],
+    "logits": [
+      [
+        22277,
+        17.121376
+      ]
+    ]
+  },
+  "39": {
+    "next": 3698,
+    "next_logit": 17.135418,
+    "observations": [],
+    "logits": [
+      [
+        3698,
+        17.135418
+      ]
+    ]
+  },
+  "62": {
+    "next": 34975,
+    "next_logit": 13.999957,
+    "observations": [],
+    "logits": [
+      [
+        22277,
+        10.044581
+      ]
+    ]
+  },
+  "63": {
+    "next": 34975,
+    "next_logit": 12.786395,
+    "observations": [],
+    "logits": [
+      [
+        3698,
+        11.24938
+      ]
+    ]
+  },
+  "76": {
+    "next": 379,
+    "next_logit": 13.718518,
+    "observations": [],
+    "logits": [
+      [
+        14522,
+        12.095079
+      ]
+    ]
+  },
+  "77": {
+    "next": 26750,
+    "next_logit": 14.15436,
+    "observations": [],
+    "logits": [
+      [
+        29324,
+        7.4918795
+      ]
+    ]
+  }
+}

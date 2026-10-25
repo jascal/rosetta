@@ -1,0 +1,5 @@
+{
+  "before_model_requests": true,
+  "reason": "Souffle has no abs functor here; replaced it with explicit signed absolute-value relations before collection. The first compiler failure and passing missing-observation rejection are retained. No arm, case, intervention or hypothesis changed.",
+  "original_freeze_sha256": "2d3bc607c03eb2ccc866c452a3f499c694ba788d7ca57af5fa83863da24e1181"
+}

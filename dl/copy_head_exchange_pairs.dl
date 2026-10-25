@@ -1,0 +1,22 @@
+// Independent audit of the frozen intervention contexts, not an answer rule.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl donor(i:number,d:number) .input donor
+.decl edit(i:number,d:number,p:number) .input edit
+.decl query_start(i:number,p:number) .input query_start
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- donor(I,D), !donor(D,I).
+invalid() :- donor(I,D), !tok(I,_,_).
+invalid() :- donor(I,D), !tok(D,_,_).
+invalid() :- donor(I,D), tok(I,P,_), !tok(D,P,_).
+.decl changed(i:number,d:number,p:number) .output changed
+changed(I,D,P) :- donor(I,D), tok(I,P,T), tok(D,P,U), T != U.
+invalid() :- changed(I,D,P), !edit(I,D,P).
+invalid() :- edit(I,D,P), !changed(I,D,P).
+invalid() :- donor(I,D), !changed(I,D,_).
+invalid() :- donor(I,D), !query_start(I,_).
+invalid() :- donor(I,D), query_start(I,S), query_start(D,T), S != T.
+invalid() :- changed(I,_,P), query_start(I,S), P >= S.
+invalid() :- tok(I,P,T), tok(I,P,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().
