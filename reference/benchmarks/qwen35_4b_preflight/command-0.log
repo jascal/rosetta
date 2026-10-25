@@ -1,0 +1,2 @@
+[convert] 56 arrays -> /tmp/rosetta-qwen35-preflight/tiny.fieldrun.json/.bin (arch=qwen35, dtype=f32, 1 shard(s), eos=[], no torch)
+[fieldrun] convert: detected --arch qwen35 from config.json

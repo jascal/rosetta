@@ -1,0 +1,19 @@
+.decl domain(i:number) .input domain
+.decl expected(i:number,t:number) .input expected
+.decl actual(i:number,t:number) .input actual
+.decl mismatch(i:number,expected:number,actual:number) .output mismatch
+mismatch(I,T,U) :- expected(I,T), actual(I,U), T != U.
+.decl missing(i:number) .output missing
+missing(I) :- domain(I), !actual(I,_).
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- domain(I), !expected(I,_).
+invalid() :- expected(I,_), !domain(I).
+invalid() :- actual(I,_), !domain(I).
+invalid() :- expected(I,T), expected(I,U), T != U.
+invalid() :- actual(I,T), actual(I,U), T != U.
+.decl counts(n:number,matched:number) .output counts
+counts(N,M) :- N = count : { domain(_) }, M = count : { expected(I,T), actual(I,T) }.
+.decl certified() .output certified
+// Tiny synthetic forward parity only, not actual 4B checkpoint certification.
+certified() :- !invalid(), !missing(_), !mismatch(_,_,_).

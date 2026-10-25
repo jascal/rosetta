@@ -1,0 +1,13 @@
+{
+  "scope": "tiny synthetic dense-hybrid architecture preflight; not real 4B parity",
+  "source": "/home/allans/code/fieldrun/scripts/qwen35_dense_ref.py",
+  "source_sha256": "62b1ec19cd1dfcca8cdc5e658337100c955b530854b65915de4658214e052fbb",
+  "fixture_seeds": [
+    2609,
+    2610
+  ],
+  "positions": 60,
+  "context": 16,
+  "dtype": "float32",
+  "verifier_sha256": "a52fde5a849a90280ff4c0badfda597c24b8593bea3360d9af0c5344704e44bb"
+}

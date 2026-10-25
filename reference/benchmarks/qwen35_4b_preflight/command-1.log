@@ -1,0 +1,8 @@
+[fieldrun] Tier B (composition) · bundle /tmp/rosetta-qwen35-preflight/tiny.fieldrun · pure-Rust qwen35
+[fieldrun] next-token top-1: 6.7%  (60 positions, 16 threads)
+[fieldrun] throughput: 15371.0 forwards/s across 16 threads (1 ms/forward/core)
+[fieldrun] device: CPU · model 0 MB / 16004 MB RAM
+
+[fieldrun] loading bundle | 0s …
+[fieldrun] loaded bundle (0 MB)                    
+[fieldrun] wrote 60 predictions to /tmp/rosetta-qwen35-preflight/actual.txt

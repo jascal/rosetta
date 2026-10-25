@@ -1,0 +1,9 @@
+.decl expected(i:number,a:symbol,t:number) .input expected
+.decl actual(i:number,a:symbol,t:number) .input actual
+.decl invalid() .output invalid
+invalid() :- !expected(_,_,_).
+invalid() :- expected(I,A,T), !actual(I,A,T).
+invalid() :- actual(I,A,T), !expected(I,A,T).
+invalid() :- actual(I,A,T), actual(I,A,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().

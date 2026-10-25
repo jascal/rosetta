@@ -1,0 +1,30 @@
+.decl row(i:number,gold:number,actual:number) .input row
+.decl window(i:number,j:number,t:number) .input window
+.decl base_member(a:symbol,l:number,h:number) .input base_member
+.decl different(i:number,d:number)
+different(I,D) :- row(I,_,_), row(D,_,_), window(I,J,T), !window(D,J,T).
+.decl representative(i:number,f:number) .output representative
+representative(I,F) :- row(I,_,_), F = min D : { row(D,_,_), !different(I,D) }.
+.decl feature(f:number) .output feature
+feature(F) :- representative(_,F).
+.decl feature_tok(f:number,j:number,t:number) .output feature_tok
+feature_tok(F,J,T) :- feature(F), window(F,J,T).
+.decl sample(i:number,f:number,gold:number,actual:number) .output sample
+sample(I,F,G,A) :- row(I,G,A), representative(I,F).
+.decl member(a:symbol,l:number,h:number) .output member
+member(A,L,H) :- base_member(A,L,H).
+member("copy9",16,9). member("copy12",16,12).
+.decl head_set(a:symbol) .output head_set
+head_set(A) :- member(A,_,_).
+.decl invalid() .output invalid
+invalid() :- !row(_,_,_).
+.decl nwindow(i:number,n:number)
+nwindow(I,N) :- row(I,_,_), N = count : { window(I,_,_) }.
+invalid() :- nwindow(_,N), N != 8.
+invalid() :- window(_,J,_), J < 0.
+invalid() :- window(_,J,_), J >= 8.
+invalid() :- window(I,J,T), window(I,J,U), T != U.
+invalid() :- row(I,_,_), !representative(I,_).
+invalid() :- !head_set(_).
+.decl certified() .output certified
+certified() :- !invalid().

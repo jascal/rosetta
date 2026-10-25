@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "complete-vocabulary component readout; no full-model equivalence claim"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "9393f8f4daae761a3080054ea30ab4e3a136c9bc9c261a622a30156654e70018",
+    "facts/feature.facts": "bd9bf2a77cc465f10a5c7e57a969f227df21d8e79e5cd56330668d9d82523d89",
+    "facts/sample.facts": "5077a75b776496d5e88715ad5fc9c16f93592ee816d76d3b80a519ef4afff4da",
+    "facts/score.facts": "0bfef2bb07177a924207041559ed7ffebe5fc85460eed523f41e127b73a7eec6",
+    "facts/vocab.facts": "1d338e1f0578df14c63d60a58630d15418f6b9d2fc289da1f02c2f3bc45f07e5",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "0e72099b42b56b78d38a16b8296674cacb00e0ed1d8da774cfe363f9869e1f67",
+    "outputs/decision.csv": "be307a77d0e9f6c372d208eb0c87d0cbebadede484a17304d4cbcd010bc5fabb",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/mapped.csv": "83e375c82861bf740d5bb67ba119d9aacd2e9edcec12fde04ca08dcb37f56a5c",
+    "outputs/rank.csv": "410842de40340313afb4f8bf029de3b866c3e531d5ef59ae13e79f045f6c1b2f",
+    "outputs/wrong.csv": "37946849a56195ae4f79260cbad98cc23222921702d3fee108ad0c65f87c54f2",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "9393f8f4daae761a3080054ea30ab4e3a136c9bc9c261a622a30156654e70018"
+  }
+}

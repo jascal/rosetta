@@ -1,0 +1,40 @@
+{
+  "binary": "/home/allans/code/fieldrun/target/release/fieldrun",
+  "binary_sha256": "1025dcc9ebfade2d2ca355715329c18b98172310b853d041582bebf75ea4a2a2",
+  "commands": [
+    [
+      "/home/allans/code/fieldrun/target/release/fieldrun",
+      "convert",
+      "--model",
+      "/tmp/rosetta-qwen35-preflight/model",
+      "--dtype",
+      "f32",
+      "-o",
+      "/tmp/rosetta-qwen35-preflight/tiny"
+    ],
+    [
+      "/home/allans/code/fieldrun/target/release/fieldrun",
+      "--bundle",
+      "/tmp/rosetta-qwen35-preflight/tiny",
+      "--ids",
+      "/tmp/rosetta-qwen35-preflight/ids.json",
+      "--ctx",
+      "16",
+      "--n-eval",
+      "60",
+      "--dump",
+      "/tmp/rosetta-qwen35-preflight/actual.txt"
+    ]
+  ],
+  "fixture_files": {
+    "expected.json": "7021b4109cb79bc5445e063a44179dc5b572414cd08df8d6737e652882e70fb1",
+    "actual.txt": "4388d6ca6243578935d3a04eda38dc7b297ba03dc311da4c289575af8a1ec040",
+    "tiny.fieldrun.bin": "86d37c756d9a0408a74b13bee82cf1f5e3f7d20b4bbe0ec626098cf5fbbd5103",
+    "ids.json": "1dd7233a5f07286a608dd31a42b4c7f38cd17876c96355701fe4fa403b09f8ba",
+    "tiny.fieldrun.json": "f511bd3c3d5c32380cd5ecad84550114363feb33164361c4465b95bcd0d3edf2",
+    "model/generation_config.json": "a7cb9ba62b25a6ad5f2d653fdf1205f7bb9fcf35e0abbf0f9d887cf12f20b408",
+    "model/config.json": "9e5abf3d5659ea0004416ef80360893ca4acb913a5c85faa5d77f9cd3ee6b099",
+    "model/model.safetensors": "660359d09a7043654801beef827a4b1ec45cd479c2e6de046fcfdcfa6b217574"
+  },
+  "replay_unchanged": true
+}
