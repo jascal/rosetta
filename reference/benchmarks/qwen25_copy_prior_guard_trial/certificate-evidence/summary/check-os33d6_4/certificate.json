@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "fixed independent confirmation, all answers retained"
+  },
+  "scalars": {},
+  "result": {
+    "certified": false
+  },
+  "sha256": {
+    "circuit.dl": "f8f8c7b2162011df02349da7b9fbe3428d3ca2d242761548e950bb52b2cae7aa",
+    "facts/domain.facts": "904f64f19833266a205995d1b6d820281fa00598904e57c130b3cf1035cfcd46",
+    "facts/edit.facts": "c04fe04080f696c9b0257ee5f6d8e67a2fb613ee3982f0032a42bc63921b8b25",
+    "facts/pair.facts": "6cbf66213629e265491a17181beef3eb0939bf4ba2936b1238f53687d0415a21",
+    "facts/ref.facts": "f43c71c8762a781d6b185e8cebdaaa5616aa899282ebde08b88d7f0d565ab75c",
+    "facts/sample.facts": "61caeaef8ced0ca96fe49bb5c655c5a2478ea040f4a158f6cdf9c2895156923e",
+    "facts/seed.facts": "a8be45a276290c536af6a2122ffeec897bf858f3b74c5e688f91bcfa9c8d81dc",
+    "facts/tok.facts": "6de21e3ad885f1eacce6e2bf2d4c6dddc635c2dc34f4ba245788ff6ca47a4c38",
+    "outputs/active_success.csv": "566b142fce9fe7302eb22f373d27338f5ac897dc2bacaeafb9ef45edcd11cae5",
+    "outputs/baseline_wrong.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/causal_groups.csv": "7c810b6821f6d447bef2edd55bb70818c5cf969b7977ad074b7d6cebe9522ff8",
+    "outputs/certified.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/counts.csv": "37f2a73baa43a9e357aee9f61cdb19b025f7560c84b87cc8794c28900235a6dd",
+    "outputs/gate_failed.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/wrong.csv": "c57fd16aa789dcfe3aa421e5c3b9ba558c54608f697bc6014302373ba1080f03",
+    "stderr.txt": "2b988e0a9834d1c48d94b756a69c3272442bd1f4bccabea3655333cf3406de19",
+    "verify.dl": "764d2aa9528f4a5030acab878a79f646f76e6b794258a3fac7d1460ad02c7526"
+  }
+}

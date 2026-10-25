@@ -1,0 +1,13 @@
+{
+  "queries": [
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/tuples/check-2_zamj2i",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/specialization/check-wuhfbcue",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/domains/check-kjbtdtmf",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/summary/check-os33d6_4",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/equiv-firing/check-z3m4tljz",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/equiv-incremental/check-jh53zqy1",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/equiv-full/check-8eliykqx",
+    "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_prior_guard_trial/certificate-evidence/runtime/check-qfjek3j5"
+  ],
+  "unchanged": true
+}
