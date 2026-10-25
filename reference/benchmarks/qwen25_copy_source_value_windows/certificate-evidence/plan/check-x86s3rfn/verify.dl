@@ -1,0 +1,37 @@
+.decl donor(i:number,d:number) .input donor
+.decl member(a:symbol,l:number,h:number) .input member
+.decl tok(i:number,p:number,t:number) .input tok
+.decl edit(i:number,p:number) .input edit
+.decl size(k:number,label:symbol)
+size(4,"w4"). size(8,"w8"). size(16,"w16").
+.decl site(i:number,p:number) .output site
+site(I,P) :- edit(I,P), tok(I,P,_).
+.decl feature(i:number,p:number,k:number) .output feature
+feature(I,P,K) :- site(I,P), size(K,_).
+.decl start(i:number,p:number,k:number,s:number) .output start
+start(I,P,K,P+1-K) :- feature(I,P,K), P+1 >= K.
+start(I,P,K,0) :- feature(I,P,K), P+1 < K.
+.decl window_tok(i:number,p:number,k:number,j:number,t:number) .output window_tok
+window_tok(I,P,K,J-S,T) :- start(I,P,K,S), tok(I,J,T), J >= S, J <= P.
+.decl truncated(i:number,p:number,k:number) .output truncated
+truncated(I,P,K) :- start(I,P,K,S), S > 0.
+.decl window_mode(m:symbol,k:number,kind:symbol) .output window_mode
+window_mode(cat(L,"_self"),K,"self") :- size(K,L).
+window_mode(cat(L,"_donor"),K,"donor") :- size(K,L).
+.decl head_set(a:symbol)
+head_set(A) :- member(A,_,_).
+.decl request(i:number,a:symbol,m:symbol,d:number) .output request
+request(I,"none","baseline",I) :- donor(I,_).
+request(I,A,"identity",I) :- donor(I,_), head_set(A).
+request(I,A,"source_values",D) :- donor(I,D), head_set(A).
+request(I,A,M,I) :- donor(I,_), head_set(A), window_mode(M,_,"self").
+request(I,A,M,D) :- donor(I,D), head_set(A), window_mode(M,_,"donor").
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- !member(_,_,_).
+invalid() :- donor(I,D), !donor(D,I).
+invalid() :- donor(I,_), !site(I,_).
+invalid() :- edit(I,P), !site(I,P).
+invalid() :- donor(I,D), edit(I,P), !edit(D,P).
+.decl certified() .output certified
+certified() :- !invalid().
