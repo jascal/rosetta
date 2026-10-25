@@ -1,0 +1,13 @@
+{
+  "scope": "diagnostics only; no model-equivalence claim",
+  "checks": [
+    {
+      "path": "certificate-evidence/classification/check-86vfqpwn",
+      "certified": true
+    },
+    {
+      "path": "certificate-evidence/explanation/check-k1nwz74s",
+      "certified": true
+    }
+  ]
+}
