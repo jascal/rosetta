@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "actual 4B MLP instrument consistency; no mechanism/equivalence claim"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "b20fd06391a3a0ecff261b656589acffc982963879cd196cd6db236bef8cb515",
+    "facts/shape.facts": "8a081396c57c2b71900e38b1445e258bf68cc8bcb3b386966ccd0711f9ae9d93",
+    "outputs/arm.csv": "ac50434e872c9ff269597f12fb542dd3203409bda0f360c43ac03813a3f0e89c",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/compare.csv": "cbbbc0b50140c899fcfe5c08bd0936afb7c54e74738c437eb07ef8644de91a88",
+    "outputs/identity_site.csv": "eb19b3de1c471779a2fe2910730d8473a9ea4377919b39935d7198b3bef2e538",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/observe.csv": "7f33e302eefbfef3b1438442b4ad0777b5c5d2aceb7f3c0f0a0c247ef3cc2085",
+    "outputs/run_arm.csv": "64132b4cf86dcdfaef6da6e76d063c3a12a3304d77b8ab7410ac7da9ff6b79df",
+    "outputs/unit.csv": "a20ae2004973cce7af938b487c38a8ab9fcf469e1fee847cf450cffc33d5357c",
+    "outputs/zero.csv": "be99565032d4daa4dc553947718e6afa92b13cd02bce5e5dca30a9d7ff4a2629",
+    "stderr.txt": "a615d48c1c6d2b843afb9394ed687eadf53f032f8a048b4c1c08c6d9cf2b2316",
+    "verify.dl": "b20fd06391a3a0ecff261b656589acffc982963879cd196cd6db236bef8cb515"
+  }
+}

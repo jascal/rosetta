@@ -1,0 +1,10 @@
+.decl identity_site(l:number,p:number,n:number) .input identity_site
+.decl observation(a:symbol,l:number,p:number,n:number,g:float,u:float,v:float) .input observation
+.decl patch(l:number,p:number,n:number,v:float) .output patch
+patch(L,P,N,V) :- identity_site(L,P,N), observation("baseline",L,P,N,_,_,V).
+.decl invalid() .output invalid
+invalid() :- !identity_site(_,_,_).
+invalid() :- identity_site(L,P,N), !patch(L,P,N,_).
+invalid() :- patch(L,P,N,V), patch(L,P,N,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

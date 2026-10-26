@@ -55,9 +55,10 @@ values, and patches selected products before down-projection. It uses hooks
 inside the official lazily loaded graph. A tiny hybrid test verifies identity,
 multi-layer/source-position substitutions against a direct resident reference,
 invalid-request rejection and cleanup before a following unpatched request.
-This does not yet validate an actual-4B intervention panel or identify its copy
-mechanism. The old model's layer/head findings are not inherited.
+Those tiny tests alone do not validate an actual-4B intervention panel or
+identify its copy mechanism. The old model's layer/head findings are not inherited.
 
-The next gate is a frozen actual-4B probe validation, then fresh model-specific
-baseline/localization data. The original requirement for positive incremental
-fresh `dl/equiv.dl` certification and Souffle-only runtime remains unmet.
+The subsequent [actual-4B probe validation](qwen35-mlp-probe-outcome.md) passes
+its frozen unit-substitution, identity and cleanup gates. Fresh model-specific
+baseline/localization data is next. The original requirement for positive
+incremental fresh `dl/equiv.dl` certification and Souffle-only runtime remains unmet.

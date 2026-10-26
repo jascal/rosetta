@@ -10,12 +10,16 @@ def main():
     parser.add_argument('directories',type=Path,nargs='*')
     a=parser.parse_args()
     directories=a.directories or [ROOT/'reference/benchmarks/qwen35_stream_preflight',ROOT/'reference/benchmarks/qwen35_4b_smoke']
+    probe=ROOT/'reference/benchmarks/qwen35_4b_probe_validation'
+    if not a.directories and (probe/'closed.json').exists():directories.append(probe)
     count=0
     for directory in directories:
         out=directory.resolve()
         for name,digest in read(out/'closed.json')['files'].items():
             if sha256(out/name)!=digest:raise ValueError(f'closed evidence changed: {out/name}')
-        for name,digest in read(out/'protocol.json')['sources'].items():
+        manifest=out/('protocol.json' if (out/'protocol.json').exists() else 'frozen.json')
+        frozen=read(manifest)
+        for name,digest in (frozen['sources']|frozen.get('prior',{})).items():
             if sha256(ROOT/name)!=digest:raise ValueError(f'source changed: {name}')
         for path in sorted((out/'certificate-evidence').rglob('certificate.json')):
             before=read(path)['result'];after=replay(path.parent)

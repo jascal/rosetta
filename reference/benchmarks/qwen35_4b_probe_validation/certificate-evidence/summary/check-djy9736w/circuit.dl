@@ -1,0 +1,65 @@
+.decl arm(a:symbol) .input arm
+.decl compare(a:symbol,b:symbol) .input compare
+.decl observe(a:symbol,l:number,p:number,n:number) .input observe
+.decl vocab(n:number) .input vocab
+.decl score(a:symbol,t:number,x:float) .input score
+.decl observation(a:symbol,l:number,p:number,n:number,g:float,u:float,v:float) .input observation
+.decl patch_request(a:symbol,l:number,p:number,n:number,v:float) .input patch_request
+.decl applied(a:symbol,l:number,p:number,n:number,before:float,after:float) .input applied
+.decl logits_hash(a:symbol,h:symbol) .input logits_hash
+.decl abs_score(a:symbol,t:number,x:float)
+abs_score(A,T,X) :- score(A,T,X), X >= 0.0.
+abs_score(A,T,-X) :- score(A,T,X), X < 0.0.
+.decl logit_bad(a:symbol,b:symbol,t:number) .output logit_bad
+logit_bad(A,B,T) :- compare(A,B), score(A,T,X), score(B,T,Y), abs_score(A,T,M), X-Y > 0.002+0.002*M.
+logit_bad(A,B,T) :- compare(A,B), score(A,T,X), score(B,T,Y), abs_score(A,T,M), Y-X > 0.002+0.002*M.
+.decl maximum(a:symbol,x:float)
+maximum(A,X) :- arm(A), X = max Y : { score(A,_,Y) }.
+.decl at_top(a:symbol,t:number)
+at_top(A,T) :- maximum(A,X), score(A,T,X).
+.decl ref(a:symbol,t:number) .output ref
+ref(A,T) :- arm(A), T = min U : { at_top(A,U) }.
+.decl argmax_bad(a:symbol,b:symbol) .output argmax_bad
+argmax_bad(A,B) :- compare(A,B), ref(A,T), ref(B,U), T != U.
+.decl obs_field(a:symbol,l:number,p:number,n:number,k:symbol,x:float)
+obs_field(A,L,P,N,"gate",G) :- observation(A,L,P,N,G,_,_).
+obs_field(A,L,P,N,"up",U) :- observation(A,L,P,N,_,U,_).
+obs_field(A,L,P,N,"product",V) :- observation(A,L,P,N,_,_,V).
+.decl abs_obs(a:symbol,l:number,p:number,n:number,k:symbol,x:float)
+abs_obs(A,L,P,N,K,X) :- obs_field(A,L,P,N,K,X), X >= 0.0.
+abs_obs(A,L,P,N,K,-X) :- obs_field(A,L,P,N,K,X), X < 0.0.
+.decl identity_arm(a:symbol)
+identity_arm("identity"). identity_arm("cleanup").
+.decl observation_bad(a:symbol,l:number,p:number,n:number,k:symbol) .output observation_bad
+observation_bad(A,L,P,N,K) :- identity_arm(A), obs_field("baseline",L,P,N,K,X),
+    obs_field(A,L,P,N,K,Y), abs_obs("baseline",L,P,N,K,M), X-Y > 0.002+0.002*M.
+observation_bad(A,L,P,N,K) :- identity_arm(A), obs_field("baseline",L,P,N,K,X),
+    obs_field(A,L,P,N,K,Y), abs_obs("baseline",L,P,N,K,M), Y-X > 0.002+0.002*M.
+.decl hash_bad(a:symbol) .output hash_bad
+hash_bad(A) :- identity_arm(A), logits_hash("baseline",X), logits_hash(A,Y), X != Y.
+.decl dose(a:symbol,n:number) .output dose
+dose(A,N) :- patch_request(A,_,_,_,_), N = count : { applied(A,_,_,_,B,V), B != V }.
+.decl changed_scores(a:symbol,n:number) .output changed_scores
+changed_scores(A,N) :- arm(A), N = count : { score(A,T,X), score("baseline",T,Y), X != Y }.
+.decl invalid() .output invalid
+invalid() :- !arm(_).
+invalid() :- !vocab(_).
+invalid() :- vocab(N), N <= 0.
+invalid() :- vocab(N), vocab(M), N != M.
+.decl nscore(a:symbol,n:number)
+nscore(A,N) :- arm(A), N = count : { score(A,_,_) }.
+invalid() :- nscore(_,M), vocab(N), M != N.
+invalid() :- score(A,_,_), !arm(A).
+invalid() :- score(_,T,_), T < 0.
+invalid() :- score(_,T,_), vocab(N), T >= N.
+invalid() :- score(A,T,X), score(A,T,Y), X != Y.
+invalid() :- arm(A), !logits_hash(A,_).
+invalid() :- observe(A,L,P,N), !observation(A,L,P,N,_,_,_).
+invalid() :- observation(A,L,P,N,_,_,_), !observe(A,L,P,N).
+invalid() :- patch_request(A,L,P,N,_), !applied(A,L,P,N,_,_).
+invalid() :- applied(A,L,P,N,_,_), !patch_request(A,L,P,N,_).
+invalid() :- patch_request(A,L,P,N,V), applied(A,L,P,N,_,W), V != W.
+invalid() :- dose(A,0), A != "identity".
+.decl certified() .output certified
+// Finite intervention-instrument consistency only.
+certified() :- !invalid(), !logit_bad(_,_,_), !argmax_bad(_,_), !observation_bad(_,_,_,_,_), !hash_bad(_).

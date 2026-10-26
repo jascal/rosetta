@@ -22,7 +22,7 @@ class MlpReference(LazyReference):
                 raise ValueError('invalid patch')
             if (l,p,n) in seen:raise ValueError('duplicate patch')
             seen.add((l,p,n))
-        hooks=[];gate={};up={};observed=[]
+        hooks=[];gate={};up={};observed=[];applied=[]
         try:
             for l in sorted({l for l,n in units}|{l for l,p,n,v in patches}):
                 module=self.model.model.layers[l].mlp
@@ -37,11 +37,13 @@ class MlpReference(LazyReference):
                             'gate':float(gate[l][n]),'value':float(up[l][n]),'product':float(products[0,-1,n])})
                     if not layer_patches:return None
                     changed=products.clone()
-                    for p,n,v in layer_patches:changed[0,p,n]=v
+                    for p,n,v in layer_patches:
+                        before=float(changed[0,p,n]);changed[0,p,n]=v
+                        applied.append({'layer':l,'position':p,'neuron':n,'before':before,'after':float(changed[0,p,n])})
                     return (changed,)+args[1:]
                 hooks.extend((module.gate_proj.register_forward_hook(capture_gate),
                     module.up_proj.register_forward_hook(capture_up),module.down_proj.register_forward_pre_hook(patch)))
             logits=self.logits(ids)
-            return {'logits':logits,'observations':observed}
+            return {'logits':logits,'observations':observed,'applied':applied}
         finally:
             for hook in hooks:hook.remove()

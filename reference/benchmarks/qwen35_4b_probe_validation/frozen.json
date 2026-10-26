@@ -1,0 +1,59 @@
+{
+  "scope": "MLP instrument validation on one known smoke context; not a copy study",
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "checkpoint_files": {
+    "merges.txt": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+    "config.json": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+    "chat_template.jinja": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+    "vocab.json": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003",
+    "model.safetensors-00001-of-00002.safetensors": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+    "tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+    "model.safetensors-00002-of-00002.safetensors": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+    "model.safetensors.index.json": "cf3f798ee02ba45f9622aa8892a47369ab667d0afbf154ee7c2212de42e6302d",
+    "tokenizer_config.json": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+  },
+  "files": {
+    "context.json": "080bf7dce4023fb7298962d5eefc258ccd414fa048d4b9cdb0de118b5196b478",
+    "plan.json": "dc30597f5d149ee610e42940f3b98256add79f5eee273ccb0332b2caf59caec2",
+    "certificate-evidence/plan/check-xmmi4zn7/stderr.txt": "a615d48c1c6d2b843afb9394ed687eadf53f032f8a048b4c1c08c6d9cf2b2316",
+    "certificate-evidence/plan/check-xmmi4zn7/verify.dl": "b20fd06391a3a0ecff261b656589acffc982963879cd196cd6db236bef8cb515",
+    "certificate-evidence/plan/check-xmmi4zn7/circuit.dl": "b20fd06391a3a0ecff261b656589acffc982963879cd196cd6db236bef8cb515",
+    "certificate-evidence/plan/check-xmmi4zn7/certificate.json": "6c32737bc413a612a5257d69432c2693296ef5a45bad83f9efccc29ef81b0815",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/identity_site.csv": "eb19b3de1c471779a2fe2910730d8473a9ea4377919b39935d7198b3bef2e538",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/unit.csv": "a20ae2004973cce7af938b487c38a8ab9fcf469e1fee847cf450cffc33d5357c",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/zero.csv": "be99565032d4daa4dc553947718e6afa92b13cd02bce5e5dca30a9d7ff4a2629",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/arm.csv": "ac50434e872c9ff269597f12fb542dd3203409bda0f360c43ac03813a3f0e89c",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/compare.csv": "cbbbc0b50140c899fcfe5c08bd0936afb7c54e74738c437eb07ef8644de91a88",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/run_arm.csv": "64132b4cf86dcdfaef6da6e76d063c3a12a3304d77b8ab7410ac7da9ff6b79df",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-xmmi4zn7/outputs/observe.csv": "7f33e302eefbfef3b1438442b4ad0777b5c5d2aceb7f3c0f0a0c247ef3cc2085",
+    "certificate-evidence/plan/check-xmmi4zn7/facts/shape.facts": "8a081396c57c2b71900e38b1445e258bf68cc8bcb3b386966ccd0711f9ae9d93"
+  },
+  "sources": {
+    "py/run_qwen35_probe_validation.py": "23706e942a33693c3a5246a4de313ec91389b8bf3e5469a7237302537389f251",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/run_qwen35_checkpoint_smoke.py": "cdec642d64136874b93633dca4ca60482c8641740958afcf0c2bd6ab915ac4f1",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "dl/qwen35_probe_plan.dl": "b20fd06391a3a0ecff261b656589acffc982963879cd196cd6db236bef8cb515",
+    "dl/qwen35_probe_identity.dl": "014a60cb1f40e36bcef394ff228f68d3a9273cb2ee0b67f0238b3e9b37d6b4e1",
+    "dl/qwen35_probe_summary.dl": "0e8a422c6e19af8b423159df1e35be65f0af023472d5ed9cae1052d60e4ed903",
+    "docs/qwen35-mlp-probe-plan.md": "b5fa87f5ed6d618ea3dec47dfdec4d605c3f493fcf654e74a63e44e07e0bf941"
+  },
+  "prior": {
+    "reference/benchmarks/qwen35_4b_smoke/parity.json": "f2fa08a12b3a858950ca7cfb7a688ac7a4e368b96cc2e5eaf5078ffb5e04f0b8",
+    "reference/benchmarks/qwen35_4b_smoke/closed.json": "f59b62bb5b773d0f46061a596591df3e0576ebc90ded1a9c1a128e1337684721",
+    "reference/benchmarks/qwen35_4b_smoke/protocol.json": "c60c656b52dd6012a13c2bf03cd293cdd97bdc27a0447a32a94d02fe21b2b4cd"
+  },
+  "threads": 2,
+  "precision": "stored checkpoint weights widened to FP32",
+  "cache": false,
+  "tolerance": {
+    "absolute": 0.002,
+    "relative": 0.002
+  }
+}

@@ -63,3 +63,11 @@ and actual-checkpoint intervention validation remain open. See the
 [reference preflight report](qwen35-reference-preflight.md) for exact scope and
 retained evidence. The next work should validate probes and begin fresh 4B
 baseline/localization collection, rather than resume the old model's sweeps.
+
+The subsequent actual-checkpoint MLP unit-substitution gate now passes on a
+frozen smoke context, with separate streamed substitutions, exact identity and
+cleanup hashes, nonempty doses and complete applied-value checks. See the
+[probe outcome](qwen35-mlp-probe-outcome.md). Fresh behavior/localization
+collection can move to the official-reference FP32 backend. This does not
+authorize treating unvalidated native fieldrun hooks as equivalent; native
+parity remains a separate gate before using that backend for collection.
