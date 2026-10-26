@@ -1,0 +1,15 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 23
+invalid() :- edit(A,B,P), query_start(A,Q), P >= Q.
+--------------------^-------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 24
+invalid() :- edit(A,B,P), !long_target(A,P).
+--------------------^------------------------
+Warning: Variable B only occurs once in file verify.dl at line 27
+invalid() :- pair(A,B,G), !sample(A,_,G,0,_,_,_).
+--------------------^-----------------------------
+Warning: Variable A only occurs once in file verify.dl at line 28
+invalid() :- pair(A,B,G), !sample(B,_,G,0,_,_,_).
+------------------^-------------------------------

@@ -1,0 +1,36 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,s:symbol,g:symbol,negative:number,exposures:number,prefix:number,target:number) .input sample
+.decl pair(a:number,b:number,g:symbol) .input pair
+.decl edit(a:number,b:number,p:number) .input edit
+.decl excluded(t:number) .input excluded
+#include "circuit.dl"
+.decl query_start(i:number,p:number)
+query_start(I,L+1-P) :- sample(I,_,_,_,_,P,_), lc_last(I,L).
+.decl changed(a:number,b:number,p:number)
+changed(A,B,P) :- pair(A,B,_), tok(A,P,T), tok(B,P,U), T != U.
+.decl source_edit_count(a:number,b:number,n:number)
+source_edit_count(A,B,N) :- pair(A,B,_), N = count : { edit(A,B,_) }.
+.decl long_target(i:number,p:number)
+long_target(I,J+1) :- sample(I,_,_,0,_,P,T), lc_source(I,J,K,T), K >= P.
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_,_,_,_,_).
+invalid() :- sample(I,_,_,_,_,_,_), !tok(I,_,_).
+invalid() :- tok(I,_,_), !sample(I,_,_,_,_,_,_).
+invalid() :- sample(I,_,G,_,_,_,_), tok(I,_,T), sample(J,_,H,_,_,_,_), tok(J,_,T), G != H.
+invalid() :- tok(_,_,T), excluded(T).
+invalid() :- changed(A,B,P), !edit(A,B,P).
+invalid() :- edit(A,B,P), !changed(A,B,P).
+invalid() :- edit(A,B,P), query_start(A,Q), P >= Q.
+invalid() :- edit(A,B,P), !long_target(A,P).
+invalid() :- pair(A,B,_), long_target(A,P), !edit(A,B,P).
+invalid() :- pair(A,B,_), sample(A,_,_,_,E,_,_), source_edit_count(A,B,N), E != N.
+invalid() :- pair(A,B,G), !sample(A,_,G,0,_,_,_).
+invalid() :- pair(A,B,G), !sample(B,_,G,0,_,_,_).
+invalid() :- pair(A,B,_), sample(A,S,_,_,_,_,_), sample(B,T,_,_,_,_,_), S != T.
+invalid() :- pair(A,B,_), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B,_), tok(B,P,_), !tok(A,P,_).
+.decl counts(split:symbol,rows:number,negative:number,pairs:number) .output counts
+counts(S,N,D,P) :- sample(_,S,_,_,_,_,_), N = count : { sample(_,S,_,_,_,_,_) },
+    D = count : { sample(_,S,_,1,_,_,_) }, P = count : { pair(A,_,_), sample(A,S,_,_,_,_,_) }.
+.decl certified() .output certified
+certified() :- !invalid().

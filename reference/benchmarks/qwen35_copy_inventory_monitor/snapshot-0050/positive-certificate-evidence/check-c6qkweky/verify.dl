@@ -1,0 +1,27 @@
+// Historical development diagnostics only. No candidate is selected or certified.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,g:symbol,gold:number) .input sample
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl class(i:number,c:symbol) .output class
+class(I,"correct") :- sample(I,_,T), ref(I,T).
+class(I,"wrong_source") :- sample(I,_,T), ref(I,R), T != R, lc_source(I,_,_,R).
+class(I,"wrong_context") :- sample(I,_,T), ref(I,R), T != R, tok(I,_,R), !lc_source(I,_,_,R).
+class(I,"wrong_external") :- sample(I,_,T), ref(I,R), T != R, !tok(I,_,R).
+.decl counts(c:symbol,n:number) .output counts
+counts(C,N) :- class(_,C), N = count : { class(_,C) }.
+.decl representative(i:number,c:symbol,g:symbol)
+representative(I,C,G) :- sample(_,G,_), class(_,C),
+    I = min J : { sample(J,G,_), class(J,C) }.
+.decl rank(i:number,c:symbol,n:number)
+rank(I,C,N) :- representative(I,C,_), N = count : { representative(J,C,_), J < I }.
+.decl selected_case(i:number,c:symbol) .output selected_case
+selected_case(I,C) :- rank(I,C,N), N < 2.
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_).
+invalid() :- sample(I,_,_), !ref(I,_).
+invalid() :- ref(I,T), ref(I,U), T != U.
+invalid() :- sample(I,_,_), !class(I,_).
+invalid() :- class(I,C), class(I,D), C != D.
+.decl certified() .output certified
+certified() :- !invalid().
