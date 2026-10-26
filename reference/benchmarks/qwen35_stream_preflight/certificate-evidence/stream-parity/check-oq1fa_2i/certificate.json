@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "ordinary and streamed FP32 same tiny checkpoint, complete vocabulary"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "be0b38acb9b85e61cafb4c8f78c66a7c1c921b982099ccfe457b3769f2c69bcb",
+    "facts/domain.facts": "cd0a6cb6d4176558a28e9b2569fab1563cebfdb4d3139dc84acaebc17f9ec7fa",
+    "facts/expected.facts": "ad791dc4b1f4b94d0ddcd85184720aa159ef7eb84b006dd40ee5507db9195022",
+    "facts/ordinary.facts": "8761db772c78806d0ea1d66605ed3fd9c552c09d8075fcf1889deed944394b09",
+    "facts/streamed.facts": "3b72f09df90ac6b83160b15def8933834f1f090683b25f2f72770b0f35c9e151",
+    "facts/vocab.facts": "913f5d1da2feaf4deeccc9e55cbb350a20f12b3f507e87be85dbb77fdd3cb9bc",
+    "outputs/argmax_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "8b0ac2ece5f346d1e14cd6c30f0fee87721e4132cf1f5fcac38faf034e9da1ca",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/logit_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/ordinary_ref.csv": "ad791dc4b1f4b94d0ddcd85184720aa159ef7eb84b006dd40ee5507db9195022",
+    "outputs/streamed_ref.csv": "ad791dc4b1f4b94d0ddcd85184720aa159ef7eb84b006dd40ee5507db9195022",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "be0b38acb9b85e61cafb4c8f78c66a7c1c921b982099ccfe457b3769f2c69bcb"
+  }
+}

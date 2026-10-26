@@ -1,0 +1,233 @@
+{
+  "actual_4b_weights_loaded": false,
+  "block_dimensions_from_pinned_config": [
+    {
+      "layer": 0,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 1,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 2,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 3,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 4,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 5,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 6,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 7,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 8,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 9,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 10,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 11,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 12,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 13,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 14,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 15,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 16,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 17,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 18,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 19,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 20,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 21,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 22,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 23,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 24,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 25,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 26,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 27,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    },
+    {
+      "layer": 28,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 29,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 30,
+      "type": "linear_attention",
+      "fp32_parameter_bytes": 451695360
+    },
+    {
+      "layer": 31,
+      "type": "full_attention",
+      "fp32_parameter_bytes": 429938688
+    }
+  ],
+  "largest_block_fp32_parameter_bytes": 451695360,
+  "head_chunk_fp32_bytes": 10485760,
+  "note": "Parameter-size bound excludes activations, runtime and allocator overhead; tiny-process RSS is not 4B measured RSS.",
+  "tiny_process_maxrss_kib": 355372,
+  "tiny_context_seconds": [
+    0.029348264000873314,
+    0.02696901700255694,
+    0.02933990800011088,
+    0.027026955998735502,
+    0.02455567599827191,
+    0.03190986399931717,
+    0.02837493200058816,
+    0.027314626997394953,
+    0.03168064199780929,
+    0.02931762600201182,
+    0.029306396001629764,
+    0.024387508998188423,
+    0.029077955998218386,
+    0.031012294999527512,
+    0.029425780001474777,
+    0.05959416700352449,
+    0.026523649001319427,
+    0.024907478000386618,
+    0.02885749100096291,
+    0.029716736997215776,
+    0.02453785200123093,
+    0.029263664997415617,
+    0.029322956997930305,
+    0.028442991002521012,
+    0.026015392002591398,
+    0.03235956000207807,
+    0.03359961400201428,
+    0.029284714000823442,
+    0.028329095999652054,
+    0.026244894001138164,
+    0.028070349002518924,
+    0.029350487999181496,
+    0.02802203800092684,
+    0.027492803001223365,
+    0.0327463079993322,
+    0.028213239002070623,
+    0.0269993149995571,
+    0.03080683799998951,
+    0.029230121999717085,
+    0.0281374260011944,
+    0.02862755800015293,
+    0.030754398998396937,
+    0.027977894998912234,
+    0.028903187001560582,
+    0.027931137999985367,
+    0.02613923600074486,
+    0.0294022150010278,
+    0.03107984199959901,
+    0.02611808599976939,
+    0.02828160600256524,
+    0.030614516999776242,
+    0.030690038998727687,
+    0.03163551699981326,
+    0.02835483500166447,
+    0.030359576998307602,
+    0.029383270000835182,
+    0.028432140999939293,
+    0.026039308002509642,
+    0.029889581997849746,
+    0.03053912399991532
+  ],
+  "torch": "2.12.1+cpu",
+  "transformers": "5.12.1"
+}

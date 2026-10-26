@@ -1,0 +1,38 @@
+{
+  "maxrss_kib": 840636,
+  "timings": [
+    {
+      "i": 0,
+      "backend": "ordinary",
+      "seconds": 6.394374498999241
+    },
+    {
+      "i": 0,
+      "backend": "streamed",
+      "seconds": 6.353795585997432
+    },
+    {
+      "i": 1,
+      "backend": "ordinary",
+      "seconds": 7.181589397001517
+    },
+    {
+      "i": 1,
+      "backend": "streamed",
+      "seconds": 6.663320333002048
+    },
+    {
+      "i": 2,
+      "backend": "ordinary",
+      "seconds": 5.833235311001772
+    },
+    {
+      "i": 2,
+      "backend": "streamed",
+      "seconds": 5.277926868002396
+    }
+  ],
+  "torch": "2.12.1+cpu",
+  "transformers": "5.12.1",
+  "note": "Process max RSS includes mapped file pages and fact staging, not only live private model weights."
+}

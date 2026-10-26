@@ -1,0 +1,51 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "3",
+        "744960",
+        "0",
+        "0"
+      ]
+    ],
+    "logit_bad": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "streamed_ref": [
+      [
+        "0",
+        "2614"
+      ],
+      [
+        "1",
+        "20956"
+      ],
+      [
+        "2",
+        "2614"
+      ]
+    ],
+    "argmax_bad": [],
+    "ordinary_ref": [
+      [
+        "0",
+        "2614"
+      ],
+      [
+        "1",
+        "20956"
+      ],
+      [
+        "2",
+        "2614"
+      ]
+    ],
+    "reset_bad": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_4b_smoke/certificate-evidence/checkpoint-parity/check-8c0hp5j5"
+}

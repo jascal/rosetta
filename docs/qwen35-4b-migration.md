@@ -52,3 +52,14 @@ with its fixed seeds and compared using the provided fieldrun binary. All
 This verifies this tiny fixture, not actual-checkpoint 4B parity, full-logit
 equality, incremental state or intervention hooks. Evidence:
 [`qwen35_4b_preflight/tiny-forward.json`](../reference/benchmarks/qwen35_4b_preflight/tiny-forward.json).
+
+Subsequent progress: the checkpoint/tokenizer revision is now pinned and
+downloaded. Two memory-bounded FP32 reference paths pass actual-checkpoint
+full-vocabulary parity on two distinct smoke contexts plus an independent
+repeat, with zero argmax differences and no reset-hash differences. Peak RSS
+is about 821 MiB and short-context forwards take 5–7 seconds. This resolves the
+initial resident-memory obstacle without weight quantization. Native 4B parity
+and actual-checkpoint intervention validation remain open. See the
+[reference preflight report](qwen35-reference-preflight.md) for exact scope and
+retained evidence. The next work should validate probes and begin fresh 4B
+baseline/localization collection, rather than resume the old model's sweeps.

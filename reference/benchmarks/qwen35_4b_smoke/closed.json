@@ -1,0 +1,27 @@
+{
+  "files": {
+    "contexts.json": "5fe5e1a66722bd8630cf27f15447a868ccf9ec0464b591a74a630b9a795b4051",
+    "parity.json": "f2fa08a12b3a858950ca7cfb7a688ac7a4e368b96cc2e5eaf5078ffb5e04f0b8",
+    "resources.json": "780df52e8032b405f986db19946f9d8b1ed24b11792fec896882b3bc84561233",
+    "replay-audit.json": "f44e434e1e7a6f3cfd2b33dc1be2831a6f44a0670fa4902cb6987132c1953e80",
+    "protocol.json": "c60c656b52dd6012a13c2bf03cd293cdd97bdc27a0447a32a94d02fe21b2b4cd",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/verify.dl": "ec2f4a258b4271bc630a1e4c3ebda706179e5f373d8fdc5898008607c19a1b2d",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/circuit.dl": "ec2f4a258b4271bc630a1e4c3ebda706179e5f373d8fdc5898008607c19a1b2d",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/certificate.json": "ba01af3c8dd97fa0b269e683958c274c71704937e84ecf7d8a91bf0eadeea840",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/counts.csv": "34d57ecd132c56a52a9164e01a24216e2a1023cda1c8d1a36d63afd4782db926",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/logit_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/streamed_ref.csv": "3f1542d7f03e763b5a7504d11bd850c01cd513f6e122fd936aa03cdbd22063b1",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/argmax_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/ordinary_ref.csv": "3f1542d7f03e763b5a7504d11bd850c01cd513f6e122fd936aa03cdbd22063b1",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/outputs/reset_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/ordinary.facts": "826001b854a4e78ff9979be750dadcfb6127a0abdce4e20f73b5fec8761009d1",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/reset_pair.facts": "a4bf3d5f3f914362415d45f65dda7f64276573d2fb5df467fb4191365aae7195",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/logits_hash.facts": "a0d810b8324653e63015770ec52e53888b0a564b09e67ad9a7121f1e50fda4fc",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/domain.facts": "b78a1987bcbdc0903ba6ba29ee3e1f4e7cc1ca868a60889beb141e26e06cb005",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/streamed.facts": "826001b854a4e78ff9979be750dadcfb6127a0abdce4e20f73b5fec8761009d1",
+    "certificate-evidence/checkpoint-parity/check-8c0hp5j5/facts/vocab.facts": "764f571d68c52fddb8c5d6b1d90ab09f1236ff2f6ceb7a4fdb9b35c5ca4771e6"
+  }
+}
