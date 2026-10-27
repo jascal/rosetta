@@ -1,0 +1,14 @@
+.decl sample(i:number,s:symbol) .input sample
+.decl firing(i:number,t:number) .input firing
+.decl mismatch(i:number,r:number,t:number) .input mismatch
+.decl fire(i:number,s:symbol,t:number)
+fire(I,S,T) :- sample(I,S), firing(I,T).
+.decl wrong(i:number,s:symbol)
+wrong(I,S) :- sample(I,S), mismatch(I,_,_).
+.decl counts(s:symbol,n:number,wrong:number) .output counts
+counts(S,N,W) :- sample(_,S), N = count : { fire(I,S,T) }, W = count : { wrong(I,S) }.
+.decl invalid() .output invalid
+invalid() :- firing(I,_), !sample(I,_).
+invalid() :- mismatch(I,_,_), !firing(I,_).
+.decl certified() .output certified
+certified() :- !invalid().

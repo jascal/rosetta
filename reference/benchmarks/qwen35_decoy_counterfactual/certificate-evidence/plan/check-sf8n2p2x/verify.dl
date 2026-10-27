@@ -1,0 +1,22 @@
+// Development-only pair selection, before new counterfactual references.
+.decl sample(i:number,g:symbol,e:number,o:symbol,t:number) .input sample
+.decl pair(a:number,b:number) .input pair
+.decl ref(i:number,t:number) .input ref
+.decl stratum(g:symbol,e:number,o:symbol)
+stratum(G,E,O) :- sample(_,G,E,O,_).
+.decl eligible(a:number,g:symbol,e:number,o:symbol)
+eligible(A,G,E,O) :- pair(A,_), sample(A,G,E,O,_).
+.decl departure(a:number,g:symbol,e:number,o:symbol)
+departure(A,G,E,O) :- eligible(A,G,E,O), sample(A,_,_,_,T), ref(A,R), T != R.
+departure(A,G,E,O) :- eligible(A,G,E,O), pair(A,B), sample(B,_,_,_,T), ref(B,R), T != R.
+.decl preferred(g:symbol,e:number,o:symbol)
+preferred(G,E,O) :- departure(_,G,E,O).
+.decl selected(a:number,b:number,g:symbol,e:number,o:symbol) .output selected
+selected(A,B,G,E,O) :- stratum(G,E,O), preferred(G,E,O), A = min I : { departure(I,G,E,O) }, pair(A,B).
+selected(A,B,G,E,O) :- stratum(G,E,O), !preferred(G,E,O), A = min I : { eligible(I,G,E,O) }, pair(A,B).
+.decl invalid() .output invalid
+invalid() :- sample(I,_,_,_,_), !ref(I,_).
+invalid() :- ref(I,T), ref(I,U), T != U.
+invalid() :- stratum(G,E,O), !selected(_,_,G,E,O).
+.decl certified() .output certified
+certified() :- !invalid().

@@ -1,0 +1,8 @@
+{
+  "protocol_sha256": "624847ef0514db9cc0d4c3ab6413d27b2e38f58f7c3e882350eae3881444d997",
+  "files": {
+    "proposals.json": "492c0c2c24742fa3bc3e2375fd9108994c44b424db23916083e08e2445c3eaed",
+    "proposals/circuits.dl": "749bd57ab1c4d24bcc823379b68e01dc06fa5c362e29a41f65e6767e815efdf9",
+    "proposals/run.dl": "f4d64c6f45d3a75859e598d027890f75eb36918cb8a37825622b0085b3894df0"
+  }
+}

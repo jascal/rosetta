@@ -1,0 +1,53 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,s:symbol,g:symbol) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl proposed(rank:number,c:number) .input proposed
+.decl pair(a:number,b:number,g:symbol) .input pair
+.decl edit(a:number,b:number,p:number) .input edit
+.decl query_start(i:number,p:number) .input query_start
+#include "circuit.dl"
+.decl required(s:symbol)
+required("train"). required("validation").
+.decl invalid() .output invalid
+invalid() :- required(S), !sample(_,S,_).
+invalid() :- sample(I,_,_), !ref(I,_).
+invalid() :- ref(I,_), !sample(I,_,_).
+invalid() :- ref(I,T), ref(I,U), T != U.
+invalid() :- sample(_,S,_), !required(S).
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+invalid() :- sample(I,_,_), !query_start(I,_).
+invalid() :- tok(I,P,T), tok(I,P,U), T != U.
+.decl changed(a:number,b:number,p:number)
+changed(A,B,P) :- pair(A,B,_), tok(A,P,T), tok(B,P,U), T != U.
+invalid() :- changed(A,B,P), !edit(A,B,P).
+invalid() :- edit(A,B,P), !changed(A,B,P).
+invalid() :- pair(A,B,_), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B,_), tok(B,P,_), !tok(A,P,_).
+invalid() :- pair(A,B,G), !sample(A,_,G).
+invalid() :- pair(A,B,G), !sample(B,_,G).
+invalid() :- pair(A,B,_), sample(A,S,_), sample(B,T,_), S != T.
+invalid() :- edit(A,B,P), query_start(A,Q), P >= Q.
+invalid() :- edit(A,B,P), !nt_match(A,P-1,1).
+.decl wrong(c:number,i:number,t:number,r:number) .output wrong
+wrong(C,I,T,R) :- proposed(_,C), nt_candidate(C,I,T), ref(I,R), T != R.
+.decl score(c:number,s:symbol,n:number,wrong:number) .output score
+score(C,S,N,W) :- proposed(_,C), required(S),
+    N = count : { sample(I,S,_), nt_candidate(C,I,_) },
+    W = count : { sample(I,S,_), wrong(C,I,_,_) }.
+.decl firing_group(c:number,s:symbol,g:symbol)
+firing_group(C,S,G) :- proposed(_,C), nt_candidate(C,I,_), sample(I,S,G).
+.decl following_group(c:number,s:symbol,g:symbol)
+following_group(C,S,G) :- proposed(_,C), pair(A,B,G), sample(A,S,G),
+    nt_candidate(C,A,T), nt_candidate(C,B,U), T != U, ref(A,T), ref(B,U).
+.decl support(c:number,s:symbol,firing:number,following:number) .output support
+support(C,S,N,M) :- proposed(_,C), required(S), N = count : { firing_group(C,S,_) },
+    M = count : { following_group(C,S,_) }.
+.decl rejected(c:number)
+rejected(C) :- score(C,_,_,W), W > 0.
+rejected(C) :- support(C,_,N,M), N < 2.
+rejected(C) :- support(C,_,N,M), M < 2.
+.decl admitted(rank:number,c:number) .output admitted
+admitted(R,C) :- proposed(R,C), !rejected(C), !invalid().
+.decl certified() .output certified
+certified() :- !invalid().

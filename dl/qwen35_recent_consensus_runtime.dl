@@ -1,0 +1,4 @@
+// Token-only hypothesis: repeated long-source agreement plus nearest-source agreement.
+// Includer supplies lc/l g detector declarations and rules.
+.decl cdecide(inst:number,out:number)
+cdecide(I,T) :- lg_prediction(0,I,T), lc_recent(I,T).

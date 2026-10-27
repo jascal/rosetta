@@ -1,0 +1,3 @@
+Warning: No rules/facts defined for relation selected in file circuit.dl at line 4
+.decl selected(rank:number,c:number)
+------^------------------------------

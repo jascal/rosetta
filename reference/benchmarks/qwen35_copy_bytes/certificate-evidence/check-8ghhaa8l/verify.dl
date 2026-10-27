@@ -1,0 +1,31 @@
+.decl target(i:number,t:number) .input target
+.decl ref(i:number,t:number) .input ref
+.decl token_len(t:number,n:number) .input token_len
+.decl special(t:number) .input special
+.decl source(i:number,p:number) .input source
+.decl tail_byte(i:number,p:number,j:number,b:number) .input tail_byte
+.decl output_byte(i:number,j:number,b:number) .input output_byte
+.decl prefix_match(i:number,p:number,n:number)
+prefix_match(I,P,0) :- source(I,P).
+prefix_match(I,P,N+1) :- prefix_match(I,P,N), output_byte(I,N,B), tail_byte(I,P,N,B).
+.decl compatible(i:number) .output compatible
+compatible(I) :- ref(I,T), !special(T), token_len(T,N), N > 0, prefix_match(I,_,N).
+.decl class(i:number,c:symbol) .output class
+class(I,"literal_id") :- target(I,T), ref(I,T).
+class(I,"same_bytes_other_id") :- target(I,T), ref(I,R), R != T, compatible(I), token_len(T,N), token_len(R,N).
+class(I,"fused_source_tokens") :- target(I,T), ref(I,R), R != T, compatible(I), token_len(T,N), token_len(R,M), M > N.
+class(I,"split_source_token") :- target(I,T), ref(I,R), R != T, compatible(I), token_len(T,N), token_len(R,M), M < N.
+class(I,"not_source_byte_prefix") :- target(I,T), ref(I,R), R != T, !special(R), token_len(R,_), !compatible(I).
+class(I,"special_output") :- target(I,_), ref(I,R), special(R).
+class(I,"unassigned_output") :- target(I,_), ref(I,R), !token_len(R,_).
+.decl counts(c:symbol,n:number) .output counts
+counts(C,N) :- class(_,C), N = count : { class(_,C) }.
+.decl invalid() .output invalid
+invalid() :- !target(_,_).
+invalid() :- target(I,_), !ref(I,_).
+invalid() :- target(I,_), !source(I,_).
+invalid() :- target(I,_), !class(I,_).
+invalid() :- class(I,C), class(I,D), C != D.
+.decl certified() .output certified
+// Diagnostic completeness; compatibility does not predict the selected token.
+certified() :- !invalid().

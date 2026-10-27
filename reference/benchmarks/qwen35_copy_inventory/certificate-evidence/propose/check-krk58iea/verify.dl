@@ -1,0 +1,23 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,s:symbol,g:symbol) .input sample
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- !sample(_,"train",_).
+invalid() :- sample(I,"train",_), !ref(I,_).
+invalid() :- ref(I,_), !sample(I,"train",_).
+invalid() :- ref(I,T), ref(I,U), T != U.
+.decl score(c:number,correct:number,wrong:number,value:number) .output score
+score(C,H,E,H-4*E) :- candidate(C,_,_,_),
+    H = count : { nt_candidate(C,I,T), sample(I,"train",_), ref(I,T) },
+    E = count : { nt_candidate(C,I,T), sample(I,"train",_), ref(I,U), T != U }.
+.decl better(c:number,d:number)
+better(C,D) :- score(C,H,E,S), H+E > 0, score(D,J,K,T), J+K > 0, T > S.
+better(C,D) :- score(C,H,E,S), H+E > 0, score(D,J,K,S), J+K > 0, D < C.
+.decl proposed(rank:number,c:number) .output proposed
+proposed(N+1,C) :- !invalid(), score(C,H,E,_), H+E > 0,
+    N = count : { better(C,_) }, N < 12.
+.decl validation_firing(rank:number,c:number,i:number,t:number) .output validation_firing
+validation_firing(R,C,I,T) :- proposed(R,C), sample(I,"validation",_), nt_candidate(C,I,T).
+.decl certified() .output certified
+certified() :- !invalid().

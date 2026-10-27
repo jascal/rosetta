@@ -1,0 +1,9 @@
+Warning: Variable I0 only occurs once in file verify.dl at line 9
+counts(S,N,W) :- sample(_,S), N = count : { fire(I,S,T) }, W = count : { wrong(I,S) }.
+-------------------------------------------------^-------------------------------------
+Warning: Variable T only occurs once in file verify.dl at line 9
+counts(S,N,W) :- sample(_,S), N = count : { fire(I,S,T) }, W = count : { wrong(I,S) }.
+-----------------------------------------------------^---------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 9
+counts(S,N,W) :- sample(_,S), N = count : { fire(I,S,T) }, W = count : { wrong(I,S) }.
+-------------------------------------------------------------------------------^-------

@@ -1,0 +1,30 @@
+// Paired development intervention analysis; no candidate admission.
+.decl planned(i:number,pairid:number,long:number,olddecoy:number,newdecoy:number,before:number) .input planned
+.decl ref(i:number,t:number) .input ref
+.decl invalid() .output invalid
+invalid() :- !planned(_,_,_,_,_,_).
+invalid() :- planned(I,_,_,_,_,_), !ref(I,_).
+invalid() :- ref(I,_), !planned(I,_,_,_,_,_).
+invalid() :- ref(I,T), ref(I,U), T != U.
+invalid() :- planned(I,_,T,D,V,_), T = V.
+invalid() :- planned(I,_,T,D,V,_), D = V.
+.decl outcome(i:number,c:symbol) .output outcome
+outcome(I,"new_decoy") :- planned(I,_,_,_,V,_), ref(I,V).
+outcome(I,"long_target") :- planned(I,_,T,_,V,_), ref(I,T), T != V.
+outcome(I,"old_decoy") :- planned(I,_,T,D,V,_), ref(I,D), D != T, D != V.
+outcome(I,"other") :- planned(I,_,T,D,V,_), ref(I,R), R != T, R != D, R != V.
+.decl effect(i:number,c:symbol) .output effect
+effect(I,"unchanged") :- planned(I,_,_,_,_,R), ref(I,R).
+effect(I,"changed") :- planned(I,_,_,_,_,R), ref(I,T), R != T.
+.decl tracking(i:number) .output tracking
+tracking(I) :- planned(I,_,_,D,V,D), ref(I,V).
+.decl long_pair(p:number) .output long_pair
+long_pair(P) :- planned(I,P,T,_,_,_), planned(J,P,U,_,_,_), I != J, T != U, ref(I,T), ref(J,U).
+.decl decoy_pair(p:number) .output decoy_pair
+decoy_pair(P) :- planned(I,P,_,_,V,_), planned(J,P,_,_,V,_), I != J, ref(I,V), ref(J,V).
+.decl counts(c:symbol,n:number) .output counts
+counts(C,N) :- outcome(_,C), N = count : { outcome(_,C) }.
+.decl effects(c:symbol,n:number) .output effects
+effects(C,N) :- effect(_,C), N = count : { effect(_,C) }.
+.decl certified() .output certified
+certified() :- !invalid().

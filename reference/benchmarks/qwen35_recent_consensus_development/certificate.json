@@ -1,0 +1,97 @@
+{
+  "certified": false,
+  "ndomain": 48,
+  "nmiss": 10,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "48"
+      ]
+    ],
+    "certified": [],
+    "nmiss": [
+      [
+        "10"
+      ]
+    ],
+    "ndomain": [
+      [
+        "48"
+      ]
+    ],
+    "mismatch": [
+      [
+        "267",
+        "46511",
+        "123713"
+      ],
+      [
+        "268",
+        "46511",
+        "119902"
+      ],
+      [
+        "269",
+        "46511",
+        "123713"
+      ],
+      [
+        "274",
+        "46511",
+        "119902"
+      ],
+      [
+        "275",
+        "46511",
+        "123713"
+      ],
+      [
+        "276",
+        "46511",
+        "119902"
+      ],
+      [
+        "277",
+        "46511",
+        "123713"
+      ],
+      [
+        "283",
+        "46511",
+        "123713"
+      ],
+      [
+        "291",
+        "46511",
+        "123713"
+      ],
+      [
+        "293",
+        "46511",
+        "123713"
+      ]
+    ],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_recent_consensus_development/certificate-evidence/equiv/check-_ya0pe8t"
+}

@@ -1,0 +1,12 @@
+Warning: Variable I only occurs once in file verify.dl at line 9
+invalid() :- planned(I,_,T,D,V,_), T = V.
+---------------------^--------------------
+Warning: Variable D only occurs once in file verify.dl at line 9
+invalid() :- planned(I,_,T,D,V,_), T = V.
+---------------------------^--------------
+Warning: Variable I only occurs once in file verify.dl at line 10
+invalid() :- planned(I,_,T,D,V,_), D = V.
+---------------------^--------------------
+Warning: Variable T only occurs once in file verify.dl at line 10
+invalid() :- planned(I,_,T,D,V,_), D = V.
+-------------------------^----------------

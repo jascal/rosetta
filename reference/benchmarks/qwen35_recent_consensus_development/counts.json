@@ -1,0 +1,24 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "train",
+        "24",
+        "0"
+      ],
+      [
+        "validation",
+        "24",
+        "10"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_recent_consensus_development/certificate-evidence/counts/check-a5zsww10"
+}

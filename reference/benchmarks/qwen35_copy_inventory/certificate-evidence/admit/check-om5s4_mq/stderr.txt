@@ -1,0 +1,33 @@
+Warning: No rules/facts defined for relation selected in file circuit.dl at line 4
+.decl selected(rank:number,c:number)
+------^------------------------------
+Warning: Variable G only occurs once in file verify.dl at line 17
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+------------------------^--------------------------
+Warning: Variable H only occurs once in file verify.dl at line 17
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+---------------------------------------^-----------
+Warning: Variable S only occurs once in file verify.dl at line 18
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+----------------------^----------------------------
+Warning: Variable T only occurs once in file verify.dl at line 18
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+-------------------------------------^-------------
+Warning: Variable B only occurs once in file verify.dl at line 27
+invalid() :- pair(A,B,G), !sample(A,_,G).
+--------------------^---------------------
+Warning: Variable A only occurs once in file verify.dl at line 28
+invalid() :- pair(A,B,G), !sample(B,_,G).
+------------------^-----------------------
+Warning: Variable B only occurs once in file verify.dl at line 30
+invalid() :- edit(A,B,P), query_start(A,Q), P >= Q.
+--------------------^-------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 31
+invalid() :- edit(A,B,P), !nt_match(A,P-1,1).
+--------------------^-------------------------
+Warning: Variable M only occurs once in file verify.dl at line 48
+rejected(C) :- support(C,_,N,M), N < 2.
+-----------------------------^----------
+Warning: Variable N only occurs once in file verify.dl at line 49
+rejected(C) :- support(C,_,N,M), M < 2.
+---------------------------^------------
