@@ -1,0 +1,10 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,g:symbol) .input sample
+.decl query(q:number,g:symbol,variant:number) .input query
+#include "circuit.dl"
+.decl key(q:number,t:number) .output key
+key(Q,T) :- query(Q,G,_), sample(I,G), lc_source(I,_,K,T), K >= 12.
+.decl invalid() .output invalid
+invalid() :- query(Q,_,_), !key(Q,_).
+.decl certified() .output certified
+certified() :- !invalid().

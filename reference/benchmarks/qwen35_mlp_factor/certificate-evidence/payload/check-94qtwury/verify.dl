@@ -1,0 +1,35 @@
+// Observed raw gate/up values; arithmetic and substitutions are Datalog.
+.decl shape(w:number) .input shape
+.decl context(i:number,last:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl observation(i:number,n:number,g:float,u:float) .input observation
+.decl neuron(n:number)
+neuron(0) :- shape(W), W > 0.
+neuron(N+1) :- neuron(N), shape(W), N+1 < W.
+.decl activated(i:number,n:number,g:float)
+activated(I,N,G/(1.0+2.718281828459045^(-G))) :- observation(I,N,G,_), G >= 0.0.
+activated(I,N,G*E/(1.0+E)) :- observation(I,N,G,_), G < 0.0, E = 2.718281828459045^G.
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(4*I,I,D,"self_reconstructed") :- donor(I,D).
+run(4*I+1,I,D,"donor_reconstructed") :- donor(I,D).
+run(4*I+2,I,D,"donor_gate") :- donor(I,D).
+run(4*I+3,I,D,"donor_up") :- donor(I,D).
+.decl patch(a:number,l:number,p:number,n:number,v:float) .output patch
+patch(A,31,P,N,G*U) :- run(A,I,_,"self_reconstructed"), context(I,P), neuron(N), activated(I,N,G), observation(I,N,_,U).
+patch(A,31,P,N,G*U) :- run(A,I,D,"donor_reconstructed"), context(I,P), neuron(N), activated(D,N,G), observation(D,N,_,U).
+patch(A,31,P,N,G*U) :- run(A,I,D,"donor_gate"), context(I,P), neuron(N), activated(D,N,G), observation(I,N,_,U).
+patch(A,31,P,N,G*U) :- run(A,I,D,"donor_up"), context(I,P), neuron(N), activated(I,N,G), observation(D,N,_,U).
+.decl invalid() .output invalid
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- !donor(_,_).
+invalid() :- donor(I,D), !context(I,_).
+invalid() :- donor(I,D), !context(D,_).
+invalid() :- run(A,I,_,_), context(I,P), neuron(N), !patch(A,31,P,N,_).
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), G != H.
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), U != V.
+invalid() :- donor(I,D), donor(I,E), D != E.
+invalid() :- patch(A,L,P,N,V), patch(A,L,P,N,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

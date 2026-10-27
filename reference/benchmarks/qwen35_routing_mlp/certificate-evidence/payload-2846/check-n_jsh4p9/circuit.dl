@@ -1,0 +1,29 @@
+// Whole-width MLP substitutions. Host supplies observations, never patch choices.
+.decl shape(width:number) .input shape
+.decl request(arm:symbol,target:number,donor:number,layer:number,pos:number,mode:symbol) .input request
+.decl observation(i:number,l:number,n:number,v:float) .input observation
+.decl neuron(n:number)
+neuron(0) :- shape(W), W > 0.
+neuron(N+1) :- neuron(N), shape(W), N+1 < W.
+.decl patch(arm:symbol,l:number,p:number,n:number,v:float) .output patch
+patch(A,L,P,N,0.0) :- request(A,_,_,L,P,"zero"), neuron(N).
+patch(A,L,P,N,V) :- request(A,I,_,L,P,"identity"), neuron(N), observation(I,L,N,V).
+patch(A,L,P,N,V) :- request(A,_,D,L,P,"donor"), neuron(N), observation(D,L,N,V).
+.decl invalid() .output invalid
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- !request(_,_,_,_,_,_).
+invalid() :- request(A,_,_,L,P,_), neuron(N), !patch(A,L,P,N,_).
+invalid() :- request(_,_,_,L,_,_), L < 0.
+invalid() :- request(_,_,_,_,P,_), P < 0.
+invalid() :- request(_,_,_,_,_,M), M != "zero", M != "identity", M != "donor".
+invalid() :- observation(I,L,N,V), observation(I,L,N,W), V != W.
+invalid() :- patch(A,L,P,N,V), patch(A,L,P,N,W), V != W.
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+.decl certified() .output certified
+certified() :- !invalid().

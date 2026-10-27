@@ -1,0 +1,20 @@
+.decl context(i:number,last:number,t:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl root(i:number,n:number,v:float) .input root
+.decl rank(i:number,n:number,r:number) .input rank
+.decl root_ref(i:number,t:number) .input root_ref
+.decl caseinfo(c:number,last:number,wanted:number) .output caseinfo
+caseinfo(I,P,T) :- donor(I,D), context(I,P,_), context(D,_,T).
+.decl member(c:number,r:number,n:number,v:float) .output member
+member(I,R,N,V) :- root(I,N,V), rank(I,N,Q), R = count : { root(I,M,_), rank(I,M,S), S < Q }.
+.decl ref(c:number,node:number,t:number) .output ref
+ref(I,0,T) :- root_ref(I,T).
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- donor(I,_), !caseinfo(I,_,_).
+invalid() :- donor(I,_), !ref(I,0,_).
+invalid() :- root(I,N,_), !member(I,_,N,_).
+invalid() :- member(I,R,N,V), member(I,R,M,U), N != M.
+invalid() :- member(I,R,N,V), member(I,R,M,U), V != U.
+.decl certified() .output certified
+certified() :- !invalid().

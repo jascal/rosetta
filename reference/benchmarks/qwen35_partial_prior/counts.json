@@ -1,0 +1,46 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "0",
+        "48",
+        "13"
+      ],
+      [
+        "1",
+        "80",
+        "17"
+      ],
+      [
+        "2",
+        "48",
+        "13"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "priorcounts": [
+      [
+        "0",
+        "144",
+        "96"
+      ],
+      [
+        "1",
+        "144",
+        "44"
+      ],
+      [
+        "2",
+        "144",
+        "96"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_partial_prior/certificate-evidence/counts/check-1d_eiqgi"
+}

@@ -1,0 +1,12 @@
+#include "circuit.dl"
+.decl key(q:number,t:number) .input key
+.decl product(q:number,n:number,v:float) .input product
+.decl partial(q:number,t:number,n:number,v:float)
+partial(Q,T,N,P*C) :- key(Q,T), unit(N), product(Q,N,P), coefficient(N,T,C).
+.decl prior(q:number,t:number,v:float) .output prior
+prior(Q,T,V) :- key(Q,T), V = sum X : { partial(Q,T,N,X) }.
+invalid() :- !key(_,_).
+invalid() :- key(Q,_), unit(N), !product(Q,N,_).
+invalid() :- key(Q,T), !token(T).
+invalid() :- product(Q,N,V), product(Q,N,U), V != U.
+invalid() :- product(_,N,_), !unit(N).

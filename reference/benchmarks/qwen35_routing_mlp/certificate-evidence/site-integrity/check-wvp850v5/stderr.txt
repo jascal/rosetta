@@ -1,0 +1,27 @@
+Warning: Variable D only occurs once in file verify.dl at line 25
+invalid() :- run(_,I,D,_,_), !context(I,_).
+---------------------^----------------------
+Warning: Variable I only occurs once in file verify.dl at line 26
+invalid() :- run(_,I,D,_,_), !context(D,_).
+-------------------^------------------------
+Warning: Variable L only occurs once in file verify.dl at line 28
+invalid() :- observation(A,L,N,_), !baseline(_,A).
+---------------------------^-----------------------
+Warning: Variable N only occurs once in file verify.dl at line 28
+invalid() :- observation(A,L,N,_), !baseline(_,A).
+-----------------------------^---------------------
+Warning: Variable P only occurs once in file verify.dl at line 37
+invalid() :- applied(A,L,P,N,B,_), run(A,I,_,L,_), baseline(I,C), observation(C,L,N,V), B != V.
+-------------------------^----------------------------------------------------------------------
+Warning: Variable V only occurs once in file verify.dl at line 39
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), B != C.
+-------------------------------^---------------------------------
+Warning: Variable W only occurs once in file verify.dl at line 39
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), B != C.
+-----------------------------------------------------^-----------
+Warning: Variable B only occurs once in file verify.dl at line 40
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), V != W.
+-----------------------------^-----------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 40
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), V != W.
+---------------------------------------------------^-------------

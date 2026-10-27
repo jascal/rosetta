@@ -1,0 +1,6 @@
+Warning: Variable D only occurs once in file verify.dl at line 16
+invalid() :- donor(I,D), !context(I,_).
+---------------------^------------------
+Warning: Variable I only occurs once in file verify.dl at line 17
+invalid() :- donor(I,D), !context(D,_).
+-------------------^--------------------

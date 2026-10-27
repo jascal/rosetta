@@ -1,0 +1,18 @@
+// Explicit instance variables preserve per-context counts through the query join.
+.decl query(q:number,g:symbol,v:number) .input query
+.decl preference(q:number,i:number,t:number) .input preference
+.decl guarded(q:number,i:number,t:number) .input guarded
+.decl error(q:number,i:number,t:number,r:number) .input error
+.decl disagreement(q:number,i:number) .input disagreement
+.decl counts(v:number,firing:number,wrong:number) .output counts
+counts(V,N,W) :- query(_,_,V),
+ N = count : { query(Q,G,V), guarded(Q,I,T) },
+ W = count : { query(Q,G,V), error(Q,I,T,R) }.
+.decl priorcounts(v:number,firing:number,wrong:number) .output priorcounts
+priorcounts(V,N,W) :- query(_,_,V),
+ N = count : { query(Q,G,V), preference(Q,I,T) },
+ W = count : { query(Q,G,V), disagreement(Q,I) }.
+.decl invalid() .output invalid
+invalid() :- !query(_,_,_).
+.decl certified() .output certified
+certified() :- !invalid().

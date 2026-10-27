@@ -1,0 +1,45 @@
+{
+  "scope": "post-hoc training source-conditioned memory-kernel diagnostic; not final confirmation",
+  "probes": 9,
+  "probe": "last4 query tokens, source successor, same last4 query tokens; observe fixed final-MLP products603/1765",
+  "mixtures": [
+    "equal source occurrence weights",
+    "maximum matched suffix length",
+    "matched suffix length divided by source distance"
+  ],
+  "predictor": "normalize mixture weights; sum mixture product times fixed two-unit token coefficient; same strict long-source guard24/12/margin4; no tuning",
+  "priors": {
+    "reference/benchmarks/qwen35_query_prior/closed.json": "8d22dd9bf206b1d468fb93606246e937820de7b72e9982fdd2f6805aa9e29fe9",
+    "reference/benchmarks/qwen35_partial_prior/closed.json": "7349530a2f9a2cd04e1a98e6cedc0f41c6e24f27e68902afe753b72627dd1550"
+  },
+  "files": {
+    "input-core.dl": "d6d12599cfd848cd99b183bebc9cff9c62528075fce290a7604f427f20e04f59",
+    "coefficients.json": "4b0f063d5ea647c499f96ecbdfc35d8f0407beb74cc231651494e5a527279d66",
+    "plan.json": "ee30435b5ae0a5e05bb834116088474533dd29bb906feaa775054bd10b0c6d44",
+    "references.json": "4a11c0c68ac885a5412b43c22ee28303a773633a22b1435f0b76818a8586670a",
+    "probes.json": "434991a4ffff2664375b908ece147ead4e5c59333d71ae6aa174cc21685f7d61",
+    "facts.json": "3e9d046ceb19a665bc4d389080b35589dfc243c82d417bee451ad3a10f9e25a4",
+    "certificate-evidence/plan/check-0o_cvjb6/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-0o_cvjb6/verify.dl": "510c1011a570c16abfe1f2e55b300df72f47d451b6b7bb7ca3087b75b618275d",
+    "certificate-evidence/plan/check-0o_cvjb6/circuit.dl": "510c1011a570c16abfe1f2e55b300df72f47d451b6b7bb7ca3087b75b618275d",
+    "certificate-evidence/plan/check-0o_cvjb6/certificate.json": "44e570df3a7fa479daa0746c0ecef62bfc424c90bd49ca134a60fea68c7780eb",
+    "certificate-evidence/plan/check-0o_cvjb6/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-0o_cvjb6/outputs/unit.csv": "c54ce4505d5d88e87d61198cf5db8b7068d00a364156d6bf7be17d148c81cb44",
+    "certificate-evidence/plan/check-0o_cvjb6/outputs/probe.csv": "fc9396fac984acb726ce6c223c9a0d8329fe90e5b5ff1d3f76dc303396ae47c6",
+    "certificate-evidence/plan/check-0o_cvjb6/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-0o_cvjb6/facts/query.facts": "d70cf5a4d8d71c8790cc8b49cd1815a4aab8f2ccd54171e34dae985b83caf503",
+    "certificate-evidence/plan/check-0o_cvjb6/facts/key.facts": "b219924493d5e8877f59336dbca593d78fd820990187ef07caa191bba7614990"
+  },
+  "sources": {
+    "py/run_qwen35_memory_kernel.py": "63010be029aa9a4a6a52dcfd0c04d7a7ca74a97b6ff91725c868e70ffa2e2b3f",
+    "dl/qwen35_memory_kernel_plan.dl": "510c1011a570c16abfe1f2e55b300df72f47d451b6b7bb7ca3087b75b618275d",
+    "dl/qwen35_memory_kernel_summary.dl": "06f679d55f77a5c2e980a082d30c3e2c55e254a96f6e2c0e2bd7af5ea83a53cb",
+    "dl/copy_longest_runtime.dl": "e43771e1e6d07af97cec586d63a51e28484d5e7ea0d49a97def4557d99261e1b",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

@@ -1,0 +1,57 @@
+// Rank by absolute gate-induced product change; no outcome-based selection.
+.decl context(i:number,last:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl product(i:number,n:number,base:float,hybrid:float) .input product
+.decl random_order(n:number,r:number) .input random_order
+.decl shape(w:number) .input shape
+.decl budget(k:number) .input budget
+.decl magnitude(i:number,n:number,v:float)
+magnitude(I,N,H-B) :- product(I,N,B,H), H >= B.
+magnitude(I,N,B-H) :- product(I,N,B,H), H < B.
+.decl rank(i:number,n:number,r:number) .output rank
+rank(I,N,A+B) :- magnitude(I,N,V),
+ A = count : { magnitude(I,M,U), U > V },
+ B = count : { magnitude(I,M,V), M < N }.
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(10000*I+10*K,I,D,cat("top",to_string(K))) :- donor(I,D), budget(K).
+run(10000*I+10*K+1,I,D,cat("random",to_string(K))) :- donor(I,D), budget(K).
+run(10000*I+10*128+2,I,D,"complement128") :- donor(I,D).
+.decl selected(a:number,i:number,n:number) .output selected
+selected(10000*I+10*K,I,N) :- donor(I,_), budget(K), rank(I,N,R), R < K.
+selected(10000*I+10*K+1,I,N) :- donor(I,_), budget(K), random_order(N,R), R < K.
+selected(10000*I+10*128+2,I,N) :- donor(I,_), rank(I,N,R), R >= 128.
+.decl patch(a:number,l:number,p:number,n:number,v:float) .output patch
+patch(A,31,P,N,H) :- selected(A,I,N), context(I,P), product(I,N,_,H).
+.decl invalid() .output invalid
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 128.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- !donor(_,_).
+invalid() :- budget(K), K <= 0.
+invalid() :- budget(K), shape(W), K > W.
+invalid() :- donor(I,D), !context(I,_).
+invalid() :- donor(I,D), !context(D,_).
+.decl nproduct(i:number,n:number)
+nproduct(I,N) :- donor(I,_), N = count : { product(I,_,_,_) }.
+invalid() :- nproduct(_,N), shape(W), N != W.
+invalid() :- product(I,N,B,H), product(I,N,C,V), B != C.
+invalid() :- product(I,N,B,H), product(I,N,C,V), H != V.
+invalid() :- product(_,N,_,_), N < 0.
+invalid() :- product(_,N,_,_), shape(W), N >= W.
+invalid() :- random_order(N,R), random_order(N,S), R != S.
+invalid() :- random_order(N,R), random_order(M,R), N != M.
+.decl nr(n:number)
+nr(N) :- N = count : { random_order(_,_) }.
+invalid() :- nr(N), shape(W), N != W.
+invalid() :- random_order(N,R), N < 0.
+invalid() :- random_order(N,R), R < 0.
+invalid() :- random_order(N,R), shape(W), N >= W.
+invalid() :- random_order(N,R), shape(W), R >= W.
+.decl nselected(a:number,n:number)
+nselected(A,N) :- run(A,_,_,_), N = count : { selected(A,_,_) }.
+invalid() :- donor(I,_), budget(K), nselected(10000*I+10*K,N), N != K.
+invalid() :- donor(I,_), budget(K), nselected(10000*I+10*K+1,N), N != K.
+invalid() :- donor(I,_), shape(W), nselected(10000*I+1282,N), N != W-128.
+invalid() :- selected(A,I,N), !patch(A,31,_,N,_).
+.decl certified() .output certified
+certified() :- !invalid().

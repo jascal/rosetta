@@ -1,0 +1,42 @@
+// Additional completeness audit. Does not change frozen interventions/outcomes.
+.decl shape(w:number) .input shape
+.decl layer(l:number) .input layer
+.decl context(i:number,last:number) .input context
+.decl run(a:number,target:number,donor:number,l:number,mode:symbol) .input run
+.decl observation(a:number,l:number,n:number,v:float) .input observation
+.decl request(a:number,l:number,p:number,n:number,v:float) .input request
+.decl applied(a:number,l:number,p:number,n:number,b:float,v:float) .input applied
+.decl neuron(n:number)
+neuron(0) :- shape(W), W > 0.
+neuron(N+1) :- neuron(N), shape(W), N+1 < W.
+.decl baseline(i:number,a:number)
+baseline(I,A) :- run(A,I,_,_,"baseline").
+.decl site(a:number,l:number,p:number,n:number)
+site(A,L,P,N) :- run(A,I,_,L,M), M != "baseline", context(I,P), neuron(N).
+.decl expected(a:number,l:number,p:number,n:number,v:float)
+expected(A,L,P,N,0.0) :- site(A,L,P,N), run(A,_,_,L,"zero").
+expected(A,L,P,N,V) :- site(A,L,P,N), run(A,I,_,L,"identity"), baseline(I,B), observation(B,L,N,V).
+expected(A,L,P,N,V) :- site(A,L,P,N), run(A,_,D,L,"donor"), baseline(D,B), observation(B,L,N,V).
+.decl invalid() .output invalid
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- !run(_,_,_,_,_).
+invalid() :- run(_,I,D,_,_), !context(I,_).
+invalid() :- run(_,I,D,_,_), !context(D,_).
+invalid() :- baseline(_,A), layer(L), neuron(N), !observation(A,L,N,_).
+invalid() :- observation(A,L,N,_), !baseline(_,A).
+invalid() :- observation(_,L,_,_), !layer(L).
+invalid() :- observation(_,_,N,_), !neuron(N).
+invalid() :- observation(A,L,N,V), observation(A,L,N,W), V != W.
+invalid() :- site(A,L,P,N), !expected(A,L,P,N,_).
+invalid() :- expected(A,L,P,N,V), !request(A,L,P,N,V).
+invalid() :- request(A,L,P,N,V), !expected(A,L,P,N,V).
+invalid() :- expected(A,L,P,N,V), !applied(A,L,P,N,_,V).
+invalid() :- applied(A,L,P,N,_,V), !expected(A,L,P,N,V).
+invalid() :- applied(A,L,P,N,B,_), run(A,I,_,L,_), baseline(I,C), observation(C,L,N,V), B != V.
+invalid() :- request(A,L,P,N,V), request(A,L,P,N,W), V != W.
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), B != C.
+invalid() :- applied(A,L,P,N,B,V), applied(A,L,P,N,C,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

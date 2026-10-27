@@ -1,0 +1,36 @@
+Warning: Variable H only occurs once in file circuit.dl at line 16
+coefficient(N,T,V) :- unit(N), token(T), V = sum X : { term(N,T,H,X) }.
+----------------------------------------------------------------^-------
+Warning: Variable C only occurs once in file circuit.dl at line 28
+counts(S,K) :- status(_,_,S), K = count : { status(C,N,S) }.
+---------------------------------------------------^---------
+Warning: Variable N only occurs once in file circuit.dl at line 28
+counts(S,K) :- status(_,_,S), K = count : { status(C,N,S) }.
+-----------------------------------------------------^-------
+Warning: Variable C only occurs once in file circuit.dl at line 39
+invalid() :- effect(C,N,T,U,_,_), !token(T).
+--------------------^------------------------
+Warning: Variable N only occurs once in file circuit.dl at line 39
+invalid() :- effect(C,N,T,U,_,_), !token(T).
+----------------------^----------------------
+Warning: Variable U only occurs once in file circuit.dl at line 39
+invalid() :- effect(C,N,T,U,_,_), !token(T).
+--------------------------^------------------
+Warning: Variable C only occurs once in file circuit.dl at line 40
+invalid() :- effect(C,N,T,U,_,_), !token(U).
+--------------------^------------------------
+Warning: Variable N only occurs once in file circuit.dl at line 40
+invalid() :- effect(C,N,T,U,_,_), !token(U).
+----------------------^----------------------
+Warning: Variable T only occurs once in file circuit.dl at line 40
+invalid() :- effect(C,N,T,U,_,_), !token(U).
+------------------------^--------------------
+Warning: Variable C only occurs once in file circuit.dl at line 41
+invalid() :- effect(C,N,_,_,_,_), !unit(N).
+--------------------^-----------------------
+Warning: Variable N only occurs once in file verify.dl at line 7
+prior(Q,T,V) :- key(Q,T), V = sum X : { partial(Q,T,N,X) }.
+----------------------------------------------------^-------
+Warning: Variable Q only occurs once in file verify.dl at line 10
+invalid() :- key(Q,T), !token(T).
+-----------------^----------------

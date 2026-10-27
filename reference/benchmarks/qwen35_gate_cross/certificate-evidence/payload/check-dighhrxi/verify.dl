@@ -1,0 +1,21 @@
+.decl context(i:number,last:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl candidate(n:number) .input candidate
+.decl hybrid(i:number,n:number,v:float) .input hybrid
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(10000*I+N,I,D,cat("neuron",to_string(N))) :- donor(I,D), candidate(N).
+run(10000*I+9999,I,D,"joint") :- donor(I,D).
+.decl patch(a:number,l:number,p:number,n:number,v:float) .output patch
+patch(10000*I+N,31,P,N,V) :- donor(I,_), context(I,P), candidate(N), hybrid(I,N,V).
+patch(10000*I+9999,31,P,N,V) :- donor(I,_), context(I,P), candidate(N), hybrid(I,N,V).
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- !candidate(603).
+invalid() :- !candidate(1765).
+invalid() :- candidate(N), N != 603, N != 1765.
+invalid() :- donor(I,D), !context(I,_).
+invalid() :- donor(I,D), !context(D,_).
+invalid() :- donor(I,_), candidate(N), !hybrid(I,N,_).
+invalid() :- hybrid(I,N,V), hybrid(I,N,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

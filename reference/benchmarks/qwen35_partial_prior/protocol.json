@@ -1,0 +1,31 @@
+{
+  "scope": "post-hoc training-only mechanism-derived predictor; not admission/final confirmation",
+  "new_forwards": 0,
+  "kernel": "sum over fixed causal neurons603/1765 of isolated-query product times final pairwise readout coefficient; same last1/last4/full-query histories; no weights/threshold tuning",
+  "guard": "unchanged diagnostic unique longest source >=24, competitor>=12, margin>=4; strict kernel preference agrees with it",
+  "priors": {
+    "reference/benchmarks/qwen35_query_prior/closed.json": "8d22dd9bf206b1d468fb93606246e937820de7b72e9982fdd2f6805aa9e29fe9",
+    "reference/benchmarks/qwen35_gate_readout/closed.json": "cc6d5331cfe1d171555fe9d0c19584816d35f5b9266e9b279c080d39241b0ff4"
+  },
+  "files": {
+    "down.facts": "3e8f31bee2f2bd8aab79da059ae2b12baaedb1f07a3164544cec9eeb0ffe8add",
+    "keys.json": "1bba7a66feef35377c89c4501d7a47e90759ac24b22ec9c732f927ee107a791d",
+    "input-core.dl": "d6d12599cfd848cd99b183bebc9cff9c62528075fce290a7604f427f20e04f59",
+    "unit.facts": "5153a775214b918b972e71798e06bc686015f915d08596e5f9cbe18583b91fd4",
+    "norm.facts": "98061c20de792c58605a4d1190cb25bef32bcb304815b35ef061cf3d880cab12",
+    "shape.facts": "535b74168959ee667177a15a134f7ac28e43b8314ca111f90566783dff8df387",
+    "key.facts": "b219924493d5e8877f59336dbca593d78fd820990187ef07caa191bba7614990",
+    "references.json": "4a11c0c68ac885a5412b43c22ee28303a773633a22b1435f0b76818a8586670a",
+    "product.facts": "6e4101af441f27838449a06255cbe1ce6c2f64bf505e5c221c5ec221e2c5361b",
+    "facts.json": "3e9d046ceb19a665bc4d389080b35589dfc243c82d417bee451ad3a10f9e25a4"
+  },
+  "sources": {
+    "py/run_qwen35_partial_prior.py": "72633706a25e471738de97a827624ffbb8935bf1d928dcd32fab890133b2b8d6",
+    "dl/qwen35_partial_readout_prior.dl": "0c85f769b340cfc84b69190de788f5f953d88b81e2e76bd0592edf4d8ad7026f",
+    "dl/qwen35_gate_readout.dl": "46487e67e6626780eafbfd429034eef2d84b422fbcccaa1ed6d2e9d035ef3f6c",
+    "dl/qwen35_query_prior_summary.dl": "00c2d10245e5548a10bd6f4e211ae5a543c97cf8b225a9fd1f9e180a190628f8",
+    "dl/qwen35_query_prior_counts.dl": "7f41b26c08b8baf47412de022ae56545b24e10174ef188acce66f98840daabf9",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842"
+  }
+}

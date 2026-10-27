@@ -1,0 +1,47 @@
+{
+  "scope": "development shared gate causality; not standalone conversion",
+  "forwards": 30,
+  "arms": "neuron162, neuron381, joint, remaining top32 excluding both, and first two nonshared neurons in seed2200 random order; all six directed contrasts",
+  "interpretation": "individual/joint sufficiency only on selected development cases; rest tests alternative support; no final selection or outcome-based retuning",
+  "prior": {
+    "path": "reference/benchmarks/qwen35_sparse_gate/closed.json",
+    "sha256": "e33962cdb0c8c73dec9a0d3ccf1bf0cc55e14758baa16a184a0cfe9b168bb6a8"
+  },
+  "additional_priors": {
+    "reference/benchmarks/qwen35_mlp_factor/closed.json": "3e310fed58737ba4c8aa36989b04ec0c64ac2b1ecdf3611299c90ac9b2ac54f2",
+    "reference/benchmarks/qwen35_sparse_gate_overlap/closed.json": "20ef7857b13a6bf6e9b85f9967cce5218d74e71e906821b17dcd2d7f52c25146"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "payload.json": "6b34afd54928e9bb7aa4fc1743add94affed71200da8cab56e356b7d8eda7c13",
+    "certificate-evidence/payload/check-8jq5krz0/stderr.txt": "0f35a20835d64253a5a9ce893dd75a52db4d204843569acdeb2a81d8b6871bc5",
+    "certificate-evidence/payload/check-8jq5krz0/verify.dl": "087e5f42a96d740e9364148c5fc07b773c8fff39975600ba7721233583db3999",
+    "certificate-evidence/payload/check-8jq5krz0/circuit.dl": "087e5f42a96d740e9364148c5fc07b773c8fff39975600ba7721233583db3999",
+    "certificate-evidence/payload/check-8jq5krz0/certificate.json": "c39a8af142499cbe7a8c424f59d7959de2e7c9323f2f2218334cbc5b16d70d15",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/counts.csv": "120b39ba1a74c6334104c74c8d17ba681f0abacd28cef2c455d852938148ac8f",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/patch.csv": "ac248fb6f07527a0c267ade770ce9749bf174ac18fdf0def701e4d3aefd028c6",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/run.csv": "607e489d05e4e51afe84d65cd7244a3cf80b2754edce421d5e8126a6f1103c69",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/selected.csv": "0f6d93cf304be80c470dbad74f7ac77a91ce512935da1e59ba8ae9f3da983fcc",
+    "certificate-evidence/payload/check-8jq5krz0/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/payload/check-8jq5krz0/facts/shared.facts": "06917c8c06df9cda8a26e0444b64fefb6a9de3cf8f7ae761e07962d469f97a67",
+    "certificate-evidence/payload/check-8jq5krz0/facts/hybrid.facts": "c7b8dcb78d9a46e9f7008a98f61e66a376aadf6825cf47c69690a421c4b9f216",
+    "certificate-evidence/payload/check-8jq5krz0/facts/top.facts": "ef28797f5d0da9f9988c6edb6fe6c401a8c9719de244421d0e57278d48f699c6",
+    "certificate-evidence/payload/check-8jq5krz0/facts/context.facts": "2d0db42ea4afe56b479e10ddc9086dc7a9f71c58f14550dadb2a637d6d53579e",
+    "certificate-evidence/payload/check-8jq5krz0/facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a",
+    "certificate-evidence/payload/check-8jq5krz0/facts/random_order.facts": "3c91fd6951f5a2895d6182af590a3f90ea0d581cbf2bad5186730749706367f1"
+  },
+  "sources": {
+    "py/run_qwen35_shared_gate.py": "6993132e80567491716ca6616432294d2e43cebe6a5d1b81ca262a83b67ee7d1",
+    "dl/qwen35_shared_gate_payload.dl": "087e5f42a96d740e9364148c5fc07b773c8fff39975600ba7721233583db3999",
+    "py/run_qwen35_sparse_gate.py": "6ffe118cc4a1a9dbabc7365e83759c7d6cc4a1bb915fa8288712360ae0203a02",
+    "py/run_qwen35_mlp_factor.py": "098763200da3632d16efc940ba519353c254058fb4d63bb2d9486c90faecafc1",
+    "dl/qwen35_mlp_factor_summary.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "0": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "84500"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0003.tar.gz",
+    "sha256": "6820ae03124160b0b24e96a2ffa5beeb4175fbd2478b3d867beb072b271b441c"
+  },
+  "1": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "84500"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0013.tar.gz",
+    "sha256": "d62ab1c92f17872adce1c2675501c4802220c234a66101d21744145de518de63"
+  },
+  "28": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "54058"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0283.tar.gz",
+    "sha256": "5baef3f9751fad69f5b5eee60248d7d05e9aadf0782ab0fe5a0e92390446ddfe"
+  },
+  "29": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "54058"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0293.tar.gz",
+    "sha256": "7df0b603dca000c248b7ae030ce151d31ee4d113812a97b8caff8f17ccc5a369"
+  },
+  "54": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "132218"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0543.tar.gz",
+    "sha256": "ba5a89748f9dfb3c619787acbcc656bfe62327375af45e86eaf5573e9c364cc4"
+  },
+  "55": {
+    "query": {
+      "certified": true,
+      "relations": {
+        "invalid": [],
+        "ref": [
+          [
+            "132218"
+          ]
+        ],
+        "nscore": [
+          [
+            "248320"
+          ]
+        ],
+        "certified": [
+          [
+            "()"
+          ]
+        ]
+      }
+    },
+    "archive": "reference-0553.tar.gz",
+    "sha256": "dddd0cc7a571b877c81af9362aadc2bfa4969920c591c5fff79ada5185088796"
+  }
+}

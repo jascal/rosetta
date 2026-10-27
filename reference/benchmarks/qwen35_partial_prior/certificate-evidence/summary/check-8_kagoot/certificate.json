@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "two-unit mechanism-derived kernel, known training only; no equivalence or admission"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "d6d12599cfd848cd99b183bebc9cff9c62528075fce290a7604f427f20e04f59",
+    "facts/prior.facts": "628ef23bf4b12be8f76a4bf067fce4e06e476be3edfe3fbe8222180e89e00cb3",
+    "facts/query.facts": "d70cf5a4d8d71c8790cc8b49cd1815a4aab8f2ccd54171e34dae985b83caf503",
+    "facts/ref.facts": "8c9e3d8f382303e6e5efc19876ad1e1b73b51f47d566a0647c2ef173caa25e7c",
+    "facts/sample.facts": "52b658a24f774c3345d502e33aaf97fffac8380918210fc4a75f181418fe614e",
+    "facts/tok.facts": "20abb470784465ff95573d041581bf9f97ab77ff238b52e69535b0981afa325a",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "e9180a68e920dcd8786ef62503af28750b9627f7e14f0d6e92c9230f3037726f",
+    "outputs/error.csv": "3a78a96c133395e5213367460b947110f12d33b6f988afe69ef5975d1526bccc",
+    "outputs/guarded.csv": "d9b301aa63e8783de8224cbe8b5a6ad88e9326b633da19edad5fed6137d4334a",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/preference.csv": "4bea4290fdc69ddb4baf1de675f57a2116ad344ff456cbcc53815969935cc81c",
+    "outputs/priorcounts.csv": "7b5a711bdf761eaa5ce8bda1cda2abf208bb43383a36cc2d746e9dd1606feb66",
+    "outputs/winner_agreement.csv": "2ad5e6001d66a3e8e131acab03b2c542d97a8e9e0ce2ac9121afca4f4abae873",
+    "stderr.txt": "0f0087e4070b2b8239d1c9964e0af35c2965a50ae8230c11b6f7c375c34da5e2",
+    "verify.dl": "00c2d10245e5548a10bd6f4e211ae5a543c97cf8b225a9fd1f9e180a190628f8"
+  }
+}

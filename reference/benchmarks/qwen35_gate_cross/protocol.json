@@ -1,0 +1,42 @@
+{
+  "scope": "development cross-context candidate test, not fresh final confirmation",
+  "forwards": 18,
+  "arms": "neuron603, neuron1765, both; all six directed contrasts; discovery singletons repeated as exact full-score hash controls",
+  "interpretation": "success across cases suggests shared gate causality, not a token rule; failures retained; no neuron retuning",
+  "prior": {
+    "path": "reference/benchmarks/qwen35_gate_bisection/closed.json",
+    "sha256": "27f1980a454353b894fe75612a27ae4b057183981f008fd80cef2d51e7c8a3cf"
+  },
+  "factor_prior_sha256": "3e310fed58737ba4c8aa36989b04ec0c64ac2b1ecdf3611299c90ac9b2ac54f2",
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "payload.json": "d1566e3250d60feb40c7dd315e5794d85f151f65b3f91f598b42f16cfbbf4ceb",
+    "discovery-leaves.json": "7874353d7fa500545a80d81f1dacc2fd386767343c17fe4967483def36d70890",
+    "certificate-evidence/payload/check-dighhrxi/stderr.txt": "f45b1441b7097ecb94c2c80c0e875f83cb4e05738d3e6d2927c8b765a1e9441c",
+    "certificate-evidence/payload/check-dighhrxi/verify.dl": "6bb5d1f78108b59171bbc54647d411538e2c0fb9733b61f17ff948f7ad567881",
+    "certificate-evidence/payload/check-dighhrxi/circuit.dl": "6bb5d1f78108b59171bbc54647d411538e2c0fb9733b61f17ff948f7ad567881",
+    "certificate-evidence/payload/check-dighhrxi/certificate.json": "c5c3b9effba1db4d89c52e3ebca88b8d5653212558ef338869b4ee3f99a3d90c",
+    "certificate-evidence/payload/check-dighhrxi/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/payload/check-dighhrxi/outputs/patch.csv": "8536b906b9de501f6ee5da57fe5e9e2274a0b454a55e0e6dcbab04abb9ffc50f",
+    "certificate-evidence/payload/check-dighhrxi/outputs/run.csv": "c38f8839917e03c295d7673530d429379c2cf70ed7099025114fc144496ff4d0",
+    "certificate-evidence/payload/check-dighhrxi/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/payload/check-dighhrxi/facts/candidate.facts": "5153a775214b918b972e71798e06bc686015f915d08596e5f9cbe18583b91fd4",
+    "certificate-evidence/payload/check-dighhrxi/facts/hybrid.facts": "c7b8dcb78d9a46e9f7008a98f61e66a376aadf6825cf47c69690a421c4b9f216",
+    "certificate-evidence/payload/check-dighhrxi/facts/context.facts": "2d0db42ea4afe56b479e10ddc9086dc7a9f71c58f14550dadb2a637d6d53579e",
+    "certificate-evidence/payload/check-dighhrxi/facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a"
+  },
+  "sources": {
+    "py/run_qwen35_gate_cross.py": "131429d696723c112ef6d4c28d3d88f95c68732cefdfad35f47c5492812f4353",
+    "dl/qwen35_gate_cross_payload.dl": "6bb5d1f78108b59171bbc54647d411538e2c0fb9733b61f17ff948f7ad567881",
+    "dl/qwen35_gate_cross_reproduction.dl": "91d284516cc1d1a2fa9916a2af7e0cb65dad09bbc9034a073115cbde0dc5e29f",
+    "py/run_qwen35_sparse_gate.py": "6ffe118cc4a1a9dbabc7365e83759c7d6cc4a1bb915fa8288712360ae0203a02",
+    "py/run_qwen35_mlp_factor.py": "098763200da3632d16efc940ba519353c254058fb4d63bb2d9486c90faecafc1",
+    "dl/qwen35_mlp_factor_summary.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

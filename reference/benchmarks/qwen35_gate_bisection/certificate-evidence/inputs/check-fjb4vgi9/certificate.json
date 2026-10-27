@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "development bisection planning/application consistency; not replacement certification"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "e1156cbab75a4d1794740c9ac7609270252ac6b587dd338c8cf347f459cb33c7",
+    "facts/context.facts": "50dc12f6133813ec20114a89ca5c0dacff6b7b09faaa6160457371e1b8ad06f5",
+    "facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a",
+    "facts/rank.facts": "c3449c98cf231d6f385c6c842dcee0716d96a4486110937027eba16340176129",
+    "facts/root.facts": "32c185b891605b40e0626b22f20e8eaf382e0b07273132308a4d28923d8216d2",
+    "facts/root_ref.facts": "4f76cc58e993a0a5e914fbc3cdbe8fab65ee56075d5a3dd15608beccc20c496c",
+    "outputs/caseinfo.csv": "699a23d2ae90d8c914f5b2fffeef604e30829cd70ec67ac0fb86fed588c4eea2",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/member.csv": "6cac4836980b112eab3a0a6ccc1f45995fb37346eaf565e42f2fd6a026f0f03f",
+    "outputs/ref.csv": "825c384b35584ad170235d2ac2bc399ce9c2d4abefb79073f902b03fa3679d33",
+    "stderr.txt": "a144103ff0eef2e2dcd8c7b724f7308bd5ffac69b92b634949a9a556dddd5c90",
+    "verify.dl": "e1156cbab75a4d1794740c9ac7609270252ac6b587dd338c8cf347f459cb33c7"
+  }
+}

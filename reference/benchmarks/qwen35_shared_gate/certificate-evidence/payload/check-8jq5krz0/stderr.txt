@@ -1,0 +1,12 @@
+Warning: Variable D only occurs once in file verify.dl at line 36
+invalid() :- donor(I,D), !context(I,_).
+---------------------^------------------
+Warning: Variable I only occurs once in file verify.dl at line 37
+invalid() :- donor(I,D), !context(D,_).
+-------------------^--------------------
+Warning: Variable I only occurs once in file verify.dl at line 38
+invalid() :- selected(A,I,N), !patch(A,31,_,N,_).
+------------------------^-------------------------
+Warning: Variable A only occurs once in file verify.dl at line 40
+invalid() :- counts(A,0).
+--------------------^-----

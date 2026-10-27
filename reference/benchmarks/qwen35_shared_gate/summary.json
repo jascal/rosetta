@@ -1,0 +1,48 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "joint",
+        "0"
+      ],
+      [
+        "random2",
+        "0"
+      ],
+      [
+        "neuron162",
+        "0"
+      ],
+      [
+        "neuron381",
+        "0"
+      ],
+      [
+        "rest_top32",
+        "3"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": [
+      [
+        "3",
+        "rest_top32"
+      ],
+      [
+        "283",
+        "rest_top32"
+      ],
+      [
+        "543",
+        "rest_top32"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_shared_gate/certificate-evidence/summary/check-5w6rt5qm"
+}

@@ -1,0 +1,8 @@
+{
+  "closed_sha256": "cc6d5331cfe1d171555fe9d0c19584816d35f5b9266e9b279c080d39241b0ff4",
+  "queries": 2,
+  "inherited_reference_witnesses": 12,
+  "new_forwards": 0,
+  "unchanged": true,
+  "audit_source_sha256": "eea2f3a75281094a3807894d607b1099bb7c258ddbb42be0f88373b86a5973a5"
+}

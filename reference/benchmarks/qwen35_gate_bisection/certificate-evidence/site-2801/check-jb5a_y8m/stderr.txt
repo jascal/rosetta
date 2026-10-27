@@ -1,0 +1,18 @@
+Warning: Variable A only occurs once in file verify.dl at line 11
+invalid() :- run(A,I,D,M), !expected(I,_).
+-----------------^-------------------------
+Warning: Variable D only occurs once in file verify.dl at line 11
+invalid() :- run(A,I,D,M), !expected(I,_).
+---------------------^---------------------
+Warning: Variable M only occurs once in file verify.dl at line 11
+invalid() :- run(A,I,D,M), !expected(I,_).
+-----------------------^-------------------
+Warning: Variable A only occurs once in file verify.dl at line 12
+invalid() :- run(A,I,D,M), !expected(D,_).
+-----------------^-------------------------
+Warning: Variable I only occurs once in file verify.dl at line 12
+invalid() :- run(A,I,D,M), !expected(D,_).
+-------------------^-----------------------
+Warning: Variable M only occurs once in file verify.dl at line 12
+invalid() :- run(A,I,D,M), !expected(D,_).
+-----------------------^-------------------

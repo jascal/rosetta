@@ -1,0 +1,60 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "self_reconstructed",
+        "0"
+      ],
+      [
+        "donor_reconstructed",
+        "3"
+      ],
+      [
+        "donor_gate",
+        "3"
+      ],
+      [
+        "donor_up",
+        "1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": [
+      [
+        "1",
+        "donor_reconstructed"
+      ],
+      [
+        "113",
+        "donor_reconstructed"
+      ],
+      [
+        "217",
+        "donor_reconstructed"
+      ],
+      [
+        "2",
+        "donor_gate"
+      ],
+      [
+        "114",
+        "donor_gate"
+      ],
+      [
+        "218",
+        "donor_gate"
+      ],
+      [
+        "115",
+        "donor_up"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_mlp_factor/certificate-evidence/summary/check-5fio2d4j"
+}

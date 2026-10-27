@@ -1,0 +1,36 @@
+Warning: Variable T only occurs once in file verify.dl at line 37
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), P != Q.
+--------------------------^----------------------------
+Warning: Variable U only occurs once in file verify.dl at line 37
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), P != Q.
+-------------------------------------------^-----------
+Warning: Variable P only occurs once in file verify.dl at line 38
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), T != U.
+------------------------^------------------------------
+Warning: Variable Q only occurs once in file verify.dl at line 38
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), T != U.
+-----------------------------------------^-------------
+Warning: Variable R only occurs once in file verify.dl at line 40
+invalid() :- member(C,R,N,V), !caseinfo(C,_,_).
+----------------------^-------------------------
+Warning: Variable N only occurs once in file verify.dl at line 40
+invalid() :- member(C,R,N,V), !caseinfo(C,_,_).
+------------------------^-----------------------
+Warning: Variable V only occurs once in file verify.dl at line 40
+invalid() :- member(C,R,N,V), !caseinfo(C,_,_).
+--------------------------^---------------------
+Warning: Variable C only occurs once in file verify.dl at line 41
+invalid() :- member(C,R,_,_), R < 0.
+--------------------^----------------
+Warning: Variable V only occurs once in file verify.dl at line 43
+invalid() :- member(C,R,N,V), member(C,R,M,U), N != M.
+--------------------------^----------------------------
+Warning: Variable U only occurs once in file verify.dl at line 43
+invalid() :- member(C,R,N,V), member(C,R,M,U), N != M.
+-------------------------------------------^-----------
+Warning: Variable N only occurs once in file verify.dl at line 44
+invalid() :- member(C,R,N,V), member(C,R,M,U), V != U.
+------------------------^------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 44
+invalid() :- member(C,R,N,V), member(C,R,M,U), V != U.
+-----------------------------------------^-------------

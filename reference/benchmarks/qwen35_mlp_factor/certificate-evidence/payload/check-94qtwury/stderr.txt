@@ -1,0 +1,18 @@
+Warning: Variable D only occurs once in file verify.dl at line 27
+invalid() :- donor(I,D), !context(I,_).
+---------------------^------------------
+Warning: Variable I only occurs once in file verify.dl at line 28
+invalid() :- donor(I,D), !context(D,_).
+-------------------^--------------------
+Warning: Variable U only occurs once in file verify.dl at line 30
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), G != H.
+-------------------------------^---------------------------------
+Warning: Variable V only occurs once in file verify.dl at line 30
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), G != H.
+-----------------------------------------------------^-----------
+Warning: Variable G only occurs once in file verify.dl at line 31
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), U != V.
+-----------------------------^-----------------------------------
+Warning: Variable H only occurs once in file verify.dl at line 31
+invalid() :- observation(I,N,G,U), observation(I,N,H,V), U != V.
+---------------------------------------------------^-------------

@@ -1,0 +1,29 @@
+.decl run(a:number,target:number,donor:number,l:number,mode:symbol) .input run
+.decl expected(i:number,t:number) .input expected
+.decl ref(a:number,t:number) .input ref
+.decl hash(a:number,h:symbol) .input hash
+.decl request(a:number,l:number,p:number,n:number,v:float) .input request
+.decl applied(a:number,l:number,p:number,n:number,b:float,v:float) .input applied
+.decl baseline(i:number,a:number)
+baseline(I,A) :- run(A,I,_,_,"baseline").
+.decl invalid() .output invalid
+invalid() :- run(A,_,_,_,_), !ref(A,_).
+invalid() :- ref(A,T), ref(A,U), T != U.
+invalid() :- baseline(I,A), expected(I,T), ref(A,U), T != U.
+invalid() :- run(A,_,_,_,_), !hash(A,_).
+invalid() :- request(A,L,P,N,V), !applied(A,L,P,N,_,V).
+invalid() :- applied(A,L,P,N,_,V), !request(A,L,P,N,V).
+invalid() :- run(A,I,_,_,"identity"), baseline(I,B), hash(A,X), hash(B,Y), X != Y.
+.decl outcome(a:number,l:number,mode:symbol,c:symbol) .output outcome
+outcome(A,L,M,"preserved") :- run(A,I,_,L,M), M != "baseline", expected(I,T), ref(A,T).
+outcome(A,L,M,"changed") :- run(A,I,_,L,M), M != "baseline", expected(I,T), ref(A,U), T != U.
+.decl transfer(a:number,l:number) .output transfer
+transfer(A,L) :- run(A,I,D,L,"donor"), expected(I,T), expected(D,U), T != U, ref(A,U).
+.decl dose(a:number,n:number) .output dose
+dose(A,N) :- run(A,_,_,_,M), M != "baseline", N = count : { applied(A,_,_,_,B,V), B != V }.
+.decl counts(l:number,mode:symbol,c:symbol,n:number) .output counts
+counts(L,M,C,N) :- outcome(_,L,M,C), N = count : { outcome(_,L,M,C) }.
+.decl transfers(l:number,n:number) .output transfers
+transfers(L,N) :- run(_,_,_,L,"donor"), N = count : { transfer(_,L) }.
+.decl certified() .output certified
+certified() :- !invalid().

@@ -1,0 +1,28 @@
+.decl run(a:number,target:number,donor:number,mode:symbol) .input run
+.decl expected(i:number,t:number) .input expected
+.decl ref(a:number,t:number) .input ref
+.decl reconstruction(a:number,ok:number) .input reconstruction
+.decl request(a:number,l:number,p:number,n:number,v:float) .input request
+.decl applied(a:number,l:number,p:number,n:number,b:float,v:float) .input applied
+.decl invalid() .output invalid
+invalid() :- !run(_,_,_,_).
+invalid() :- run(A,_,_,_), !ref(A,_).
+invalid() :- ref(A,T), ref(A,U), T != U.
+invalid() :- run(A,I,D,M), !expected(I,_).
+invalid() :- run(A,I,D,M), !expected(D,_).
+invalid() :- run(A,_,_,"self_reconstructed"), !reconstruction(A,1).
+invalid() :- run(A,_,_,"donor_reconstructed"), !reconstruction(A,1).
+invalid() :- request(A,L,P,N,_), !applied(A,L,P,N,_,_).
+invalid() :- applied(A,L,P,N,_,_), !request(A,L,P,N,_).
+.decl magnitude(a:number,l:number,p:number,n:number,v:float)
+magnitude(A,L,P,N,V) :- request(A,L,P,N,V), V >= 0.0.
+magnitude(A,L,P,N,-V) :- request(A,L,P,N,V), V < 0.0.
+// FP32 narrowing of Datalog double payloads is expected, before down projection.
+invalid() :- request(A,L,P,N,V), applied(A,L,P,N,_,U), magnitude(A,L,P,N,M), U-V > 0.0000001+0.0000001*M.
+invalid() :- request(A,L,P,N,V), applied(A,L,P,N,_,U), magnitude(A,L,P,N,M), V-U > 0.0000001+0.0000001*M.
+.decl transfer(a:number,mode:symbol) .output transfer
+transfer(A,M) :- run(A,I,D,M), expected(I,T), expected(D,U), T != U, ref(A,U).
+.decl counts(mode:symbol,n:number) .output counts
+counts(M,N) :- run(_,_,_,M), N = count : { transfer(_,M) }.
+.decl certified() .output certified
+certified() :- !invalid().

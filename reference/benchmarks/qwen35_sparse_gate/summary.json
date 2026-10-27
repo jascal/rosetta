@@ -1,0 +1,88 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "top32",
+        "3"
+      ],
+      [
+        "random32",
+        "0"
+      ],
+      [
+        "top128",
+        "3"
+      ],
+      [
+        "random128",
+        "0"
+      ],
+      [
+        "complement128",
+        "2"
+      ],
+      [
+        "top512",
+        "3"
+      ],
+      [
+        "random512",
+        "0"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": [
+      [
+        "320",
+        "top32"
+      ],
+      [
+        "280320",
+        "top32"
+      ],
+      [
+        "540320",
+        "top32"
+      ],
+      [
+        "1280",
+        "top128"
+      ],
+      [
+        "281280",
+        "top128"
+      ],
+      [
+        "541280",
+        "top128"
+      ],
+      [
+        "1282",
+        "complement128"
+      ],
+      [
+        "541282",
+        "complement128"
+      ],
+      [
+        "5120",
+        "top512"
+      ],
+      [
+        "285120",
+        "top512"
+      ],
+      [
+        "545120",
+        "top512"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_sparse_gate/certificate-evidence/summary/check-iio70xcw"
+}

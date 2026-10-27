@@ -1,0 +1,11 @@
+.decl query(q:number,g:symbol,v:number) .input query
+.decl key(q:number,t:number) .input key
+.decl probe(id:number,q:number,t:number) .output probe
+probe(1000000*Q+T,Q,T) :- query(Q,_,1), key(Q,T).
+.decl unit(l:number,n:number) .output unit
+unit(31,603). unit(31,1765).
+.decl invalid() .output invalid
+invalid() :- !probe(_,_,_).
+invalid() :- query(Q,_,1), !probe(_,Q,_).
+.decl certified() .output certified
+certified() :- !invalid().

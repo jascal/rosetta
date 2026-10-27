@@ -1,0 +1,46 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "0",
+        "56",
+        "12"
+      ],
+      [
+        "1",
+        "56",
+        "12"
+      ],
+      [
+        "2",
+        "48",
+        "12"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "priorcounts": [
+      [
+        "0",
+        "144",
+        "58"
+      ],
+      [
+        "1",
+        "144",
+        "58"
+      ],
+      [
+        "2",
+        "144",
+        "94"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_query_prior_counts/certificate-evidence/check-71winlo6"
+}

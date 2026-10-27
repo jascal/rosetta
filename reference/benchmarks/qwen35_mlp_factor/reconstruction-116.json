@@ -1,0 +1,24 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "badargmax": [],
+    "ref": [
+      [
+        "original",
+        "54058"
+      ],
+      [
+        "reconstructed",
+        "54058"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "badlogit": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_mlp_factor/certificate-evidence/reconstruction-116/check-ks0yi2uk"
+}

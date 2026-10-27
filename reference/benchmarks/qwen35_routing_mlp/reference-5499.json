@@ -1,0 +1,25 @@
+{
+  "archive": "reference-5499.tar.gz",
+  "sha256": "5ba99c4f05b729da6bf8495c8c42b11fa10dd8b0b77485e54ab8205c975e4f8a",
+  "query": {
+    "certified": true,
+    "relations": {
+      "invalid": [],
+      "ref": [
+        [
+          "73062"
+        ]
+      ],
+      "nscore": [
+        [
+          "248320"
+        ]
+      ],
+      "certified": [
+        [
+          "()"
+        ]
+      ]
+    }
+  }
+}
