@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "all fixed routing/value/gate substitutions and scalar reconstructions"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "760c62aefd5193f451fa3227f1f6c20cc23cb4a1caa1a8b356425d81b3091fbd",
+    "facts/context.facts": "243bdab987ecca5996a038b5dc2dd060714ce8c527a2ab54bea7a1285f59483e",
+    "facts/gate.facts": "68025ede645dffc290e8678afbe7591c70281d00f98cd995ef4e02dba5dcc230",
+    "facts/shape.facts": "f16c302d5d30e1d3fbe955cf4f637f58a871adeba597922e3baad0aeeb13f656",
+    "facts/value.facts": "07241e420a8c9714b50958553baa02f2ae9bd9f68a96daf51a001e9b46a08aa6",
+    "facts/vector.facts": "b67689691b84b09ef1160f46c836dab94982df23342de5307fd0be330aa1b15c",
+    "facts/weight.facts": "4f87cf620f4d8690386e34ecd1bd435d0a30f314e7be39dace5837db0488bb3b",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/patch.csv": "5b2deb8180164769efb3370bf0192b34cc8f1db553b36ec371c82385aece7a16",
+    "outputs/reconstruction_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/run.csv": "acd2071ecd93dc2cd4b9a74a986e89358a1a63b064fe6e4d3a9e9b9b9ca82caf",
+    "stderr.txt": "d805c82e9e4d03a9437d1d712d9c2609385d5e72f3fc1e6af5fd3a10db1036b1",
+    "verify.dl": "760c62aefd5193f451fa3227f1f6c20cc23cb4a1caa1a8b356425d81b3091fbd"
+  }
+}

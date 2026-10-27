@@ -1,0 +1,24 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 51
+dot(A,P,V) :- run(A,I,_,_), position(I,P), V = sum X : { dot_term(A,P,D,X) }.
+----------------------------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 55
+maximum(A,V) :- run(A,_,_,_), V = max X : { logit(A,P,X) }.
+----------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 59
+partition(A,V) :- run(A,_,_,_), V = sum X : { exponential(A,P,X) }.
+------------------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 68
+ungated(A,D,V) :- run(A,_,_,_), dimension(D), V = sum X : { value_term(A,D,P,X) }.
+---------------------------------------------------------------------------^-------
+Warning: Variable I only occurs once in file verify.dl at line 114
+invalid() :- run(A,I,_,_), dimension(D), !patch(A,_,_,_,D,_).
+-------------------^------------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 121
+source_count(I,R,N) :- context(I,_,_,_), role(R), N = count : { source(I,P,R) }.
+-------------------------------------------------------------------------^-------
+Warning: Variable A only occurs once in file verify.dl at line 124
+invalid() :- checked_reference(A,R), dimension(D), !control_vector(R,D,_).
+-------------------------------^-------------------------------------------

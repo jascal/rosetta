@@ -1,0 +1,6 @@
+Warning: Variable I0 only occurs once in file verify.dl at line 22
+counts(N,M) :- N = count : { context(I) }, M = count : { result(I,1) }.
+-------------------------------------^----------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 22
+counts(N,M) :- N = count : { context(I) }, M = count : { result(I,1) }.
+----------------------------------------------------------------^-------

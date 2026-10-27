@@ -1,0 +1,7 @@
+{
+  "closed_sha256": "efdcba5ceb2d8f94481b5959bcb0a786c9704c59f8f94af9f0a5878cad883597",
+  "queries": 9,
+  "unchanged": true,
+  "scope": "observational profile, not causal head certificate",
+  "audit_source_sha256": "cb5aff2dbee285d220c41bc8a777b39aa08329db1521886515df1d6847e9e2e2"
+}

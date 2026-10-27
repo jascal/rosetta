@@ -1,0 +1,34 @@
+.decl mode(k:number,m:symbol) .input mode
+.decl context(i:number,t:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl meta(a:number,i:number,f:number,k:number,side:symbol) .input meta
+.decl reference_short(i:number,t:number) .input reference_short
+.decl ref(a:number,t:number) .input ref
+.decl key_result(i:number,k:number,ok:number) .input key_result
+.decl argmax_match(a:number) .output argmax_match
+argmax_match(A) :- meta(A,I,_,_,"self"), context(I,T), ref(A,T).
+argmax_match(A) :- meta(A,I,_,_,"donor"), reference_short(I,T), ref(A,T).
+.decl transfer(a:number,k:number) .output transfer
+transfer(A,K) :- meta(A,I,_,K,"donor"), donor(I,D), context(I,T), context(D,U), T != U, ref(A,U).
+.decl transfer_without_key_match(a:number,k:number) .output transfer_without_key_match
+transfer_without_key_match(A,K) :- transfer(A,K), meta(A,_,F,K,_), key_result(F,K,0).
+.decl counts(k:number,m:symbol,total:number,key_matches:number,self_matches:number,donor_matches:number,unmatched_transfers:number) .output counts
+counts(K,M,N,B,S,D,U) :- mode(K,M), N = count : { context(I,T) }, B = count : { key_result(I,K,1) },
+ S = count : { meta(A,I,F,K,"self"), argmax_match(A) }, D = count : { meta(A,I,F,K,"donor"), argmax_match(A) },
+ U = count : { transfer_without_key_match(A,K) }.
+.decl recovered(k:number) .output recovered
+recovered(K) :- counts(K,_,N,N,N,N,_), N > 0.
+.decl invalid() .output invalid
+invalid() :- !context(_,_).
+invalid() :- context(I,_), !donor(I,_).
+invalid() :- context(I,_), !reference_short(I,_).
+invalid() :- mode(K,_), context(I,_), !key_result(I,K,_).
+invalid() :- key_result(I,K,V), V != 0, V != 1.
+invalid() :- key_result(I,K,V), key_result(I,K,W), V != W.
+invalid() :- mode(K,_), context(I,_), !meta(_,I,_,K,"self").
+invalid() :- mode(K,_), context(I,_), !meta(_,I,_,K,"donor").
+invalid() :- meta(A,_,_,_,_), !ref(A,_).
+invalid() :- ref(A,T), ref(A,U), T != U.
+.decl certified() .output certified
+// Completeness of this empirical outcome table, never new model coverage.
+certified() :- !invalid().

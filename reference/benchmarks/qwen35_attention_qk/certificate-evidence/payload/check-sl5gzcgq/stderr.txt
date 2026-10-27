@@ -1,0 +1,18 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 46
+dot(A,P,V) :- run(A,I,_,_), position(I,P), V = sum X : { dot_term(A,P,D,X) }.
+----------------------------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 50
+maximum(A,V) :- run(A,_,_,_), V = max X : { logit(A,P,X) }.
+----------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 54
+partition(A,V) :- run(A,_,_,_), V = sum X : { exponential(A,P,X) }.
+------------------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 63
+ungated(A,D,V) :- run(A,_,_,_), dimension(D), V = sum X : { value_term(A,D,P,X) }.
+---------------------------------------------------------------------------^-------
+Warning: Variable I only occurs once in file verify.dl at line 106
+invalid() :- run(A,I,_,_), dimension(D), !patch(A,_,_,_,D,_).
+-------------------^------------------------------------------

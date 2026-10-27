@@ -1,0 +1,37 @@
+{
+  "scope": "known development head27/10 factorization; not final circuit confirmation",
+  "capture_forwards": 6,
+  "substitution_forwards": 30,
+  "modes": [
+    "self_reconstructed",
+    "donor_reconstructed",
+    "donor_routing",
+    "donor_values",
+    "donor_gate"
+  ],
+  "formula": "sigmoid(raw_gate_from) * sum_j attention_from(j)*value_from(j,dimension); stable Datalog double arithmetic, then model FP32 substitution",
+  "controls": "capture hashes exact to previous no-op; vector reconstruction1e-5+1e-5abs; twelve full-vocabulary reconstructed controls .002+.002abs and exact argmax must all pass before hybrids",
+  "freeze": "policy before captures; full payload and capture hashes before substitutions; all six directions including failed transfers",
+  "priors": {
+    "reference/benchmarks/qwen35_attention_exchange/closed.json": "45d0277667fec64ba60d575fb3e39174953a747d2d53bf47fec1b6d23a0613eb",
+    "reference/benchmarks/qwen35_attention_profile/closed.json": "efdcba5ceb2d8f94481b5959bcb0a786c9704c59f8f94af9f0a5878cad883597"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "baseline-hashes.json": "05deac646e4b1bfc6083cb6990a478f3d322f491441c1516b077453e021f3af5"
+  },
+  "sources": {
+    "py/run_qwen35_attention_factor.py": "22bbe7c582f883c2e8c1a94bacfeccaa8ec9f07d3e3db01b337d982c22e37738",
+    "py/qwen35_attention_factor_reference.py": "fa15fbc9aa388c3bd2ad8e69641026f761e5478190acd0a11238b0517c280f1f",
+    "py/qwen35_attention_reference.py": "5d6fc1a797bd9c4f6ce2c906bac32513640bb6eb293b7a568886de0dafd9ca7e",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "dl/qwen35_attention_factor_payload.dl": "760c62aefd5193f451fa3227f1f6c20cc23cb4a1caa1a8b356425d81b3091fbd",
+    "dl/qwen35_attention_factor_summary.dl": "a4a0726bc8c473f7aeb209eeffb65c251c420c80ea597a2e35983b83cbb27039",
+    "dl/qwen35_factor_reconstruction_linear.dl": "6301f9262f5f54fa48842bbd4d0220f813f48cad95123b07925955bd3e6c484e",
+    "dl/qwen35_gate_cross_reproduction.dl": "91d284516cc1d1a2fa9916a2af7e0cb65dad09bbc9034a073115cbde0dc5e29f",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842"
+  }
+}

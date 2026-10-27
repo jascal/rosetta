@@ -1,0 +1,24 @@
+.decl dimension(d:number) .input dimension
+.decl context(i:number) .input context
+.decl expected(i:number,d:number,v:float) .input expected
+.decl actual(i:number,d:number,v:float) .input actual
+.decl magnitude(i:number,d:number,v:float)
+magnitude(I,D,V) :- expected(I,D,V), V >= 0.0.
+magnitude(I,D,-V) :- expected(I,D,V), V < 0.0.
+.decl bad(i:number,d:number) .output bad
+bad(I,D) :- expected(I,D,V), actual(I,D,W), magnitude(I,D,M), V-W > 0.00001+0.00001*M.
+bad(I,D) :- expected(I,D,V), actual(I,D,W), magnitude(I,D,M), W-V > 0.00001+0.00001*M.
+.decl invalid() .output invalid
+invalid() :- !context(_).
+invalid() :- !dimension(_).
+invalid() :- context(I), dimension(D), !actual(I,D,_).
+invalid() :- context(I), dimension(D), !expected(I,D,_).
+invalid() :- actual(I,D,V), actual(I,D,W), V != W.
+invalid() :- expected(I,D,V), expected(I,D,W), V != W.
+.decl result(i:number,ok:number) .output result
+result(I,0) :- context(I), bad(I,_).
+result(I,1) :- context(I), !bad(I,_), !invalid().
+.decl counts(total:number,matched:number) .output counts
+counts(N,M) :- N = count : { context(I) }, M = count : { result(I,1) }.
+.decl certified() .output certified
+certified() :- !invalid(), !bad(_,_).

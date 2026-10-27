@@ -1,0 +1,78 @@
+Warning: Variable P only occurs once in file verify.dl at line 16
+mass(A,L,H,V) :- observe(A,L,H), V = sum X : { attention(A,L,P,H,J,X) }.
+-------------------------------------------------------------^-----------
+Warning: Variable J only occurs once in file verify.dl at line 16
+mass(A,L,H,V) :- observe(A,L,H), V = sum X : { attention(A,L,P,H,J,X) }.
+-----------------------------------------------------------------^-------
+Warning: Variable L only occurs once in file verify.dl at line 18
+dose(A,N) :- request(A,_,_,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+-----------------------------------------------------------^-----------------------
+Warning: Variable P only occurs once in file verify.dl at line 18
+dose(A,N) :- request(A,_,_,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+-------------------------------------------------------------^---------------------
+Warning: Variable H only occurs once in file verify.dl at line 18
+dose(A,N) :- request(A,_,_,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+---------------------------------------------------------------^-------------------
+Warning: Variable D only occurs once in file verify.dl at line 18
+dose(A,N) :- request(A,_,_,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+-----------------------------------------------------------------^-----------------
+Warning: Variable P only occurs once in file verify.dl at line 24
+invalid() :- vector(A,L,P,H,D,_), !observe(A,L,H).
+------------------------^--------------------------
+Warning: Variable D only occurs once in file verify.dl at line 24
+invalid() :- vector(A,L,P,H,D,_), !observe(A,L,H).
+----------------------------^----------------------
+Warning: Variable A only occurs once in file verify.dl at line 25
+invalid() :- vector(A,L,P,H,D,_), !dimension(D).
+--------------------^----------------------------
+Warning: Variable L only occurs once in file verify.dl at line 25
+invalid() :- vector(A,L,P,H,D,_), !dimension(D).
+----------------------^--------------------------
+Warning: Variable P only occurs once in file verify.dl at line 25
+invalid() :- vector(A,L,P,H,D,_), !dimension(D).
+------------------------^------------------------
+Warning: Variable H only occurs once in file verify.dl at line 25
+invalid() :- vector(A,L,P,H,D,_), !dimension(D).
+--------------------------^----------------------
+Warning: Variable A only occurs once in file verify.dl at line 26
+invalid() :- vector(A,L,P,H,D,_), shape(_,Q), P != Q.
+--------------------^---------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 26
+invalid() :- vector(A,L,P,H,D,_), shape(_,Q), P != Q.
+----------------------^-------------------------------
+Warning: Variable H only occurs once in file verify.dl at line 26
+invalid() :- vector(A,L,P,H,D,_), shape(_,Q), P != Q.
+--------------------------^---------------------------
+Warning: Variable D only occurs once in file verify.dl at line 26
+invalid() :- vector(A,L,P,H,D,_), shape(_,Q), P != Q.
+----------------------------^-------------------------
+Warning: Variable P only occurs once in file verify.dl at line 28
+invalid() :- attention(A,L,P,H,J,_), !observe(A,L,H).
+---------------------------^--------------------------
+Warning: Variable J only occurs once in file verify.dl at line 28
+invalid() :- attention(A,L,P,H,J,_), !observe(A,L,H).
+-------------------------------^----------------------
+Warning: Variable A only occurs once in file verify.dl at line 29
+invalid() :- attention(A,L,P,H,J,_), !position(J).
+-----------------------^---------------------------
+Warning: Variable L only occurs once in file verify.dl at line 29
+invalid() :- attention(A,L,P,H,J,_), !position(J).
+-------------------------^-------------------------
+Warning: Variable P only occurs once in file verify.dl at line 29
+invalid() :- attention(A,L,P,H,J,_), !position(J).
+---------------------------^-----------------------
+Warning: Variable H only occurs once in file verify.dl at line 29
+invalid() :- attention(A,L,P,H,J,_), !position(J).
+-----------------------------^---------------------
+Warning: Variable A only occurs once in file verify.dl at line 30
+invalid() :- attention(A,L,P,H,J,_), shape(_,Q), P != Q.
+-----------------------^---------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 30
+invalid() :- attention(A,L,P,H,J,_), shape(_,Q), P != Q.
+-------------------------^-------------------------------
+Warning: Variable H only occurs once in file verify.dl at line 30
+invalid() :- attention(A,L,P,H,J,_), shape(_,Q), P != Q.
+-----------------------------^---------------------------
+Warning: Variable J only occurs once in file verify.dl at line 30
+invalid() :- attention(A,L,P,H,J,_), shape(_,Q), P != Q.
+-------------------------------^-------------------------

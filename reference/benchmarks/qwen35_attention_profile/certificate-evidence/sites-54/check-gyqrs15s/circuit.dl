@@ -1,0 +1,47 @@
+.decl shape(width:number,last:number) .input shape
+.decl arm(a:symbol) .input arm
+.decl observe(a:symbol,l:number,h:number) .input observe
+.decl vector(a:symbol,l:number,p:number,h:number,d:number,v:float) .input vector
+.decl attention(a:symbol,l:number,p:number,h:number,j:number,v:float) .input attention
+.decl request(a:symbol,l:number,p:number,h:number,d:number,v:float) .input request
+.decl applied(a:symbol,l:number,p:number,h:number,d:number,b:float,v:float) .input applied
+.decl hash(a:symbol,h:symbol) .input hash
+.decl dimension(d:number)
+dimension(0) :- shape(W,_), W > 0.
+dimension(D+1) :- dimension(D), shape(W,_), D+1 < W.
+.decl position(p:number)
+position(0) :- shape(_,P), P >= 0.
+position(J+1) :- position(J), shape(_,P), J+1 <= P.
+.decl mass(a:symbol,l:number,h:number,v:float) .output mass
+mass(A,L,H,V) :- observe(A,L,H), V = sum X : { attention(A,L,P,H,J,X) }.
+.decl dose(a:symbol,n:number) .output dose
+dose(A,N) :- request(A,_,_,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+.decl identity(a:symbol)
+identity("identity"). identity("cleanup").
+.decl invalid() .output invalid
+invalid() :- !arm(_).
+invalid() :- observe(A,L,H), shape(_,P), dimension(D), !vector(A,L,P,H,D,_).
+invalid() :- vector(A,L,P,H,D,_), !observe(A,L,H).
+invalid() :- vector(A,L,P,H,D,_), !dimension(D).
+invalid() :- vector(A,L,P,H,D,_), shape(_,Q), P != Q.
+invalid() :- observe(A,L,H), shape(_,P), position(J), !attention(A,L,P,H,J,_).
+invalid() :- attention(A,L,P,H,J,_), !observe(A,L,H).
+invalid() :- attention(A,L,P,H,J,_), !position(J).
+invalid() :- attention(A,L,P,H,J,_), shape(_,Q), P != Q.
+invalid() :- attention(_,_,_,_,_,V), V < 0.0.
+invalid() :- attention(_,_,_,_,_,V), V > 1.0.
+invalid() :- mass(_,_,_,V), V < 0.99999.
+invalid() :- mass(_,_,_,V), V > 1.00001.
+invalid() :- request(A,L,P,H,D,V), !applied(A,L,P,H,D,_,V).
+invalid() :- applied(A,L,P,H,D,_,V), !request(A,L,P,H,D,V).
+invalid() :- request(A,L,P,H,D,V), applied(A,L,P,H,D,_,W), V != W.
+invalid() :- request(A,L,P,H,D,V), request(A,L,P,H,D,W), V != W.
+invalid() :- dose(A,0), A != "identity".
+invalid() :- arm(A), !hash(A,_).
+invalid() :- identity(A), hash(A,X), hash("baseline",Y), X != Y.
+invalid() :- identity(A), vector("baseline",L,P,H,D,V), vector(A,L,P,H,D,W), V != W.
+invalid() :- identity(A), attention("baseline",L,P,H,J,V), attention(A,L,P,H,J,W), V != W.
+invalid() :- vector(A,L,P,H,D,V), vector(A,L,P,H,D,W), V != W.
+invalid() :- attention(A,L,P,H,J,V), attention(A,L,P,H,J,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

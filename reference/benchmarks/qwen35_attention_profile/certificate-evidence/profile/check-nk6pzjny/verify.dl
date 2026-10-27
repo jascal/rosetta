@@ -1,0 +1,39 @@
+// Observational retrieval contrasts; head ranking is not a causal certificate.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl context(i:number,pairid:number,side:symbol) .input context
+.decl head(l:number,h:number) .input head
+.decl attention(i:number,l:number,h:number,p:number,v:float) .input attention
+#include "circuit.dl"
+.decl source(i:number,p:number,r:symbol)
+source(I,J+1,"long") :- lc_winner(I,T), lc_source(I,J,K,T), K >= 12.
+source(I,J+1,"short") :- lc_winner(I,T), lc_source(I,J,K,U), T != U, K >= 12.
+.decl role(r:symbol)
+role("long"). role("short").
+.decl mass(i:number,l:number,h:number,r:symbol,v:float) .output mass
+mass(I,L,H,R,V) :- context(I,_,_), head(L,H), role(R),
+ V = sum X : { source(I,P,R), attention(I,L,H,P,X) }.
+.decl pair(c:number,a:number,b:number)
+pair(C,A,B) :- context(A,C,"old"), context(B,C,"new").
+.decl shift(c:number,l:number,h:number,v:float) .output shift
+shift(C,L,H,(BL-BS)-(AL-AS)) :- pair(C,A,B), head(L,H),
+ mass(A,L,H,"long",AL), mass(A,L,H,"short",AS),
+ mass(B,L,H,"long",BL), mass(B,L,H,"short",BS).
+.decl total(l:number,h:number,v:float) .output total
+total(L,H,V) :- head(L,H), V = sum X : { shift(C,L,H,X) }.
+.decl positive_groups(l:number,h:number,n:number) .output positive_groups
+positive_groups(L,H,N) :- head(L,H), N = count : { shift(C,L,H,X), X > 0.0 }.
+.decl stronger(l:number,h:number,a:number,b:number)
+stronger(L,H,A,B) :- total(L,H,V), total(A,B,W), W > V.
+stronger(L,H,A,B) :- total(L,H,V), total(A,B,V), A < L.
+stronger(L,H,A,B) :- total(L,H,V), total(L,B,V), B < H, A = L.
+.decl rank(l:number,h:number,n:number) .output rank
+rank(L,H,N) :- head(L,H), N = count : { stronger(L,H,A,B) }.
+.decl leading(l:number,h:number,v:float,positive:number) .output leading
+leading(L,H,V,P) :- rank(L,H,N), N < 4, total(L,H,V), positive_groups(L,H,P).
+.decl invalid() .output invalid
+invalid() :- !context(_,_,_).
+invalid() :- context(I,_,_), !source(I,_,"long").
+invalid() :- context(I,_,_), !source(I,_,"short").
+invalid() :- context(_,C,_), !pair(C,_,_).
+.decl certified() .output certified
+certified() :- !invalid().

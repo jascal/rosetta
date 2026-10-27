@@ -1,0 +1,60 @@
+{
+  "closed_sha256": "59fa35fc465305905a983d2d77800bd6ee0b0db816218d30bc1c506333485250",
+  "queries": 33,
+  "reference_witnesses": 72,
+  "unchanged": true,
+  "outcome": {
+    "tag": "empirical",
+    "stopped": false,
+    "table": [
+      {
+        "mode": "full_prefix",
+        "total": 6,
+        "key_matches": 6,
+        "self_argmax_matches": 6,
+        "donor_short_argmax_matches": 6,
+        "unmatched_transfers": 0,
+        "status": "empirical_recovery"
+      },
+      {
+        "mode": "window4_fill0",
+        "total": 6,
+        "key_matches": 0,
+        "self_argmax_matches": 4,
+        "donor_short_argmax_matches": 6,
+        "unmatched_transfers": 2,
+        "status": "negative_recovery"
+      },
+      {
+        "mode": "window4_fill1",
+        "total": 6,
+        "key_matches": 0,
+        "self_argmax_matches": 4,
+        "donor_short_argmax_matches": 6,
+        "unmatched_transfers": 2,
+        "status": "negative_recovery"
+      },
+      {
+        "mode": "window16_fill0",
+        "total": 6,
+        "key_matches": 0,
+        "self_argmax_matches": 5,
+        "donor_short_argmax_matches": 6,
+        "unmatched_transfers": 2,
+        "status": "negative_recovery"
+      },
+      {
+        "mode": "window16_fill1",
+        "total": 6,
+        "key_matches": 0,
+        "self_argmax_matches": 5,
+        "donor_short_argmax_matches": 6,
+        "unmatched_transfers": 2,
+        "status": "negative_recovery"
+      }
+    ],
+    "new_certified_coverage": false
+  },
+  "model_coverage_certificate": false,
+  "audit_source_sha256": "707f5a08c603aac716b766c0729166c4ad93258ab21952e0659e6b9838251eba"
+}

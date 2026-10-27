@@ -1,0 +1,12 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_attention_factor/certificate-evidence/capture-reproduction/check-fzckwg64"
+}

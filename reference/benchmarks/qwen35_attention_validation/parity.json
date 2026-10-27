@@ -1,0 +1,67 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "5",
+        "1241600",
+        "0",
+        "0"
+      ]
+    ],
+    "logit_bad": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "streamed_ref": [
+      [
+        "0",
+        "20956"
+      ],
+      [
+        "1",
+        "20956"
+      ],
+      [
+        "2",
+        "20956"
+      ],
+      [
+        "3",
+        "20956"
+      ],
+      [
+        "4",
+        "20956"
+      ]
+    ],
+    "argmax_bad": [],
+    "ordinary_ref": [
+      [
+        "0",
+        "20956"
+      ],
+      [
+        "1",
+        "20956"
+      ],
+      [
+        "2",
+        "20956"
+      ],
+      [
+        "3",
+        "20956"
+      ],
+      [
+        "4",
+        "20956"
+      ]
+    ],
+    "reset_bad": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_attention_validation/certificate-evidence/parity/check-l03n6rpg"
+}

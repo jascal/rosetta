@@ -1,0 +1,15 @@
+{
+  "prior_closed_sha256": "863975b09276f3afd5aae3a529c7d64d916246d716bb398603436d2adea96f96",
+  "old_site_count_report_sha256": "1186e934855e9c4363f2d9862b72f1768307adb534c11b722810e68040828542",
+  "fact_hashes": {
+    "tok": "a6b7f38f306ebf1e22cfb375b50f7a0c279c633b9a1c08e78ccaee48a82972b9",
+    "context": "8fe0ab63fc234c3821d9f305406dd6bb16c55d9595088adccc9eec1c195a8fcb"
+  },
+  "repaired_sources": {
+    "dl/qwen35_attention_qk_source_counts.dl": "70a07de14db4a22778ecda8c5c0d75a235fbfc8663b851df424ebd377812d17d",
+    "dl/qwen35_attention_qk_payload.dl": "8f1f3cdac934e53452928d6ea140af6f766e92119983ca00792ede1f45928f12",
+    "dl/qwen35_key_window_payload.dl": "6f51129e5d1653c8058fb3d1462fab5222b2098b1fe1047156397f2890042e7d"
+  },
+  "strict_site_count_certified": true,
+  "recaptured": false
+}

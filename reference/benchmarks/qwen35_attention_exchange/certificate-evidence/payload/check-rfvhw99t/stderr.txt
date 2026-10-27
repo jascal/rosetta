@@ -1,0 +1,30 @@
+Warning: Variable H only occurs once in file verify.dl at line 9
+per_layer(L,N) :- selected(L,_), N = count : { selected(L,H) }.
+----------------------------------------------------------^-----
+Warning: Variable L only occurs once in file verify.dl at line 35
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+---------------------------------------------------^-------------
+Warning: Variable P only occurs once in file verify.dl at line 35
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+-----------------------------------------------------^-----------
+Warning: Variable H only occurs once in file verify.dl at line 35
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+-------------------------------------------------------^---------
+Warning: Variable D only occurs once in file verify.dl at line 35
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+---------------------------------------------------------^-------
+Warning: Variable V only occurs once in file verify.dl at line 35
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+-----------------------------------------------------------^-----
+Warning: Variable L only occurs once in file verify.dl at line 44
+invalid() :- per_layer(L,N), N != 2.
+-----------------------^-------------
+Warning: Variable H only occurs once in file verify.dl at line 46
+ncontrol(L,N) :- per_layer(L,_), N = count : { control(L,H) }.
+---------------------------------------------------------^-----
+Warning: Variable A only occurs once in file verify.dl at line 48
+invalid() :- site(A,I,F,L,H), dimension(D), !vector(F,L,H,D,_).
+------------------^---------------------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 48
+invalid() :- site(A,I,F,L,H), dimension(D), !vector(F,L,H,D,_).
+--------------------^-------------------------------------------

@@ -1,0 +1,57 @@
+Warning: Variable L only occurs once in file verify.dl at line 14
+dose(A,N) :- run(A,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+---------------------------------------------------^-----------------------
+Warning: Variable P only occurs once in file verify.dl at line 14
+dose(A,N) :- run(A,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+-----------------------------------------------------^---------------------
+Warning: Variable H only occurs once in file verify.dl at line 14
+dose(A,N) :- run(A,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+-------------------------------------------------------^-------------------
+Warning: Variable D only occurs once in file verify.dl at line 14
+dose(A,N) :- run(A,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+---------------------------------------------------------^-----------------
+Warning: Variable A0 only occurs once in file verify.dl at line 16
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+---------------------------------------------------^---------------------------------------------------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 16
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+-----------------------------------------------------^-------------------------------------------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 16
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+-------------------------------------------------------^-----------------------------------------------------------------------
+Warning: Variable A1 only occurs once in file verify.dl at line 16
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+-------------------------------------------------------------------------------------^-----------------------------------------
+Warning: Variable A only occurs once in file verify.dl at line 16
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+-----------------------------------------------------------------------------------------------------------------------^-------
+Warning: Variable L only occurs once in file verify.dl at line 18
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+-------------------------------------------------------^-------------
+Warning: Variable P only occurs once in file verify.dl at line 18
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+---------------------------------------------------------^-----------
+Warning: Variable H only occurs once in file verify.dl at line 18
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+-----------------------------------------------------------^---------
+Warning: Variable D only occurs once in file verify.dl at line 18
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+-------------------------------------------------------------^-------
+Warning: Variable V only occurs once in file verify.dl at line 18
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+---------------------------------------------------------------^-----
+Warning: Variable A only occurs once in file verify.dl at line 23
+invalid() :- run(A,I,D,_), !expected(I,_).
+-----------------^-------------------------
+Warning: Variable D only occurs once in file verify.dl at line 23
+invalid() :- run(A,I,D,_), !expected(I,_).
+---------------------^---------------------
+Warning: Variable A only occurs once in file verify.dl at line 24
+invalid() :- run(A,I,D,_), !expected(D,_).
+-----------------^-------------------------
+Warning: Variable I only occurs once in file verify.dl at line 24
+invalid() :- run(A,I,D,_), !expected(D,_).
+-------------------^-----------------------
+Warning: Variable A only occurs once in file verify.dl at line 26
+invalid() :- run(A,I,_,"identity"), !baseline_hash(I,_).
+-----------------^---------------------------------------

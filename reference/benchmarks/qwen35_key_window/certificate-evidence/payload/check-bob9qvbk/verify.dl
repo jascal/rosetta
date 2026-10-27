@@ -1,0 +1,130 @@
+// Build-time Q/K softmax factorization; no token-only runtime claim.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl context(i:number,pairid:number,side:symbol,last:number) .input context
+.decl shape(w:number) .input shape
+.decl qvec(i:number,d:number,v:float) .input qvec
+.decl kvec(i:number,p:number,d:number,v:float) .input kvec
+.decl scale(i:number,v:float) .input scale
+.decl mask(i:number,p:number,v:float) .input mask
+.decl weight(i:number,p:number,v:float) .input weight
+.decl value(i:number,p:number,d:number,v:float) .input value
+.decl gate(i:number,d:number,v:float) .input gate
+.decl control_vector(a:number,d:number,v:float) .input control_vector
+.decl proxy_key(i:number,k:number,d:number,v:float) .input proxy_key
+.decl prior_probability(a:number,p:number,v:float) .input prior_probability
+#include "circuit.dl"
+.decl donor(i:number,d:number)
+donor(I,D) :- context(I,C,S,_), context(D,C,T,_), S != T.
+.decl source(i:number,p:number,r:symbol)
+source(I,J+1,"long") :- lc_winner(I,T), lc_source(I,J,K,T), K >= 12.
+source(I,J+1,"short") :- lc_winner(I,T), lc_source(I,J,K,U), T != U, K >= 12.
+.decl window(k:number,m:symbol)
+window(0,"full_prefix"). window(1,"window4_fill0"). window(2,"window4_fill1").
+window(3,"window16_fill0"). window(4,"window16_fill1").
+.decl run_info(a:number,target:number,from:number,k:number,side:symbol) .output run_info
+run_info(100*I+2,I,I,0,"self") :- donor(I,_).
+run_info(100*I+3,I,D,0,"donor") :- donor(I,D).
+run_info(100*I+10*K,I,I,K,"self") :- donor(I,_), window(K,_), K > 0.
+run_info(100*I+10*K+1,I,D,K,"donor") :- donor(I,D), window(K,_), K > 0.
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(100*I,I,D,"captured_self") :- donor(I,D).
+run(100*I+1,I,D,"captured_donor_short") :- donor(I,D).
+run(100*I+2,I,D,"self_full_prefix") :- donor(I,D).
+run(100*I+3,I,D,"donor_full_prefix") :- donor(I,D).
+run(A,I,D,cat(S,"_",M)) :- run_info(A,I,_,K,S), K > 0, window(K,M), donor(I,D).
+.decl dimension(d:number)
+dimension(0) :- shape(W), W > 0.
+dimension(D+1) :- dimension(D), shape(W), D+1 < W.
+.decl position(i:number,p:number)
+position(I,0) :- context(I,_,_,P), P >= 0.
+position(I,J+1) :- position(I,J), context(I,_,_,P), J+1 <= P.
+.decl mixed_key(a:number,p:number,d:number,v:float)
+// Captured replay arms never read proxy_key.
+mixed_key(100*I,P,D,V) :- donor(I,_), kvec(I,P,D,V).
+mixed_key(100*I+1,P,D,V) :- donor(I,F), source(I,P,"short"), kvec(F,P,D,V).
+mixed_key(100*I+1,P,D,V) :- donor(I,_), position(I,P), !source(I,P,"short"), kvec(I,P,D,V).
+mixed_key(A,P,D,V) :- run_info(A,I,F,K,_), source(I,P,"short"), proxy_key(F,K,D,V).
+mixed_key(A,P,D,V) :- run_info(A,I,_,_,_), position(I,P), !source(I,P,"short"), kvec(I,P,D,V).
+.decl dot_term(a:number,p:number,d:number,v:float)
+dot_term(A,P,D,Q*K) :- run(A,I,_,_), qvec(I,D,Q), mixed_key(A,P,D,K).
+.decl dot(a:number,p:number,v:float)
+dot(A,P,V) :- run(A,I,_,_), position(I,P), V = sum X : { dot_term(A,P,D,X) }.
+.decl logit(a:number,p:number,v:float)
+logit(A,P,V*S+M) :- dot(A,P,V), run(A,I,_,_), scale(I,S), mask(I,P,M).
+.decl maximum(a:number,v:float)
+maximum(A,V) :- run(A,_,_,_), V = max X : { logit(A,P,X) }.
+.decl exponential(a:number,p:number,v:float)
+exponential(A,P,2.718281828459045^(V-M)) :- logit(A,P,V), maximum(A,M).
+.decl partition(a:number,v:float)
+partition(A,V) :- run(A,_,_,_), V = sum X : { exponential(A,P,X) }.
+.decl probability(a:number,p:number,v:float) .output probability
+probability(A,P,E/Z) :- exponential(A,P,E), partition(A,Z), Z > 0.0.
+.decl activated(i:number,d:number,v:float)
+activated(I,D,1.0/(1.0+2.718281828459045^(-G))) :- gate(I,D,G), G >= 0.0.
+activated(I,D,E/(1.0+E)) :- gate(I,D,G), G < 0.0, E = 2.718281828459045^G.
+.decl value_term(a:number,d:number,p:number,v:float)
+value_term(A,D,P,W*V) :- probability(A,P,W), run(A,I,_,_), value(I,P,D,V).
+.decl ungated(a:number,d:number,v:float)
+ungated(A,D,V) :- run(A,_,_,_), dimension(D), V = sum X : { value_term(A,D,P,X) }.
+.decl patch(a:number,l:number,p:number,h:number,d:number,v:float) .output patch
+patch(A,27,P,10,D,V*G) :- run(A,I,_,_), context(I,_,_,P), ungated(A,D,V), activated(I,D,G).
+.decl checked_reference(a:number,r:number) .output checked_reference
+checked_reference(100*I,6*I) :- donor(I,_).
+checked_reference(100*I+1,6*I+5) :- donor(I,_).
+checked_reference(100*I+2,6*I) :- donor(I,_).
+checked_reference(100*I+3,6*I+5) :- donor(I,_).
+.decl expected_weight(a:number,p:number,v:float)
+expected_weight(A,P,V) :- checked_reference(A,R), prior_probability(R,P,V).
+.decl expected_vector(a:number,d:number,v:float)
+expected_vector(A,D,V) :- checked_reference(A,R), control_vector(R,D,V).
+.decl abs_weight(a:number,p:number,v:float)
+abs_weight(A,P,V) :- expected_weight(A,P,V), V >= 0.0.
+abs_weight(A,P,-V) :- expected_weight(A,P,V), V < 0.0.
+.decl abs_vector(a:number,d:number,v:float)
+abs_vector(A,D,V) :- expected_vector(A,D,V), V >= 0.0.
+abs_vector(A,D,-V) :- expected_vector(A,D,V), V < 0.0.
+.decl probability_bad(a:number,p:number) .output probability_bad
+probability_bad(A,P) :- probability(A,P,V), expected_weight(A,P,W), abs_weight(A,P,M), V-W > 0.00001+0.00001*M.
+probability_bad(A,P) :- probability(A,P,V), expected_weight(A,P,W), abs_weight(A,P,M), W-V > 0.00001+0.00001*M.
+.decl vector_bad(a:number,d:number) .output vector_bad
+vector_bad(A,D) :- patch(A,_,_,_,D,V), expected_vector(A,D,W), abs_vector(A,D,M), V-W > 0.00001+0.00001*M.
+vector_bad(A,D) :- patch(A,_,_,_,D,V), expected_vector(A,D,W), abs_vector(A,D,M), W-V > 0.00001+0.00001*M.
+.decl invalid() .output invalid
+invalid() :- !context(_,_,_,_).
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- context(I,_,_,P), lc_last(I,Q), P != Q.
+invalid() :- context(I,_,_,_), !donor(I,_).
+invalid() :- donor(I,D), context(I,_,_,P), context(D,_,_,Q), P != Q.
+invalid() :- context(I,_,_,_), !source_count(I,"long",1).
+invalid() :- context(I,_,_,_), !source_count(I,"short",1).
+invalid() :- context(I,_,_,_), dimension(D), !qvec(I,D,_).
+invalid() :- position(I,P), dimension(D), !kvec(I,P,D,_).
+invalid() :- position(I,P), dimension(D), !value(I,P,D,_).
+invalid() :- context(I,_,_,_), dimension(D), !gate(I,D,_).
+invalid() :- context(I,_,_,_), !scale(I,_).
+invalid() :- scale(_,V), V <= 0.0.
+invalid() :- position(I,P), !mask(I,P,_).
+invalid() :- position(I,P), !weight(I,P,_).
+invalid() :- donor(I,D), scale(I,V), scale(D,W), V != W.
+invalid() :- donor(I,D), mask(I,P,V), mask(D,P,W), V != W.
+invalid() :- qvec(I,D,V), qvec(I,D,W), V != W.
+invalid() :- kvec(I,P,D,V), kvec(I,P,D,W), V != W.
+invalid() :- run(A,I,_,_), dimension(D), !patch(A,_,_,_,D,_).
+invalid() :- partition(_,Z), Z <= 0.0.
+invalid() :- context(I,_,_,_), window(K,_), dimension(D), !proxy_key(I,K,D,_).
+invalid() :- proxy_key(I,K,D,V), proxy_key(I,K,D,W), V != W.
+.decl role(r:symbol)
+role("long"). role("short").
+.decl source_count(i:number,r:symbol,n:number)
+source_count(I,R,N) :- context(I,_,_,_), role(R), N = count : { source(I,P,R) }.
+// Expected coverage is a positive obligation; an empty comparison is invalid.
+invalid() :- checked_reference(A,R), run(A,I,_,_), position(I,P), !prior_probability(R,P,_).
+invalid() :- checked_reference(A,R), dimension(D), !control_vector(R,D,_).
+invalid() :- checked_reference(A,_), run(A,I,_,_), position(I,P), !probability(A,P,_).
+invalid() :- checked_reference(A,_), dimension(D), !patch(A,_,_,_,D,_).
+invalid() :- prior_probability(A,P,V), prior_probability(A,P,W), V != W.
+invalid() :- control_vector(A,D,V), control_vector(A,D,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid(), !probability_bad(_,_), !vector_bad(_,_).

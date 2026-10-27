@@ -1,0 +1,16 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl context(i:number) .input context
+#include "circuit.dl"
+.decl source(i:number,p:number,r:symbol) .output source
+source(I,J+1,"long") :- lc_winner(I,T), lc_source(I,J,K,T), K >= 12.
+source(I,J+1,"short") :- lc_winner(I,T), lc_source(I,J,K,U), T != U, K >= 12.
+.decl role(r:symbol)
+role("long"). role("short").
+.decl counts(i:number,r:symbol,n:number) .output counts
+counts(I,R,N) :- context(I), role(R), N = count : { source(I,P,R) }.
+.decl invalid() .output invalid
+invalid() :- !context(_).
+invalid() :- context(I), !counts(I,"long",1).
+invalid() :- context(I), !counts(I,"short",1).
+.decl certified() .output certified
+certified() :- context(_), !invalid().

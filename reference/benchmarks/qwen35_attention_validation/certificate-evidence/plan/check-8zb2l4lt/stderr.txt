@@ -1,0 +1,18 @@
+Warning: Variable H only occurs once in file verify.dl at line 22
+invalid() :- shape(L,H,W,P), L <= 31.
+---------------------^----------------
+Warning: Variable W only occurs once in file verify.dl at line 22
+invalid() :- shape(L,H,W,P), L <= 31.
+-----------------------^--------------
+Warning: Variable P only occurs once in file verify.dl at line 22
+invalid() :- shape(L,H,W,P), L <= 31.
+-------------------------^------------
+Warning: Variable L only occurs once in file verify.dl at line 23
+invalid() :- shape(L,H,W,P), H <= 15.
+-------------------^------------------
+Warning: Variable W only occurs once in file verify.dl at line 23
+invalid() :- shape(L,H,W,P), H <= 15.
+-----------------------^--------------
+Warning: Variable P only occurs once in file verify.dl at line 23
+invalid() :- shape(L,H,W,P), H <= 15.
+-------------------------^------------

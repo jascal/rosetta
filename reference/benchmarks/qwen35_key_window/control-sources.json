@@ -1,0 +1,38 @@
+{
+  "0": {
+    "self_prior_arm": 0,
+    "donor_prior_arm": 5,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-0.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-5.pt"
+  },
+  "1": {
+    "self_prior_arm": 6,
+    "donor_prior_arm": 11,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-1.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-11.pt"
+  },
+  "28": {
+    "self_prior_arm": 168,
+    "donor_prior_arm": 173,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-28.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-173.pt"
+  },
+  "29": {
+    "self_prior_arm": 174,
+    "donor_prior_arm": 179,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-29.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-179.pt"
+  },
+  "54": {
+    "self_prior_arm": 324,
+    "donor_prior_arm": 329,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-54.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-329.pt"
+  },
+  "55": {
+    "self_prior_arm": 330,
+    "donor_prior_arm": 335,
+    "self_file": "reference/benchmarks/qwen35_attention_qk/capture-55.pt",
+    "donor_file": "reference/benchmarks/qwen35_attention_qk/arm-335.pt"
+  }
+}

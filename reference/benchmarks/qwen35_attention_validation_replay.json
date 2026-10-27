@@ -1,0 +1,7 @@
+{
+  "closed_sha256": "625a54bda085509f0d85ea43e99ef29a4fb255dccfa8157a4bc64aacd147d7de",
+  "queries": 4,
+  "unchanged": true,
+  "scope": "attention instrument gate, not extraction success",
+  "audit_source_sha256": "d8315559d977b9735adb567b3529cfca4a73e60a398544e56a592621b0596bba"
+}

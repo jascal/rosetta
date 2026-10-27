@@ -1,0 +1,25 @@
+{
+  "query": {
+    "certified": true,
+    "relations": {
+      "invalid": [],
+      "ref": [
+        [
+          "84500"
+        ]
+      ],
+      "nscore": [
+        [
+          "248320"
+        ]
+      ],
+      "certified": [
+        [
+          "()"
+        ]
+      ]
+    }
+  },
+  "archive": "reference-6.tar.gz",
+  "sha256": "38cdbbcb9a6e4373e5ccf04133d94fe9a4246b8b82fd9b88e1f9a11153e4d582"
+}
