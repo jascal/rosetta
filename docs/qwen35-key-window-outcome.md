@@ -52,3 +52,9 @@ Artifacts:
 The outcome query's `certified` bit checks table completeness only. It is not a
 model-equivalence certificate. Negative key-match reports retain their false
 bits and complete expected relations.
+
+For model-free replay, run `python3 py/audit_qwen35_key_window.py`. The historical
+Q/K auditor (`python3 py/audit_qwen35_attention_qk.py`) recognizes the exact
+checker repair pinned by this study's receipt; it still checks the original
+frozen files and replays their original verifier snapshots. It rejects other
+source changes and does not replace the historical payload with a fresh result.
