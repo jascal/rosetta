@@ -1,0 +1,28 @@
+// Compile complete context-free observations to a discrete finite lexical relation.
+.decl query(q:number) .input query
+.decl target(t:number) .input target
+.decl maximum(q:number,m:float) .input maximum
+.decl score(q:number,t:number,s:float) .input score
+.decl invalid() .output invalid
+invalid() :- !query(_).
+invalid() :- !target(_).
+invalid() :- query(Q), !maximum(Q,_).
+invalid() :- maximum(Q,_), !query(Q).
+invalid() :- maximum(Q,M), maximum(Q,N), M != N.
+invalid() :- score(Q,T,_), !query(Q).
+invalid() :- score(Q,T,_), !target(T).
+invalid() :- score(Q,T,S), score(Q,T,R), S != R.
+invalid() :- score(Q,_,S), maximum(Q,M), S > M.
+.decl ntarget(n:number)
+ntarget(N) :- N = count : { target(_) }.
+.decl nscore(q:number,n:number)
+nscore(Q,N) :- query(Q), N = count : { score(Q,_,_) }.
+invalid() :- nscore(_,N), ntarget(M), N != M.
+.decl prior_band(q:number,t:number,b:number) .output prior_band
+prior_band(Q,T,B) :- score(Q,T,S), maximum(Q,M), M-S >= 0.0, M-S < 63.0, B = to_number(M-S).
+prior_band(Q,T,63) :- score(Q,T,S), maximum(Q,M), M-S >= 63.0.
+.decl nband(n:number) .output nband
+nband(N) :- N = count : { prior_band(_,_,_) }.
+.decl certified() .output certified
+// Observation/transform integrity, not a model-equivalence certificate.
+certified() :- !invalid().

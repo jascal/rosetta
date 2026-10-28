@@ -1,0 +1,14 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "logit_changed": [],
+    "changed": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_mechanism/certificate-evidence/preflight/check-rxzsltk0"
+}

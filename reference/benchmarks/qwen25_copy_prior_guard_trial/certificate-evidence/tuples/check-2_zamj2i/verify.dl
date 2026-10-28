@@ -1,0 +1,51 @@
+// Construct guard-relevant input types before observing full-context answers.
+.decl planned_group(g:symbol) .input planned_group
+.decl q_candidate(g:symbol,q:number,r:number) .input q_candidate
+.decl t_candidate(g:symbol,t:number,r:number) .input t_candidate
+.decl d_candidate(g:symbol,t:number,r:number) .input d_candidate
+.decl raw_prior(q:number,t:number,b:number) .input raw_prior
+.decl eligible(g:symbol,k:number,q:number,t:number,u:number,d:number)
+eligible(G,K,Q,T,U,D) :- q_candidate(G,Q,QR), t_candidate(G,T,TR), t_candidate(G,U,UR),
+    TR < UR, d_candidate(G,D,DR), raw_prior(Q,T,B), raw_prior(Q,U,C), raw_prior(Q,D,E),
+    B < E, C < E, K = ((QR*12+TR)*12+UR)*6+DR.
+.decl best(g:symbol,k:number)
+best(G,K) :- planned_group(G), eligible(G,_,_,_,_,_), K = min N : { eligible(G,N,_,_,_,_) }.
+.decl chosen(g:symbol,q:number,t:number,u:number,d:number) .output chosen
+chosen(G,Q,T,U,D) :- best(G,K), eligible(G,K,Q,T,U,D).
+.decl missing(g:symbol,q:number,t:number) .output missing
+missing(G,Q,T) :- q_candidate(G,Q,_), t_candidate(G,T,_), !raw_prior(Q,T,_).
+missing(G,Q,T) :- q_candidate(G,Q,_), d_candidate(G,T,_), !raw_prior(Q,T,_).
+.decl invalid() .output invalid
+invalid() :- !planned_group(_).
+invalid() :- q_candidate(G,_,_), !planned_group(G).
+invalid() :- t_candidate(G,_,_), !planned_group(G).
+invalid() :- d_candidate(G,_,_), !planned_group(G).
+invalid() :- q_candidate(_,_,R), R < 0.
+invalid() :- q_candidate(_,_,R), R >= 6.
+invalid() :- t_candidate(_,_,R), R < 0.
+invalid() :- t_candidate(_,_,R), R >= 12.
+invalid() :- d_candidate(_,_,R), R < 0.
+invalid() :- d_candidate(_,_,R), R >= 6.
+invalid() :- raw_prior(Q,T,B), raw_prior(Q,T,C), B != C.
+invalid() :- planned_group(G), !chosen(G,_,_,_,_).
+.decl nq(g:symbol,n:number)
+nq(G,N) :- planned_group(G), N = count : { q_candidate(G,_,_) }.
+.decl nt(g:symbol,n:number)
+nt(G,N) :- planned_group(G), N = count : { t_candidate(G,_,_) }.
+.decl nd(g:symbol,n:number)
+nd(G,N) :- planned_group(G), N = count : { d_candidate(G,_,_) }.
+invalid() :- nq(_,N), N != 6.
+invalid() :- nt(_,N), N != 12.
+invalid() :- nd(_,N), N != 6.
+invalid() :- q_candidate(G,Q,R), q_candidate(G,Q,S), R != S.
+invalid() :- t_candidate(G,T,R), t_candidate(G,T,S), R != S.
+invalid() :- d_candidate(G,T,R), d_candidate(G,T,S), R != S.
+invalid() :- q_candidate(G,Q,R), q_candidate(G,P,R), Q != P.
+invalid() :- t_candidate(G,T,R), t_candidate(G,U,R), T != U.
+invalid() :- d_candidate(G,T,R), d_candidate(G,U,R), T != U.
+invalid() :- q_candidate(G,Q,_), q_candidate(H,Q,_), G != H.
+invalid() :- t_candidate(G,T,_), t_candidate(H,T,_), G != H.
+invalid() :- d_candidate(G,T,_), d_candidate(H,T,_), G != H.
+.decl certified() .output certified
+// Construction completeness only; this does not certify the candidate's answer.
+certified() :- !invalid(), !missing(_,_,_).

@@ -1,0 +1,12 @@
+Warning: Variable B only occurs once in file verify.dl at line 31
+invalid() :- pair(A,B,G), !sample(A,G,_).
+--------------------^---------------------
+Warning: Variable A only occurs once in file verify.dl at line 32
+invalid() :- pair(A,B,G), !sample(B,G,_).
+------------------^-----------------------
+Warning: Variable B only occurs once in file verify.dl at line 33
+invalid() :- edit(A,B,P), sample(A,_,S), P >= S.
+--------------------^----------------------------
+Warning: Variable B only occurs once in file verify.dl at line 34
+invalid() :- edit(A,B,P), !lc_source(A,P-1,_,_).
+--------------------^----------------------------

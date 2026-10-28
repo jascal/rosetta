@@ -1,0 +1,57 @@
+{
+  "scope": "133 historical-case discovery interventions; no final-test circuit",
+  "files": {
+    "dataset.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9",
+    "instrument.json": "ca11920d20ef55dfc0fd6431532b72fe90710dc77f2e38b58fd1c4b29a1b9845",
+    "plan.json": "ed18b2ecd20da6e57345366a5fd0466454a933b5e0fe43826a801ff705f06d9e",
+    "instrument.patch": "257546942a61ca5d80eaa74ffb4fe006bac19c88d9ebf14c65b2dc9e5703dcca",
+    "rankings.json": "f2b7afe38d1964eea004f0ea984df914f585873261a8f24e09e1b661df9d26cb",
+    "certificate-evidence/plan/check-_9hu_cqs/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-_9hu_cqs/verify.dl": "bbde64fce7fda78d6d641241bb9ec0f2b235caaaf9a5f691d9944b7ac4ca05cc",
+    "certificate-evidence/plan/check-_9hu_cqs/circuit.dl": "bbde64fce7fda78d6d641241bb9ec0f2b235caaaf9a5f691d9944b7ac4ca05cc",
+    "certificate-evidence/plan/check-_9hu_cqs/certificate.json": "651ae0aba79d52543ffccb9bc9913a1ce02cf444c4e792267edd9bd0c7951b49",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/control.csv": "da7ce50db7238f0cb9100d88d0da8c38dc2b8b3a93a9a19106c031b44009e577",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/arm.csv": "a3e7681b6d0c82f8f8e857e7b35f2bdb7177c8bb6a97fe10e7ceeb37f86418cb",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/member.csv": "b75dd3db141de5033fb405ceb21f867708dc5718e0ba04c32cf5c9282fe49543",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/request.csv": "0a1b67810de92282b32a35e59d2d9279aaa465084750b90a343bf992950d44a7",
+    "certificate-evidence/plan/check-_9hu_cqs/outputs/chosen_control.csv": "43aa5790496c6c94b74ec3f8e8e563aa60ae1f4620dc92d5fdfe7af11049bf62",
+    "certificate-evidence/plan/check-_9hu_cqs/facts/ranked.facts": "b3457f96b60a99dc8caed677264b848b21296b0d1f4c875b53a749d94aa03e56",
+    "certificate-evidence/plan/check-_9hu_cqs/facts/row.facts": "17aaf84553f7dc08ac86f84b61748b937f81efb589339d1d9fd405639020d6a6"
+  },
+  "sources": {
+    "py/run_copy_heads.py": "077255fe66067fcb1e53cd643d709f6829368a22641ebf07358c3affeaf6099f",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_head_plan.dl": "bbde64fce7fda78d6d641241bb9ec0f2b235caaaf9a5f691d9944b7ac4ca05cc",
+    "dl/copy_head_summary.dl": "88b61d7f34733a335170b7f3182d7735a489a2994d26630398e124c6cb27f165",
+    "docs/copy-head-ablation-plan.md": "fac621876e5cb3d3e9be9d807893b6b2032dd96609d740856f86fd1b4eccd524"
+  },
+  "historical": {
+    "reference/benchmarks/qwen25_copy_source_diagnosis/selected.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9",
+    "reference/benchmarks/qwen25_copy_source_diagnosis/frozen.json": "5aea19536c478cc81eca6adb1c1717b6d5a402a7eb033b3d107d7705cb0a8cf4",
+    "reference/benchmarks/qwen25_copy_source_diagnosis/closed.json": "e294fc0be27ccf44a53d631c639c6506060fae54467f466a72ae46d67826256c",
+    "reference/benchmarks/qwen25_copy_longest/observations.jsonl": "e598b74374dcabcbe91f8c7ea96fd32186c4ae9d1d85c1ba60b678b0151a93a8"
+  },
+  "binary_sha256": "19b329ffccfb5501e4bcd016902805b12fd98651b55df8ec37d9c9c6cf97f9f0",
+  "bundle_sha256": {
+    ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+    ".fieldrun.json": "e7e01b0efe95521e905142bcb936e1688e60783a3e6f6a3043c2c30bb96a72c0"
+  },
+  "checkpoint": "/home/allans/.cache/huggingface/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+  "checkpoint_sha256": {
+    "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+    "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+  },
+  "reference": {
+    "precision": "float32",
+    "attention": "eager",
+    "threads": 2
+  },
+  "seed": 503
+}

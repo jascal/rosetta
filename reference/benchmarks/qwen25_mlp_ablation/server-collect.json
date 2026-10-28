@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/tmp/rosetta-native-qwen-f32/fieldrun-0948cbe",
+    "--bundle",
+    "/tmp/rosetta-native-qwen-f32/model",
+    "--serve",
+    "8394"
+  ],
+  "pid": 1204714,
+  "model_sha256": "f8831110ce342360ccb0242e58f47654c888b508096479e64b6efec69a6205b5"
+}

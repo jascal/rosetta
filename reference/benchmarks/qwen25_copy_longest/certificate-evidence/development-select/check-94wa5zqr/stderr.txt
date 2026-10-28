@@ -1,0 +1,21 @@
+Warning: Variable I only occurs once in file verify.dl at line 13
+invalid() :- sample(I,S,_), !required(S).
+--------------------^---------------------
+Warning: Variable G only occurs once in file verify.dl at line 15
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+------------------------^--------------------------
+Warning: Variable H only occurs once in file verify.dl at line 15
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+---------------------------------------^-----------
+Warning: Variable S only occurs once in file verify.dl at line 16
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+----------------------^----------------------------
+Warning: Variable T only occurs once in file verify.dl at line 16
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+-------------------------------------^-------------
+Warning: Variable B only occurs once in file verify.dl at line 24
+invalid() :- pair(A,B,G), !sample(A,_,G).
+--------------------^---------------------
+Warning: Variable A only occurs once in file verify.dl at line 25
+invalid() :- pair(A,B,G), !sample(B,_,G).
+------------------^-----------------------

@@ -1,0 +1,121 @@
+{
+  "scope": "fresh development, shared intrinsic lexicon frozen before these contexts",
+  "seeds": [
+    911,
+    912
+  ],
+  "groups_per_length": 3,
+  "options": [
+    [
+      1,
+      16,
+      2
+    ],
+    [
+      2,
+      16,
+      3
+    ],
+    [
+      3,
+      24,
+      2
+    ],
+    [
+      4,
+      24,
+      3
+    ],
+    [
+      5,
+      32,
+      2
+    ],
+    [
+      6,
+      32,
+      3
+    ]
+  ],
+  "disjoint": {
+    "train": {
+      "tokens": 1359,
+      "groups": 18,
+      "rows": 306
+    },
+    "validation": {
+      "tokens": 1359,
+      "groups": 18,
+      "rows": 306
+    }
+  },
+  "files": {
+    "pairs.json": "2256ee505ddc70edca792fc6c421c102e21cce36b2653e08b74151ddfbe85ac6",
+    "development-domains.json": "5c57c6716e40faa842d0a21825dc9c77c5700fc7b0b7e9760eb1da092bcd6fe8",
+    "specialization.json": "857765ea186e8bfc41bc1e1c4e165da030be5fae584fa3a842e1a30199bedd8a",
+    "library.dl": "189e62a876e6723622b1b4c64305b9dfc65a2b9e8a3082d08823954dd28bb3e4",
+    "specialization-core.dl": "06c890bb24114eb100d07715caa83f057bd70ac225aee728c19d61389c7c8c4a",
+    "baseline.dl": "84947f2cbb4226c5acf24f56e7e4d26170f85ed904a682a9e833100cb9e239c7",
+    "dataset.json": "d571ff25d90bf45edfad820c93208ea8d6e3fe6ee9830beb8e39b8c59944bdd3",
+    "used-roles.json": "e9df48f596bf02ad8925fc32a3174ff2112943046bad7738d6e9931bd84005d3",
+    "excluded-tokens.json": "9450e0ae2c6777e367a5e4eb9fd1b80e6618cd7d655685a5b399c74a54a84c13",
+    "lexical.dl": "c3e8f74da638e3c09479b7101057b8fab308d10b9b6f69d545f1ea2890b9d68f",
+    "certificate-evidence/specialization/check-8uv6zji8/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/specialization/check-8uv6zji8/verify.dl": "a90ab9718cfe8ab77d057c7ad8d38b1f6e7a12d25ebcbab6a16bb472eb2e7cc8",
+    "certificate-evidence/specialization/check-8uv6zji8/circuit.dl": "06c890bb24114eb100d07715caa83f057bd70ac225aee728c19d61389c7c8c4a",
+    "certificate-evidence/specialization/check-8uv6zji8/certificate.json": "af9ec746b10c33e7284642361226ecbb68f305caa977d05ff6e874d347923166",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/need_target.csv": "3a7ec2cfb13a7027362d7d5c03ad6827f4cf19645506de04586704d4f30eea8e",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/selected_prior.csv": "b81de9367d43d2faaa2a9cb9038778337a5b5a0c5cd148743fd7de3e32c0512f",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/missing.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/nselected.csv": "6769ca79aec531036ceb25fa229ca5246a83830604d7bbf6991d2232eb6d5348",
+    "certificate-evidence/specialization/check-8uv6zji8/outputs/need_query.csv": "bf018b3de5f8496816c8ad56dbdd85d06fc7b96422cd50245217bb2377c7f8c8",
+    "certificate-evidence/specialization/check-8uv6zji8/facts/raw_prior.facts": "98241b24e7dd4c81b5c451eae553d5bfc5057a22abd506924761d2c45a95b5df",
+    "certificate-evidence/specialization/check-8uv6zji8/facts/domain.facts": "904f64f19833266a205995d1b6d820281fa00598904e57c130b3cf1035cfcd46",
+    "certificate-evidence/specialization/check-8uv6zji8/facts/tok.facts": "2b3f2783e7e9e5d66733005a81ce57fba7920640ee40ad4e2b1af223cd95fd68",
+    "certificate-evidence/development-domains/check-wl_op74t/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/development-domains/check-wl_op74t/verify.dl": "04e4c17e5b9ef26c9981ed3af188d4c7a43d50518245f3dba367304425a1ef7d",
+    "certificate-evidence/development-domains/check-wl_op74t/circuit.dl": "189e62a876e6723622b1b4c64305b9dfc65a2b9e8a3082d08823954dd28bb3e4",
+    "certificate-evidence/development-domains/check-wl_op74t/certificate.json": "2be6ae1d5689698dffe0a8dd7ee215604095f99c61f7bea2b39c44930c4ea6b8",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/counts.csv": "dc254a463baf1ea4f0764091408a93a9539b4695c5ae2a31e1b13f387a09c8e4",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/firing.csv": "cfce27243898217b0bab746588dd5f24338182595449afba7601597a2b571052",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/overlap.csv": "6498619df49e0f3a347ed0c327d354380f9a5996eb11a0928b11a5197678c46b",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/baseline.csv": "20c52356440ef595b6017172e0c4dcda2c93cb82f501218b7e02cabea462a931",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/conflict.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/development-domains/check-wl_op74t/outputs/incremental.csv": "b6c70f047bfc9dc154f23b2604ece9019937b10591e8ce670ccb929360dd3212",
+    "certificate-evidence/development-domains/check-wl_op74t/facts/sample.facts": "12f1f97a26c2f50e77b9fa6011f6cdaac77dc37cee11792dfc87f37aba9348df",
+    "certificate-evidence/development-domains/check-wl_op74t/facts/tok.facts": "2b3f2783e7e9e5d66733005a81ce57fba7920640ee40ad4e2b1af223cd95fd68"
+  },
+  "sources": {
+    "py/run_copy_prior_guard.py": "fe5c10a7725861397d5c6b3f644908f15b701a94f8c0f3dfbf6e5a7ef00b5c83",
+    "py/run_copy_prefix.py": "be1f028837140d63b878c7ffe0d67a4adbb20a48f9aecb6ce072bcc7e20c22be",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_longest_runtime.dl": "e43771e1e6d07af97cec586d63a51e28484d5e7ea0d49a97def4557d99261e1b",
+    "dl/copy_long_consensus_runtime.dl": "e0e6b90d06bc334e9d05cec3bc6097aff7617ac779bd72c7e1afbee385a07d70",
+    "dl/copy_prior_guard_runtime.dl": "008efe489080195b4ef8779cca16292fcc73b8e15210ee902dd39658fefcfc8d",
+    "dl/copy_prior_guard_select.dl": "4ef00a7662a14e9b442d2a6e29f7747b12920e957d9048cd0741ea7b5c29b5bc",
+    "dl/copy_prior_guard_domains.dl": "04e4c17e5b9ef26c9981ed3af188d4c7a43d50518245f3dba367304425a1ef7d",
+    "dl/copy_prior_specialize.dl": "a90ab9718cfe8ab77d057c7ad8d38b1f6e7a12d25ebcbab6a16bb472eb2e7cc8",
+    "docs/copy-prior-guard-plan.md": "1308ec3308e778a0afa697aba33730d3f11dc2ab0c586c800a0567357931c2b6",
+    "docs/copy-prior-guard-specialization.md": "1ea8be87f34fb63d8f3b853641b6d3948c0fa246213afe7c21b43315a47f9faa"
+  },
+  "exclusions": {
+    "reference/benchmarks/qwen25_copy_prior_lexicon/feature.json": "37c18bb71ca427f31597d5d478bd577e56b83be33be6a070c85c4cadefb488e4",
+    "reference/benchmarks/qwen25_copy_prior_lexicon/pools.json": "1197d24990a51c23a531e0c507155517e954ffca38f78e942567f6fb3f05d277",
+    "reference/benchmarks/qwen25_copy_prior_lexicon/prior-bands.facts": "98241b24e7dd4c81b5c451eae553d5bfc5057a22abd506924761d2c45a95b5df"
+  },
+  "baseline_sha256": "84947f2cbb4226c5acf24f56e7e4d26170f85ed904a682a9e833100cb9e239c7",
+  "pinned_model": {
+    "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+    "bundle_sha256": {
+      ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+      ".fieldrun.json": "5c013a3a24ef13276d3c4d3fbd0a9007525bf4e9d720608b8db0176a391aaa12"
+    },
+    "preflight_report_sha256": "6d313afd02660343b805767919e6135630ed51e8acfe81bf115162bdabde3150",
+    "reference_sha256": "e58ed6ead6c36fe29cef72d424e274485f4a6ba4fff4c93e56829c45cada3b9c"
+  }
+}

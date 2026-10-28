@@ -1,0 +1,35 @@
+// Frozen, reference-free domains for the selected candidate and composite.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl domain(i:number) .input domain
+.decl seed(i:number,s:number) .input seed
+#include "circuit.dl"
+.decl candidate_domain(i:number) .output candidate_domain
+candidate_domain(I) :- domain(I), ls_prediction(_,I,_).
+.decl baseline_domain(i:number) .output baseline_domain
+baseline_domain(I) :- domain(I), bdecide(I,_).
+.decl composite_domain(i:number) .output composite_domain
+composite_domain(I) :- domain(I), cdecide(I,_).
+.decl incremental_domain(i:number) .output incremental_domain
+incremental_domain(I) :- candidate_domain(I), !baseline_domain(I).
+.decl candidate_prediction(i:number,t:number) .output candidate_prediction
+candidate_prediction(I,T) :- domain(I), ls_prediction(_,I,T).
+.decl composite_prediction(i:number,t:number) .output composite_prediction
+composite_prediction(I,T) :- domain(I), cdecide(I,T).
+.decl candidate_abstain(i:number) .output candidate_abstain
+candidate_abstain(I) :- domain(I), !candidate_domain(I).
+.decl composite_abstain(i:number) .output composite_abstain
+composite_abstain(I) :- domain(I), !composite_domain(I).
+.decl conflict(i:number,candidate:number,baseline:number) .output conflict
+conflict(I,T,U) :- candidate_prediction(I,T), bdecide(I,U), T != U.
+.decl seed_incremental(s:number,n:number) .output seed_incremental
+seed_incremental(S,N) :- seed(_,S), N = count : { seed(I,S), incremental_domain(I) }.
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- tok(I,_,_), !domain(I).
+invalid() :- domain(I), !tok(I,_,_).
+invalid() :- domain(I), !seed(I,_).
+invalid() :- candidate_prediction(I,T), candidate_prediction(I,U), T != U.
+invalid() :- composite_prediction(I,T), composite_prediction(I,U), T != U.
+.decl certified() .output certified
+// Domain integrity only. Equivalence is a separate ref-dependent query.
+certified() :- !invalid(), candidate_domain(_), composite_domain(_), incremental_domain(_).

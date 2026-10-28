@@ -1,0 +1,36 @@
+Warning: Variable W only occurs once in file verify.dl at line 26
+invalid() :- shape(L,W,P), shape(M,V,Q), L != M.
+---------------------^---------------------------
+Warning: Variable P only occurs once in file verify.dl at line 26
+invalid() :- shape(L,W,P), shape(M,V,Q), L != M.
+-----------------------^-------------------------
+Warning: Variable V only occurs once in file verify.dl at line 26
+invalid() :- shape(L,W,P), shape(M,V,Q), L != M.
+-----------------------------------^-------------
+Warning: Variable Q only occurs once in file verify.dl at line 26
+invalid() :- shape(L,W,P), shape(M,V,Q), L != M.
+-------------------------------------^-----------
+Warning: Variable L only occurs once in file verify.dl at line 27
+invalid() :- shape(L,W,P), shape(M,V,Q), W != V.
+-------------------^-----------------------------
+Warning: Variable P only occurs once in file verify.dl at line 27
+invalid() :- shape(L,W,P), shape(M,V,Q), W != V.
+-----------------------^-------------------------
+Warning: Variable M only occurs once in file verify.dl at line 27
+invalid() :- shape(L,W,P), shape(M,V,Q), W != V.
+---------------------------------^---------------
+Warning: Variable Q only occurs once in file verify.dl at line 27
+invalid() :- shape(L,W,P), shape(M,V,Q), W != V.
+-------------------------------------^-----------
+Warning: Variable L only occurs once in file verify.dl at line 28
+invalid() :- shape(L,W,P), shape(M,V,Q), P != Q.
+-------------------^-----------------------------
+Warning: Variable W only occurs once in file verify.dl at line 28
+invalid() :- shape(L,W,P), shape(M,V,Q), P != Q.
+---------------------^---------------------------
+Warning: Variable M only occurs once in file verify.dl at line 28
+invalid() :- shape(L,W,P), shape(M,V,Q), P != Q.
+---------------------------------^---------------
+Warning: Variable V only occurs once in file verify.dl at line 28
+invalid() :- shape(L,W,P), shape(M,V,Q), P != Q.
+-----------------------------------^-------------

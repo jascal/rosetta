@@ -1,0 +1,43 @@
+{
+  "scope": "historical source diagnostic, not confirmation",
+  "files": {
+    "selected.json": "746f3a595f5b084dda11e58f176f545ebb74bebd583b83f7a8d313fe0b3abee9",
+    "classification.json": "b2e9c7a43eb45dac58a5d89b86eccdf44dbd2dbed9a76295374c72efa34a01a8",
+    "certificate-evidence/classification/check-86vfqpwn/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/classification/check-86vfqpwn/verify.dl": "ef0624976adfdb034944e4fd587ddb901f07be3a672a29fd1eb2351e55740e13",
+    "certificate-evidence/classification/check-86vfqpwn/circuit.dl": "89e8f234e7c86cf54090b4306ec62ac2e269fc671d2b85dc337d2cd84e603de3",
+    "certificate-evidence/classification/check-86vfqpwn/certificate.json": "be005a41bcfe1f6dfd8967a1573e6cb86f9afe68ac29935653172adef20e9f10",
+    "certificate-evidence/classification/check-86vfqpwn/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/classification/check-86vfqpwn/outputs/counts.csv": "6994ebf0e03538bcc30b8c2c07ceaf295157cb4800201cf4bb0c966b4f9249d6",
+    "certificate-evidence/classification/check-86vfqpwn/outputs/selected_case.csv": "c2dc35800886124226146232573f02db92f68ac84d09b5ac405a56f3733d9eda",
+    "certificate-evidence/classification/check-86vfqpwn/outputs/class.csv": "3a9efa7d558b7086b95fce0410367e814b58cea915ee4b0b3f2d3d97d1e1d6aa",
+    "certificate-evidence/classification/check-86vfqpwn/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/classification/check-86vfqpwn/facts/sample.facts": "f31eacb411f1a13678d8fbbc3af4373b89eec7d9bc618cfb75777f922401bce3",
+    "certificate-evidence/classification/check-86vfqpwn/facts/tok.facts": "f3915e7b78dd6de02821736a84626408286cf7ffaa7c875cb6e720aaff4c8e57",
+    "certificate-evidence/classification/check-86vfqpwn/facts/ref.facts": "d267b6441c64b2a6e4449b79025f0f6dce7e34087b01dac7bf3561cb815ff193"
+  },
+  "sources": {
+    "py/observe_copy_source.py": "1bc53426c03eca3416730782adbb63901298e1b9a2cf0333fd6d31a38731413b",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/run_copy_prefix.py": "be1f028837140d63b878c7ffe0d67a4adbb20a48f9aecb6ce072bcc7e20c22be",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_source_diagnosis.dl": "ef0624976adfdb034944e4fd587ddb901f07be3a672a29fd1eb2351e55740e13",
+    "dl/copy_source_explanation.dl": "dc78b34e64ed78cfaa7f134dd5890fc785728db26708023234c36711a2af5b0f",
+    "docs/copy-source-diagnosis-plan.md": "4bf4d87e334db8c5f944713e43a5fa2b19a798f5301021bf69ed4411ec4024b0"
+  },
+  "historical": {
+    "reference/benchmarks/qwen25_copy_longest/dataset.json": "13cb3e089e928001e73e841b437bac3464f198d9ebd3cdf77f1460ceac72b7f3",
+    "reference/benchmarks/qwen25_copy_longest/observations.jsonl": "e598b74374dcabcbe91f8c7ea96fd32186c4ae9d1d85c1ba60b678b0151a93a8",
+    "reference/benchmarks/qwen25_copy_longest/library.dl": "89e8f234e7c86cf54090b4306ec62ac2e269fc671d2b85dc337d2cd84e603de3",
+    "reference/benchmarks/qwen25_copy_longest/closed.json": "c7531e1a6deabb6f57a9ce79f2048c98fd97265c30dacfb3283790a2c10b6940"
+  },
+  "pinned_model": {
+    "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+    "bundle_sha256": {
+      ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+      ".fieldrun.json": "5c013a3a24ef13276d3c4d3fbd0a9007525bf4e9d720608b8db0176a391aaa12"
+    },
+    "preflight_report_sha256": "6d313afd02660343b805767919e6135630ed51e8acfe81bf115162bdabde3150",
+    "reference_sha256": "e58ed6ead6c36fe29cef72d424e274485f4a6ba4fff4c93e56829c45cada3b9c"
+  }
+}

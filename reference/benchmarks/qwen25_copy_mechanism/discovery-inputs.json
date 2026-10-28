@@ -1,0 +1,10 @@
+{
+  "status": "discovery only; not a final artifact freeze",
+  "sha256": {
+    "reference/benchmarks/qwen25_native_trace_c/dataset.json": "1b54ab66f056295a87a8cd4e11a0c81ba47206043ac3db5696ac33ed675f6b44",
+    "reference/benchmarks/qwen25_native_trace_c/references.json": "8c5e4d64a7f12ad27100f39f6201c7d7c2b6d88434ee4e5e189ef761ab51a10e",
+    "reference/benchmarks/qwen25_native_trace_b/artifacts/behavior/circuits.dl": "84947f2cbb4226c5acf24f56e7e4d26170f85ed904a682a9e833100cb9e239c7",
+    "dl/copy_mechanism_donors.dl": "bf668169d394413b354799dbc04440ba05679762f3b1554ded303536d9c8ae8e",
+    "docs/copy-mechanism-plan.md": "7307ae372414889e173af3b3d56c7ba71d4d7d13eda6082ae27052d9f3521809"
+  }
+}

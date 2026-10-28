@@ -1,0 +1,42 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,g:symbol,length:number,short:number,order:symbol,gold:number) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl pair(a:number,b:number) .input pair
+.decl edit(a:number,b:number,p:number) .input edit
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_,_,_,_).
+invalid() :- sample(I,_,_,_,_,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- ref(I,_), !sample(I,_,_,_,_,_).
+.decl changed(a:number,b:number,p:number)
+changed(A,B,P) :- pair(A,B), tok(A,P,T), tok(B,P,U), T != U.
+invalid() :- changed(A,B,P), !edit(A,B,P).
+invalid() :- edit(A,B,P), !changed(A,B,P).
+invalid() :- pair(A,B), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B), tok(B,P,_), !tok(A,P,_).
+.decl prediction(c:number,i:number,t:number) .output prediction
+prediction(C,I,T) :- lc_prediction(C,I,T).
+.decl mismatch(c:number,i:number,pred:number,actual:number) .output mismatch
+mismatch(C,I,T,R) :- lc_prediction(C,I,T), ref(I,R), T != R.
+.decl incremental(c:number,i:number) .output incremental
+incremental(C,I) :- lc_prediction(C,I,_), !bdecide(I,_).
+.decl overlap(c:number,i:number) .output overlap
+overlap(C,I) :- lc_prediction(C,I,_), bdecide(I,_).
+.decl causal(c:number,a:number,b:number) .output causal
+causal(C,A,B) :- pair(A,B), lc_prediction(C,A,T), lc_prediction(C,B,U), T != U, ref(A,T), ref(B,U).
+.decl score(c:number,length:number,short:number,order:symbol,covered:number,wrong:number,incremental:number) .output score
+score(C,L,S,O,N,W,D) :- lc_option(C,_,_), sample(_,_,L,S,O,_),
+    N = count : { sample(I,_,L,S,O,_), lc_prediction(C,I,_) },
+    W = count : { sample(I,_,L,S,O,_), mismatch(C,I,_,_) },
+    D = count : { sample(I,_,L,S,O,_), incremental(C,I) }.
+.decl model_score(length:number,short:number,order:symbol,n:number,gold:number,recent:number,baseline:number,baseline_wrong:number) .output model_score
+model_score(L,S,O,N,G,R,B,W) :- sample(_,_,L,S,O,_),
+    N = count : { sample(_,_,L,S,O,_) },
+    G = count : { sample(I,_,L,S,O,T), ref(I,T) },
+    R = count : { sample(I,_,L,S,O,_), lc_recent(I,T), ref(I,T) },
+    B = count : { sample(I,_,L,S,O,_), bdecide(I,_) },
+    W = count : { sample(I,_,L,S,O,_), bdecide(I,T), ref(I,U), T != U }.
+.decl certified() .output certified
+// Integrity only, not a model-equivalence certificate.
+certified() :- !invalid().

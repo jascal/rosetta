@@ -1,0 +1,26 @@
+// OPEN: discovery hypothesis, rejected; not a faithful replacement.
+.decl ap_option(c:number,k:number,min_sources:number)
+ap_option(4,12,3).
+// Token-only bounded-Hamming suffix alignment. Includer supplies ap_option(c,k,min_sources).
+.decl ap_last(i:number,p:number)
+ap_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl ap_state(i:number,j:number,k:number,errors:number)
+ap_state(I,J,1,0) :- ap_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+ap_state(I,J,1,1) :- ap_last(I,P), tok(I,P,T), tok(I,J,U), T != U, J < P.
+ap_state(I,J,K+1,E) :- ap_state(I,J,K,E), K < 12, ap_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,T).
+ap_state(I,J,K+1,E+1) :- ap_state(I,J,K,E), K < 12, E < 1, ap_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,U), T != U.
+.decl ap_source(c:number,i:number,j:number,t:number)
+ap_source(C,I,J,T) :- ap_option(C,K,_), ap_state(I,J,K,1), ap_last(I,P),
+    J+1 < P-K+1, tok(I,J+1,T).
+.decl ap_conflict(c:number,i:number)
+ap_conflict(C,I) :- ap_source(C,I,_,T), ap_source(C,I,_,U), T != U.
+.decl ap_support(c:number,i:number,n:number)
+ap_support(C,I,N) :- ap_source(C,I,_,_), N = count : { ap_source(C,I,_,_) }.
+.decl ap_prediction(c:number,i:number,t:number)
+ap_prediction(C,I,T) :- ap_option(C,_,M), ap_source(C,I,_,T), ap_support(C,I,N),
+    N >= M, !ap_conflict(C,I).
+
+.decl cdecide(i:number,t:number)
+cdecide(I,T) :- ap_prediction(_,I,T).

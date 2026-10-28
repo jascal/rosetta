@@ -1,0 +1,26 @@
+#include "circuit.dl"
+.decl previous(i:number,a:symbol,m:symbol,d:number,t:number,r:float,g:float) .input previous
+.decl repeated_bad(i:number,a:symbol,m:symbol) .output repeated_bad
+repeated_bad(I,A,M) :- previous(I,A,M,D,T,_,_), result(I,A,M,D,U,_,_,_), T != U.
+.decl previous_abs(i:number,a:symbol,m:symbol,r:float,g:float)
+previous_abs(I,A,M,R,G) :- previous(I,A,M,_,_,R,G), R >= 0.0, G >= 0.0.
+previous_abs(I,A,M,-R,G) :- previous(I,A,M,_,_,R,G), R < 0.0, G >= 0.0.
+previous_abs(I,A,M,R,-G) :- previous(I,A,M,_,_,R,G), R >= 0.0, G < 0.0.
+previous_abs(I,A,M,-R,-G) :- previous(I,A,M,_,_,R,G), R < 0.0, G < 0.0.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,Y,_), result(I,A,M,D,_,X,_,_), previous_abs(I,A,M,Z,_), X-Y > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,Y,_), result(I,A,M,D,_,X,_,_), previous_abs(I,A,M,Z,_), Y-X > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,_,Y), result(I,A,M,D,_,_,X,_), previous_abs(I,A,M,_,Z), X-Y > 0.002+0.002*Z.
+repeated_bad(I,A,M) :- previous(I,A,M,D,_,_,Y), result(I,A,M,D,_,_,X,_), previous_abs(I,A,M,_,Z), Y-X > 0.002+0.002*Z.
+.decl mode_transfer(i:number,a:symbol,m:symbol,t:number) .output mode_transfer
+mode_transfer(I,A,M,T) :- result(I,A,M,D,T,_,_,_), reference_eligible(I), historical(D,T,_,_,_), M != "identity", M != "baseline", M != "token_self", M != "bigram_self".
+.decl mode_target(i:number,a:symbol,m:symbol,t:number) .output mode_target
+mode_target(I,A,M,T) :- result(I,A,M,D,T,_,_,_), historical(D,_,T,_,_), historical(I,_,U,_,_), T != U.
+.decl mode_counts(a:symbol,m:symbol,n:number,flips:number,transfers:number,targets:number) .output mode_counts
+mode_counts(A,M,N,F,T,G) :- request(_,A,M,_), N = count : { request(_,A,M,_) }, F = count : { flip(_,A,M,_) },
+    T = count : { mode_transfer(_,A,M,_) }, G = count : { mode_target(_,A,M,_) }.
+.decl locality_invalid() .output locality_invalid
+locality_invalid() :- request(I,A,M,D), M="source_values", !previous(I,A,M,D,_,_,_).
+locality_invalid() :- request(I,A,M,D), M="identity", !previous(I,A,M,D,_,_,_).
+locality_invalid() :- request(I,A,M,D), M="baseline", !previous(I,A,M,D,_,_,_).
+.decl certified() .output certified
+certified() :- base_certified(), !repeated_bad(_,_,_), !locality_invalid().

@@ -1,0 +1,43 @@
+// Development proposal; not final-test evidence.
+.decl ls_option(c:number,minmatch:number,anchor:number)
+ls_option(6,24,1).
+// Exact final-token anchor; choose a uniquely longer conflicting source context.
+// Includer supplies tok and lc_option(candidate, minimum_match, minimum_margin).
+.decl lc_last(i:number,p:number)
+lc_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl lc_match(i:number,j:number,k:number)
+lc_match(I,J,1) :- lc_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+lc_match(I,J,K+1) :- lc_match(I,J,K), K < 64, lc_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,T).
+.decl lc_source(i:number,j:number,k:number,t:number)
+lc_source(I,J,K,T) :- lc_match(I,J,K), tok(I,J+1,T).
+.decl lc_best(i:number,k:number)
+lc_best(I,K) :- lc_source(I,_,_,_), K = max L : { lc_source(I,_,L,_) }.
+.decl lc_tie(i:number)
+lc_tie(I) :- lc_best(I,K), lc_source(I,_,K,T), lc_source(I,_,K,U), T != U.
+.decl lc_winner(i:number,t:number)
+lc_winner(I,T) :- lc_best(I,K), lc_source(I,_,K,T), !lc_tie(I).
+.decl lc_other(i:number,k:number)
+lc_other(I,K) :- lc_winner(I,T), lc_source(I,_,K,U), T != U.
+.decl lc_runner(i:number,k:number)
+lc_runner(I,K) :- lc_other(I,_), K = max L : { lc_other(I,L) }.
+.decl lc_frequency(i:number,t:number,n:number)
+lc_frequency(I,T,N) :- lc_winner(I,T), N = count : { tok(I,_,T) }.
+.decl lc_prediction(c:number,i:number,t:number)
+lc_prediction(C,I,T) :- lc_option(C,M,D), lc_best(I,K), K >= M,
+    lc_runner(I,R), R >= 3, K-R >= D, lc_winner(I,T), lc_frequency(I,T,1).
+.decl lc_recent_position(i:number,j:number)
+lc_recent_position(I,J) :- lc_match(I,_,3), J = max Q : { lc_match(I,Q,3) }.
+.decl lc_recent(i:number,t:number)
+lc_recent(I,T) :- lc_recent_position(I,J), tok(I,J+1,T).
+// Boundary-sensitive variants. Includer supplies ls_option(c,minmatch,anchor).
+.decl lc_option(c:number,minmatch:number,margin:number)
+lc_option(C,M,3) :- ls_option(C,M,_).
+.decl ls_anchor(i:number)
+ls_anchor(I) :- lc_best(I,K), lc_winner(I,T), lc_source(I,J,K,T), J-K+1 = 0.
+.decl ls_prediction(c:number,i:number,t:number)
+ls_prediction(C,I,T) :- ls_option(C,_,0), lc_prediction(C,I,T).
+ls_prediction(C,I,T) :- ls_option(C,_,1), lc_prediction(C,I,T), ls_anchor(I).
+
+.decl cdecide(i:number,t:number)
+cdecide(I,T) :- ls_prediction(_,I,T).

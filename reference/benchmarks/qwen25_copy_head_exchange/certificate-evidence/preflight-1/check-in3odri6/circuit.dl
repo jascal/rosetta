@@ -1,0 +1,36 @@
+.decl request(i:number,a:symbol,m:symbol,d:number) .input request
+.decl donor(i:number,d:number) .input donor
+.decl historical(i:number,t:number,gold:number,logit:float,goldlogit:float) .input historical
+.decl result(i:number,a:symbol,m:symbol,d:number,t:number,reflogit:float,goldlogit:float,donorlogit:float) .input result
+.decl delta(i:number,a:symbol,l1:float) .input delta
+.decl invalid() .output invalid
+invalid() :- request(I,A,M,D), !result(I,A,M,D,_,_,_,_).
+invalid() :- result(I,A,M,D,_,_,_,_), !request(I,A,M,D).
+invalid() :- result(I,A,M,D,T,_,_,_), result(I,A,M,D,U,_,_,_), T != U.
+invalid() :- request(I,_,_,_), !historical(I,_,_,_,_).
+invalid() :- donor(_,D), !historical(D,_,_,_,_).
+.decl parity_bad(i:number,kind:symbol) .output parity_bad
+parity_bad(I,"native_answer") :- result(I,"none","baseline",I,T,_,_,_), historical(I,U,_,_,_), T != U.
+parity_bad(I,"native_ref_logit") :- result(I,"none","baseline",I,_,X,_,_), historical(I,_,_,Y,_), abs(X-Y)>0.002+0.002*abs(Y).
+parity_bad(I,"native_gold_logit") :- result(I,"none","baseline",I,_,_,X,_), historical(I,_,_,_,Y), abs(X-Y)>0.002+0.002*abs(Y).
+parity_bad(I,A) :- result(I,A,"identity",I,T,_,_,_), result(I,"none","baseline",I,U,_,_,_), T != U.
+parity_bad(I,A) :- result(I,A,"identity",I,_,X,_,_), result(I,"none","baseline",I,_,Y,_,_), abs(X-Y)>0.002+0.002*abs(Y).
+parity_bad(I,A) :- result(I,A,"identity",I,_,_,X,_), result(I,"none","baseline",I,_,_,Y,_), abs(X-Y)>0.002+0.002*abs(Y).
+.decl flip(i:number,a:symbol,m:symbol,t:number) .output flip
+flip(I,A,M,T) :- result(I,A,M,_,T,_,_,_), historical(I,U,_,_,_), T != U.
+.decl reference_eligible(i:number) .output reference_eligible
+reference_eligible(I) :- donor(I,D), historical(I,T,_,_,_), historical(D,U,_,_,_), T != U.
+.decl transfer(i:number,a:symbol,t:number) .output transfer
+transfer(I,A,T) :- result(I,A,"exchange",D,T,_,_,_), reference_eligible(I), historical(D,T,_,_,_).
+.decl target_transfer(i:number,a:symbol,t:number) .output target_transfer
+target_transfer(I,A,T) :- result(I,A,"exchange",D,T,_,_,_), historical(D,_,T,_,_), historical(I,_,U,_,_), T != U.
+.decl counts(a:symbol,m:symbol,n:number,flips:number,transfers:number,target_transfers:number) .output counts
+counts(A,M,N,F,T,G) :- request(_,A,M,_), N = count : { request(_,A,M,_) },
+    F = count : { flip(_,A,M,_) }, T = count : { transfer(_,A,_), M="exchange" },
+    G = count : { target_transfer(_,A,_), M="exchange" }.
+.decl zero_delta(i:number,a:symbol) .output zero_delta
+zero_delta(I,A) :- delta(I,A,0.0).
+invalid() :- request(I,A,"exchange",_), !delta(I,A,_).
+.decl certified() .output certified
+// Instrument consistency only; this is not model equivalence.
+certified() :- !invalid(), !parity_bad(_,_).

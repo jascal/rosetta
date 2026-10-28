@@ -1,0 +1,57 @@
+.decl row(i:number) .input row
+.decl ranked(l:number,h:number,r:number) .input ranked
+.decl treated(l:number,h:number)
+treated(16,7). treated(16,9). treated(16,12).
+treated(21,2). treated(21,13).
+.decl control(l:number,h:number,k:number) .output control
+control(L,H,K) :- ranked(L,H,R), !treated(L,H),
+    K = count : { ranked(L,J,S), !treated(L,J), S < R }.
+.decl chosen_control(l:number,h:number,k:number) .output chosen_control
+chosen_control(16,H,K) :- control(16,H,K), K < 3.
+chosen_control(21,H,K) :- control(21,H,K), K < 2.
+.decl arm(a:symbol,n:number) .output arm
+arm("none",0).
+arm("copy7",1). arm("copy9",1). arm("copy12",1).
+arm("copy_pair",2). arm("copy_triplet",3).
+arm("ctrl16a",1). arm("ctrl16b",1). arm("ctrl16c",1).
+arm("ctrl16pair",2). arm("ctrl16triplet",3).
+arm("semantic2",1). arm("semantic13",1). arm("semantic_pair",2).
+arm("ctrl21a",1). arm("ctrl21b",1). arm("ctrl21pair",2).
+arm("joint",5). arm("joint_control",5).
+.decl member(a:symbol,l:number,h:number) .output member
+member("copy7",16,7). member("copy9",16,9). member("copy12",16,12).
+member("copy_pair",16,9). member("copy_pair",16,12).
+member("copy_triplet",16,H) :- treated(16,H).
+member("ctrl16a",16,H) :- chosen_control(16,H,0).
+member("ctrl16b",16,H) :- chosen_control(16,H,1).
+member("ctrl16c",16,H) :- chosen_control(16,H,2).
+member("ctrl16pair",16,H) :- chosen_control(16,H,K), K < 2.
+member("ctrl16triplet",16,H) :- chosen_control(16,H,_).
+member("semantic2",21,2). member("semantic13",21,13).
+member("semantic_pair",21,H) :- treated(21,H).
+member("ctrl21a",21,H) :- chosen_control(21,H,0).
+member("ctrl21b",21,H) :- chosen_control(21,H,1).
+member("ctrl21pair",21,H) :- chosen_control(21,H,_).
+member("joint",L,H) :- treated(L,H).
+member("joint_control",L,H) :- chosen_control(L,H,_).
+.decl request(i:number,a:symbol) .output request
+request(I,A) :- row(I), arm(A,_).
+.decl invalid() .output invalid
+invalid() :- !row(_).
+.decl layer(l:number)
+layer(16). layer(21).
+.decl nranked(l:number,n:number)
+nranked(L,N) :- layer(L), N = count : { ranked(L,_,_) }.
+invalid() :- nranked(_,N), N != 14.
+invalid() :- ranked(L,_,_), !layer(L).
+invalid() :- ranked(_,H,_), H < 0.
+invalid() :- ranked(_,H,_), H >= 14.
+invalid() :- ranked(_,_,R), R < 0.
+invalid() :- ranked(_,_,R), R >= 14.
+invalid() :- ranked(L,H,R), ranked(L,H,S), R != S.
+invalid() :- ranked(L,H,R), ranked(L,J,R), H != J.
+.decl nmember(a:symbol,n:number)
+nmember(A,N) :- arm(A,_), N = count : { member(A,_,_) }.
+invalid() :- arm(A,N), nmember(A,M), N != M.
+.decl certified() .output certified
+certified() :- !invalid().

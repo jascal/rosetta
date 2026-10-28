@@ -1,0 +1,8 @@
+{
+  "torch": "2.12.1+cpu",
+  "transformers": "5.12.1",
+  "head_dim": 64,
+  "precision": "float32",
+  "attention": "eager",
+  "threads": 2
+}

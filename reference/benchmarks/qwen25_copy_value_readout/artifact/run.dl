@@ -1,0 +1,6 @@
+.decl source_window(i:number,t0:number,t1:number,t2:number,t3:number,t4:number,t5:number,t6:number,t7:number)
+.input source_window
+#include "mapping.dl"
+.decl readout(i:number,a:symbol,t:number)
+.output readout
+readout(I,A,T) :- source_window(I,T0,T1,T2,T3,T4,T5,T6,T7), value_emit(A,T0,T1,T2,T3,T4,T5,T6,T7,T).

@@ -1,0 +1,32 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,c:symbol,gold:number) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl explained(i:number,t:number) .input explained
+.decl head(i:number,rank:number,layer:number,h:number,p:number,t:number,mass:float,dla:float) .input head
+.decl promotes(i:number,rank:number,k:number,t:number) .input promotes
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_).
+invalid() :- sample(I,_,_), !explained(I,_).
+invalid() :- explained(I,T), !ref(I,T).
+invalid() :- explained(I,T), explained(I,U), T != U.
+invalid() :- head(I,_,_,_,P,T,_,_), !tok(I,P,T).
+invalid() :- sample(I,_,_), !head(I,_,_,_,_,_,_,_).
+.decl peak_class(i:number,rank:number,c:symbol) .output peak_class
+.decl peak_gold(i:number,rank:number)
+peak_gold(I,R) :- head(I,R,_,_,_,T,_,_), sample(I,_,T).
+.decl peak_competitor(i:number,rank:number)
+peak_competitor(I,R) :- head(I,R,_,_,P,T,_,_), sample(I,_,G), T != G,
+    lc_source(I,J,_,T), P = J+1.
+peak_class(I,R,"gold") :- peak_gold(I,R).
+peak_class(I,R,"competing_successor") :- peak_competitor(I,R).
+peak_class(I,R,"other") :- head(I,R,_,_,_,_,_,_), !peak_gold(I,R), !peak_competitor(I,R).
+.decl promotes_gold(i:number,rank:number) .output promotes_gold
+promotes_gold(I,R) :- promotes(I,R,_,T), sample(I,_,T).
+.decl promotes_actual(i:number,rank:number) .output promotes_actual
+promotes_actual(I,R) :- promotes(I,R,_,T), ref(I,T).
+.decl selected_head(i:number,rank:number,layer:number,h:number,p:number,t:number,mass:float,dla:float) .output selected_head
+selected_head(I,R,L,H,P,T,M,D) :- head(I,R,L,H,P,T,M,D).
+.decl certified() .output certified
+// Finite instrument consistency only; no equivalence or mechanism claim.
+certified() :- !invalid().

@@ -1,0 +1,20 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "60",
+        "60"
+      ]
+    ],
+    "missing": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "mismatch": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_4b_preflight/certificate-evidence/tiny-forward/check-ss1jed9o"
+}

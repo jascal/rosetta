@@ -1,0 +1,42 @@
+{
+  "scope": "development only; no final-test certificate",
+  "inputs_and_sources_unchanged": true,
+  "checks": [
+    {
+      "evidence": "certificate-evidence/development-domains/check-fyt6k0ge",
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-1/check-bsuknekj",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-2/check-od3c8zwt",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-3/check-g4ov2o7_",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-4/check-fwbk_ytr",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-5/check-mjcba_x4",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-equiv-6/check-fcm75l4h",
+      "certified": false
+    },
+    {
+      "evidence": "certificate-evidence/development-select/check-94wa5zqr",
+      "certified": true
+    },
+    {
+      "evidence": "certificate-evidence/report/check-8kb74ov6",
+      "certified": true
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "candidate": 1,
+    "result": {
+      "certified": false,
+      "ndomain": 16,
+      "nmiss": 3,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "16"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "3"
+          ]
+        ],
+        "ndomain": [
+          [
+            "16"
+          ]
+        ],
+        "mismatch": [
+          [
+            "3",
+            "4093",
+            "16469"
+          ],
+          [
+            "7",
+            "37054",
+            "9167"
+          ],
+          [
+            "31",
+            "340",
+            "2546"
+          ]
+        ],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_longest_pilot/certificate-evidence/equiv-1/check-w21hjz9u"
+    }
+  },
+  {
+    "candidate": 2,
+    "result": {
+      "certified": false,
+      "ndomain": 8,
+      "nmiss": 1,
+      "nuncov": 0,
+      "nmissing": 0,
+      "ninvalid": 0,
+      "relations": {
+        "nuncov": [
+          [
+            "0"
+          ]
+        ],
+        "invalid": [],
+        "nmissing": [
+          [
+            "0"
+          ]
+        ],
+        "missing_ref": [],
+        "ncover": [
+          [
+            "8"
+          ]
+        ],
+        "certified": [],
+        "nmiss": [
+          [
+            "1"
+          ]
+        ],
+        "ndomain": [
+          [
+            "8"
+          ]
+        ],
+        "mismatch": [
+          [
+            "31",
+            "340",
+            "2546"
+          ]
+        ],
+        "ninvalid": [
+          [
+            "0"
+          ]
+        ],
+        "uncovered": []
+      },
+      "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_longest_pilot/certificate-evidence/equiv-2/check-vv_fqat1"
+    }
+  }
+]

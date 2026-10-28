@@ -1,0 +1,55 @@
+.decl domain(i:number) .input domain
+.decl vocab(n:number) .input vocab
+.decl ordinary(i:number,t:number,x:float) .input ordinary
+.decl streamed(i:number,t:number,x:float) .input streamed
+.decl abs_ref(i:number,t:number,x:float)
+abs_ref(I,T,X) :- ordinary(I,T,X), X >= 0.0.
+abs_ref(I,T,-X) :- ordinary(I,T,X), X < 0.0.
+.decl logit_bad(i:number,t:number) .output logit_bad
+logit_bad(I,T) :- ordinary(I,T,X), streamed(I,T,Y), abs_ref(I,T,A), X-Y > 0.002+0.002*A.
+logit_bad(I,T) :- ordinary(I,T,X), streamed(I,T,Y), abs_ref(I,T,A), Y-X > 0.002+0.002*A.
+.decl ordinary_max(i:number,x:float)
+ordinary_max(I,X) :- domain(I), X = max Y : { ordinary(I,_,Y) }.
+.decl streamed_max(i:number,x:float)
+streamed_max(I,X) :- domain(I), X = max Y : { streamed(I,_,Y) }.
+.decl ordinary_top(i:number,t:number)
+ordinary_top(I,T) :- ordinary_max(I,X), ordinary(I,T,X).
+.decl streamed_top(i:number,t:number)
+streamed_top(I,T) :- streamed_max(I,X), streamed(I,T,X).
+.decl ordinary_ref(i:number,t:number) .output ordinary_ref
+ordinary_ref(I,T) :- domain(I), T = min U : { ordinary_top(I,U) }.
+.decl streamed_ref(i:number,t:number) .output streamed_ref
+streamed_ref(I,T) :- domain(I), T = min U : { streamed_top(I,U) }.
+.decl argmax_bad(i:number) .output argmax_bad
+argmax_bad(I) :- ordinary_ref(I,T), streamed_ref(I,U), T != U.
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- !vocab(_).
+invalid() :- vocab(N), vocab(M), N != M.
+.decl nordinary(i:number,n:number)
+nordinary(I,N) :- domain(I), N = count : { ordinary(I,_,_) }.
+.decl nstreamed(i:number,n:number)
+nstreamed(I,N) :- domain(I), N = count : { streamed(I,_,_) }.
+invalid() :- nordinary(_,M), vocab(N), M != N.
+invalid() :- nstreamed(_,M), vocab(N), M != N.
+invalid() :- ordinary(I,_,_), !domain(I).
+invalid() :- streamed(I,_,_), !domain(I).
+invalid() :- ordinary(_,T,_), T < 0.
+invalid() :- streamed(_,T,_), T < 0.
+invalid() :- ordinary(_,T,_), vocab(N), T >= N.
+invalid() :- streamed(_,T,_), vocab(N), T >= N.
+invalid() :- ordinary(I,T,X), ordinary(I,T,Y), X != Y.
+invalid() :- streamed(I,T,X), streamed(I,T,Y), X != Y.
+.decl counts(contexts:number,scores:number,bad_logits:number,bad_argmax:number) .output counts
+counts(N,S,L,A) :- N = count : { domain(_) }, S = count : { streamed(_,_,_) },
+    L = count : { logit_bad(_,_) }, A = count : { argmax_bad(_) }.
+.decl certified() .output certified
+// Finite instrument parity, not a replacement-model certificate.
+certified() :- !invalid(), !logit_bad(_,_), !argmax_bad(_), !reset_bad(_,_,_).
+.decl reset_pair(a:number,b:number) .input reset_pair
+.decl logits_hash(i:number,backend:symbol,hash:symbol) .input logits_hash
+.decl reset_bad(a:number,b:number,backend:symbol) .output reset_bad
+reset_bad(A,B,K) :- reset_pair(A,B), logits_hash(A,K,X), logits_hash(B,K,Y), X != Y.
+invalid() :- reset_pair(A,B), logits_hash(A,K,_), !logits_hash(B,K,_).
+invalid() :- domain(I), !logits_hash(I,"ordinary",_).
+invalid() :- domain(I), !logits_hash(I,"streamed",_).

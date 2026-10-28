@@ -1,0 +1,20 @@
+{
+  "files": {
+    "scores-copy9.facts.gz": "6619126739bbba82d321bfa2bd59b1f541ebee63b4ac71cdf9bb85eeaff2150c",
+    "scores-copy12.facts.gz": "bba0e4a7540d3557a13094521a749f9d5486a745b712fdd60dc6c2e3f92289af",
+    "scores-joint.facts.gz": "3f78dbc5aba00f455f559477e9568a331ff6e59fd7e4e0ca6a65b94577efd407",
+    "scores-copy.facts.gz": "efbc5609553720e42cc14b55271b7d95053f773b60e64cb7c652dc5cec45882d",
+    "scores-semantic.facts.gz": "cf6ec5f903d8c37b623a284bec8ee5066e21692b8ca753c9f703893e9b921279",
+    "scores-control_copy.facts.gz": "a2c9be5bd3f04215f2e7af55968f394fe5de2f1969d09baf360ba42e7bb656c2",
+    "scores-control_semantic.facts.gz": "3d45ddc1526b1cfd41f3a0cc2a4f4d725e1093c2c88cf4a3b0a18aa91ed40082",
+    "scores-control_joint.facts.gz": "03473661a5fbbd03ff99b9fc8721e7afd49726961e1fdee07ca40269c41b3e2a",
+    "component-vectors.pt": "39644497bebaa45025569806fa40f8b80328446b9375a0c800d9bbdff80f7dce"
+  },
+  "vocab_size": 151936,
+  "torch": "2.12.1+cpu",
+  "transformers": "5.12.1",
+  "precision": "float32",
+  "normalization": "learned final norm gain; common positive inverse RMS omitted",
+  "head_dim": 64,
+  "num_key_value_groups": 7
+}

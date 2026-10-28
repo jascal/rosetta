@@ -1,0 +1,137 @@
+// Run-D effect summary.
+//
+// Every readout is a Datalog relation over the observed intervention results
+// and run C's frozen unpatched references: which arms moved the model, which
+// copy rows they moved, how far the reference logit moved, and which of the
+// registered hypotheses the evidence supports.
+//
+// A flip is relative to the row's OWN unpatched answer. Copy-row flips are
+// counted separately from control-row flips, because a control row has no
+// correct answer to lose.
+
+.decl result(i:number,arm:symbol,key:number,answer:number,ref_logit:float,target_logit:float) .input result
+.decl req(i:number,arm:symbol,key:number) .input req
+.decl req_layer(i:number,arm:symbol,key:number,l:number) .input req_layer
+.decl ref(i:number,t:number) .input ref
+.decl row(i:number,cls:number,expected:number) .input row
+.decl base(i:number,ref_logit:float,target_logit:float) .input base
+.decl donor(d:number,i:number) .input donor
+.decl cumul_arm(k:number) .input cumul_arm
+
+// ---------------------------------------------------------------- integrity
+.decl invalid() .output invalid
+invalid() :- !result(_,_,_,_,_,_).
+invalid() :- !req(_,_,_).
+invalid() :- !ref(_,_).
+invalid() :- result(I,A,K,_,_,_), !req(I,A,K).
+invalid() :- req(I,A,K), !result(I,A,K,_,_,_).
+invalid() :- result(I,_,_,_,_,_), !ref(I,_).
+invalid() :- base(I,_,_), !ref(I,_).
+invalid() :- donor(D,I), !ref(D,_).
+invalid() :- row(I,_,_), !ref(I,_).
+invalid() :- result(I,A,K,_,_,_), req_layer(I,A,K,L), !row(I,_,_).
+
+// ---------------------------------------------------------------- readouts
+.decl flip(i:number,arm:symbol,key:number) .output flip
+flip(I,A,K) :- result(I,A,K,X,_,_), ref(I,R), X != R.
+
+// Copy rows only: the decision rules are about the copy computation.
+.decl flip_copy(i:number,arm:symbol,key:number) .output flip_copy
+flip_copy(I,A,K) :- flip(I,A,K), row(I,0,_).
+
+// The generated copy target, reached or lost.
+.decl answer_correct(i:number,arm:symbol,key:number) .output answer_correct
+answer_correct(I,A,K) :- result(I,A,K,X,_,_), row(I,0,E), X = E.
+
+.decl logit_delta(i:number,arm:symbol,key:number,d:float) .output logit_delta
+logit_delta(I,A,K,RL-BL) :- result(I,A,K,_,RL,_), base(I,BL,_).
+.decl abs_delta(i:number,arm:symbol,key:number,d:float)
+abs_delta(I,A,K,D) :- logit_delta(I,A,K,X), X >= 0.0, D = X.
+abs_delta(I,A,K,D) :- logit_delta(I,A,K,X), X < 0.0, D = -X.
+.decl bigger_abs(arm:symbol,key:number,d:float)
+bigger_abs(A,K,X) :- abs_delta(_,A,K,X), abs_delta(_,A,K,Y), Y > X.
+.decl max_abs(arm:symbol,key:number,m:float) .output max_abs
+max_abs(A,K,X) :- abs_delta(_,A,K,X), !bigger_abs(A,K,X).
+// The group-by keys must be grounded outside the aggregate.
+.decl arm_key(arm:symbol,key:number)
+arm_key(A,K) :- req(_,A,K).
+.decl sum_abs(arm:symbol,key:number,s:float)
+sum_abs(A,K,S) :- arm_key(A,K), S = sum D : { abs_delta(_,A,K,D) }.
+.decl n_abs(arm:symbol,key:number,c:number)
+n_abs(A,K,C) :- arm_key(A,K), C = count : { abs_delta(_,A,K,_) }.
+.decl mean_abs(arm:symbol,key:number,m:float) .output mean_abs
+mean_abs(A,K,M) :- sum_abs(A,K,S), n_abs(A,K,C), C > 0, M = S / to_float(C).
+
+// ------------------------------------------------------------------ tables
+.decl summary(arm:symbol,key:number,n:number,nflip:number,nflipcopy:number,ncorrect:number) .output summary
+summary(A,K,N,F,FC,C) :- req(_,A,K),
+    N  = count : { req(_,A,K) },
+    F  = count : { flip(_,A,K) },
+    FC = count : { flip_copy(_,A,K) },
+    C  = count : { answer_correct(_,A,K) }.
+
+// The sweep, one row per layer.
+.decl layer_table(arm:symbol,l:number,n:number,nflip:number,nflipcopy:number,ncorrect:number) .output layer_table
+layer_table(A,L,N,F,FC,C) :- req(I,A,L), req_layer(I,A,L,_),
+    N  = count : { req(I2,A,L) },
+    F  = count : { flip(I2,A,L) },
+    FC = count : { flip_copy(I2,A,L) },
+    C  = count : { answer_correct(I2,A,L) }.
+
+// -------------------------------------------------------- instrument checks
+// The identity arm must reproduce the row's own answer exactly.
+.decl identity_ok(i:number) .output identity_ok
+identity_ok(I) :- result(I,"ident",K,X,_,_), ref(I,X).
+.decl identity_broken(i:number) .output identity_broken
+identity_broken(I) :- result(I,"ident",K,X,_,_), ref(I,R), X != R.
+.decl any_identity_broken() .output any_identity_broken
+any_identity_broken() :- identity_broken(_).
+.decl instrument_ok() .output instrument_ok
+instrument_ok() :- !any_identity_broken().
+
+// The cumulative k=1 arm and the sweep's layer-0 arm are the same
+// intervention; they must agree exactly.
+.decl consistency_broken(i:number) .output consistency_broken
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), X1 != X0.
+consistency_broken(I) :- result(I,"cumul",1,X1,RL1,_), result(I,"sweep",0,X0,RL0,_), RL1 != RL0.
+.decl any_consistency_broken() .output any_consistency_broken
+any_consistency_broken() :- consistency_broken(_).
+.decl consistency_ok() .output consistency_ok
+consistency_ok() :- !any_consistency_broken().
+
+// ------------------------------------------------------------- the verdicts
+// Registered in docs/native-trace-mlp-prereg.md before any collection.
+//
+// H-B  : some layer's answer-position MLP is necessary.
+// H-Ba : no single layer is, but all of them together are (aggregate).
+// H-C  : no layer's answer-position MLP is necessary, but some layer's MLP is
+//        necessary when removed along the whole sequence (position).
+// H-A  : no layer's MLP is necessary at any position in scope.
+.decl sweep_flip(l:number) .output sweep_flip
+sweep_flip(L) :- flip_copy(_,"sweep",L).
+// The joint arm is the cumulative arm that covers every layer, whatever the
+// model's depth is.
+.decl joint_k(k:number)
+joint_k(K) :- cumul_arm(K), K = max M : { cumul_arm(M) }.
+.decl joint_flip() .output joint_flip
+joint_flip() :- joint_k(K), flip_copy(_,"cumul",K).
+.decl full_flip(l:number) .output full_flip
+full_flip(L) :- flip_copy(_,"full",L).
+.decl any_sweep_flip() .output any_sweep_flip
+any_sweep_flip() :- sweep_flip(_).
+.decl any_full_flip() .output any_full_flip
+any_full_flip() :- full_flip(_).
+.decl any_joint_flip() .output any_joint_flip
+any_joint_flip() :- joint_flip().
+
+.decl h_b_supported() .output h_b_supported
+h_b_supported() :- sweep_flip(_).
+.decl h_b_aggregate() .output h_b_aggregate
+h_b_aggregate() :- !any_sweep_flip(), joint_flip().
+.decl h_c_supported() .output h_c_supported
+h_c_supported() :- !any_sweep_flip(), !any_joint_flip(), full_flip(_).
+.decl h_a_supported() .output h_a_supported
+h_a_supported() :- !any_sweep_flip(), !any_joint_flip(), !any_full_flip().
+
+.decl certified() .output certified
+certified() :- !invalid().

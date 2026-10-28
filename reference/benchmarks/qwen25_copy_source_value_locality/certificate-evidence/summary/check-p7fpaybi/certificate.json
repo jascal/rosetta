@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "historical source-value locality; instrument consistency only"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "a77f44072b2366f84c5e80b78a4f91c36923223247cc3cf99ea54bcc72b3c380",
+    "facts/delta.facts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "facts/donor.facts": "dbe3ed1f1b56bcdea5d91fb7063ea9898792fd0fc82b73f191bf9bc14c14e1a0",
+    "facts/historical.facts": "d4a898afc41ca6470f1e9571d1fcd4c4b6ac16ae7dff5ade421cd0e8ecaca19c",
+    "facts/previous.facts": "d6f52c65f5ced3d6f6c015922a99e7ba01777e9e756928ff8d3cba9df546f108",
+    "facts/request.facts": "01e85565c21ab03972319f47194914b06997bf4e603cf04ff29edf3133f0d8e6",
+    "facts/result.facts": "9fe8584dfae66d2943e74fec69ef49046dbc70932e2d10d05a6af57b5e44d1fc",
+    "outputs/base_certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "a274564038e4c2e622ff85b58c39a8e99dd6ad243480b9e7b6be8d35746c3fad",
+    "outputs/flip.csv": "65bd49579d17741a6f3ac57570416ebadb9195345ffe46ccc1f46a195f77983b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/locality_invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/mode_counts.csv": "804d13adcb361b674865a656672b421782db9093b98680f84b0cb2799ec199bd",
+    "outputs/mode_target.csv": "d5663804fccb737eb058016e33ee0c7848f17d0e365b1f53823761c61ff6b7ea",
+    "outputs/mode_transfer.csv": "2ed3bf9c006bb4fa4bf5609165d2b6a6a56f054817cc195024be90bc8bc4edfe",
+    "outputs/parity_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/reference_eligible.csv": "76da90667b4425081a62e79de3d0f4b88b03ac33cbb030f99359963378862c03",
+    "outputs/repeated_bad.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/target_transfer.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/transfer.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/zero_delta.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "verify.dl": "cf5a37ff21ab3738c6743f42de60746261e4ce9e9817883a0fc29f0464aa52b9"
+  }
+}

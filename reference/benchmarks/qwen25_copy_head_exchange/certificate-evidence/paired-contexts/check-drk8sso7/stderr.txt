@@ -1,0 +1,9 @@
+Warning: Variable D only occurs once in file verify.dl at line 9
+invalid() :- donor(I,D), !tok(I,_,_).
+---------------------^----------------
+Warning: Variable I only occurs once in file verify.dl at line 10
+invalid() :- donor(I,D), !tok(D,_,_).
+-------------------^------------------
+Warning: Variable D only occurs once in file verify.dl at line 17
+invalid() :- donor(I,D), !query_start(I,_).
+---------------------^----------------------

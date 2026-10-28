@@ -1,0 +1,106 @@
+{
+  "certified": true,
+  "relations": {
+    "changed_scores": [
+      [
+        "identity",
+        "0"
+      ],
+      [
+        "baseline",
+        "0"
+      ],
+      [
+        "cleanup",
+        "0"
+      ],
+      [
+        "zero_last",
+        "248320"
+      ],
+      [
+        "direct_last",
+        "248320"
+      ],
+      [
+        "zero_source",
+        "248273"
+      ],
+      [
+        "direct_source",
+        "248273"
+      ],
+      [
+        "prior",
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "logit_bad": [],
+    "ref": [
+      [
+        "identity",
+        "20956"
+      ],
+      [
+        "baseline",
+        "20956"
+      ],
+      [
+        "cleanup",
+        "20956"
+      ],
+      [
+        "zero_last",
+        "20956"
+      ],
+      [
+        "direct_last",
+        "20956"
+      ],
+      [
+        "zero_source",
+        "20956"
+      ],
+      [
+        "direct_source",
+        "20956"
+      ],
+      [
+        "prior",
+        "20956"
+      ]
+    ],
+    "hash_bad": [],
+    "observation_bad": [],
+    "dose": [
+      [
+        "identity",
+        "0"
+      ],
+      [
+        "zero_source",
+        "2"
+      ],
+      [
+        "direct_source",
+        "2"
+      ],
+      [
+        "zero_last",
+        "8"
+      ],
+      [
+        "direct_last",
+        "8"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "argmax_bad": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_4b_probe_validation/certificate-evidence/summary/check-djy9736w"
+}

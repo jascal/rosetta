@@ -1,0 +1,99 @@
+{
+  "scope": "fresh development only; no final reference requests",
+  "seeds": [
+    601,
+    602
+  ],
+  "groups_per_length": 3,
+  "options": [
+    [
+      1,
+      6,
+      0
+    ],
+    [
+      2,
+      6,
+      1
+    ],
+    [
+      3,
+      12,
+      0
+    ],
+    [
+      4,
+      12,
+      1
+    ],
+    [
+      5,
+      24,
+      0
+    ],
+    [
+      6,
+      24,
+      1
+    ]
+  ],
+  "disjoint": {
+    "train": {
+      "tokens": 1176,
+      "groups": 18,
+      "rows": 342
+    },
+    "validation": {
+      "tokens": 1176,
+      "groups": 18,
+      "rows": 342
+    }
+  },
+  "files": {
+    "dataset.json": "13cb3e089e928001e73e841b437bac3464f198d9ebd3cdf77f1460ceac72b7f3",
+    "pairs.json": "ead38e142f3e646dfcd6f885986bee2207db58b85ad19c45690035eddd82ec37",
+    "excluded-tokens.json": "74f1f816464fd13a707c28aef52f42b864c35fc9e4d47ee6d7a46f1049d46f2c",
+    "library.dl": "89e8f234e7c86cf54090b4306ec62ac2e269fc671d2b85dc337d2cd84e603de3",
+    "baseline.dl": "84947f2cbb4226c5acf24f56e7e4d26170f85ed904a682a9e833100cb9e239c7"
+  },
+  "sources": {
+    "py/run_copy_longest.py": "7a22cc8abb77f328f43e0b3475e12891077117be13616b8398b97149cc2bc078",
+    "py/run_copy_prefix.py": "be1f028837140d63b878c7ffe0d67a4adbb20a48f9aecb6ce072bcc7e20c22be",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/run_native_trace2.py": "539c6705d92dce76bb98088cd4b775470966ee38d0df532e845e76a2eac54094",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_longest_runtime.dl": "e43771e1e6d07af97cec586d63a51e28484d5e7ea0d49a97def4557d99261e1b",
+    "dl/copy_longest_anchor.dl": "e5e1798b8248dac6cca6412a402d41d869b691d344cb812a0d1023cf84a01ccf",
+    "dl/copy_longest_select.dl": "a80bf4c264a0ca3208d0f42bf8b3f2be78d9eacb3d6de46a77745f92f98fe101",
+    "docs/copy-longest-development-plan.md": "eec08996c605363db6798c6d5d137a7e004eebdb114f2a9a0671f6a2e14a30e7"
+  },
+  "exclusions": {
+    "reference/benchmarks/qwen25_05b/dataset.json": "ab5259de311580ee5aff230261c3055c3d970e48453f0783b809a18f053dbd31",
+    "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json": "34f8d83a9c361db58c6d4837d66629192bb1a1e08ecf87e31fca84a07e790705",
+    "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json": "a58f4f08592e833b668fafbdcb9b902bdee431dcb2fc042e7f173fd7d8c3b12f",
+    "reference/benchmarks/qwen25_05b_int8_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807",
+    "reference/benchmarks/qwen25_05b_target_diagnostic/dataset.json": "20e175ac57969982dc0fd08417b889a211e3ca0cc4841947853c1cceab7fa1f6",
+    "reference/benchmarks/qwen25_05b_withheld_pairs/dataset.json": "9e17550717add2a7b9df9c2e9f3d242155d66849b0517c5480bbe14d655a4807",
+    "reference/benchmarks/qwen25_native_trace/dataset.json": "c9a190bebec4c27d51129a1867db854d19ed2f011fbaf2a77355cba5870b80d6",
+    "reference/benchmarks/qwen25_native_trace/discovery.json": "250a61c3d1ba8bb8ceef048ae0eda0f404f00bf5838b6886a1ec7b85fb78eb22",
+    "reference/benchmarks/qwen25_native_trace_b/dataset.json": "80bce2e349f8b67e3edc12b1fc89b94d5386b9f97d44fee78cbec116dead0634",
+    "reference/benchmarks/qwen25_native_trace_c/dataset.json": "1b54ab66f056295a87a8cd4e11a0c81ba47206043ac3db5696ac33ed675f6b44",
+    "reference/benchmarks/qwen25_copy_prefix/dataset.json": "1f690a1f9aa7f24a60137e307ded31fa1c452c698844ed6fcedaddeeb2772cf9",
+    "reference/benchmarks/qwen25_copy_corruption_pilot/dataset.json": "bca6053ecef88f89271a960bad97b2aa6718f00164ecb5bbfacad92f7a3c8bd2",
+    "reference/benchmarks/qwen25_copy_longest_pilot/dataset.json": "baf9f4cba988e77330aa73fb883a940334fc93c916d451d340347074bdd14fb6"
+  },
+  "baseline_sha256": "84947f2cbb4226c5acf24f56e7e4d26170f85ed904a682a9e833100cb9e239c7",
+  "pinned_model": {
+    "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+    "bundle_sha256": {
+      ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+      ".fieldrun.json": "5c013a3a24ef13276d3c4d3fbd0a9007525bf4e9d720608b8db0176a391aaa12"
+    },
+    "preflight_report_sha256": "6d313afd02660343b805767919e6135630ed51e8acfe81bf115162bdabde3150",
+    "reference_sha256": "e58ed6ead6c36fe29cef72d424e274485f4a6ba4fff4c93e56829c45cada3b9c"
+  },
+  "pre_collection_fix": {
+    "previous_protocol_sha256": "087723e1b3600a3bdc52b341a52d6b990d5123c2b66d7223be59a9450c685bc3",
+    "note": "Synthetic test found ungrounded negated aggregate wildcard. Named incremental relation fixes selector before first model request; inputs, hypotheses and admission policy unchanged."
+  }
+}

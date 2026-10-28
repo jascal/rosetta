@@ -1,0 +1,33 @@
+.decl shape(layers:number,width:number,last:number) .input shape
+.decl unit(l:number,n:number) .output unit
+unit(0,0). unit(0,1). unit(3,0). unit(3,1).
+unit(15,0). unit(15,1). unit(31,0). unit(31,1).
+.decl run_arm(a:symbol,order:number) .output run_arm
+run_arm("baseline",0). run_arm("identity",1). run_arm("zero_last",2).
+run_arm("zero_source",3). run_arm("direct_last",4). run_arm("direct_source",5).
+run_arm("cleanup",6).
+.decl arm(a:symbol) .output arm
+arm(A) :- run_arm(A,_).
+arm("prior").
+.decl compare(a:symbol,b:symbol) .output compare
+compare("baseline","identity"). compare("baseline","cleanup"). compare("baseline","prior").
+compare("zero_last","direct_last"). compare("zero_source","direct_source").
+.decl observe(a:symbol,l:number,p:number,n:number) .output observe
+observe(A,L,P,N) :- run_arm(A,_), A != "direct_last", A != "direct_source", unit(L,N), shape(_,_,P).
+.decl identity_site(l:number,p:number,n:number) .output identity_site
+identity_site(L,P,N) :- unit(L,N), shape(_,_,P).
+.decl zero(a:symbol,l:number,p:number,n:number,v:float) .output zero
+zero("zero_last",L,P,N,0.0) :- unit(L,N), shape(_,_,P).
+zero("direct_last",L,P,N,0.0) :- unit(L,N), shape(_,_,P).
+zero("zero_source",0,0,0,0.0). zero("zero_source",0,0,1,0.0).
+zero("direct_source",0,0,0,0.0). zero("direct_source",0,0,1,0.0).
+.decl invalid() .output invalid
+invalid() :- !shape(_,_,_).
+invalid() :- shape(L,W,P), shape(M,V,Q), L != M.
+invalid() :- shape(L,W,P), shape(M,V,Q), W != V.
+invalid() :- shape(L,W,P), shape(M,V,Q), P != Q.
+invalid() :- unit(L,_), shape(M,_,_), L >= M.
+invalid() :- unit(_,N), shape(_,W,_), N >= W.
+invalid() :- shape(_,_,P), P < 1.
+.decl certified() .output certified
+certified() :- !invalid().

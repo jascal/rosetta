@@ -1,0 +1,55 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl orig(i:number,p:number,t:number) .input orig
+.decl sample(i:number,g:symbol,length:number,offset:number,gold:number,oldref:number) .input sample
+.decl corrupt(i:number,p:number) .input corrupt
+.decl pair(a:number,b:number) .input pair
+.decl source_edit(a:number,b:number,p:number) .input source_edit
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_,_,_,_).
+invalid() :- sample(I,_,_,_,_,_), !ref(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- ref(I,_), !sample(I,_,_,_,_,_).
+.decl changed(i:number,p:number)
+changed(I,P) :- tok(I,P,T), orig(I,P,U), T != U.
+invalid() :- changed(I,P), !corrupt(I,P).
+invalid() :- corrupt(I,P), !changed(I,P).
+invalid() :- tok(I,P,_), !orig(I,P,_).
+invalid() :- orig(I,P,_), !tok(I,P,_).
+.decl ncorrupt(i:number,n:number)
+ncorrupt(I,N) :- sample(I,_,_,_,_,_), N = count : { corrupt(I,_) }.
+invalid() :- ncorrupt(_,N), N != 1.
+invalid() :- sample(I,_,_,O,_,_), ap_last(I,P), corrupt(I,Q), Q != P-O.
+.decl pair_changed(a:number,b:number,p:number)
+pair_changed(A,B,P) :- pair(A,B), tok(A,P,T), tok(B,P,U), T != U.
+invalid() :- pair_changed(A,B,P), !source_edit(A,B,P).
+invalid() :- source_edit(A,B,P), !pair_changed(A,B,P).
+invalid() :- pair(A,B), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B), tok(B,P,_), !tok(A,P,_).
+.decl prediction(c:number,i:number,t:number) .output prediction
+prediction(C,I,T) :- ap_prediction(C,I,T).
+.decl mismatch(c:number,i:number,pred:number,actual:number) .output mismatch
+mismatch(C,I,T,R) :- ap_prediction(C,I,T), ref(I,R), T != R.
+.decl overlap(c:number,i:number) .output overlap
+overlap(C,I) :- ap_prediction(C,I,_), bdecide(I,_).
+.decl incremental(c:number,i:number) .output incremental
+incremental(C,I) :- ap_prediction(C,I,_), !bdecide(I,_).
+.decl score(c:number,length:number,offset:number,total:number,covered:number,wrong:number,incremental:number) .output score
+score(C,L,O,N,A,W,D) :- ap_option(C,_,_), sample(_,_,L,O,_,_),
+    N = count : { sample(_,_,L,O,_,_) },
+    A = count : { sample(I,_,L,O,_,_), ap_prediction(C,I,_) },
+    W = count : { sample(I,_,L,O,_,_), mismatch(C,I,_,_) },
+    D = count : { sample(I,_,L,O,_,_), incremental(C,I) }.
+.decl model_score(length:number,offset:number,total:number,gold:number,old:number,baseline:number,baseline_wrong:number) .output model_score
+model_score(L,O,N,G,P,B,W) :- sample(_,_,L,O,_,_),
+    N = count : { sample(_,_,L,O,_,_) },
+    G = count : { sample(I,_,L,O,T,_), ref(I,T) },
+    P = count : { sample(I,_,L,O,_,T), ref(I,T) },
+    B = count : { sample(I,_,L,O,_,_), bdecide(I,_) },
+    W = count : { sample(I,_,L,O,_,_), bdecide(I,T), ref(I,R), T != R }.
+.decl causal(c:number,a:number,b:number) .output causal
+causal(C,A,B) :- pair(A,B), ap_prediction(C,A,T), ap_prediction(C,B,U), T != U, ref(A,T), ref(B,U).
+.decl certified() .output certified
+// Instrument integrity only; candidate mismatch rows remain failures.
+certified() :- !invalid().

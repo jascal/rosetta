@@ -1,0 +1,127 @@
+// Token-only artifact; no native model observations are runtime inputs.
+.decl base(b:number,kind:number,k:number,m:number)
+.decl candidate(c:number,b:number,a:number,d:number)
+.decl selected(rank:number,c:number)
+base(4,0,3,1).
+base(5,0,3,2).
+base(14,1,3,1).
+base(17,2,12,1).
+candidate(169,4,0,0).
+candidate(177,4,8,0).
+candidate(179,4,10,0).
+candidate(223,4,8,10).
+candidate(225,5,0,0).
+candidate(233,5,8,0).
+candidate(235,5,10,0).
+candidate(279,5,8,10).
+candidate(737,14,8,0).
+candidate(783,14,8,10).
+candidate(905,17,8,0).
+candidate(951,17,8,10).
+selected(1,169).
+selected(3,177).
+selected(2,179).
+selected(4,223).
+selected(5,225).
+selected(6,233).
+selected(7,235).
+selected(8,279).
+selected(9,737).
+selected(10,783).
+selected(11,905).
+selected(12,951).
+// Token-only candidate library. Includer supplies tok, base(B,kind,k,m),
+// candidate(C,B,guard1,guard2), and selected(rank,C). Zero guard means true.
+// kind: 0 consensus, 1 nearest, 2 longest suffix, 3 plurality, 4 final token.
+.decl nt_last(i:number,p:number)
+nt_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl nt_match(i:number,j:number,k:number)
+nt_match(I,J,1) :- nt_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+nt_match(I,J,K+1) :- nt_match(I,J,K), K < 12, nt_last(I,P),
+                     tok(I,P-K,T), tok(I,J-K,T).
+.decl nt_source(b:number,i:number,j:number,t:number)
+nt_source(B,I,J,T) :- base(B,K,L,_), K != 4, nt_match(I,J,L), tok(I,J+1,T).
+.decl nt_conflict(b:number,i:number)
+nt_conflict(B,I) :- nt_source(B,I,_,A), nt_source(B,I,_,Z), A != Z.
+.decl nt_support(b:number,i:number,n:number)
+nt_support(B,I,N) :- nt_source(B,I,_,_), N = count : { nt_source(B,I,_,_) }.
+.decl nt_nearest(b:number,i:number,j:number)
+nt_nearest(B,I,J) :- nt_source(B,I,_,_), J = max P : { nt_source(B,I,P,_) }.
+.decl nt_votes(b:number,i:number,t:number,n:number)
+nt_votes(B,I,T,N) :- nt_source(B,I,_,T), N = count : { nt_source(B,I,_,T) }.
+.decl nt_max_votes(b:number,i:number,n:number)
+nt_max_votes(B,I,N) :- nt_votes(B,I,_,_), N = max V : { nt_votes(B,I,_,V) }.
+.decl nt_tie(b:number,i:number)
+nt_tie(B,I) :- nt_max_votes(B,I,N), nt_votes(B,I,A,N), nt_votes(B,I,Z,N), A != Z.
+.decl nt_best_length(i:number,k:number)
+nt_best_length(I,K) :- nt_match(I,_,_), K = max L : { nt_match(I,_,L) }.
+.decl nt_longest_source(i:number,j:number)
+nt_longest_source(I,J) :- nt_best_length(I,K), J = max P : { nt_match(I,P,K) }.
+.decl nt_prediction(b:number,i:number,t:number)
+nt_prediction(B,I,T) :- base(B,0,_,M), nt_source(B,I,_,T), nt_support(B,I,N), N >= M, !nt_conflict(B,I).
+nt_prediction(B,I,T) :- base(B,1,_,_), nt_nearest(B,I,J), nt_source(B,I,J,T).
+nt_prediction(B,I,T) :- base(B,2,_,_), nt_longest_source(I,J), tok(I,J+1,T).
+nt_prediction(B,I,T) :- base(B,3,_,M), nt_votes(B,I,T,N), N >= M, nt_max_votes(B,I,N), !nt_tie(B,I).
+nt_prediction(B,I,T) :- base(B,4,_,_), nt_last(I,P), tok(I,P,T).
+
+.decl nt_output(i:number,t:number)
+nt_output(I,T) :- nt_prediction(_,I,T).
+.decl nt_previous(i:number,t:number,p:number)
+nt_previous(I,T,P) :- nt_output(I,T), nt_last(I,L), tok(I,Q,T), Q < L,
+                      P = max J : { tok(I,J,T), J < L }.
+.decl nt_frequency(i:number,t:number,n:number)
+nt_frequency(I,T,N) :- nt_output(I,T), N = count : { tok(I,_,T) }.
+.decl nt_property(i:number,t:number,a:number)
+nt_property(I,T,0) :- nt_output(I,T).
+nt_property(I,T,1) :- nt_output(I,T), nt_last(I,P), P+1 <= 32.
+nt_property(I,T,2) :- nt_output(I,T), nt_last(I,P), P+1 > 32.
+nt_property(I,T,3) :- nt_output(I,T), nt_last(I,P), P+1 <= 64.
+nt_property(I,T,4) :- nt_output(I,T), nt_last(I,P), P+1 > 64.
+nt_property(I,T,5) :- nt_previous(I,T,P), nt_last(I,L), L-P <= 16.
+nt_property(I,T,6) :- nt_previous(I,T,P), nt_last(I,L), L-P <= 32.
+nt_property(I,T,7) :- nt_previous(I,T,P), nt_last(I,L), L-P > 32.
+nt_property(I,T,8) :- nt_frequency(I,T,N), N >= 2.
+nt_property(I,T,9) :- nt_frequency(I,T,N), N >= 3.
+nt_property(I,T,10) :- nt_output(I,T), nt_last(I,P), tok(I,P,X), X != T.
+
+.decl nt_candidate(c:number,i:number,t:number)
+nt_candidate(C,I,T) :- candidate(C,B,A,D), nt_prediction(B,I,T),
+                       nt_property(I,T,A), nt_property(I,T,D).
+.decl nt_route(i:number,r:number)
+nt_route(I,R) :- selected(_,C), nt_candidate(C,I,_),
+                 R = min Q : { selected(Q,H), nt_candidate(H,I,_) }.
+.decl bdecide(inst:number,out:number)
+bdecide(I,T) :- nt_route(I,R), selected(R,C), nt_candidate(C,I,T).
+
+.decl lc_option(c:number,minmatch:number,margin:number)
+lc_option(1,6,3).
+lc_option(2,12,3).
+// Exact final-token anchor; choose a uniquely longer conflicting source context.
+// Includer supplies tok and lc_option(candidate, minimum_match, minimum_margin).
+.decl lc_last(i:number,p:number)
+lc_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl lc_match(i:number,j:number,k:number)
+lc_match(I,J,1) :- lc_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+lc_match(I,J,K+1) :- lc_match(I,J,K), K < 64, lc_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,T).
+.decl lc_source(i:number,j:number,k:number,t:number)
+lc_source(I,J,K,T) :- lc_match(I,J,K), tok(I,J+1,T).
+.decl lc_best(i:number,k:number)
+lc_best(I,K) :- lc_source(I,_,_,_), K = max L : { lc_source(I,_,L,_) }.
+.decl lc_tie(i:number)
+lc_tie(I) :- lc_best(I,K), lc_source(I,_,K,T), lc_source(I,_,K,U), T != U.
+.decl lc_winner(i:number,t:number)
+lc_winner(I,T) :- lc_best(I,K), lc_source(I,_,K,T), !lc_tie(I).
+.decl lc_other(i:number,k:number)
+lc_other(I,K) :- lc_winner(I,T), lc_source(I,_,K,U), T != U.
+.decl lc_runner(i:number,k:number)
+lc_runner(I,K) :- lc_other(I,_), K = max L : { lc_other(I,L) }.
+.decl lc_frequency(i:number,t:number,n:number)
+lc_frequency(I,T,N) :- lc_winner(I,T), N = count : { tok(I,_,T) }.
+.decl lc_prediction(c:number,i:number,t:number)
+lc_prediction(C,I,T) :- lc_option(C,M,D), lc_best(I,K), K >= M,
+    lc_runner(I,R), R >= 3, K-R >= D, lc_winner(I,T), lc_frequency(I,T,1).
+.decl lc_recent_position(i:number,j:number)
+lc_recent_position(I,J) :- lc_match(I,_,3), J = max Q : { lc_match(I,Q,3) }.
+.decl lc_recent(i:number,t:number)
+lc_recent(I,T) :- lc_recent_position(I,J), tok(I,J+1,T).

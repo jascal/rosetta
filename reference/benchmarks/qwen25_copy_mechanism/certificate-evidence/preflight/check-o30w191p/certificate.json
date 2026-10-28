@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "layer-0 discovery; instrument integrity, not model equivalence"
+  },
+  "scalars": {},
+  "result": {
+    "certified": false,
+    "error": "Error: syntax error, unexpected >, expecting . in file verify.dl at line 19\nlogit_changed(I) :- ref(I,_,A), answer(I,_,B), abs(A-B) > 0.002+0.002*abs(A).\n--------------------------------------------------------^---------------------\n1 errors generated, evaluation aborted"
+  },
+  "sha256": {
+    "circuit.dl": "cc5bfebcb9f38584a3a71a08ea07e61c39535557a0c21bf857cae15081e0bda4",
+    "facts/answer.facts": "99f72a5713c0c3a2f96cc956407fc026ecc9650af309d340a3d3f5084c40bafb",
+    "facts/observed.facts": "6367f231c6b451f14d9617a35c5230efdb1d4830bb750a48cc47d01a3e89db0e",
+    "facts/ref.facts": "99f72a5713c0c3a2f96cc956407fc026ecc9650af309d340a3d3f5084c40bafb",
+    "facts/row.facts": "bd0fcbabaa8faa94f0a40fd67ff851b8426fc71216ddb6013d3fd656101e3ab7",
+    "stderr.txt": "d2f3d66834c6775a1b854b4c763cfc81c7841cf79250a0a2143ec08f9ba4418b",
+    "verify.dl": "cc5bfebcb9f38584a3a71a08ea07e61c39535557a0c21bf857cae15081e0bda4"
+  }
+}

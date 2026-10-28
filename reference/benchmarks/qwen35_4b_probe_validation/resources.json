@@ -1,0 +1,33 @@
+{
+  "timings": [
+    {
+      "arm": "baseline",
+      "seconds": 6.84238818599988
+    },
+    {
+      "arm": "identity",
+      "seconds": 6.529461292000633
+    },
+    {
+      "arm": "zero_last",
+      "seconds": 6.644326630997966
+    },
+    {
+      "arm": "zero_source",
+      "seconds": 6.611436066999886
+    },
+    {
+      "arm": "direct_last",
+      "seconds": 6.190670569998474
+    },
+    {
+      "arm": "direct_source",
+      "seconds": 6.22812237800099
+    },
+    {
+      "arm": "cleanup",
+      "seconds": 6.609033616001398
+    }
+  ],
+  "maxrss_kib": 847836
+}

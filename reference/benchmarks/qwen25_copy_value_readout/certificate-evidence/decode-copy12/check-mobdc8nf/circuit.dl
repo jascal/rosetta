@@ -1,0 +1,42 @@
+.decl feature(f:number) .input feature
+.decl sample(i:number,f:number,gold:number,actual:number) .input sample
+.decl vocab(n:number) .input vocab
+.decl score(f:number,t:number,s:float) .input score
+.decl maximum(f:number,s:float)
+maximum(F,S) :- feature(F), S = max V : { score(F,_,V) }.
+.decl at_top(f:number,t:number)
+at_top(F,T) :- maximum(F,S), score(F,T,S).
+.decl mapped(f:number,t:number) .output mapped
+mapped(F,T) :- feature(F), at_top(F,_), T = min U : { at_top(F,U) }.
+.decl requested(f:number,t:number)
+requested(F,T) :- sample(_,F,T,_).
+requested(F,T) :- sample(_,F,_,T).
+.decl better(f:number,t:number,u:number)
+better(F,T,U) :- requested(F,T), score(F,T,X), score(F,U,Y), Y > X.
+better(F,T,U) :- requested(F,T), score(F,T,X), score(F,U,X), U < T.
+.decl rank(f:number,t:number,r:number) .output rank
+rank(F,T,N+1) :- requested(F,T), score(F,T,_), N = count : { better(F,T,_) }.
+.decl decision(i:number,t:number) .output decision
+decision(I,T) :- sample(I,F,_,_), mapped(F,T).
+.decl wrong(i:number,pred:number,actual:number) .output wrong
+wrong(I,T,A) :- decision(I,T), sample(I,_,_,A), T != A.
+.decl counts(n:number,gold:number,actual:number) .output counts
+counts(N,G,A) :- N = count : { sample(_,_,_,_) },
+    G = count : { sample(I,_,T,_), decision(I,T) },
+    A = count : { sample(I,_,_,T), decision(I,T) }.
+.decl nscore(f:number,n:number)
+nscore(F,N) :- feature(F), N = count : { score(F,_,_) }.
+.decl invalid() .output invalid
+invalid() :- !feature(_).
+invalid() :- !vocab(_).
+invalid() :- vocab(N), vocab(M), N != M.
+invalid() :- vocab(N), N <= 0.
+invalid() :- nscore(_,M), vocab(N), M != N.
+invalid() :- score(F,_,_), !feature(F).
+invalid() :- score(_,T,_), T < 0.
+invalid() :- score(_,T,_), vocab(N), T >= N.
+invalid() :- score(F,T,X), score(F,T,Y), X != Y.
+invalid() :- sample(_,F,_,_), !mapped(F,_).
+.decl certified() .output certified
+// Complete component projection only; wrong rows do not become equivalence.
+certified() :- !invalid().

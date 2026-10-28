@@ -1,0 +1,8 @@
+// Boundary-sensitive variants. Includer supplies ls_option(c,minmatch,anchor).
+.decl lc_option(c:number,minmatch:number,margin:number)
+lc_option(C,M,3) :- ls_option(C,M,_).
+.decl ls_anchor(i:number)
+ls_anchor(I) :- lc_best(I,K), lc_winner(I,T), lc_source(I,J,K,T), J-K+1 = 0.
+.decl ls_prediction(c:number,i:number,t:number)
+ls_prediction(C,I,T) :- ls_option(C,_,0), lc_prediction(C,I,T).
+ls_prediction(C,I,T) :- ls_option(C,_,1), lc_prediction(C,I,T), ls_anchor(I).

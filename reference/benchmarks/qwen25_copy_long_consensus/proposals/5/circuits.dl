@@ -1,0 +1,48 @@
+// Development proposal; not final-test evidence.
+.decl lg_option(c:number,minmatch:number,support:number)
+lg_option(5,32,2).
+.decl lc_option(c:number,minmatch:number,margin:number)
+lc_option(C,M,4) :- lg_option(C,M,_).
+// Exact final-token anchor; choose a uniquely longer conflicting source context.
+// Includer supplies tok and lc_option(candidate, minimum_match, minimum_margin).
+.decl lc_last(i:number,p:number)
+lc_last(I,P) :- tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl lc_match(i:number,j:number,k:number)
+lc_match(I,J,1) :- lc_last(I,P), tok(I,P,T), tok(I,J,T), J < P.
+lc_match(I,J,K+1) :- lc_match(I,J,K), K < 64, lc_last(I,P),
+    tok(I,P-K,T), tok(I,J-K,T).
+.decl lc_source(i:number,j:number,k:number,t:number)
+lc_source(I,J,K,T) :- lc_match(I,J,K), tok(I,J+1,T).
+.decl lc_best(i:number,k:number)
+lc_best(I,K) :- lc_source(I,_,_,_), K = max L : { lc_source(I,_,L,_) }.
+.decl lc_tie(i:number)
+lc_tie(I) :- lc_best(I,K), lc_source(I,_,K,T), lc_source(I,_,K,U), T != U.
+.decl lc_winner(i:number,t:number)
+lc_winner(I,T) :- lc_best(I,K), lc_source(I,_,K,T), !lc_tie(I).
+.decl lc_other(i:number,k:number)
+lc_other(I,K) :- lc_winner(I,T), lc_source(I,_,K,U), T != U.
+.decl lc_runner(i:number,k:number)
+lc_runner(I,K) :- lc_other(I,_), K = max L : { lc_other(I,L) }.
+.decl lc_frequency(i:number,t:number,n:number)
+lc_frequency(I,T,N) :- lc_winner(I,T), N = count : { tok(I,_,T) }.
+.decl lc_prediction(c:number,i:number,t:number)
+lc_prediction(C,I,T) :- lc_option(C,M,D), lc_best(I,K), K >= M,
+    lc_runner(I,R), R >= 3, K-R >= D, lc_winner(I,T), lc_frequency(I,T,1).
+.decl lc_recent_position(i:number,j:number)
+lc_recent_position(I,J) :- lc_match(I,_,3), J = max Q : { lc_match(I,Q,3) }.
+.decl lc_recent(i:number,t:number)
+lc_recent(I,T) :- lc_recent_position(I,J), tok(I,J+1,T).
+// Includer supplies lc_match/lc_source/lc_best/lc_other/lc_runner/lc_winner
+// from copy_longest_runtime.dl, and lg_option(c,minmatch,minsupport).
+.decl lg_support_source(c:number,i:number,j:number,t:number)
+lg_support_source(C,I,J,T) :- lg_option(C,M,_), lc_winner(I,T), lc_runner(I,R),
+    lc_source(I,J,K,T), K >= M, K >= R+4.
+.decl lg_support(c:number,i:number,n:number)
+lg_support(C,I,N) :- lg_option(C,_,_), lc_winner(I,_),
+    N = count : { lg_support_source(C,I,_,_) }.
+.decl lg_prediction(c:number,i:number,t:number)
+lg_prediction(C,I,T) :- lg_option(C,M,S), lc_best(I,K), K >= M,
+    lc_winner(I,T), lc_runner(I,R), R >= 12, K-R >= 4, lg_support(C,I,N), N >= S.
+
+.decl cdecide(i:number,t:number)
+cdecide(I,T) :- lg_prediction(_,I,T).

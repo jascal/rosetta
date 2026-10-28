@@ -1,0 +1,13 @@
+// Includer supplies prior_band(q,t,category), pg_option, and long-consensus rules.
+.decl pg_query(i:number,q:number)
+pg_query(I,Q) :- lc_last(I,P), tok(I,P,Q).
+.decl pg_source(i:number,t:number)
+pg_source(I,T) :- lc_source(I,_,K,T), K >= 12.
+.decl pg_missing(i:number)
+pg_missing(I) :- pg_query(I,Q), pg_source(I,T), !prior_band(Q,T,_).
+.decl pg_opposed(i:number,t:number)
+pg_opposed(I,T) :- pg_query(I,Q), prior_band(Q,T,B), pg_source(I,U), T != U,
+    prior_band(Q,U,C), C <= B.
+.decl pg_prediction(c:number,i:number,t:number)
+pg_prediction(C,I,T) :- pg_option(C,_,_), lg_prediction(C,I,T), pg_query(I,Q),
+    prior_band(Q,T,_), !pg_missing(I), !pg_opposed(I,T).

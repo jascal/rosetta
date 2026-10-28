@@ -1,0 +1,47 @@
+{
+  "scope": "historical routing/value factorization, not a final circuit test",
+  "files": {
+    "pairs.json": "a0d46a9fc6e6558dd912b41fcd49c49ee7ba9748cb01afb862d4b01d5568a9ad",
+    "historical.json": "bcb50bf14a9802764e11917e3e5152a2cfc9cb02319415b5ccb5bbe34b682369",
+    "dataset.json": "c53f78554b48628af2910f46eb6833423956b20e20ccfeec908a63ea64d42b38",
+    "members.json": "64bfb228c425e618f854899455887354dcf9e2ccc044594b1f98a5bb26372d60",
+    "donors.json": "e5e123dcfb67aa7d75aa90d7da9273ef4e2cd2fa3d8f708120477d2ed37318a6",
+    "plan.json": "6d82e32779816468bd01ff3545ada13e44930556df2475fe318e0d0347532cbf",
+    "base-checker.dl": "a77f44072b2366f84c5e80b78a4f91c36923223247cc3cf99ea54bcc72b3c380",
+    "certificate-evidence/plan/check-n_4sb06j/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-n_4sb06j/verify.dl": "3fcd9b202f5583e5bb6bba64d0b816028b9b7d4bddae156ec939a5b7daa6ba8f",
+    "certificate-evidence/plan/check-n_4sb06j/circuit.dl": "3fcd9b202f5583e5bb6bba64d0b816028b9b7d4bddae156ec939a5b7daa6ba8f",
+    "certificate-evidence/plan/check-n_4sb06j/certificate.json": "504190eac5a226f385b1adb6bd0804ba9fcd5c38f1c353bcb8244185747df4e5",
+    "certificate-evidence/plan/check-n_4sb06j/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-n_4sb06j/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-n_4sb06j/outputs/request.csv": "cdd56133eab348ea075f12cbd62773df2cb93e1a5c15da614065c0d59a4e43f4",
+    "certificate-evidence/plan/check-n_4sb06j/facts/member.facts": "457deb70a610aef72f5b5c9ac14575b0958fb018224529061335ed80f17c49f5",
+    "certificate-evidence/plan/check-n_4sb06j/facts/donor.facts": "dbe3ed1f1b56bcdea5d91fb7063ea9898792fd0fc82b73f191bf9bc14c14e1a0"
+  },
+  "sources": {
+    "py/run_copy_head_factorization.py": "dd861e55ee78ac13ab2aeabe5d3ef1153eaac618a4ea87071b2fbba2a8edc701",
+    "py/run_copy_head_exchange.py": "4ef0b1eb5fe16d505303498a53c0fb4ed6aa97f43ad30c657dc7c27ece25da13",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_head_exchange_summary.dl": "6990bf26bd8045870fbffb8ea9a13f04b9a08e410d946ae5adc2d7516eca1a7b",
+    "dl/copy_head_factorization_plan.dl": "3fcd9b202f5583e5bb6bba64d0b816028b9b7d4bddae156ec939a5b7daa6ba8f",
+    "dl/copy_head_factorization_summary.dl": "8f1c405164047981d2799a2c62a8b6cd88d6a3d5c5c572cfe2738782b152ec86",
+    "docs/copy-head-factorization-plan.md": "2f234148eddb1b98f3733297fb2e688c398623a99c463188f5e93b4fefc88926"
+  },
+  "previous": {
+    "reference/benchmarks/qwen25_copy_head_exchange/plan.json": "8182ea05d381dacfd0e69944b78e9be8d65f288de4bb3b93c7fa0e2bed1c03f3",
+    "reference/benchmarks/qwen25_copy_head_exchange/frozen.json": "4ac8acb276cc0d4b3f4efb65ff7c5783580afbd34a1275dc33029faa1e91f0c0",
+    "reference/benchmarks/qwen25_copy_head_exchange/closed.json": "6f061e810070c3feb305872bfb857619dd3998882f8b20ee2058e68199c8ac0f",
+    "reference/benchmarks/qwen25_copy_head_exchange/observations.jsonl": "906beede6692f8f69b398d6c05c5f8134215bc1acdb47470c48c7bbe662e8016",
+    "reference/benchmarks/qwen25_copy_head_exchange/activations.json": "c87d15ec5d44e7afd89a3bc3d561b094289a4ce8d8020aa75a087d030156ac2e"
+  },
+  "checkpoint": "/home/allans/.cache/huggingface/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+  "checkpoint_sha256": {
+    "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+    "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "train",
+        "150",
+        "6",
+        "72"
+      ],
+      [
+        "validation",
+        "150",
+        "6",
+        "72"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_copy_inventory/certificate-evidence/input-integrity/check-dsr0n919"
+}

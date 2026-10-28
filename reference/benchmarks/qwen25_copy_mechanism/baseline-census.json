@@ -1,0 +1,71 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "0",
+        "96",
+        "96",
+        "1"
+      ],
+      [
+        "1",
+        "18",
+        "6",
+        "0"
+      ]
+    ],
+    "abstained": [
+      [
+        "32"
+      ],
+      [
+        "34"
+      ],
+      [
+        "35"
+      ],
+      [
+        "37"
+      ],
+      [
+        "70"
+      ],
+      [
+        "72"
+      ],
+      [
+        "73"
+      ],
+      [
+        "75"
+      ],
+      [
+        "108"
+      ],
+      [
+        "110"
+      ],
+      [
+        "111"
+      ],
+      [
+        "113"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "wrong": [
+      [
+        "105",
+        "2546",
+        "15014"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_mechanism/certificate-evidence/baseline-census/check-ozvceyfd"
+}

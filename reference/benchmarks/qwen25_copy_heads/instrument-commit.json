@@ -1,0 +1,6 @@
+{
+  "checkout": "/tmp/rosetta-copy-attention",
+  "branch": "research/copy-attention-ablation",
+  "commit": "93b0be6e21c1198352115955dd07d25d5a8a4bd4",
+  "publication": "local isolated branch; source patch retained in study"
+}

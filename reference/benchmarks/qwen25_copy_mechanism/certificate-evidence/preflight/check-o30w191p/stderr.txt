@@ -1,0 +1,4 @@
+Error: syntax error, unexpected >, expecting . in file verify.dl at line 19
+logit_changed(I) :- ref(I,_,A), answer(I,_,B), abs(A-B) > 0.002+0.002*abs(A).
+--------------------------------------------------------^---------------------
+1 errors generated, evaluation aborted

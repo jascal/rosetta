@@ -1,0 +1,14 @@
+[
+  {
+    "path": "certificate-evidence/equiv-1/check-w21hjz9u",
+    "certified": false
+  },
+  {
+    "path": "certificate-evidence/equiv-2/check-vv_fqat1",
+    "certified": false
+  },
+  {
+    "path": "certificate-evidence/report/check-l7_ln7f0",
+    "certified": true
+  }
+]

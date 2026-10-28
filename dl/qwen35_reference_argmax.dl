@@ -1,0 +1,20 @@
+.decl vocab(n:number) .input vocab
+.decl score(t:number,x:float) .input score
+.decl maximum(x:float)
+maximum(X) :- X = max Y : { score(_,Y) }.
+.decl top(t:number)
+top(T) :- maximum(X), score(T,X).
+.decl ref(t:number) .output ref
+ref(T) :- top(_), T = min U : { top(U) }.
+.decl invalid() .output invalid
+invalid() :- !vocab(_).
+invalid() :- vocab(N), N <= 0.
+invalid() :- vocab(N), vocab(M), N != M.
+.decl nscore(n:number) .output nscore
+nscore(N) :- N = count : { score(_,_) }.
+invalid() :- vocab(N), nscore(M), M != N.
+invalid() :- score(T,_), T < 0.
+invalid() :- score(T,_), vocab(N), T >= N.
+invalid() :- score(T,X), score(T,Y), X != Y.
+.decl certified() .output certified
+certified() :- !invalid(), ref(_).

@@ -1,0 +1,37 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,gold:number) .input sample
+.decl actual(i:number,t:number) .input actual
+.decl requested(q:number,t:number) .input requested
+.decl prior(q:number,t:number,s:float) .input prior
+#include "circuit.dl"
+.decl score_source(i:number,t:number,s:float)
+score_source(I,T,S) :- sample(I,_), lc_last(I,P), tok(I,P,Q), lc_source(I,_,K,T), K >= 12, prior(Q,T,S).
+.decl best(i:number,s:float)
+best(I,S) :- sample(I,_), score_source(I,_,_), S = max X : { score_source(I,_,X) }.
+.decl tie(i:number)
+tie(I) :- best(I,S), score_source(I,T,S), score_source(I,U,S), T != U.
+.decl preferred(i:number,t:number) .output preferred
+preferred(I,T) :- best(I,S), score_source(I,T,S), !tie(I).
+.decl delta(i:number,t:number,over_gold:float) .output delta
+delta(I,T,S-G) :- score_source(I,T,S), sample(I,V), score_source(I,V,G).
+.decl invalid() .output invalid
+invalid() :- !sample(_,_).
+invalid() :- requested(Q,T), !prior(Q,T,_).
+invalid() :- prior(Q,T,_), !requested(Q,T).
+invalid() :- prior(Q,T,S), prior(Q,T,R), S != R.
+invalid() :- sample(I,_), !actual(I,_).
+invalid() :- actual(I,T), actual(I,U), T != U.
+.decl agreement(c:number,i:number) .output agreement
+agreement(C,I) :- lg_prediction(C,I,T), preferred(I,T).
+.decl disagreement(c:number,i:number) .output disagreement
+disagreement(C,I) :- lg_prediction(C,I,T), preferred(I,U), T != U.
+.decl counts(c:number,n:number,literal_right:number,prior_right:number,agree:number,agree_wrong:number) .output counts
+counts(C,N,L,P,A,W) :- lg_option(C,_,_),
+    N = count : { lg_prediction(C,_,_) },
+    L = count : { lg_prediction(C,I,T), actual(I,T) },
+    P = count : { lg_prediction(C,I,_), preferred(I,T), actual(I,T) },
+    A = count : { agreement(C,_) },
+    W = count : { agreement(C,I), lg_prediction(C,I,T), actual(I,U), T != U }.
+.decl certified() .output certified
+// Descriptive completeness only, not model-equivalence or feature admission.
+certified() :- !invalid().

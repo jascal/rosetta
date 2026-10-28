@@ -1,0 +1,61 @@
+// Empirical causal readouts. A passing certified() means instrument integrity only.
+.decl row(i:number,negative:number) .input row
+.decl ref(i:number,t:number) .input ref
+.decl donor(i:number,d:number) .input donor
+.decl planned(i:number,kind:symbol,d:number) .input planned
+.decl base(i:number,own:float,other:float) .input base
+.decl result(i:number,kind:symbol,t:number,own:float,other:float) .input result
+.decl old_zero(i:number,t:number,l:float) .input old_zero
+.decl product(i:number,n:number,v:float) .input product
+.decl invalid() .output invalid
+invalid() :- !planned(_,_,_).
+invalid() :- planned(I,K,_), !result(I,K,_,_,_).
+invalid() :- result(I,K,_,_,_), !planned(I,K,_).
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), T != U.
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), A != C.
+invalid() :- result(I,K,T,A,B), result(I,K,U,C,D), B != D.
+invalid() :- planned(I,_,_), !row(I,_).
+invalid() :- planned(I,_,_), !ref(I,_).
+invalid() :- planned(I,_,_), !base(I,_,_).
+invalid() :- donor(I,D), !ref(D,_).
+.decl preserved(i:number,kind:symbol) .output preserved
+preserved(I,K) :- result(I,K,T,_,_), ref(I,T).
+.decl transferred(i:number,kind:symbol) .output transferred
+transferred(I,K) :- result(I,K,T,_,_), donor(I,D), ref(D,T).
+.decl other(i:number,kind:symbol) .output other
+other(I,K) :- result(I,K,T,_,_), ref(I,A), donor(I,D), ref(D,B), T != A, T != B.
+.decl identity_broken(i:number) .output identity_broken
+identity_broken(I) :- result(I,"identity",T,_,_), !ref(I,T).
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), A != C.
+identity_broken(I) :- result(I,"identity",_,A,B), base(I,C,D), B != D.
+.decl zero_changed(i:number) .output zero_changed
+zero_changed(I) :- result(I,"zero",T,_,_), old_zero(I,U,_), T != U.
+.decl old_abs(i:number,a:float)
+old_abs(I,A) :- old_zero(I,_,A), A >= 0.0.
+old_abs(I,-A) :- old_zero(I,_,A), A < 0.0.
+zero_changed(I) :- result(I,"zero",_,A,_), old_zero(I,_,B), old_abs(I,M), A-B > 0.002+0.002*M.
+zero_changed(I) :- result(I,"zero",_,A,_), old_zero(I,_,B), old_abs(I,M), B-A > 0.002+0.002*M.
+invalid() :- result(I,"zero",_,_,_), !old_zero(I,_,_).
+.decl counts(kind:symbol,negative:number,total:number,preserved:number,transferred:number,other:number) .output counts
+counts(K,C,N,P,T,O) :- result(_,K,_,_,_), row(_,C),
+    N = count : { row(I,C), result(I,K,_,_,_) },
+    P = count : { row(I,C), preserved(I,K) },
+    T = count : { row(I,C), transferred(I,K) },
+    O = count : { row(I,C), other(I,K) }.
+.decl effect(i:number,kind:symbol,own_delta:float,donor_delta:float) .output effect
+effect(I,K,A-C,B-D) :- result(I,K,_,A,B), base(I,C,D).
+.decl difference(i:number,n:number,d:float)
+difference(I,N,A-B) :- donor(I,J), product(I,N,A), product(J,N,B).
+.decl abs_difference(i:number,n:number,d:float)
+abs_difference(I,N,D) :- difference(I,N,D), D >= 0.0.
+abs_difference(I,N,-D) :- difference(I,N,D), D < 0.0.
+.decl abs_product(i:number,n:number,v:float)
+abs_product(I,N,V) :- product(I,N,V), V >= 0.0.
+abs_product(I,N,-V) :- product(I,N,V), V < 0.0.
+.decl vector_change(i:number,l1:float,maxabs:float,relative_l1:float) .output vector_change
+vector_change(I,S,M,S/W) :- donor(I,_),
+    S = sum V : { abs_difference(I,_,V) },
+    M = max V : { abs_difference(I,_,V) },
+    W = sum V : { abs_product(I,_,V) }, W > 0.0.
+.decl certified() .output certified
+certified() :- !invalid(), !identity_broken(_), !zero_changed(_).

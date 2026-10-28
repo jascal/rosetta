@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/tmp/rosetta-copy-fieldrun/target/release/fieldrun",
+    "--bundle",
+    "/tmp/rosetta-copy-mechanism/model",
+    "--serve",
+    "8396"
+  ],
+  "pid": 11936,
+  "binary_sha256": "54de8fc8fd5acec025a0cda6bd5a73202f08b4d2d3e30c0ea982c6c24567ea62",
+  "bundle_sha256": {
+    ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+    ".fieldrun.json": "e7e01b0efe95521e905142bcb936e1688e60783a3e6f6a3043c2c30bb96a72c0"
+  }
+}

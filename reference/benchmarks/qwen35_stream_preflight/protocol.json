@@ -1,0 +1,25 @@
+{
+  "scope": "synthetic dense-hybrid streaming parity; actual 4B weights not evaluated",
+  "contexts_sha256": "14578e81a118e731855700781c49148b5467ea8fe17c3e2b78a639c3c945a0f4",
+  "ncontexts": 60,
+  "vocab_chunk": 7,
+  "tolerance": {
+    "absolute": 2e-06,
+    "relative": 2e-06
+  },
+  "precision": "FP32",
+  "cache": false,
+  "threads": 1,
+  "sources": {
+    "py/verify_qwen35_stream.py": "090c8b5b21c971a0185aa11b830cdd5466d4ffde96d3b78283e46e08d1dd3a7a",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_stream_parity.dl": "be0b38acb9b85e61cafb4c8f78c66a7c1c921b982099ccfe457b3769f2c69bcb"
+  },
+  "checkpoint": "/tmp/rosetta-qwen35-preflight/model",
+  "checkpoint_files": {
+    "generation_config.json": "a7cb9ba62b25a6ad5f2d653fdf1205f7bb9fcf35e0abbf0f9d887cf12f20b408",
+    "config.json": "9e5abf3d5659ea0004416ef80360893ca4acb913a5c85faa5d77f9cd3ee6b099",
+    "model.safetensors": "660359d09a7043654801beef827a4b1ec45cd479c2e6de046fcfdcfa6b217574"
+  }
+}

@@ -1,0 +1,151 @@
+diff --git a/src/api.rs b/src/api.rs
+index 54489c0..6172247 100644
+--- a/src/api.rs
++++ b/src/api.rs
+@@ -43,6 +43,31 @@ struct MlpProbeReq {
+     probe: crate::model::MlpProbe,
+ }
+ 
++#[derive(Deserialize)]
++#[serde(deny_unknown_fields)]
++struct HeadProbeReq {
++    ids: Vec<i64>,
++    probe: crate::model::HeadProbe,
++}
++
++#[cfg(test)]
++mod head_probe_request_tests {
++    use super::*;
++
++    #[test]
++    fn strict_head_probe_request_schema() {
++        let good: HeadProbeReq = serde_json::from_str(r#"{"ids":[1],"probe":{"heads":[[16,9]],"readouts":[2]}}"#).unwrap();
++        assert_eq!(good.probe.heads, vec![(16,9)]);
++        for bad in [
++            r#"{"ids":[1],"probe":{"positions":[0]}}"#,
++            r#"{"ids":[1],"probe":{"heads":[[0,-1]]}}"#,
++            r#"{"ids":[1],"probe":{},"unknown":1}"#,
++        ] {
++            assert!(serde_json::from_str::<HeadProbeReq>(bad).is_err());
++        }
++    }
++}
++
+ #[derive(Deserialize)]
+ struct TopkReq {
+     ids: Vec<i64>,
+@@ -590,6 +615,13 @@ fn handle(url: &str, body: &str, lm: &dyn Model, arch: &str, tg: Option<&TextGen
+     let route = url.split('?').next().unwrap_or(url);
+     match route {
+         "/health" => "{\"ok\":true}".to_string(),
++        "/probe/heads" => match serde_json::from_str::<HeadProbeReq>(body) {
++            Ok(r) => match lm.probe_heads(&r.ids, &r.probe) {
++                Some(result) => serde_json::to_string(&result).unwrap(),
++                None => err("head probe unsupported or invalid ids/heads/readouts"),
++            },
++            _ => err("expected {ids:[...],probe:{heads:[[layer,query_head]],readouts:[token]}}"),
++        },
+         "/probe/mlp" => match serde_json::from_str::<MlpProbeReq>(body) {
+             Ok(r) => match lm.probe_mlp(&r.ids, &r.probe) {
+                 Some(result) => serde_json::to_string(&result).unwrap(),
+diff --git a/src/model.rs b/src/model.rs
+index 2c3695c..1f64509 100644
+--- a/src/model.rs
++++ b/src/model.rs
+@@ -320,7 +320,29 @@ pub struct MlpProbeResult {
+     pub logits: Vec<(usize, f32)>,
+ }
+ 
++/// Build-time whole-sequence attention-head deletion. Heads are query-head
++/// indices, including for GQA models. No position-specific intervention implied.
++#[derive(Clone, Debug, Default, serde::Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct HeadProbe {
++    #[serde(default)]
++    pub heads: Vec<(usize, usize)>,
++    #[serde(default)]
++    pub readouts: Vec<usize>,
++}
++
++#[derive(Debug, serde::Serialize)]
++pub struct HeadProbeResult {
++    pub next: i64,
++    pub next_logit: f32,
++    pub logits: Vec<(usize, f32)>,
++    pub scope: &'static str,
++}
++
+ pub trait Model: Sync {
++    fn probe_heads(&self, _ids: &[i64], _probe: &HeadProbe) -> Option<HeadProbeResult> {
++        None
++    }
+     /// Observes last-position gate/value/product and optionally patches native
+     /// products before down-projection. None means unsupported or invalid input.
+     fn probe_mlp(&self, _ids: &[i64], _probe: &MlpProbe) -> Option<MlpProbeResult> {
+diff --git a/src/rope.rs b/src/rope.rs
+index 2d1d2e5..93520ce 100644
+--- a/src/rope.rs
++++ b/src/rope.rs
+@@ -889,6 +889,29 @@ impl Rope {
+ }
+ 
+ impl Model for Rope {
++    fn probe_heads(&self, ids: &[i64], probe: &crate::model::HeadProbe)
++        -> Option<crate::model::HeadProbeResult> {
++        let vocab = self.b.config[6] as usize;
++        if ids.is_empty() || ids.iter().any(|&t| t < 0 || t as usize >= vocab)
++            || probe.heads.iter().any(|&(l,h)| l >= self.n_layer || h >= self.h)
++            || probe.readouts.iter().any(|&t| t >= vocab) {
++            return None;
++        }
++        let mut heads = std::collections::HashSet::new();
++        let mut readouts = std::collections::HashSet::new();
++        if probe.heads.iter().any(|&h| !heads.insert(h))
++            || probe.readouts.iter().any(|&t| !readouts.insert(t)) {
++            return None;
++        }
++        let values = self.logits_ablated(ids, &probe.heads, &[])?;
++        let next = values.iter().enumerate().max_by(|a,b| a.1.partial_cmp(b.1).unwrap())?.0;
++        Some(crate::model::HeadProbeResult {
++            next: next as i64, next_logit: values[next],
++            logits: probe.readouts.iter().map(|&t| (t, values[t])).collect(),
++            scope: "all_positions",
++        })
++    }
++
+     fn probe_mlp(&self, ids: &[i64], probe: &crate::model::MlpProbe)
+         -> Option<crate::model::MlpProbeResult> {
+         self.observed_mlp(ids, probe)
+@@ -1559,6 +1582,32 @@ mod tests {
+     use crate::bundle::Bundle;
+     use crate::model::{Model, BlindArm, POLE_NEG, POLE_POS};
+ 
++    #[test]
++    fn head_probe_matches_direct_ablation_and_rejects_invalid_requests() {
++        use crate::model::HeadProbe;
++        let m = Rope::new(Bundle::load(&tiny_rope("head_probe")).unwrap(), 0.0, false);
++        let mut p = HeadProbe { heads: vec![], readouts: (0..20).collect() };
++        let base = m.probe_heads(&IDS, &p).unwrap();
++        assert_eq!(base.next, m.predict(&IDS));
++        assert_eq!(base.scope, "all_positions");
++        p.heads = vec![(1,0), (1,2)];
++        let changed = m.probe_heads(&IDS, &p).unwrap();
++        let direct = m.logits_ablated(&IDS, &p.heads, &[]).unwrap();
++        assert_eq!(changed.logits, direct.iter().copied().enumerate().collect::<Vec<_>>());
++        assert_ne!(base.logits, changed.logits);
++        assert!(m.probe_heads(&[], &p).is_none());
++        assert!(m.probe_heads(&[-1], &p).is_none());
++        assert!(m.probe_heads(&[20], &p).is_none());
++        for heads in [vec![(3,0)],vec![(0,4)],vec![(0,0),(0,0)]] {
++            p.heads = heads;
++            assert!(m.probe_heads(&IDS, &p).is_none());
++        }
++        p.heads.clear(); p.readouts = vec![20];
++        assert!(m.probe_heads(&IDS, &p).is_none());
++        p.readouts = vec![1,1];
++        assert!(m.probe_heads(&IDS, &p).is_none());
++    }
++
+     /// Deterministic pseudo-random weights — no RNG dependency, so a failure is always reproducible.
+     fn v(seed: usize, n: usize) -> Vec<f32> {
+         (0..n).map(|i| (((seed * 37 + i * 17) % 41) as f32) / 20.0 - 1.0).collect()

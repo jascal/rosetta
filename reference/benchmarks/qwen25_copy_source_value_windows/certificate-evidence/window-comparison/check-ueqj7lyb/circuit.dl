@@ -1,0 +1,19 @@
+// Compare all retained window interventions with their contextual controls.
+.decl request(i:number,a:symbol,m:symbol,d:number) .input request
+.decl result(i:number,a:symbol,m:symbol,d:number,t:number,r:float,g:float,v:float) .input result
+.decl window_mode(m:symbol,k:number,kind:symbol) .input window_mode
+.decl expected(i:number,a:symbol,m:symbol,k:number,kind:symbol,t:number)
+expected(I,A,M,K,"self",T) :- request(I,A,M,_), window_mode(M,K,"self"), result(I,A,"identity",I,T,_,_,_).
+expected(I,A,M,K,"donor",T) :- request(I,A,M,D), window_mode(M,K,"donor"), result(I,A,"source_values",D,T,_,_,_).
+.decl difference(i:number,a:symbol,k:number,kind:symbol,window:number,contextual:number) .output difference
+difference(I,A,K,C,T,U) :- expected(I,A,M,K,C,U), result(I,A,M,_,T,_,_,_), T != U.
+.decl counts(k:number,kind:symbol,n:number,different:number) .output counts
+counts(K,C,N,D) :- window_mode(_,K,C), N = count : { expected(_,_,_,K,C,_) },
+    D = count : { difference(_,_,K,C,_,_) }.
+.decl invalid() .output invalid
+invalid() :- !request(_,_,_,_).
+invalid() :- request(I,A,M,D), !result(I,A,M,D,_,_,_,_).
+invalid() :- request(I,A,M,_), window_mode(M,_,_), !expected(I,A,M,_,_,_).
+.decl certified() .output certified
+// Completeness only. All differences are retained, not used to select cases.
+certified() :- !invalid().

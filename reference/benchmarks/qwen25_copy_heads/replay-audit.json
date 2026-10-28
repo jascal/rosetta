@@ -1,0 +1,14 @@
+{
+  "scope": "instrument consistency, no model-equivalence claim",
+  "frozen_hashes_unchanged": true,
+  "checks": [
+    {
+      "path": "certificate-evidence/plan/check-_9hu_cqs",
+      "certified": true
+    },
+    {
+      "path": "certificate-evidence/summary/check-zb9oc4yp",
+      "certified": true
+    }
+  ]
+}

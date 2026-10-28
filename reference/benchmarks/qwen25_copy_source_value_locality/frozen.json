@@ -1,0 +1,52 @@
+{
+  "scope": "historical token/bigram source-value locality; no final certificate",
+  "files": {
+    "pairs.json": "a0d46a9fc6e6558dd912b41fcd49c49ee7ba9748cb01afb862d4b01d5568a9ad",
+    "historical.json": "bcb50bf14a9802764e11917e3e5152a2cfc9cb02319415b5ccb5bbe34b682369",
+    "dataset.json": "c53f78554b48628af2910f46eb6833423956b20e20ccfeec908a63ea64d42b38",
+    "members.json": "64bfb228c425e618f854899455887354dcf9e2ccc044594b1f98a5bb26372d60",
+    "donors.json": "e5e123dcfb67aa7d75aa90d7da9273ef4e2cd2fa3d8f708120477d2ed37318a6",
+    "plan.json": "79d2b43eebcd06d530f3da5dbc09e3f5a4d711c6b0456ae497a7955c1681c43b",
+    "base-checker.dl": "a77f44072b2366f84c5e80b78a4f91c36923223247cc3cf99ea54bcc72b3c380",
+    "certificate-evidence/plan/check-swstrn8u/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-swstrn8u/verify.dl": "1b02717c9d1c3bb8aa43f4b55c4bcb361a58f05f542a3b856dd95dd348ac353b",
+    "certificate-evidence/plan/check-swstrn8u/circuit.dl": "1b02717c9d1c3bb8aa43f4b55c4bcb361a58f05f542a3b856dd95dd348ac353b",
+    "certificate-evidence/plan/check-swstrn8u/certificate.json": "6638d5725749b0e9a404b40ce33654a9dea1b68c1f1ae23ce7e26f684e89e4d0",
+    "certificate-evidence/plan/check-swstrn8u/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-swstrn8u/outputs/feature.csv": "50b8ad128792ee85c30c46583301ccccf6b4bc8aa49eca3eea176fb41ad2368c",
+    "certificate-evidence/plan/check-swstrn8u/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-swstrn8u/outputs/site.csv": "34466f0e4e3c02fc02ba1bcc3d52689a5f3f63bee7b10f54fa82eeaad1aea8a6",
+    "certificate-evidence/plan/check-swstrn8u/outputs/request.csv": "01e85565c21ab03972319f47194914b06997bf4e603cf04ff29edf3133f0d8e6",
+    "certificate-evidence/plan/check-swstrn8u/facts/member.facts": "457deb70a610aef72f5b5c9ac14575b0958fb018224529061335ed80f17c49f5",
+    "certificate-evidence/plan/check-swstrn8u/facts/donor.facts": "dbe3ed1f1b56bcdea5d91fb7063ea9898792fd0fc82b73f191bf9bc14c14e1a0",
+    "certificate-evidence/plan/check-swstrn8u/facts/edit.facts": "d97dee7e6654dcca816f717df3ecfdf7f82837f737f559e573f2081b8e9ba4e6",
+    "certificate-evidence/plan/check-swstrn8u/facts/tok.facts": "da26781e6d5b85fe908cb4c64be024ea5d667699bf9e014919375e1e965f5411"
+  },
+  "sources": {
+    "py/run_copy_source_value_locality.py": "445d4c5952a72c4dca9f33cc7617558e521876c692424b68d2d3a46b14313420",
+    "py/run_copy_head_factorization.py": "dd861e55ee78ac13ab2aeabe5d3ef1153eaac618a4ea87071b2fbba2a8edc701",
+    "py/run_copy_head_exchange.py": "4ef0b1eb5fe16d505303498a53c0fb4ed6aa97f43ad30c657dc7c27ece25da13",
+    "py/run_copy_mechanism.py": "ff7d4fcb55242d7eb1aa8032e24decc5a5d409670d6ea2656f1c61e58ed13434",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/copy_head_exchange_summary.dl": "6990bf26bd8045870fbffb8ea9a13f04b9a08e410d946ae5adc2d7516eca1a7b",
+    "dl/copy_source_value_locality_plan.dl": "1b02717c9d1c3bb8aa43f4b55c4bcb361a58f05f542a3b856dd95dd348ac353b",
+    "dl/copy_source_value_locality_summary.dl": "cf5a37ff21ab3738c6743f42de60746261e4ce9e9817883a0fc29f0464aa52b9",
+    "docs/copy-source-value-locality-plan.md": "84c27e40a76d0c35150e53f0ee9bd1d54ebfe92e812d77892d3767e799357e3b"
+  },
+  "previous": {
+    "reference/benchmarks/qwen25_copy_head_factorization/closed.json": "edce533813f4c06b71a61707a39a5ae7e3ef1fea3091a1277952fb28b279dbb7",
+    "reference/benchmarks/qwen25_copy_head_factorization/frozen.json": "14290b562e3318cbe122cdee7d0ee1c82a0340e9a2bbaa8c50de34ad021cda2d",
+    "reference/benchmarks/qwen25_copy_head_factorization/observations.jsonl": "5f4493f06894fb241bbd782ac44488bae19dd10b9e481a03427513971bc4bba9",
+    "reference/benchmarks/qwen25_copy_head_factorization/captured-factors.pt": "abf685abb8d7dec37e752627ea0bad632bf4f0418e1db28599e4ecaa2108014c",
+    "reference/benchmarks/qwen25_copy_head_factorization/upstream-build.json": "a02372046cb4c02e32f41213888f4a0673992dc43e52690c84fbfe469e45499d"
+  },
+  "checkpoint": "/home/allans/.cache/huggingface/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775",
+  "checkpoint_sha256": {
+    "generation_config.json": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+    "config.json": "18e18afcaccafade98daf13a54092927904649e1dd4eba8299ab717d5d94ff45",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+  }
+}

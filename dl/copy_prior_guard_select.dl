@@ -1,0 +1,80 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,split:symbol,g:symbol) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl pair(a:number,b:number,g:symbol) .input pair
+.decl edit(a:number,b:number,p:number) .input edit
+#include "circuit.dl"
+.decl required(s:symbol)
+required("train"). required("validation").
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_).
+invalid() :- sample(I,_,_), !ref(I,_).
+invalid() :- ref(I,_), !sample(I,_,_).
+invalid() :- sample(I,S,_), !required(S).
+invalid() :- required(S), !sample(_,S,_).
+invalid() :- sample(I,S,G), sample(I,T,H), S != T.
+invalid() :- sample(I,S,G), sample(I,T,H), G != H.
+invalid() :- ref(I,A), ref(I,B), A != B.
+.decl changed(a:number,b:number,p:number)
+changed(A,B,P) :- pair(A,B,_), tok(A,P,T), tok(B,P,U), T != U.
+invalid() :- pair(A,B,_), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B,_), tok(B,P,_), !tok(A,P,_).
+invalid() :- changed(A,B,P), !edit(A,B,P).
+invalid() :- edit(A,B,P), !changed(A,B,P).
+invalid() :- pair(A,B,G), !sample(A,_,G).
+invalid() :- pair(A,B,G), !sample(B,_,G).
+invalid() :- pair(A,B,_), sample(A,S,_), sample(B,T,_), S != T.
+invalid() :- pair(A,B,_), lc_last(A,P), tok(A,P,T), !tok(B,P,T).
+.decl mismatch(c:number,i:number,pred:number,actual:number) .output mismatch
+mismatch(C,I,T,R) :- pg_prediction(C,I,T), ref(I,R), T != R.
+.decl baseline_wrong(i:number,pred:number,actual:number) .output baseline_wrong
+baseline_wrong(I,T,R) :- bdecide(I,T), ref(I,R), T != R.
+.decl baseline_overlap(c:number,i:number) .output baseline_overlap
+baseline_overlap(C,I) :- pg_prediction(C,I,_), bdecide(I,_).
+.decl baseline_conflict(c:number,i:number) .output baseline_conflict
+baseline_conflict(C,I) :- pg_prediction(C,I,T), bdecide(I,U), T != U.
+.decl pair_success(c:number,a:number,b:number,g:symbol)
+pair_success(C,A,B,G) :- pair(A,B,G), pg_prediction(C,A,T), pg_prediction(C,B,U),
+    T != U, ref(A,T), ref(B,U).
+.decl successful_pairs(c:number,s:symbol,n:number) .output successful_pairs
+successful_pairs(C,S,N) :- pg_option(C,_,_), required(S),
+    N = count : { sample(A,S,G), pair_success(C,A,_,G) }.
+// Count distinct groups, not correlated pairs, for the admission gate.
+.decl successful_group(c:number,s:symbol,g:symbol)
+successful_group(C,S,G) :- pair_success(C,A,_,G), sample(A,S,G).
+.decl ngroups(c:number,s:symbol,n:number) .output ngroups
+ngroups(C,S,N) :- pg_option(C,_,_), required(S), N = count : { successful_group(C,S,_) }.
+.decl score(c:number,s:symbol,n:number,wrong:number) .output score
+score(C,S,N,W) :- pg_option(C,_,_), required(S),
+    N = count : { sample(I,S,_), pg_prediction(C,I,_) },
+    W = count : { sample(I,S,_), mismatch(C,I,_,_) }.
+.decl rejected(c:number) .output rejected
+rejected(C) :- score(C,_,0,_).
+rejected(C) :- score(C,_,_,W), W > 0.
+rejected(C) :- ngroups(C,_,N), N < 2.
+.decl eligible(c:number) .output eligible
+eligible(C) :- pg_option(C,_,_), !rejected(C), !invalid().
+.decl coverage(c:number,n:number)
+.decl new_coverage(c:number,i:number)
+new_coverage(C,I) :- pg_prediction(C,I,_), !bdecide(I,_).
+coverage(C,N) :- pg_option(C,_,_), N = count : { new_coverage(C,_) }.
+.decl beaten(c:number)
+beaten(C) :- eligible(C), eligible(D), coverage(C,N), coverage(D,M), M > N.
+beaten(C) :- eligible(C), eligible(D), coverage(C,N), coverage(D,N),
+    pg_option(C,K,_), pg_option(D,L,_), L > K.
+beaten(C) :- eligible(C), eligible(D), coverage(C,N), coverage(D,N),
+    pg_option(C,K,M), pg_option(D,K,L), L < M.
+.decl pg_selected(c:number,k:number,support:number) .output pg_selected
+pg_selected(C,K,M) :- eligible(C), !beaten(C), pg_option(C,K,M).
+.decl certified() .output certified
+// Integrity only; selected may be empty, and no final model claim is made.
+certified() :- !invalid().
+
+// Admission needs real incremental coverage in each development split.
+.decl incremental_score(c:number,s:symbol,n:number) .output incremental_score
+incremental_score(C,S,N) :- pg_option(C,_,_), required(S),
+    N = count : { sample(I,S,_), new_coverage(C,I) }.
+rejected(C) :- incremental_score(C,_,0).
+
+// Baseline-priority composite must not introduce a token conflict.
+rejected(C) :- baseline_conflict(C,_).

@@ -1,0 +1,23 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl domain(i:number) .input domain
+.decl raw_prior(q:number,t:number,b:number) .input raw_prior
+#include "circuit.dl"
+.decl need_query(q:number) .output need_query
+need_query(Q) :- domain(I), lc_last(I,P), tok(I,P,Q), lc_source(I,_,K,_), K >= 12.
+.decl need_target(t:number) .output need_target
+need_target(T) :- domain(I), lc_source(I,_,K,T), K >= 12.
+.decl selected_prior(q:number,t:number,b:number) .output selected_prior
+selected_prior(Q,T,B) :- need_query(Q), need_target(T), raw_prior(Q,T,B).
+.decl missing(q:number,t:number) .output missing
+missing(Q,T) :- need_query(Q), need_target(T), !raw_prior(Q,T,_).
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- tok(I,_,_), !domain(I).
+invalid() :- raw_prior(Q,T,B), raw_prior(Q,T,C), B != C.
+invalid() :- raw_prior(_,_,B), B < 0.
+invalid() :- raw_prior(_,_,B), B > 63.
+.decl nselected(n:number) .output nselected
+nselected(N) :- N = count : { selected_prior(_,_,_) }.
+.decl certified() .output certified
+// Complete, unmodified finite lexical view; no model-equivalence claim.
+certified() :- !invalid(), !missing(_,_), selected_prior(_,_,_).

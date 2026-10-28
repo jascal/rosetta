@@ -1,0 +1,62 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl domain(i:number) .input domain
+.decl seed(i:number,s:number) .input seed
+.decl sample(i:number,g:symbol,start:number) .input sample
+.decl ref(i:number,t:number) .input ref
+.decl pair(a:number,b:number,g:symbol) .input pair
+.decl edit(a:number,b:number,p:number) .input edit
+#include "circuit.dl"
+.decl firing(i:number)
+firing(I) :- domain(I), pg_prediction(_,I,_).
+.decl incremental(i:number)
+incremental(I) :- firing(I), !bdecide(I,_).
+.decl wrong(i:number,pred:number,actual:number) .output wrong
+wrong(I,T,R) :- pg_prediction(_,I,T), ref(I,R), T != R.
+.decl baseline_wrong(i:number,pred:number,actual:number) .output baseline_wrong
+baseline_wrong(I,T,R) :- bdecide(I,T), ref(I,R), T != R.
+.decl invalid() .output invalid
+invalid() :- !domain(_).
+invalid() :- domain(I), !ref(I,_).
+invalid() :- ref(I,_), !domain(I).
+invalid() :- tok(I,_,_), !domain(I).
+invalid() :- ref(I,T), ref(I,U), T != U.
+invalid() :- domain(I), !seed(I,_).
+invalid() :- domain(I), !sample(I,_,_).
+.decl changed(a:number,b:number,p:number)
+changed(A,B,P) :- pair(A,B,_), tok(A,P,T), tok(B,P,U), T != U.
+invalid() :- changed(A,B,P), !edit(A,B,P).
+invalid() :- edit(A,B,P), !changed(A,B,P).
+invalid() :- pair(A,B,_), tok(A,P,_), !tok(B,P,_).
+invalid() :- pair(A,B,_), tok(B,P,_), !tok(A,P,_).
+invalid() :- pair(A,B,G), !sample(A,G,_).
+invalid() :- pair(A,B,G), !sample(B,G,_).
+invalid() :- edit(A,B,P), sample(A,_,S), P >= S.
+invalid() :- edit(A,B,P), !lc_source(A,P-1,_,_).
+.decl active_success(a:number,b:number,g:symbol) .output active_success
+active_success(A,B,G) :- pair(A,B,G), incremental(A), incremental(B),
+    pg_prediction(_,A,T), pg_prediction(_,B,U), T != U, ref(A,T), ref(B,U).
+.decl successful_group(s:number,g:symbol)
+successful_group(S,G) :- active_success(A,_,G), seed(A,S).
+.decl causal_groups(s:number,n:number) .output causal_groups
+causal_groups(S,N) :- seed(_,S), N = count : { successful_group(S,_) }.
+.decl counts(s:number,total:number,firing:number,incremental:number,wrong:number,baseline:number,baseline_wrong:number,baseline_only:number) .output counts
+counts(S,N,F,A,W,B,E,O) :- seed(_,S),
+    N = count : { seed(_,S) },
+    F = count : { seed(I,S), firing(I) },
+    A = count : { seed(I,S), incremental(I) },
+    W = count : { seed(I,S), wrong(I,_,_) },
+    B = count : { seed(I,S), bdecide(I,_) },
+    E = count : { seed(I,S), baseline_wrong(I,_,_) },
+    O = count : { seed(I,S), bdecide(I,_), !firing(I) }.
+.decl required_seed(s:number)
+required_seed(921). required_seed(922).
+invalid() :- required_seed(S), !seed(_,S).
+invalid() :- seed(_,S), !required_seed(S).
+.decl gate_failed() .output gate_failed
+gate_failed() :- wrong(_,_,_).
+gate_failed() :- counts(_,_,0,_,_,_,_,_).
+gate_failed() :- counts(_,_,_,0,_,_,_,_).
+gate_failed() :- causal_groups(_,N), N < 2.
+.decl certified() .output certified
+// Fixed confirmation gates; exact equivalence is also checked by dl/equiv.dl.
+certified() :- !invalid(), !gate_failed().

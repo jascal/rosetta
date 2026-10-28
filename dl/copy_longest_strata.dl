@@ -1,0 +1,15 @@
+// Append to the frozen development selector; these strata never select a rule.
+.decl gold(i:number,t:number) .input gold
+.decl bucket(i:number,f:symbol,v:symbol) .input bucket
+.decl model_gold_wrong(i:number,pred:number,gold:number) .output model_gold_wrong
+model_gold_wrong(I,T,G) :- ref(I,T), gold(I,G), T != G.
+.decl stratum(f:symbol,v:symbol,n:number,model_gold:number,baseline_answers:number,baseline_wrong:number) .output stratum
+stratum(F,V,N,G,A,W) :- bucket(_,F,V),
+    N = count : { bucket(_,F,V) },
+    G = count : { bucket(I,F,V), gold(I,T), ref(I,T) },
+    A = count : { bucket(I,F,V), bdecide(I,_) },
+    W = count : { bucket(I,F,V), baseline_wrong(I,_,_) }.
+.decl candidate_stratum(c:number,f:symbol,v:symbol,answered:number,wrong:number) .output candidate_stratum
+candidate_stratum(C,F,V,N,W) :- ls_option(C,_,_), bucket(_,F,V),
+    N = count : { bucket(I,F,V), ls_prediction(C,I,_) },
+    W = count : { bucket(I,F,V), mismatch(C,I,_,_) }.

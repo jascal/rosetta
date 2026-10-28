@@ -1,0 +1,11 @@
+// Includer supplies lc_match/lc_source/lc_best/lc_other/lc_runner/lc_winner
+// from copy_longest_runtime.dl, and lg_option(c,minmatch,minsupport).
+.decl lg_support_source(c:number,i:number,j:number,t:number)
+lg_support_source(C,I,J,T) :- lg_option(C,M,_), lc_winner(I,T), lc_runner(I,R),
+    lc_source(I,J,K,T), K >= M, K >= R+4.
+.decl lg_support(c:number,i:number,n:number)
+lg_support(C,I,N) :- lg_option(C,_,_), lc_winner(I,_),
+    N = count : { lg_support_source(C,I,_,_) }.
+.decl lg_prediction(c:number,i:number,t:number)
+lg_prediction(C,I,T) :- lg_option(C,M,S), lc_best(I,K), K >= M,
+    lc_winner(I,T), lc_runner(I,R), R >= 12, K-R >= 4, lg_support(C,I,N), N >= S.

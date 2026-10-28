@@ -1,0 +1,16 @@
+{
+  "tag": "empirical",
+  "upstream_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "converter": "/home/allans/code/fieldrun/target/release/fieldrun",
+  "converter_sha256": "3c83390dcadb73cc4b539dfaa08d4a62cc9a31c19580aaaa86d9a1a5130c74c4",
+  "bundle_sha256": {
+    ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+    ".fieldrun.json": "e7e01b0efe95521e905142bcb936e1688e60783a3e6f6a3043c2c30bb96a72c0"
+  },
+  "historical_bundle_sha256": {
+    ".fieldrun.bin": "3a2fb8e5062e9f281dffd9919eb81e164d5001b22395b1c87e2467cc67f77f8d",
+    ".fieldrun.json": "5c013a3a24ef13276d3c4d3fbd0a9007525bf4e9d720608b8db0176a391aaa12"
+  },
+  "runtime_validation": "pending: installed executable lacks /probe/mlp; rebuilding historical instrumentation 0948cbe in /tmp/rosetta-copy-fieldrun",
+  "note": "Weight bytes match; new converter adds sidecar metadata. No inherited executable validation and no new final references."
+}

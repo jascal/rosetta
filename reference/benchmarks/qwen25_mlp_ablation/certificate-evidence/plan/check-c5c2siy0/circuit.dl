@@ -1,0 +1,129 @@
+// Run-D ablation plan.
+//
+// The treatment is the whole layer grid, fixed in advance: every layer of the
+// model is ablated, so no layer can be picked after the fact. This query
+// decides the ARM STRUCTURE -- which rows, which arms, which layers, which
+// positions, which value -- and checks that the patchable coordinate universe
+// is exactly the neurons each layer actually has.
+//
+// The expansion of a registered rule into per-neuron patch rows is mechanical
+// serialization and happens in the host; the choices are here. Fail closed.
+
+.decl row(i:number,cls:number) .input row
+.decl layer(l:number,width:number) .input layer
+.decl neuron(l:number,n:number) .input neuron
+.decl sweep_arm(l:number) .input sweep_arm
+.decl cumul_arm(k:number) .input cumul_arm
+.decl cumul_member(k:number,l:number) .input cumul_member
+.decl ident_arm(l:number) .input ident_arm
+.decl donor_arm(l:number) .input donor_arm
+.decl full_arm(l:number) .input full_arm
+
+// ---------------------------------------------------------------- integrity
+.decl invalid() .output invalid
+invalid() :- !row(_,_).
+invalid() :- !layer(_,_).
+invalid() :- !neuron(_,_).
+invalid() :- !sweep_arm(_).
+invalid() :- !cumul_arm(_).
+invalid() :- !ident_arm(_).
+invalid() :- !donor_arm(_).
+
+// The sweep must cover every layer of the model exactly once.
+.decl nlayers(n:number)
+nlayers(N) :- N = count : { layer(_,_) }.
+invalid() :- nlayers(N), M = count : { sweep_arm(_) }, M != N.
+invalid() :- sweep_arm(L), !layer(L,_).
+
+// The cumulative arm must be a prefix of the layer order, and must include the
+// joint arm (all layers) exactly once. A set of k distinct layers with a
+// minimum of 0 and a maximum of k-1 IS the prefix {0..k-1}.
+invalid() :- cumul_arm(K), K < 1.
+invalid() :- cumul_arm(K), nlayers(N), K > N.
+invalid() :- nlayers(N), !cumul_arm(N).
+.decl cumul_count(k:number,c:number)
+cumul_count(K,C) :- cumul_arm(K), C = count : { cumul_member(K,_) }.
+.decl cumul_lo(k:number,l:number)
+cumul_lo(K,N) :- cumul_arm(K), N = min M : { cumul_member(K,M) }.
+.decl cumul_hi(k:number,l:number)
+cumul_hi(K,N) :- cumul_arm(K), N = max M : { cumul_member(K,M) }.
+invalid() :- cumul_arm(K), cumul_count(K,C), C != K.
+invalid() :- cumul_arm(K), cumul_lo(K,N), N != 0.
+invalid() :- cumul_arm(K), cumul_hi(K,N), N != K-1.
+invalid() :- cumul_member(K,L), !cumul_arm(K).
+invalid() :- cumul_member(K,L), !layer(L,_).
+// A prefix member must sit below its k; the per-k count/min/max pins the set.
+invalid() :- cumul_member(K,L), L >= K.
+
+// The write-back arms are registered on the same layers.
+invalid() :- ident_arm(L), !layer(L,_).
+invalid() :- donor_arm(L), !layer(L,_).
+invalid() :- ident_arm(L), !donor_arm(L).
+invalid() :- donor_arm(L), !ident_arm(L).
+
+// Stage 2 may be empty (before stage 1) but may not name an unknown layer.
+invalid() :- full_arm(L), !layer(L,_).
+invalid() :- full_arm(L1), full_arm(L2), L1 < L2.
+
+// The patchable coordinate universe must be exactly each layer's neurons.
+.decl n_neurons(l:number,c:number)
+n_neurons(L,C) :- layer(L,_), C = count : { neuron(L,_) }.
+invalid() :- layer(L,W), n_neurons(L,C), C != W.
+.decl lo(l:number,n:number)
+lo(L,N) :- layer(L,_), N = min M : { neuron(L,M) }.
+.decl hi(l:number,n:number)
+hi(L,N) :- layer(L,_), N = max M : { neuron(L,M) }.
+invalid() :- layer(L,W), lo(L,N), N != 0.
+invalid() :- layer(L,W), hi(L,N), N != W-1.
+invalid() :- neuron(L,N), !layer(L,_).
+
+// ---------------------------------------------------------------- the arms
+// "zero" patches the product with 0.0; "own" writes the row's own observed
+// products back; "donor" writes the donor row's observed products. allpos=1
+// means every position of the context, not just the answer position.
+.decl plan(i:number,arm:symbol,key:number,l:number,mode:symbol,allpos:number) .output plan
+plan(I,"sweep",L,L,"zero",0) :- row(I,_), sweep_arm(L).
+plan(I,"cumul",K,L,"zero",0) :- row(I,_), cumul_member(K,L).
+plan(I,"ident",L,L,"own",0) :- row(I,_), ident_arm(L).
+plan(I,"donor",L,L,"donor",0) :- row(I,_), donor_arm(L).
+plan(I,"full",L,L,"zero",1) :- row(I,_), full_arm(L).
+
+// One request per (row, arm, key): the sweep and the write-back arms have one
+// request per layer, the cumulative arm one per k.
+.decl req(i:number,arm:symbol,key:number) .output req
+req(I,"sweep",L) :- row(I,_), sweep_arm(L).
+req(I,"cumul",K) :- row(I,_), cumul_arm(K).
+req(I,"ident",L) :- row(I,_), ident_arm(L).
+req(I,"donor",L) :- row(I,_), donor_arm(L).
+req(I,"full",L) :- row(I,_), full_arm(L).
+
+.decl req_layer(i:number,arm:symbol,key:number,l:number) .output req_layer
+req_layer(I,"sweep",L,L) :- row(I,_), sweep_arm(L).
+req_layer(I,"cumul",K,L) :- row(I,_), cumul_member(K,L).
+req_layer(I,"ident",L,L) :- row(I,_), ident_arm(L).
+req_layer(I,"donor",L,L) :- row(I,_), donor_arm(L).
+req_layer(I,"full",L,L) :- row(I,_), full_arm(L).
+
+// Every request must patch at least one layer, and the number of layers a
+// request patches must match the arm's definition.
+.decl req_nlayers(i:number,arm:symbol,key:number,n:number)
+req_nlayers(I,A,K,N) :- req(I,A,K), N = count : { req_layer(I,A,K,_) }.
+invalid() :- req(I,A,K), req_nlayers(I,A,K,N), N = 0.
+invalid() :- req(I,"sweep",K), req_nlayers(I,"sweep",K,N), N != 1.
+invalid() :- req(I,"cumul",K), req_nlayers(I,"cumul",K,N), N != K.
+invalid() :- req(I,"ident",K), req_nlayers(I,"ident",K,N), N != 1.
+invalid() :- req(I,"donor",K), req_nlayers(I,"donor",K,N), N != 1.
+invalid() :- req(I,"full",K), req_nlayers(I,"full",K,N), N != 1.
+
+// The plan must cover every request and no request may be unplanned.
+invalid() :- plan(I,A,K,L,_,_), !req(I,A,K).
+invalid() :- req(I,A,K), !plan(I,A,K,_,_,_).
+
+.decl nreq(n:number) .output nreq
+nreq(N) :- N = count : { req(_,_,_) }.
+.decl nplan(n:number) .output nplan
+nplan(N) :- N = count : { plan(_,_,_,_,_,_) }.
+.decl narms(n:number) .output narms
+narms(N) :- N = count : { sweep_arm(_) }.
+.decl certified() .output certified
+certified() :- !invalid().

@@ -1,0 +1,74 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "changed": [
+      [
+        "0",
+        "1",
+        "12"
+      ],
+      [
+        "1",
+        "0",
+        "12"
+      ],
+      [
+        "12",
+        "13",
+        "12"
+      ],
+      [
+        "13",
+        "12",
+        "12"
+      ],
+      [
+        "14",
+        "15",
+        "12"
+      ],
+      [
+        "15",
+        "14",
+        "12"
+      ],
+      [
+        "38",
+        "39",
+        "12"
+      ],
+      [
+        "39",
+        "38",
+        "12"
+      ],
+      [
+        "62",
+        "63",
+        "12"
+      ],
+      [
+        "63",
+        "62",
+        "12"
+      ],
+      [
+        "76",
+        "77",
+        "12"
+      ],
+      [
+        "77",
+        "76",
+        "12"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_head_exchange/certificate-evidence/paired-contexts/check-drk8sso7"
+}

@@ -1,0 +1,12 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen25_copy_value_readout/certificate-evidence/runtime/check-m9s2dc03"
+}

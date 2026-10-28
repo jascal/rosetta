@@ -1,0 +1,90 @@
+Warning: Variable B only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+--------------------------^------------------------------------
+Warning: Variable G only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+----------------------------^----------------------------------
+Warning: Variable S only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+------------------------------^--------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+-----------------------------------------------^---------------
+Warning: Variable D only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+-------------------------------------------------^-------------
+Warning: Variable R only occurs once in file verify.dl at line 15
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), T != U.
+---------------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+------------------------^--------------------------------------
+Warning: Variable G only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+----------------------------^----------------------------------
+Warning: Variable S only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+------------------------------^--------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+---------------------------------------------^-----------------
+Warning: Variable D only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+-------------------------------------------------^-------------
+Warning: Variable R only occurs once in file verify.dl at line 16
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), B != C.
+---------------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+------------------------^--------------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+--------------------------^------------------------------------
+Warning: Variable S only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+------------------------------^--------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+---------------------------------------------^-----------------
+Warning: Variable C only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+-----------------------------------------------^---------------
+Warning: Variable R only occurs once in file verify.dl at line 17
+invalid() :- native(I,A,T,B,G,S), native(I,A,U,C,D,R), G != D.
+---------------------------------------------------^-----------
+Warning: Variable B only occurs once in file verify.dl at line 18
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), T != U.
+----------------------------^----------------------------------
+Warning: Variable G only occurs once in file verify.dl at line 18
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), T != U.
+------------------------------^--------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 18
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), T != U.
+-------------------------------------------------^-------------
+Warning: Variable D only occurs once in file verify.dl at line 18
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), T != U.
+---------------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 19
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), B != C.
+--------------------------^------------------------------------
+Warning: Variable G only occurs once in file verify.dl at line 19
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), B != C.
+------------------------------^--------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 19
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), B != C.
+-----------------------------------------------^---------------
+Warning: Variable D only occurs once in file verify.dl at line 19
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), B != C.
+---------------------------------------------------^-----------
+Warning: Variable T only occurs once in file verify.dl at line 20
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), G != D.
+--------------------------^------------------------------------
+Warning: Variable B only occurs once in file verify.dl at line 20
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), G != D.
+----------------------------^----------------------------------
+Warning: Variable U only occurs once in file verify.dl at line 20
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), G != D.
+-----------------------------------------------^---------------
+Warning: Variable C only occurs once in file verify.dl at line 20
+invalid() :- upstream(I,A,T,B,G), upstream(I,A,U,C,D), G != D.
+-------------------------------------------------^-------------

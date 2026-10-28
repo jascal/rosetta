@@ -1,0 +1,33 @@
+// Discovery plan only. Historical references may select donors, never runtime rules.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl ref(i:number,t:number) .input ref
+.decl row(i:number,negative:number) .input row
+.decl last(i:number,p:number)
+last(I,P) :- row(I,_), tok(I,_,_), P = max Q : { tok(I,Q,_) }.
+.decl eligible(i:number,d:number)
+eligible(I,D) :- row(I,_), row(D,_), I != D,
+    last(I,P), tok(I,P,T), last(D,Q), tok(D,Q,T),
+    ref(I,A), ref(D,B), A != B.
+.decl donor(i:number,d:number) .output donor
+donor(I,D) :- eligible(I,_), D = min J : { eligible(I,J) }.
+.decl no_donor(i:number) .output no_donor
+no_donor(I) :- row(I,_), !donor(I,_).
+.decl arm(i:number,kind:symbol,d:number) .output arm
+arm(I,"identity",I) :- donor(I,_).
+arm(I,"zero",I) :- donor(I,_).
+arm(I,"exchange",D) :- donor(I,D).
+.decl invalid() .output invalid
+invalid() :- !row(_,_).
+invalid() :- row(I,_), !ref(I,_).
+invalid() :- row(I,_), !last(I,_).
+invalid() :- ref(I,A), ref(I,B), A != B.
+invalid() :- tok(I,_,_), !row(I,_).
+invalid() :- ref(I,_), !row(I,_).
+invalid() :- tok(I,P,A), tok(I,P,B), A != B.
+invalid() :- tok(_,P,_), P < 0.
+.decl counts(negative:number,total:number,paired:number) .output counts
+counts(C,N,M) :- row(_,C), N = count : { row(_,C) },
+    M = count : { row(I,C), donor(I,_) }.
+.decl certified() .output certified
+// This verdict certifies plan integrity, not model equivalence or mechanism.
+certified() :- !invalid(), donor(_,_).
