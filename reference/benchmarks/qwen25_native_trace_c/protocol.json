@@ -1,0 +1,87 @@
+{
+  "seed": 301,
+  "lengths": [
+    8,
+    12,
+    24
+  ],
+  "groups": 2,
+  "excluded_tokens": 8872,
+  "excluded_from": [
+    "reference/benchmarks/qwen25_05b/dataset.json",
+    "reference/benchmarks/qwen25_05b_copy_generalization/dataset.json",
+    "reference/benchmarks/qwen25_05b_guarded_seed1/dataset.json",
+    "reference/benchmarks/qwen25_05b_int8_withheld_pairs/dataset.json",
+    "reference/benchmarks/qwen25_05b_target_diagnostic/dataset.json",
+    "reference/benchmarks/qwen25_05b_withheld_pairs/dataset.json",
+    "reference/benchmarks/qwen25_native_trace/dataset.json",
+    "reference/benchmarks/qwen25_native_trace/discovery.json",
+    "reference/benchmarks/qwen25_native_trace_b/dataset.json"
+  ],
+  "counts": {
+    "n": 114,
+    "negative": 18
+  },
+  "problems": [],
+  "note": "Fresh inputs, generated before any run-C model request.",
+  "dataset_sha256": "1b54ab66f056295a87a8cd4e11a0c81ba47206043ac3db5696ac33ed675f6b44",
+  "prereg_sha256": "2f6de4b4fbde0dc3e8ffdcce0044a085c89d83fc5e5d07af48456e7a6a410509",
+  "treatment_sha256": "fe06adfa53badd035a84c735f9c98af19ca014aee63619037a8231172d6aea57",
+  "treatment": [
+    {
+      "rank": 1,
+      "layer": 7,
+      "neuron": 1898,
+      "channel": "gate"
+    },
+    {
+      "rank": 2,
+      "layer": 15,
+      "neuron": 788,
+      "channel": "gate"
+    },
+    {
+      "rank": 3,
+      "layer": 23,
+      "neuron": 412,
+      "channel": "gate"
+    },
+    {
+      "rank": 4,
+      "layer": 7,
+      "neuron": 3,
+      "channel": "value"
+    },
+    {
+      "rank": 5,
+      "layer": 15,
+      "neuron": 680,
+      "channel": "value"
+    },
+    {
+      "rank": 6,
+      "layer": 23,
+      "neuron": 1650,
+      "channel": "value"
+    },
+    {
+      "rank": 7,
+      "layer": 7,
+      "neuron": 1835,
+      "channel": "product"
+    },
+    {
+      "rank": 8,
+      "layer": 15,
+      "neuron": 992,
+      "channel": "product"
+    },
+    {
+      "rank": 9,
+      "layer": 23,
+      "neuron": 1792,
+      "channel": "product"
+    }
+  ],
+  "random_seed": 205
+}

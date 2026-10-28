@@ -1,0 +1,113 @@
+// Run-C effect summary.
+//
+// Every readout of the causal experiment is computed here, from the observed
+// intervention results and the unpatched references. No host-side arithmetic
+// decides a flip, a rate, or a hypothesis verdict.
+//
+// A "flip" is relative to the row's OWN unpatched greedy answer: a model that
+// already gets a copy row wrong cannot be flipped away from correct there, so
+// flips and correctness are counted separately and never conflated.
+
+.decl result(i:number,mode:symbol,k:number,answer:number,answer_logit:float,ref_logit:float,target_logit:float) .input result
+.decl base(i:number,ref_logit:float,target_logit:float) .input base
+.decl ref(i:number,t:number) .input ref
+.decl row(i:number,cls:number,expected:number) .input row
+.decl donor(d:number,i:number) .input donor
+.decl request(i:number,mode:symbol,k:number) .input request
+
+// ---------------------------------------------------------------- integrity
+.decl invalid() .output invalid
+invalid() :- !result(_,_,_,_,_,_,_).
+invalid() :- !base(_,_,_).
+invalid() :- !ref(_,_).
+invalid() :- result(I,_,_,_,_,_,_), !ref(I,_).
+invalid() :- result(I,M,K,_,_,_,_), !request(I,M,K).
+invalid() :- request(I,M,K), !result(I,M,K,_,_,_,_).
+invalid() :- base(I,_,_), !ref(I,_).
+invalid() :- donor(D,I), !ref(D,_).
+invalid() :- row(I,_,_), !ref(I,_).
+
+// ---------------------------------------------------------------- readouts
+.decl flip(i:number,mode:symbol,k:number) .output flip
+flip(I,M,K) :- result(I,M,K,A,_,_,_), ref(I,R), A != R.
+
+// Copy rows only: the decision rules are about the copy computation.
+.decl flip_copy(i:number,mode:symbol,k:number) .output flip_copy
+flip_copy(I,M,K) :- flip(I,M,K), row(I,0,_).
+
+// The generated copy target, reached or lost. Controls are excluded on purpose:
+// for a negative control the generated target is a readout, not an assertion.
+.decl answer_correct(i:number,mode:symbol,k:number) .output answer_correct
+answer_correct(I,M,K) :- result(I,M,K,A,_,_,_), row(I,0,E), A = E.
+
+// Did the write make the row answer exactly what the donor answers?
+.decl flip_to_donor(i:number,mode:symbol,k:number) .output flip_to_donor
+flip_to_donor(I,M,K) :- result(I,M,K,A,_,_,_), donor(D,I), ref(D,A).
+
+// Change in the logit of the row's own reference token.
+.decl logit_delta(i:number,mode:symbol,k:number,d:float) .output logit_delta
+logit_delta(I,M,K,RL-BL) :- result(I,M,K,_,_,RL,_), base(I,BL,_).
+.decl abs_delta(i:number,mode:symbol,k:number,d:float)
+abs_delta(I,M,K,D) :- logit_delta(I,M,K,X), X >= 0.0, D = X.
+abs_delta(I,M,K,D) :- logit_delta(I,M,K,X), X < 0.0, D = -X.
+.decl bigger_abs(mode:symbol,k:number,d:float)
+bigger_abs(M,K,X) :- abs_delta(_,M,K,X), abs_delta(_,M,K,Y), Y > X.
+.decl max_abs(mode:symbol,k:number,m:float) .output max_abs
+max_abs(M,K,X) :- abs_delta(_,M,K,X), !bigger_abs(M,K,X).
+
+// The instrument control: writing a row's own values back must reproduce its
+// own answer exactly. A broken identity invalidates every other arm.
+.decl identity_ok(i:number) .output identity_ok
+identity_ok(I) :- result(I,"ident",9,A,_,_,_), ref(I,A).
+.decl identity_broken(i:number) .output identity_broken
+identity_broken(I) :- result(I,"ident",9,A,_,_,_), ref(I,R), A != R.
+.decl any_identity_broken() .output any_identity_broken
+any_identity_broken() :- identity_broken(_).
+.decl instrument_ok() .output instrument_ok
+instrument_ok() :- !any_identity_broken().
+
+// ------------------------------------------------------------------ tables
+.decl summary(mode:symbol,k:number,n:number,nflip:number,nflipcopy:number,ncorrect:number,nflipdonor:number) .output summary
+summary(M,K,N,F,FC,C,D) :- request(_,M,K),
+    N  = count : { request(_,M,K) },
+    F  = count : { flip(_,M,K) },
+    FC = count : { flip_copy(_,M,K) },
+    C  = count : { answer_correct(_,M,K) },
+    D  = count : { flip_to_donor(_,M,K) }.
+
+.decl flip_class(i:number,mode:symbol,k:number,cls:number)
+flip_class(I,M,K,CL) :- flip(I,M,K), row(I,CL,_).
+.decl class_summary(mode:symbol,k:number,cls:number,n:number,nflip:number,ncorrect:number) .output class_summary
+class_summary(M,K,CL,N,F,C) :- request(_,M,K), row(_,CL,_),
+    N = count : { row(I,CL,_), result(I,M,K,_,_,_,_) },
+    F = count : { flip_class(I,M,K,CL) },
+    C = count : { answer_correct(I,M,K) }.
+
+// ------------------------------------------------------------- the verdicts
+// Registered in docs/native-trace-runc-prereg.md before any collection.
+//
+// H2 (redundancy): a group-level intervention moves the model.
+// H1 (off-path):   no arm at all moves the model.
+// H-SUF:           a write makes the row answer the donor's answer.
+// A third outcome is registered: causally relevant but not sufficient.
+.decl any_flip() .output any_flip
+any_flip() :- flip(_,_,_).
+.decl any_flip_to_donor() .output any_flip_to_donor
+any_flip_to_donor() :- flip_to_donor(_,_,_).
+
+.decl h2_supported() .output h2_supported
+h2_supported() :- flip_copy(_,"zero",K), K >= 3.
+h2_supported() :- flip_copy(_,"mean",9).
+h2_supported() :- flip_copy(_,"write_control_into_copy",0).
+
+.decl h1_supported() .output h1_supported
+h1_supported() :- !h2_supported(), !any_flip().
+
+.decl h_suf_supported() .output h_suf_supported
+h_suf_supported() :- flip_to_donor(_,_,_).
+
+.decl relevant_not_sufficient() .output relevant_not_sufficient
+relevant_not_sufficient() :- any_flip(), !any_flip_to_donor().
+
+.decl certified() .output certified
+certified() :- !invalid().

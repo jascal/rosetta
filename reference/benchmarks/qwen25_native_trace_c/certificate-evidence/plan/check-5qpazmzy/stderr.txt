@@ -1,0 +1,36 @@
+Warning: Variable I only occurs once in file verify.dl at line 37
+invalid() :- row(I,C,_,_), C > 1.
+-----------------^----------------
+Warning: Variable R only occurs once in file verify.dl at line 40
+invalid() :- row(I,_,_,_), unit(R,L,N), !obs(I,L,N,_).
+--------------------------------^----------------------
+Warning: Variable I only occurs once in file verify.dl at line 41
+invalid() :- obs(I,L,N,_), !unit(_,L,N).
+-----------------^-----------------------
+Warning: Variable K only occurs once in file verify.dl at line 44
+invalid() :- rset(K,L,N), unit(_,L,N).
+------------------^--------------------
+Warning: Variable I only occurs once in file verify.dl at line 76
+invalid() :- row(I,C,_,_), C != 0, C != 1.
+-----------------^-------------------------
+Warning: Variable R only occurs once in file verify.dl at line 85
+coord_mean(L,N,M) :- unit(R,L,N),
+--------------------------^-------
+Warning: Variable R only occurs once in file verify.dl at line 89
+invalid() :- unit(R,L,N), !coord_mean(L,N,_).
+------------------^---------------------------
+Warning: Variable R only occurs once in file verify.dl at line 105
+patch(I,"zero",K,L,N,0.0) :- row(I,_,_,_), zmember(K,R,L,N).
+-----------------------------------------------------^-------
+Warning: Variable R only occurs once in file verify.dl at line 107
+patch(I,"mean",9,L,N,M) :- row(I,_,_,_), unit(R,L,N), coord_mean(L,N,M).
+----------------------------------------------^--------------------------
+Warning: Variable R only occurs once in file verify.dl at line 108
+patch(I,"ident",9,L,N,V) :- row(I,_,_,_), unit(R,L,N), obs(I,L,N,V).
+-----------------------------------------------^---------------------
+Warning: Variable R only occurs once in file verify.dl at line 109
+patch(I,"write_copy_into_control",0,L,N,V) :- row(I,1,_,_), unit(R,L,N),
+-----------------------------------------------------------------^-------
+Warning: Variable R only occurs once in file verify.dl at line 111
+patch(I,"write_control_into_copy",0,L,N,V) :- row(I,0,_,_), unit(R,L,N),
+-----------------------------------------------------------------^-------

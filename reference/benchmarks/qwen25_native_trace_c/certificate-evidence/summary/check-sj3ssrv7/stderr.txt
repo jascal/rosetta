@@ -1,0 +1,9 @@
+Warning: Variable I only occurs once in file verify.dl at line 27
+invalid() :- donor(D,I), !ref(D,_).
+---------------------^--------------
+Warning: Variable I1 only occurs once in file verify.dl at line 83
+    F = count : { flip_class(I,M,K,CL) },
+-----------------------------^------------
+Warning: Variable I only occurs once in file verify.dl at line 84
+    C = count : { answer_correct(I,M,K) }.
+---------------------------------^---------
