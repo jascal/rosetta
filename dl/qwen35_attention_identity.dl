@@ -1,0 +1,10 @@
+.decl identity_site(l:number,p:number,h:number,d:number) .input identity_site
+.decl vector(l:number,p:number,h:number,d:number,v:float) .input vector
+.decl patch(l:number,p:number,h:number,d:number,v:float) .output patch
+patch(L,P,H,D,V) :- identity_site(L,P,H,D), vector(L,P,H,D,V).
+.decl invalid() .output invalid
+invalid() :- !identity_site(_,_,_,_).
+invalid() :- identity_site(L,P,H,D), !patch(L,P,H,D,_).
+invalid() :- patch(L,P,H,D,V), patch(L,P,H,D,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

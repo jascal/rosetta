@@ -1,0 +1,24 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl context(i:number,pairid:number,side:symbol,last:number) .input context
+#include "circuit.dl"
+.decl source_position(i:number,p:number) .output source_position
+source_position(I,J+1) :- lc_winner(I,T), lc_source(I,J,K,U), U != T, K >= 12.
+.decl mode(k:number,m:symbol,w:number,fill:number) .output mode
+mode(0,"full_prefix",0,0).
+mode(1,"window4_fill0",4,0). mode(2,"window4_fill1",4,1).
+mode(3,"window16_fill0",16,0). mode(4,"window16_fill1",16,1).
+.decl probe(a:number,i:number,k:number,m:symbol,last:number) .output probe
+probe(10*I+K,I,K,M,P) :- context(I,_,_,_), source_position(I,P), mode(K,M,_,_).
+.decl probe_tok(a:number,p:number,t:number) .output probe_tok
+probe_tok(A,J,T) :- probe(A,I,0,_,P), tok(I,J,T), J <= P.
+probe_tok(A,J,T) :- probe(A,I,K,_,P), K > 0, mode(K,_,W,_), tok(I,J,T), J <= P, J >= P+1-W.
+probe_tok(A,J,F) :- probe(A,I,K,_,P), K > 0, mode(K,_,W,F), tok(I,J,_), J < P+1-W.
+.decl invalid() .output invalid
+invalid() :- !context(_,_,_,_).
+.decl nsource(i:number,n:number)
+nsource(I,N) :- context(I,_,_,_), N = count : { source_position(I,P) }.
+invalid() :- nsource(_,N), N != 1.
+invalid() :- source_position(_,P), P+1 <= 16.
+invalid() :- probe_tok(A,P,T), probe_tok(A,P,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().

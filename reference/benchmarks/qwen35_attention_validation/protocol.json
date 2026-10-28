@@ -1,0 +1,39 @@
+{
+  "scope": "attention instrument only, one previous five-token smoke context",
+  "forwards": 7,
+  "sites": "heads3/0 and31/15, last-query attention and post-gate vector; identity512 scalars; zero256 scalars last31/15 and source-position0 at3/0; independent StreamReference controls",
+  "precision": "stored BF16 widened FP32, two CPU threads",
+  "parity": "full-vocabulary .002+.002abs tolerance and exact argmax; identity/cleanup hashes and observations exact; all sites and attention row masses checked",
+  "prior": {
+    "path": "reference/benchmarks/qwen35_4b_probe_validation/closed.json",
+    "sha256": "056063be179c031e1452570f269e5131a45b00216dddf4f54981ccf7cf319904"
+  },
+  "files": {
+    "context.json": "080bf7dce4023fb7298962d5eefc258ccd414fa048d4b9cdb0de118b5196b478",
+    "plan.json": "27e3a1617cc492055aae107f7e4e56b00ebacd9c4639809a02c348ab54646cfa",
+    "certificate-evidence/plan/check-8zb2l4lt/stderr.txt": "0d72ecbf4a25d011d8683a1f36ddac1eff62b12ce3797d41c9ea33c83234a53a",
+    "certificate-evidence/plan/check-8zb2l4lt/verify.dl": "e99a16a84c428ef83009ac32e0828a60ef0494993a8d463be2d2bb4240c7d9f6",
+    "certificate-evidence/plan/check-8zb2l4lt/circuit.dl": "e99a16a84c428ef83009ac32e0828a60ef0494993a8d463be2d2bb4240c7d9f6",
+    "certificate-evidence/plan/check-8zb2l4lt/certificate.json": "8af4497e8918907e91e0ec6c0969d0d5c054697770c0d6859d53a836a7cbb6d1",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/identity_site.csv": "d39a99847eb87588808fa213a3dce44e968aa8ed5f84386a55118bdd65a93745",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/zero.csv": "1976da54128c5364732d7a7f21f1fd4257a82b9cebe51b2e29d8d8f6ebfdc431",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/run_arm.csv": "d7aeac760789d94475e995f51f8bfe4fe8d9af2fc931918dff2df7adee5ae96d",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/head.csv": "1ebd060e3e127b79baa10eb5588bf5a23fc3b831f337a2a034465a8152c1d44c",
+    "certificate-evidence/plan/check-8zb2l4lt/outputs/observe.csv": "2237f5fa3c9866846df12d82095afa1401bddfaf5a7b0ab93493f1dd66e9e7ae",
+    "certificate-evidence/plan/check-8zb2l4lt/facts/full_layer.facts": "4ac05db0fdcae97c9ccac9e3e40686daa975995b2104809094d15a610c24832c",
+    "certificate-evidence/plan/check-8zb2l4lt/facts/shape.facts": "15fd474f46d2bc4b6eeee1dc5a1e6772ea81d59f362e5cec239f2c082fbc9a48"
+  },
+  "sources": {
+    "py/run_qwen35_attention_validation.py": "9bbd6f986d5407e30f5ef314849d8b3f194febe36d934b55564a971316da1d15",
+    "py/qwen35_attention_reference.py": "5d6fc1a797bd9c4f6ce2c906bac32513640bb6eb293b7a568886de0dafd9ca7e",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "dl/qwen35_attention_plan.dl": "e99a16a84c428ef83009ac32e0828a60ef0494993a8d463be2d2bb4240c7d9f6",
+    "dl/qwen35_attention_identity.dl": "1fcd15b9d23e9ca6cf9763e70d05184c64fb7542eec99b22d9e8149749ab2d3d",
+    "dl/qwen35_attention_sites.dl": "e462e67122b9f22940dd59b6c531b555c0c7ad908a3377e97f8f23a857c49500",
+    "dl/qwen35_checkpoint_parity.dl": "ec2f4a258b4271bc630a1e4c3ebda706179e5f373d8fdc5898008607c19a1b2d",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842"
+  }
+}

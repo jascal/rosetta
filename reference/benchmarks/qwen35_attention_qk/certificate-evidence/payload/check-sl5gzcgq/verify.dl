@@ -1,0 +1,109 @@
+// Build-time Q/K softmax factorization; no token-only runtime claim.
+.decl tok(i:number,p:number,t:number) .input tok
+.decl context(i:number,pairid:number,side:symbol,last:number) .input context
+.decl shape(w:number) .input shape
+.decl qvec(i:number,d:number,v:float) .input qvec
+.decl kvec(i:number,p:number,d:number,v:float) .input kvec
+.decl scale(i:number,v:float) .input scale
+.decl mask(i:number,p:number,v:float) .input mask
+.decl weight(i:number,p:number,v:float) .input weight
+.decl value(i:number,p:number,d:number,v:float) .input value
+.decl gate(i:number,d:number,v:float) .input gate
+.decl control_vector(i:number,kind:symbol,d:number,v:float) .input control_vector
+#include "circuit.dl"
+.decl donor(i:number,d:number)
+donor(I,D) :- context(I,C,S,_), context(D,C,T,_), S != T.
+.decl source(i:number,p:number,r:symbol)
+source(I,J+1,"long") :- lc_winner(I,T), lc_source(I,J,K,T), K >= 12.
+source(I,J+1,"short") :- lc_winner(I,T), lc_source(I,J,K,U), T != U, K >= 12.
+.decl mode(k:number,m:symbol)
+mode(0,"self_reconstructed"). mode(1,"donor_reconstructed"). mode(2,"donor_query").
+mode(3,"donor_keys"). mode(4,"donor_source_keys"). mode(5,"donor_short_keys").
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(6*I+K,I,D,M) :- donor(I,D), mode(K,M).
+.decl dimension(d:number)
+dimension(0) :- shape(W), W > 0.
+dimension(D+1) :- dimension(D), shape(W), D+1 < W.
+.decl position(i:number,p:number)
+position(I,0) :- context(I,_,_,P), P >= 0.
+position(I,J+1) :- position(I,J), context(I,_,_,P), J+1 <= P.
+.decl query_from(a:number,i:number)
+query_from(A,I) :- run(A,I,_,M), M != "donor_reconstructed", M != "donor_query".
+query_from(A,D) :- run(A,_,D,"donor_reconstructed").
+query_from(A,D) :- run(A,_,D,"donor_query").
+.decl key_from(a:number,p:number,i:number)
+key_from(A,P,I) :- run(A,I,_,"self_reconstructed"), position(I,P).
+key_from(A,P,I) :- run(A,I,_,"donor_query"), position(I,P).
+key_from(A,P,D) :- run(A,I,D,"donor_reconstructed"), position(I,P).
+key_from(A,P,D) :- run(A,I,D,"donor_keys"), position(I,P).
+key_from(A,P,D) :- run(A,I,D,"donor_source_keys"), source(I,P,_).
+key_from(A,P,I) :- run(A,I,_,"donor_source_keys"), position(I,P), !source(I,P,_).
+key_from(A,P,D) :- run(A,I,D,"donor_short_keys"), source(I,P,"short").
+key_from(A,P,I) :- run(A,I,_,"donor_short_keys"), position(I,P), !source(I,P,"short").
+.decl dot_term(a:number,p:number,d:number,v:float)
+dot_term(A,P,D,Q*K) :- query_from(A,IQ), key_from(A,P,IK), qvec(IQ,D,Q), kvec(IK,P,D,K).
+.decl dot(a:number,p:number,v:float)
+dot(A,P,V) :- run(A,I,_,_), position(I,P), V = sum X : { dot_term(A,P,D,X) }.
+.decl logit(a:number,p:number,v:float)
+logit(A,P,V*S+M) :- dot(A,P,V), run(A,I,_,_), scale(I,S), mask(I,P,M).
+.decl maximum(a:number,v:float)
+maximum(A,V) :- run(A,_,_,_), V = max X : { logit(A,P,X) }.
+.decl exponential(a:number,p:number,v:float)
+exponential(A,P,2.718281828459045^(V-M)) :- logit(A,P,V), maximum(A,M).
+.decl partition(a:number,v:float)
+partition(A,V) :- run(A,_,_,_), V = sum X : { exponential(A,P,X) }.
+.decl probability(a:number,p:number,v:float) .output probability
+probability(A,P,E/Z) :- exponential(A,P,E), partition(A,Z), Z > 0.0.
+.decl activated(i:number,d:number,v:float)
+activated(I,D,1.0/(1.0+2.718281828459045^(-G))) :- gate(I,D,G), G >= 0.0.
+activated(I,D,E/(1.0+E)) :- gate(I,D,G), G < 0.0, E = 2.718281828459045^G.
+.decl value_term(a:number,d:number,p:number,v:float)
+value_term(A,D,P,W*V) :- probability(A,P,W), run(A,I,_,_), value(I,P,D,V).
+.decl ungated(a:number,d:number,v:float)
+ungated(A,D,V) :- run(A,_,_,_), dimension(D), V = sum X : { value_term(A,D,P,X) }.
+.decl patch(a:number,l:number,p:number,h:number,d:number,v:float) .output patch
+patch(A,27,P,10,D,V*G) :- run(A,I,_,_), context(I,_,_,P), ungated(A,D,V), activated(I,D,G).
+.decl expected_weight(a:number,p:number,v:float)
+expected_weight(A,P,V) :- run(A,I,_,"self_reconstructed"), weight(I,P,V).
+expected_weight(A,P,V) :- run(A,_,D,"donor_reconstructed"), weight(D,P,V).
+.decl expected_vector(a:number,d:number,v:float)
+expected_vector(A,D,V) :- run(A,I,_,"self_reconstructed"), control_vector(I,"self",D,V).
+expected_vector(A,D,V) :- run(A,I,_,"donor_reconstructed"), control_vector(I,"donor",D,V).
+.decl abs_weight(a:number,p:number,v:float)
+abs_weight(A,P,V) :- expected_weight(A,P,V), V >= 0.0.
+abs_weight(A,P,-V) :- expected_weight(A,P,V), V < 0.0.
+.decl abs_vector(a:number,d:number,v:float)
+abs_vector(A,D,V) :- expected_vector(A,D,V), V >= 0.0.
+abs_vector(A,D,-V) :- expected_vector(A,D,V), V < 0.0.
+.decl probability_bad(a:number,p:number) .output probability_bad
+probability_bad(A,P) :- probability(A,P,V), expected_weight(A,P,W), abs_weight(A,P,M), V-W > 0.00001+0.00001*M.
+probability_bad(A,P) :- probability(A,P,V), expected_weight(A,P,W), abs_weight(A,P,M), W-V > 0.00001+0.00001*M.
+.decl vector_bad(a:number,d:number) .output vector_bad
+vector_bad(A,D) :- patch(A,_,_,_,D,V), expected_vector(A,D,W), abs_vector(A,D,M), V-W > 0.00001+0.00001*M.
+vector_bad(A,D) :- patch(A,_,_,_,D,V), expected_vector(A,D,W), abs_vector(A,D,M), W-V > 0.00001+0.00001*M.
+.decl invalid() .output invalid
+invalid() :- !context(_,_,_,_).
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- context(I,_,_,P), lc_last(I,Q), P != Q.
+invalid() :- context(I,_,_,_), !donor(I,_).
+invalid() :- donor(I,D), context(I,_,_,P), context(D,_,_,Q), P != Q.
+invalid() :- context(I,_,_,_), !source(I,_,"long").
+invalid() :- context(I,_,_,_), !source(I,_,"short").
+invalid() :- context(I,_,_,_), dimension(D), !qvec(I,D,_).
+invalid() :- position(I,P), dimension(D), !kvec(I,P,D,_).
+invalid() :- position(I,P), dimension(D), !value(I,P,D,_).
+invalid() :- context(I,_,_,_), dimension(D), !gate(I,D,_).
+invalid() :- context(I,_,_,_), !scale(I,_).
+invalid() :- scale(_,V), V <= 0.0.
+invalid() :- position(I,P), !mask(I,P,_).
+invalid() :- position(I,P), !weight(I,P,_).
+invalid() :- donor(I,D), scale(I,V), scale(D,W), V != W.
+invalid() :- donor(I,D), mask(I,P,V), mask(D,P,W), V != W.
+invalid() :- qvec(I,D,V), qvec(I,D,W), V != W.
+invalid() :- kvec(I,P,D,V), kvec(I,P,D,W), V != W.
+invalid() :- run(A,I,_,_), dimension(D), !patch(A,_,_,_,D,_).
+invalid() :- partition(_,Z), Z <= 0.0.
+.decl certified() .output certified
+certified() :- !invalid(), !probability_bad(_,_), !vector_bad(_,_).

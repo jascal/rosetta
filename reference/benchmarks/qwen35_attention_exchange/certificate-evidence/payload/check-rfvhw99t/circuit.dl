@@ -1,0 +1,52 @@
+.decl context(i:number,pairid:number,side:symbol,last:number) .input context
+.decl leading(l:number,h:number,score:float,positive:number) .input leading
+.decl random_order(l:number,h:number,r:number) .input random_order
+.decl shape(w:number) .input shape
+.decl vector(i:number,l:number,h:number,d:number,v:float) .input vector
+.decl selected(l:number,h:number) .output selected
+selected(L,H) :- leading(L,H,_,3).
+.decl per_layer(l:number,n:number)
+per_layer(L,N) :- selected(L,_), N = count : { selected(L,H) }.
+.decl control_rank(l:number,h:number,r:number)
+control_rank(L,H,N) :- per_layer(L,_), random_order(L,H,R), !selected(L,H),
+ N = count : { random_order(L,J,S), !selected(L,J), S < R }.
+.decl control(l:number,h:number) .output control
+control(L,H) :- control_rank(L,H,R), per_layer(L,N), R < N.
+.decl donor(i:number,d:number)
+donor(I,D) :- context(I,C,S,_), context(D,C,T,_), S != T.
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(10000*I+100*L+H,I,D,cat("selected_",to_string(L),"_",to_string(H))) :- donor(I,D), selected(L,H).
+run(10000*I+100*L+H,I,D,cat("random_",to_string(L),"_",to_string(H))) :- donor(I,D), control(L,H).
+run(10000*I+9000,I,D,"selected_joint") :- donor(I,D).
+run(10000*I+9001,I,D,"random_joint") :- donor(I,D).
+run(10000*I+9002,I,I,"identity") :- donor(I,_).
+.decl site(a:number,target:number,from:number,l:number,h:number)
+site(10000*I+100*L+H,I,D,L,H) :- donor(I,D), selected(L,H).
+site(10000*I+100*L+H,I,D,L,H) :- donor(I,D), control(L,H).
+site(10000*I+9000,I,D,L,H) :- donor(I,D), selected(L,H).
+site(10000*I+9001,I,D,L,H) :- donor(I,D), control(L,H).
+site(10000*I+9002,I,I,L,H) :- donor(I,_), selected(L,H).
+.decl dimension(d:number)
+dimension(0) :- shape(W), W > 0.
+dimension(D+1) :- dimension(D), shape(W), D+1 < W.
+.decl patch(a:number,l:number,p:number,h:number,d:number,v:float) .output patch
+patch(A,L,P,H,D,V) :- site(A,I,F,L,H), context(I,_,_,P), dimension(D), vector(F,L,H,D,V).
+.decl npatch(a:number,n:number) .output npatch
+npatch(A,N) :- run(A,_,_,_), N = count : { patch(A,L,P,H,D,V) }.
+.decl invalid() .output invalid
+invalid() :- !selected(_,_).
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- context(I,_,_,_), !donor(I,_).
+invalid() :- donor(I,D), donor(I,E), D != E.
+invalid() :- selected(L,H), control(L,H).
+invalid() :- per_layer(L,N), N != 2.
+.decl ncontrol(l:number,n:number)
+ncontrol(L,N) :- per_layer(L,_), N = count : { control(L,H) }.
+invalid() :- per_layer(L,N), ncontrol(L,M), N != M.
+invalid() :- site(A,I,F,L,H), dimension(D), !vector(F,L,H,D,_).
+invalid() :- vector(I,L,H,D,V), vector(I,L,H,D,W), V != W.
+invalid() :- npatch(_,0).
+.decl certified() .output certified
+certified() :- !invalid().

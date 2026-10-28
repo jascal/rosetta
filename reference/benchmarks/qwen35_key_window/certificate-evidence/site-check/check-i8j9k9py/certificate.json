@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "user-scoped frozen key-window empirical test; never certified model coverage"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "a4a0726bc8c473f7aeb209eeffb65c251c420c80ea597a2e35983b83cbb27039",
+    "facts/applied.facts": "cbcb0b92ecb5f7f661595375121b2c569b41bded27bdcdbc970919f659594bdd",
+    "facts/expected.facts": "265829bbd60e092cfa02badafbb688fc0af1bdaf070761dfb235e2db707a5009",
+    "facts/reconstruction.facts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "facts/ref.facts": "b1f141bd4fc3d5c61ce978a87d3c968284b1592c24b024fba44727de6907ad08",
+    "facts/request.facts": "e766d898541eb953c24eaf72ddd0d1d82dc60ecc4028b0433b8e729ee1178d86",
+    "facts/run.facts": "087fc41533e6f788cc2205dd4a25e35609d7f5f94df3996405ff288c461876da",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "ccb16205a364c55c2aa2f7029279d193e903472e2c52f7d66feadf357e6824df",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/transferred.csv": "1055de480bc8fd2c5a39e32db443625baf9204ffaa171de1b521696f73153cce",
+    "stderr.txt": "229b3c8e35b52d247287ed064af05bdee5813a0322222b02c990944246a7154d",
+    "verify.dl": "a4a0726bc8c473f7aeb209eeffb65c251c420c80ea597a2e35983b83cbb27039"
+  }
+}

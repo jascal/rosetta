@@ -1,0 +1,65 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "self_reconstructed",
+        "6",
+        "0"
+      ],
+      [
+        "donor_reconstructed",
+        "6",
+        "2"
+      ],
+      [
+        "donor_routing",
+        "6",
+        "2"
+      ],
+      [
+        "donor_values",
+        "6",
+        "2"
+      ],
+      [
+        "donor_gate",
+        "6",
+        "0"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transferred": [
+      [
+        "1",
+        "donor_reconstructed"
+      ],
+      [
+        "271",
+        "donor_reconstructed"
+      ],
+      [
+        "2",
+        "donor_routing"
+      ],
+      [
+        "272",
+        "donor_routing"
+      ],
+      [
+        "3",
+        "donor_values"
+      ],
+      [
+        "273",
+        "donor_values"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_attention_factor/certificate-evidence/summary/check-72ualyab"
+}

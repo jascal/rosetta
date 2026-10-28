@@ -1,0 +1,28 @@
+.decl shape(layers:number,heads:number,width:number,last:number) .input shape
+.decl full_layer(l:number) .input full_layer
+.decl head(l:number,h:number) .output head
+head(3,0). head(31,15).
+.decl dimension(d:number)
+dimension(0) :- shape(_,_,W,_), W > 0.
+dimension(D+1) :- dimension(D), shape(_,_,W,_), D+1 < W.
+.decl run_arm(a:symbol,order:number) .output run_arm
+run_arm("baseline",0). run_arm("identity",1). run_arm("zero_last",2).
+run_arm("zero_source",3). run_arm("direct_last",4). run_arm("direct_source",5). run_arm("cleanup",6).
+.decl observe(a:symbol,l:number,h:number) .output observe
+observe(A,L,H) :- run_arm(A,_), A != "direct_last", A != "direct_source", head(L,H).
+.decl identity_site(l:number,p:number,h:number,d:number) .output identity_site
+identity_site(L,P,H,D) :- head(L,H), dimension(D), shape(_,_,_,P).
+.decl zero(a:symbol,l:number,p:number,h:number,d:number,v:float) .output zero
+zero("zero_last",31,P,15,D,0.0) :- dimension(D), shape(_,_,_,P).
+zero("direct_last",31,P,15,D,0.0) :- dimension(D), shape(_,_,_,P).
+zero("zero_source",3,0,0,D,0.0) :- dimension(D).
+zero("direct_source",3,0,0,D,0.0) :- dimension(D).
+.decl invalid() .output invalid
+invalid() :- !shape(_,_,_,_).
+invalid() :- shape(L,H,W,P), L <= 31.
+invalid() :- shape(L,H,W,P), H <= 15.
+invalid() :- shape(_,_,W,_), W <= 0.
+invalid() :- shape(_,_,_,P), P < 1.
+invalid() :- head(L,_), !full_layer(L).
+.decl certified() .output certified
+certified() :- !invalid().

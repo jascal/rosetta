@@ -1,0 +1,43 @@
+{
+  "scope": "Q/K routing decomposition on six known contrasts, not final confirmation",
+  "capture_forwards": 6,
+  "substitution_forwards": 36,
+  "modes": [
+    "self_reconstructed",
+    "donor_reconstructed",
+    "donor_query",
+    "donor_keys",
+    "donor_source_keys",
+    "donor_short_keys"
+  ],
+  "fixed": "head27/10, target contextual values and output gate in every mode; aligned positions; actual normalized/rotated Q/K, scale and causal-mask row captured at official eager boundary",
+  "source_keys": "successors after suffix matches>=12; long is unique longest successor; short has different successor; other keys stay target",
+  "controls": "self route versus original target; full donor route versus prior routing-only substitution; probability/vector tolerances1e-5+1e-5abs;12 whole-score controls .002+.002abs and exact argmax before hybrids",
+  "reuse": "validated attention-factor collection/evaluation engine with only reconstruction reference resolver changed; numerical payload and captures freeze before substitutions",
+  "priors": {
+    "reference/benchmarks/qwen35_attention_factor/closed.json": "c86e2e49268162c33299c37f9a02cb2689e8d404bf7d25102e6089394fd97bcf",
+    "reference/benchmarks/qwen35_copy_inventory/closed.json": "edead1a31f8a94c0ce3cd2c377c13f20284a1f394dfa67f85a57a70f5c54f030"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "baseline-hashes.json": "05deac646e4b1bfc6083cb6990a478f3d322f491441c1516b077453e021f3af5",
+    "input-core.dl": "d6d12599cfd848cd99b183bebc9cff9c62528075fce290a7604f427f20e04f59"
+  },
+  "sources": {
+    "py/run_qwen35_attention_qk.py": "b37b11ba0476edd146b2911ee72bc7506eb2fe0278dc25fa46b4fa096d371c16",
+    "py/run_qwen35_attention_factor.py": "22bbe7c582f883c2e8c1a94bacfeccaa8ec9f07d3e3db01b337d982c22e37738",
+    "py/qwen35_attention_qk_reference.py": "0da655fb16eee18eb0cd0837fd7799f86c8a29569a0454485b9ffc581bb04df2",
+    "py/qwen35_attention_factor_reference.py": "fa15fbc9aa388c3bd2ad8e69641026f761e5478190acd0a11238b0517c280f1f",
+    "py/qwen35_attention_reference.py": "5d6fc1a797bd9c4f6ce2c906bac32513640bb6eb293b7a568886de0dafd9ca7e",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "dl/qwen35_attention_qk_payload.dl": "51311e35e6fbe29832e47c59995ec76953d78a41e377245273674610b26b1fd8",
+    "dl/copy_longest_runtime.dl": "e43771e1e6d07af97cec586d63a51e28484d5e7ea0d49a97def4557d99261e1b",
+    "dl/qwen35_attention_factor_summary.dl": "a4a0726bc8c473f7aeb209eeffb65c251c420c80ea597a2e35983b83cbb27039",
+    "dl/qwen35_factor_reconstruction_linear.dl": "6301f9262f5f54fa48842bbd4d0220f813f48cad95123b07925955bd3e6c484e",
+    "dl/qwen35_gate_cross_reproduction.dl": "91d284516cc1d1a2fa9916a2af7e0cb65dad09bbc9034a073115cbde0dc5e29f",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842"
+  }
+}

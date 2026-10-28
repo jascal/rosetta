@@ -1,0 +1,82 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "self_reconstructed",
+        "6",
+        "0"
+      ],
+      [
+        "donor_reconstructed",
+        "6",
+        "2"
+      ],
+      [
+        "donor_query",
+        "6",
+        "1"
+      ],
+      [
+        "donor_keys",
+        "6",
+        "2"
+      ],
+      [
+        "donor_source_keys",
+        "6",
+        "2"
+      ],
+      [
+        "donor_short_keys",
+        "6",
+        "2"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transferred": [
+      [
+        "1",
+        "donor_reconstructed"
+      ],
+      [
+        "325",
+        "donor_reconstructed"
+      ],
+      [
+        "2",
+        "donor_query"
+      ],
+      [
+        "3",
+        "donor_keys"
+      ],
+      [
+        "327",
+        "donor_keys"
+      ],
+      [
+        "4",
+        "donor_source_keys"
+      ],
+      [
+        "328",
+        "donor_source_keys"
+      ],
+      [
+        "5",
+        "donor_short_keys"
+      ],
+      [
+        "329",
+        "donor_short_keys"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_attention_qk/certificate-evidence/summary/check-wv9xhbld"
+}

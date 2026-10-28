@@ -1,0 +1,45 @@
+{
+  "certified": true,
+  "relations": {
+    "result": [
+      [
+        "0",
+        "1"
+      ],
+      [
+        "1",
+        "1"
+      ],
+      [
+        "28",
+        "1"
+      ],
+      [
+        "29",
+        "1"
+      ],
+      [
+        "54",
+        "1"
+      ],
+      [
+        "55",
+        "1"
+      ]
+    ],
+    "invalid": [],
+    "counts": [
+      [
+        "6",
+        "6"
+      ]
+    ],
+    "bad": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_key_window/certificate-evidence/key-match-0/check-98cfbo7j"
+}

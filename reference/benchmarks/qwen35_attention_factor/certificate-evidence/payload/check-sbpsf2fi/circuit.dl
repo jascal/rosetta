@@ -1,0 +1,68 @@
+.decl context(i:number,pairid:number,side:symbol,last:number) .input context
+.decl shape(w:number) .input shape
+.decl weight(i:number,p:number,v:float) .input weight
+.decl value(i:number,p:number,d:number,v:float) .input value
+.decl gate(i:number,d:number,v:float) .input gate
+.decl vector(i:number,d:number,v:float) .input vector
+.decl donor(i:number,d:number)
+donor(I,D) :- context(I,C,S,_), context(D,C,T,_), S != T.
+.decl combo(a:number,i:number,d:number,m:symbol,w:number,v:number,g:number)
+combo(5*I,I,D,"self_reconstructed",I,I,I) :- donor(I,D).
+combo(5*I+1,I,D,"donor_reconstructed",D,D,D) :- donor(I,D).
+combo(5*I+2,I,D,"donor_routing",D,I,I) :- donor(I,D).
+combo(5*I+3,I,D,"donor_values",I,D,I) :- donor(I,D).
+combo(5*I+4,I,D,"donor_gate",I,I,D) :- donor(I,D).
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(A,I,D,M) :- combo(A,I,D,M,_,_,_).
+.decl dimension(d:number)
+dimension(0) :- shape(W), W > 0.
+dimension(D+1) :- dimension(D), shape(W), D+1 < W.
+.decl position(i:number,p:number)
+position(I,0) :- context(I,_,_,P), P >= 0.
+position(I,J+1) :- position(I,J), context(I,_,_,P), J+1 <= P.
+.decl activated(i:number,d:number,v:float)
+activated(I,D,1.0/(1.0+2.718281828459045^(-G))) :- gate(I,D,G), G >= 0.0.
+activated(I,D,E/(1.0+E)) :- gate(I,D,G), G < 0.0, E = 2.718281828459045^G.
+.decl term(a:number,d:number,p:number,v:float)
+term(A,D,P,W*V) :- combo(A,_,_,_,IW,IV,_), weight(IW,P,W), value(IV,P,D,V).
+.decl ungated(a:number,d:number,v:float)
+ungated(A,D,V) :- combo(A,_,_,_,_,_,_), dimension(D), V = sum X : { term(A,D,P,X) }.
+.decl patch(a:number,l:number,p:number,h:number,d:number,v:float) .output patch
+patch(A,27,P,10,D,V*G) :- combo(A,I,_,_,_,_,IG), context(I,_,_,P), ungated(A,D,V), activated(IG,D,G).
+.decl expected(a:number,d:number,v:float)
+expected(A,D,V) :- combo(A,I,_,"self_reconstructed",_,_,_), vector(I,D,V).
+expected(A,D,V) :- combo(A,_,I,"donor_reconstructed",_,_,_), vector(I,D,V).
+.decl abs_expected(a:number,d:number,v:float)
+abs_expected(A,D,V) :- expected(A,D,V), V >= 0.0.
+abs_expected(A,D,-V) :- expected(A,D,V), V < 0.0.
+.decl reconstruction_bad(a:number,d:number) .output reconstruction_bad
+reconstruction_bad(A,D) :- expected(A,D,V), patch(A,_,_,_,D,W), abs_expected(A,D,M), V-W > 0.00001+0.00001*M.
+reconstruction_bad(A,D) :- expected(A,D,V), patch(A,_,_,_,D,W), abs_expected(A,D,M), W-V > 0.00001+0.00001*M.
+.decl mass(i:number,v:float)
+mass(I,V) :- context(I,_,_,_), V = sum X : { weight(I,P,X) }.
+.decl invalid() .output invalid
+invalid() :- !context(_,_,_,_).
+invalid() :- !shape(_).
+invalid() :- shape(W), W <= 0.
+invalid() :- shape(W), shape(V), W != V.
+invalid() :- context(I,_,_,_), !donor(I,_).
+invalid() :- donor(I,D), donor(I,E), D != E.
+invalid() :- donor(I,D), context(I,_,_,P), context(D,_,_,Q), P != Q.
+invalid() :- position(I,P), !weight(I,P,_).
+invalid() :- position(I,P), dimension(D), !value(I,P,D,_).
+invalid() :- context(I,_,_,_), dimension(D), !gate(I,D,_).
+invalid() :- context(I,_,_,_), dimension(D), !vector(I,D,_).
+invalid() :- weight(I,P,V), weight(I,P,W), V != W.
+invalid() :- value(I,P,D,V), value(I,P,D,W), V != W.
+invalid() :- gate(I,D,V), gate(I,D,W), V != W.
+invalid() :- weight(I,P,_), !position(I,P).
+invalid() :- value(I,P,D,_), !position(I,P).
+invalid() :- value(I,P,D,_), !dimension(D).
+invalid() :- gate(I,D,_), !dimension(D).
+invalid() :- mass(_,V), V < 0.99999.
+invalid() :- mass(_,V), V > 1.00001.
+invalid() :- weight(_,_,V), V < 0.0.
+invalid() :- weight(_,_,V), V > 1.0.
+invalid() :- combo(A,I,_,_,_,_,_), dimension(D), !patch(A,_,_,_,D,_).
+.decl certified() .output certified
+certified() :- !invalid(), !reconstruction_bad(_,_).

@@ -1,0 +1,30 @@
+Warning: Variable I0 only occurs once in file verify.dl at line 16
+counts(K,M,N,B,S,D,U) :- mode(K,M), N = count : { context(I,T) }, B = count : { key_result(I,K,1) },
+----------------------------------------------------------^------------------------------------------
+Warning: Variable T only occurs once in file verify.dl at line 16
+counts(K,M,N,B,S,D,U) :- mode(K,M), N = count : { context(I,T) }, B = count : { key_result(I,K,1) },
+------------------------------------------------------------^----------------------------------------
+Warning: Variable I1 only occurs once in file verify.dl at line 16
+counts(K,M,N,B,S,D,U) :- mode(K,M), N = count : { context(I,T) }, B = count : { key_result(I,K,1) },
+-------------------------------------------------------------------------------------------^---------
+Warning: Variable I2 only occurs once in file verify.dl at line 17
+ S = count : { meta(A,I,F,K,"self"), argmax_match(A) }, D = count : { meta(A,I,F,K,"donor"), argmax_match(A) },
+----------------------^-----------------------------------------------------------------------------------------
+Warning: Variable F0 only occurs once in file verify.dl at line 17
+ S = count : { meta(A,I,F,K,"self"), argmax_match(A) }, D = count : { meta(A,I,F,K,"donor"), argmax_match(A) },
+------------------------^---------------------------------------------------------------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 17
+ S = count : { meta(A,I,F,K,"self"), argmax_match(A) }, D = count : { meta(A,I,F,K,"donor"), argmax_match(A) },
+-----------------------------------------------------------------------------^----------------------------------
+Warning: Variable F only occurs once in file verify.dl at line 17
+ S = count : { meta(A,I,F,K,"self"), argmax_match(A) }, D = count : { meta(A,I,F,K,"donor"), argmax_match(A) },
+-------------------------------------------------------------------------------^--------------------------------
+Warning: Variable A only occurs once in file verify.dl at line 18
+ U = count : { transfer_without_key_match(A,K) }.
+------------------------------------------^-------
+Warning: Variable I only occurs once in file verify.dl at line 26
+invalid() :- key_result(I,K,V), V != 0, V != 1.
+------------------------^-----------------------
+Warning: Variable K only occurs once in file verify.dl at line 26
+invalid() :- key_result(I,K,V), V != 0, V != 1.
+--------------------------^---------------------

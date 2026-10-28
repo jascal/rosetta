@@ -1,0 +1,32 @@
+.decl vocab(n:number) .input vocab
+.decl score(side:symbol,t:number,v:float) .input score
+.decl observed_side(s:symbol)
+observed_side(S) :- score(S,_,_).
+.decl maximum(s:symbol,v:float)
+maximum(S,V) :- observed_side(S), V = max X : { score(S,_,X) }.
+.decl top(s:symbol,t:number)
+top(S,T) :- maximum(S,V), score(S,T,V).
+.decl ref(s:symbol,t:number) .output ref
+ref(S,T) :- maximum(S,_), T = min U : { top(S,U) }.
+.decl invalid() .output invalid
+invalid() :- !vocab(_).
+invalid() :- vocab(N), N <= 0.
+invalid() :- vocab(N), vocab(M), N != M.
+.decl side(s:symbol)
+side("original"). side("reconstructed").
+.decl countscore(s:symbol,n:number)
+countscore(S,N) :- side(S), N = count : { score(S,_,_) }.
+invalid() :- countscore(_,N), vocab(M), N != M.
+invalid() :- score(S,_,_), !side(S).
+invalid() :- score(_,T,_), T < 0.
+invalid() :- score(_,T,_), vocab(N), T >= N.
+invalid() :- score(S,T,V), score(S,T,U), V != U.
+.decl badlogit(t:number) .output badlogit
+badlogit(T) :- score("original",T,V), score("reconstructed",T,U), V >= 0.0, U-V > 0.00001+0.00001*V.
+badlogit(T) :- score("original",T,V), score("reconstructed",T,U), V >= 0.0, V-U > 0.00001+0.00001*V.
+badlogit(T) :- score("original",T,V), score("reconstructed",T,U), V < 0.0, U-V > 0.00001-0.00001*V.
+badlogit(T) :- score("original",T,V), score("reconstructed",T,U), V < 0.0, V-U > 0.00001-0.00001*V.
+.decl badargmax() .output badargmax
+badargmax() :- ref("original",T), ref("reconstructed",U), T != U.
+.decl certified() .output certified
+certified() :- !invalid(), !badlogit(_), !badargmax().

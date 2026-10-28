@@ -1,0 +1,96 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "mass": [
+      [
+        "identity",
+        "3",
+        "0",
+        "1.000000074505806"
+      ],
+      [
+        "identity",
+        "31",
+        "15",
+        "1.0000000111758709"
+      ],
+      [
+        "baseline",
+        "3",
+        "0",
+        "1.000000074505806"
+      ],
+      [
+        "baseline",
+        "31",
+        "15",
+        "1.0000000111758709"
+      ],
+      [
+        "cleanup",
+        "3",
+        "0",
+        "1.000000074505806"
+      ],
+      [
+        "cleanup",
+        "31",
+        "15",
+        "1.0000000111758709"
+      ],
+      [
+        "zero_last",
+        "3",
+        "0",
+        "1.000000074505806"
+      ],
+      [
+        "zero_last",
+        "31",
+        "15",
+        "1.0000000111758709"
+      ],
+      [
+        "zero_source",
+        "3",
+        "0",
+        "1.000000074505806"
+      ],
+      [
+        "zero_source",
+        "31",
+        "15",
+        "0.99999997019767761"
+      ]
+    ],
+    "dose": [
+      [
+        "identity",
+        "0"
+      ],
+      [
+        "direct_source",
+        "256"
+      ],
+      [
+        "direct_last",
+        "256"
+      ],
+      [
+        "zero_last",
+        "256"
+      ],
+      [
+        "zero_source",
+        "256"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_attention_validation/certificate-evidence/sites/check-sc4ambb1"
+}

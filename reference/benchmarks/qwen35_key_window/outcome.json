@@ -1,0 +1,52 @@
+{
+  "tag": "empirical",
+  "stopped": false,
+  "table": [
+    {
+      "mode": "full_prefix",
+      "total": 6,
+      "key_matches": 6,
+      "self_argmax_matches": 6,
+      "donor_short_argmax_matches": 6,
+      "unmatched_transfers": 0,
+      "status": "empirical_recovery"
+    },
+    {
+      "mode": "window4_fill0",
+      "total": 6,
+      "key_matches": 0,
+      "self_argmax_matches": 4,
+      "donor_short_argmax_matches": 6,
+      "unmatched_transfers": 2,
+      "status": "negative_recovery"
+    },
+    {
+      "mode": "window4_fill1",
+      "total": 6,
+      "key_matches": 0,
+      "self_argmax_matches": 4,
+      "donor_short_argmax_matches": 6,
+      "unmatched_transfers": 2,
+      "status": "negative_recovery"
+    },
+    {
+      "mode": "window16_fill0",
+      "total": 6,
+      "key_matches": 0,
+      "self_argmax_matches": 5,
+      "donor_short_argmax_matches": 6,
+      "unmatched_transfers": 2,
+      "status": "negative_recovery"
+    },
+    {
+      "mode": "window16_fill1",
+      "total": 6,
+      "key_matches": 0,
+      "self_argmax_matches": 5,
+      "donor_short_argmax_matches": 6,
+      "unmatched_transfers": 2,
+      "status": "negative_recovery"
+    }
+  ],
+  "new_certified_coverage": false
+}

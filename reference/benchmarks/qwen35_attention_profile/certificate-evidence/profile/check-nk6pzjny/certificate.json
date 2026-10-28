@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "observational source-position attention shifts; not causal head admission"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "d6d12599cfd848cd99b183bebc9cff9c62528075fce290a7604f427f20e04f59",
+    "facts/attention.facts": "00468f79d4c68d7a31f6388a8d1eef6db19132ee08a7c0440728b4eab7b8f61f",
+    "facts/context.facts": "39d619538293092ef5f270a4b28efd5aefc1e9de04215564aae9b6fa249579c1",
+    "facts/head.facts": "04d88d6f0514f17909733c6b1f6a59281bc512e43ce343c9a0ce867d35ea0f66",
+    "facts/tok.facts": "a6b7f38f306ebf1e22cfb375b50f7a0c279c633b9a1c08e78ccaee48a82972b9",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/leading.csv": "d6e928af72125262a3551fd02e85be9c38041c30ad638bafbcd4a7806b627fb8",
+    "outputs/mass.csv": "19bfbab37392faed8fb5e809931b9eb7734b4d4e0a6edfce841f5def32063e54",
+    "outputs/positive_groups.csv": "f45ee5f7245152560676d235a92bef7adc08338fe25073e18fd868bef28dac5f",
+    "outputs/rank.csv": "534987cbaff28150463856da1a35ac1cbf9dd75b2a46b1272f43bf80c1c5c930",
+    "outputs/shift.csv": "b304d01d2b0c39f4b24e5287b6c7ed361c60bddab4761bc555e6e203685563fb",
+    "outputs/total.csv": "fa9c0a01e463559d9af8e510ea32ced82ddbe2f88927fe010de44cc0579e5657",
+    "stderr.txt": "265a93f0790b2e89228673e042d13a2f531e85a7b522d82cf9de67262a575369",
+    "verify.dl": "a84d6926d526ab7e13287fc42a50ef21a7f515ec6ee8f96b1e2c2467ef9e16db"
+  }
+}

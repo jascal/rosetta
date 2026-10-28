@@ -1,0 +1,42 @@
+{
+  "scope": "causal head-vector transfer on six known contrasts, not final circuit confirmation",
+  "forwards": 42,
+  "selection": "among frozen leading4 heads, require positive source shifts in all3 pairs; two heads per selected layer; same-count layer-matched random controls exclude selected; seed2300",
+  "arms": "each selected/random head separately, selected/random joint, selected joint identity; last-position post-gate vectors before output projection; both directions",
+  "priors": {
+    "reference/benchmarks/qwen35_attention_profile/closed.json": "efdcba5ceb2d8f94481b5959bcb0a786c9704c59f8f94af9f0a5878cad883597",
+    "reference/benchmarks/qwen35_attention_validation/closed.json": "625a54bda085509f0d85ea43e99ef29a4fb255dccfa8157a4bc64aacd147d7de"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "baseline-hashes.json": "05deac646e4b1bfc6083cb6990a478f3d322f491441c1516b077453e021f3af5",
+    "payload.json": "d01bf943b63dbeabdbeeead94514f1c68755e27b191366bdc043471f82db3b47",
+    "certificate-evidence/payload/check-rfvhw99t/stderr.txt": "42a287d793e8c41d3e61c74644115b35b71532473cc34e6cdbf14653c769cb16",
+    "certificate-evidence/payload/check-rfvhw99t/verify.dl": "d437ae9a2039db4d268afc6b863f94a1257a88f401b4391360c5d14ef644fd3a",
+    "certificate-evidence/payload/check-rfvhw99t/circuit.dl": "d437ae9a2039db4d268afc6b863f94a1257a88f401b4391360c5d14ef644fd3a",
+    "certificate-evidence/payload/check-rfvhw99t/certificate.json": "084003527c246b52cdb1549a6e78225484da3a01bfb58a1db99ae38aaacbf599",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/control.csv": "0d768c17b7dade0dbc5f0801447d75960b6a6a85b126b95fa2d0490aee8b5769",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/npatch.csv": "593b257e04fd6165868f1da983923d5bc599d4c9ad51d373233b096b7bd05ee8",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/patch.csv": "31e322b05bdb40275f75a10f27e22307ce92f2795db27b6278b4e75bc77cfda2",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/run.csv": "96ee6f6e0a2a4bfea0696929f200227214452d72bfda7b87dd78e4b223cc9396",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/selected.csv": "eec50a620ef98f79a1816dafc7ca5f364cbe6e1bae5783bac49c5e83036a01d2",
+    "certificate-evidence/payload/check-rfvhw99t/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/payload/check-rfvhw99t/facts/context.facts": "243bdab987ecca5996a038b5dc2dd060714ce8c527a2ab54bea7a1285f59483e",
+    "certificate-evidence/payload/check-rfvhw99t/facts/random_order.facts": "9ddf8d32547307f641aa9abcbf5417ecb05e6396ec459bc50bf630ba1af2d9dc",
+    "certificate-evidence/payload/check-rfvhw99t/facts/vector.facts": "00b7bf854a026804942e8b63d5713debe46e577274deeaaef8c5bc5ed65a50ed",
+    "certificate-evidence/payload/check-rfvhw99t/facts/leading.facts": "d6e928af72125262a3551fd02e85be9c38041c30ad638bafbcd4a7806b627fb8",
+    "certificate-evidence/payload/check-rfvhw99t/facts/shape.facts": "f16c302d5d30e1d3fbe955cf4f637f58a871adeba597922e3baad0aeeb13f656"
+  },
+  "sources": {
+    "py/run_qwen35_attention_exchange.py": "1f11b2df9c8c46652cb9e66777d9d8838ff42888f91d17d389e070f769c366b8",
+    "dl/qwen35_attention_exchange_payload.dl": "d437ae9a2039db4d268afc6b863f94a1257a88f401b4391360c5d14ef644fd3a",
+    "dl/qwen35_attention_exchange_summary.dl": "b176d8d75edc031e5883db4a532af10f98266ef64a620f1b5b05c51dbd4e3406",
+    "py/qwen35_attention_reference.py": "5d6fc1a797bd9c4f6ce2c906bac32513640bb6eb293b7a568886de0dafd9ca7e",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842"
+  }
+}

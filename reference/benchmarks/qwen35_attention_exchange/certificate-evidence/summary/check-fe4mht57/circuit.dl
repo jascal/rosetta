@@ -1,0 +1,36 @@
+.decl run(a:number,target:number,donor:number,mode:symbol) .input run
+.decl expected(i:number,t:number) .input expected
+.decl ref(a:number,t:number) .input ref
+.decl baseline_hash(i:number,h:symbol) .input baseline_hash
+.decl hash(a:number,h:symbol) .input hash
+.decl npatch(a:number,n:number) .input npatch
+.decl request(a:number,l:number,p:number,h:number,d:number,v:float) .input request
+.decl applied(a:number,l:number,p:number,h:number,d:number,b:float,v:float) .input applied
+.decl transferred(a:number,mode:symbol) .output transferred
+transferred(A,M) :- run(A,I,D,M), M != "identity", expected(I,T), expected(D,U), T != U, ref(A,U).
+.decl changed(a:number,mode:symbol) .output changed
+changed(A,M) :- run(A,I,_,M), expected(I,T), ref(A,U), T != U.
+.decl dose(a:number,n:number) .output dose
+dose(A,N) :- run(A,_,_,_), N = count : { applied(A,L,P,H,D,B,V), B != V }.
+.decl counts(m:symbol,n:number,changed:number,transfers:number) .output counts
+counts(M,N,C,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, C = count : { changed(A,M) }, T = count : { transferred(A,M) }.
+.decl nrequest(a:number,n:number)
+nrequest(A,N) :- run(A,_,_,_), N = count : { request(A,L,P,H,D,V) }.
+.decl invalid() .output invalid
+invalid() :- !run(_,_,_,_).
+invalid() :- run(A,_,_,_), !ref(A,_).
+invalid() :- ref(A,T), ref(A,U), T != U.
+invalid() :- run(A,I,D,_), !expected(I,_).
+invalid() :- run(A,I,D,_), !expected(D,_).
+invalid() :- run(A,_,_,_), !hash(A,_).
+invalid() :- run(A,I,_,"identity"), !baseline_hash(I,_).
+invalid() :- run(A,I,_,"identity"), hash(A,H), baseline_hash(I,G), H != G.
+invalid() :- run(A,_,_,"identity"), dose(A,N), N != 0.
+invalid() :- run(A,_,_,"identity"), changed(A,_).
+invalid() :- run(A,_,_,_), !npatch(A,_).
+invalid() :- npatch(A,N), nrequest(A,M), N != M.
+invalid() :- request(A,L,P,H,D,V), !applied(A,L,P,H,D,_,V).
+invalid() :- applied(A,L,P,H,D,_,V), !request(A,L,P,H,D,V).
+invalid() :- request(A,L,P,H,D,V), applied(A,L,P,H,D,_,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

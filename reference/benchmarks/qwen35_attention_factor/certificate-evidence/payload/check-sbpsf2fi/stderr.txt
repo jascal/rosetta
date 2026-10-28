@@ -1,0 +1,21 @@
+Warning: Variable P only occurs once in file verify.dl at line 29
+ungated(A,D,V) :- combo(A,_,_,_,_,_,_), dimension(D), V = sum X : { term(A,D,P,X) }.
+-----------------------------------------------------------------------------^-------
+Warning: Variable P only occurs once in file verify.dl at line 42
+mass(I,V) :- context(I,_,_,_), V = sum X : { weight(I,P,X) }.
+------------------------------------------------------^-------
+Warning: Variable D only occurs once in file verify.dl at line 59
+invalid() :- value(I,P,D,_), !position(I,P).
+-----------------------^---------------------
+Warning: Variable I only occurs once in file verify.dl at line 60
+invalid() :- value(I,P,D,_), !dimension(D).
+-------------------^------------------------
+Warning: Variable P only occurs once in file verify.dl at line 60
+invalid() :- value(I,P,D,_), !dimension(D).
+---------------------^----------------------
+Warning: Variable I only occurs once in file verify.dl at line 61
+invalid() :- gate(I,D,_), !dimension(D).
+------------------^----------------------
+Warning: Variable I only occurs once in file verify.dl at line 66
+invalid() :- combo(A,I,_,_,_,_,_), dimension(D), !patch(A,_,_,_,D,_).
+---------------------^------------------------------------------------

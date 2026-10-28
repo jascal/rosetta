@@ -1,0 +1,6 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 10
+counts(I,R,N) :- context(I), role(R), N = count : { source(I,P,R) }.
+-------------------------------------------------------------^-------

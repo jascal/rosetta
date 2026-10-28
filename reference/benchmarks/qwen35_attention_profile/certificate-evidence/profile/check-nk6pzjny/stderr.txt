@@ -1,0 +1,15 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 22
+total(L,H,V) :- head(L,H), V = sum X : { shift(C,L,H,X) }.
+-----------------------------------------------^-----------
+Warning: Variable C only occurs once in file verify.dl at line 24
+positive_groups(L,H,N) :- head(L,H), N = count : { shift(C,L,H,X), X > 0.0 }.
+---------------------------------------------------------^--------------------
+Warning: Variable A only occurs once in file verify.dl at line 30
+rank(L,H,N) :- head(L,H), N = count : { stronger(L,H,A,B) }.
+-----------------------------------------------------^-------
+Warning: Variable B only occurs once in file verify.dl at line 30
+rank(L,H,N) :- head(L,H), N = count : { stronger(L,H,A,B) }.
+-------------------------------------------------------^-----

@@ -1,0 +1,14 @@
+.decl heads(n:number) .input heads
+.decl full_layer(l:number) .input full_layer
+.decl index(h:number)
+index(0) :- heads(N), N > 0.
+index(H+1) :- index(H), heads(N), H+1 < N.
+.decl head(l:number,h:number) .output head
+head(L,H) :- full_layer(L), index(H).
+.decl invalid() .output invalid
+invalid() :- !heads(_).
+invalid() :- heads(N), N <= 0.
+invalid() :- heads(N), heads(M), N != M.
+invalid() :- !full_layer(_).
+.decl certified() .output certified
+certified() :- !invalid().

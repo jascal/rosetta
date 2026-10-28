@@ -1,0 +1,27 @@
+.decl run(a:number,target:number,donor:number,mode:symbol) .input run
+.decl expected(i:number,t:number) .input expected
+.decl ref(a:number,t:number) .input ref
+.decl reconstruction(a:number,ok:number) .input reconstruction
+.decl request(a:number,l:number,p:number,h:number,d:number,v:float) .input request
+.decl applied(a:number,l:number,p:number,h:number,d:number,b:float,v:float) .input applied
+.decl transferred(a:number,m:symbol) .output transferred
+transferred(A,M) :- run(A,I,D,M), expected(I,T), expected(D,U), T != U, ref(A,U).
+.decl counts(m:symbol,n:number,t:number) .output counts
+counts(M,N,T) :- run(_,_,_,M), N = count : { run(A,I,D,M) }, T = count : { transferred(A,M) }.
+.decl magnitude(a:number,l:number,p:number,h:number,d:number,v:float)
+magnitude(A,L,P,H,D,V) :- request(A,L,P,H,D,V), V >= 0.0.
+magnitude(A,L,P,H,D,-V) :- request(A,L,P,H,D,V), V < 0.0.
+.decl invalid() .output invalid
+invalid() :- !run(_,_,_,_).
+invalid() :- run(A,_,_,_), !ref(A,_).
+invalid() :- ref(A,T), ref(A,U), T != U.
+invalid() :- run(A,I,D,_), !expected(I,_).
+invalid() :- run(A,I,D,_), !expected(D,_).
+invalid() :- run(A,_,_,"self_reconstructed"), !reconstruction(A,1).
+invalid() :- run(A,_,_,"donor_reconstructed"), !reconstruction(A,1).
+invalid() :- request(A,L,P,H,D,_), !applied(A,L,P,H,D,_,_).
+invalid() :- applied(A,L,P,H,D,_,_), !request(A,L,P,H,D,_).
+invalid() :- request(A,L,P,H,D,V), applied(A,L,P,H,D,_,W), magnitude(A,L,P,H,D,M), V-W > 0.0000001+0.0000001*M.
+invalid() :- request(A,L,P,H,D,V), applied(A,L,P,H,D,_,W), magnitude(A,L,P,H,D,M), W-V > 0.0000001+0.0000001*M.
+.decl certified() .output certified
+certified() :- !invalid().
