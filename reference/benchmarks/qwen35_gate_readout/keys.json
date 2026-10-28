@@ -1,0 +1,52 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "unit": [
+      [
+        "603"
+      ],
+      [
+        "1765"
+      ]
+    ],
+    "token": [
+      [
+        "18274"
+      ],
+      [
+        "54058"
+      ],
+      [
+        "73062"
+      ],
+      [
+        "79662"
+      ],
+      [
+        "84500"
+      ],
+      [
+        "86271"
+      ],
+      [
+        "91825"
+      ],
+      [
+        "104128"
+      ],
+      [
+        "107366"
+      ],
+      [
+        "132218"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_gate_readout/certificate-evidence/keys/check-z0susyll"
+}

@@ -1,0 +1,58 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,g:symbol) .input sample
+.decl query(q:number,g:symbol,v:number) .input query
+.decl memory(q:number,t:number,n:number,v:float) .input memory
+.decl coefficient(n:number,t:number,v:float) .input coefficient
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl mode(m:number)
+mode(0). mode(1). mode(2).
+.decl unit(n:number)
+unit(603). unit(1765).
+.decl position(i:number,j:number,t:number)
+position(I,J,T) :- lc_source(I,J,K,T), K >= 12.
+.decl strength(i:number,j:number,t:number,k:number)
+strength(I,J,T,K) :- position(I,J,T), K = max M : { lc_source(I,J,M,T) }.
+.decl weight(m:number,i:number,j:number,w:float)
+weight(0,I,J,1.0) :- position(I,J,_).
+weight(1,I,J,to_float(K)) :- strength(I,J,_,K).
+weight(2,I,J,to_float(K)/to_float(L-J)) :- strength(I,J,_,K), lc_last(I,L), L > J.
+.decl mass(m:number,i:number,w:float)
+mass(M,I,W) :- mode(M), sample(I,_), W = sum V : { weight(M,I,J,V) }.
+.decl term(m:number,i:number,n:number,j:number,v:float)
+term(M,I,N,J,W*P) :- weight(M,I,J,W), position(I,J,T), sample(I,G), query(Q,G,1), unit(N), memory(Q,T,N,P).
+.decl predicted(m:number,i:number,n:number,v:float) .output predicted
+predicted(M,I,N,V/W) :- mass(M,I,W), W > 0.0, unit(N), V = sum X : { term(M,I,N,J,X) }.
+.decl source(i:number,t:number)
+source(I,T) :- position(I,_,T).
+.decl score_term(m:number,i:number,t:number,n:number,v:float)
+score_term(M,I,T,N,P*C) :- predicted(M,I,N,P), source(I,T), coefficient(N,T,C).
+.decl score(m:number,i:number,t:number,v:float) .output score
+score(M,I,T,V) :- mode(M), source(I,T), V = sum X : { score_term(M,I,T,N,X) }.
+.decl maximum(m:number,i:number,v:float)
+maximum(M,I,V) :- mode(M), sample(I,_), V = max X : { score(M,I,T,X) }.
+.decl top(m:number,i:number,t:number)
+top(M,I,T) :- maximum(M,I,V), score(M,I,T,V).
+.decl tie(m:number,i:number)
+tie(M,I) :- top(M,I,T), top(M,I,U), T != U.
+.decl preference(m:number,i:number,t:number) .output preference
+preference(M,I,T) :- top(M,I,T), !tie(M,I).
+.decl wrong(m:number,i:number) .output wrong
+wrong(M,I) :- preference(M,I,T), ref(I,U), T != U.
+.decl guarded(m:number,i:number,t:number) .output guarded
+guarded(M,I,T) :- preference(M,I,T), lc_winner(I,T), lc_best(I,K), K >= 24, lc_runner(I,R), R >= 12, K-R >= 4.
+.decl error(m:number,i:number,p:number,r:number) .output error
+error(M,I,T,U) :- guarded(M,I,T), ref(I,U), T != U.
+.decl counts(m:number,n:number,wrong:number,firing:number,errors:number) .output counts
+counts(M,N,W,F,E) :- mode(M), N = count : { preference(M,I,T) }, W = count : { wrong(M,I) },
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+.decl invalid() .output invalid
+invalid() :- !sample(_,_).
+invalid() :- sample(I,_), !ref(I,_).
+invalid() :- sample(I,G), !query(_,G,1).
+invalid() :- sample(I,G), query(Q,G,1), position(I,_,T), unit(N), !memory(Q,T,N,_).
+invalid() :- source(_,T), unit(N), !coefficient(N,T,_).
+invalid() :- memory(Q,T,N,V), memory(Q,T,N,W), V != W.
+invalid() :- coefficient(N,T,V), coefficient(N,T,W), V != W.
+.decl certified() .output certified
+certified() :- !invalid().

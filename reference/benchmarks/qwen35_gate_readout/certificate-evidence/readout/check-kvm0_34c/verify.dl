@@ -1,0 +1,45 @@
+// Build-time pairwise readout analysis. These weight facts are not a runtime artifact.
+.decl shape(h:number) .input shape
+.decl unit(n:number) .input unit
+.decl token(t:number) .input token
+.decl down(n:number,h:number,w:float) .input down
+.decl norm(h:number,w:float) .input norm
+.decl head(t:number,h:number,w:float) .input head
+.decl effect(c:number,n:number,old:number,wanted:number,before:float,after:float) .input effect
+.decl observed(c:number,n:number,answer:number) .input observed
+.decl dimension(h:number)
+dimension(0) :- shape(H), H > 0.
+dimension(J+1) :- dimension(J), shape(H), J+1 < H.
+.decl term(n:number,t:number,h:number,v:float)
+term(N,T,H,D*(1.0+W)*O) :- down(N,H,D), norm(H,W), head(T,H,O).
+.decl coefficient(n:number,t:number,v:float) .output coefficient
+coefficient(N,T,V) :- unit(N), token(T), V = sum X : { term(N,T,H,X) }.
+.decl margin_change(c:number,n:number,v:float) .output margin_change
+margin_change(C,N,(A-B)*(X-Y)) :- effect(C,N,T,U,B,A), coefficient(N,U,X), coefficient(N,T,Y).
+.decl status(c:number,n:number,s:symbol) .output status
+status(C,N,"toward_wanted") :- margin_change(C,N,V), V > 0.0.
+status(C,N,"away_from_wanted") :- margin_change(C,N,V), V < 0.0.
+status(C,N,"no_pairwise_change") :- margin_change(C,N,0.0).
+.decl transferred(c:number,n:number) .output transferred
+transferred(C,N) :- effect(C,N,T,U,_,_), T != U, observed(C,N,U).
+.decl sign_conflict(c:number,n:number) .output sign_conflict
+sign_conflict(C,N) :- transferred(C,N), margin_change(C,N,V), V <= 0.0.
+.decl counts(s:symbol,n:number) .output counts
+counts(S,K) :- status(_,_,S), K = count : { status(C,N,S) }.
+.decl invalid() .output invalid
+invalid() :- !shape(_).
+invalid() :- shape(H), H <= 0.
+invalid() :- shape(H), shape(J), H != J.
+invalid() :- unit(N), dimension(H), !down(N,H,_).
+invalid() :- token(T), dimension(H), !head(T,H,_).
+invalid() :- dimension(H), !norm(H,_).
+invalid() :- down(N,H,V), down(N,H,U), V != U.
+invalid() :- head(T,H,V), head(T,H,U), V != U.
+invalid() :- norm(H,V), norm(H,U), V != U.
+invalid() :- effect(C,N,T,U,_,_), !token(T).
+invalid() :- effect(C,N,T,U,_,_), !token(U).
+invalid() :- effect(C,N,_,_,_,_), !unit(N).
+invalid() :- effect(C,N,_,_,_,_), !observed(C,N,_).
+invalid() :- observed(C,N,T), observed(C,N,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid(), !sign_conflict(_,_).

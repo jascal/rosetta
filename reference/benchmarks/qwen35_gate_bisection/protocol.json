@@ -1,0 +1,44 @@
+{
+  "scope": "adaptive development bisection; no final-test or runtime artifact",
+  "max_rounds": 6,
+  "max_new_forwards": 30,
+  "rule": "both halves observed before branch; left if success else right if success; otherwise stop; failed roots stop; singleton success stops",
+  "priors": {
+    "reference/benchmarks/qwen35_shared_gate/closed.json": "358821719815be439656accadacb578fb3b58e699ea90279fa8a4c5f2494951e",
+    "reference/benchmarks/qwen35_sparse_gate/closed.json": "e33962cdb0c8c73dec9a0d3ccf1bf0cc55e14758baa16a184a0cfe9b168bb6a8"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "inputs.json": "abd23580b3cf8a01d643bd417b83da5eb28eee8d9e8788dbb3aa1b1f35454901",
+    "root-witnesses.json": "d063c5ce0f1fb249942eb4ac84b0dc7eed97bb6b81eebae412acffb8b4b4ed5e",
+    "initial.json": "7d35b872558d785f564b4ad5c3dfdc673cabd8d0618c8b2b40cc257af5c33f5d",
+    "donors.json": "d2704f244b4bb5e5a08d4918c1a50d42e7101647a4e74613c4466c289bdd379d",
+    "certificate-evidence/inputs/check-fjb4vgi9/stderr.txt": "a144103ff0eef2e2dcd8c7b724f7308bd5ffac69b92b634949a9a556dddd5c90",
+    "certificate-evidence/inputs/check-fjb4vgi9/verify.dl": "e1156cbab75a4d1794740c9ac7609270252ac6b587dd338c8cf347f459cb33c7",
+    "certificate-evidence/inputs/check-fjb4vgi9/circuit.dl": "e1156cbab75a4d1794740c9ac7609270252ac6b587dd338c8cf347f459cb33c7",
+    "certificate-evidence/inputs/check-fjb4vgi9/certificate.json": "77ac5e786b27879ef756c7d45df8ef0fbf3787c994e75f0b6462281b199ed829",
+    "certificate-evidence/inputs/check-fjb4vgi9/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/inputs/check-fjb4vgi9/outputs/caseinfo.csv": "699a23d2ae90d8c914f5b2fffeef604e30829cd70ec67ac0fb86fed588c4eea2",
+    "certificate-evidence/inputs/check-fjb4vgi9/outputs/ref.csv": "825c384b35584ad170235d2ac2bc399ce9c2d4abefb79073f902b03fa3679d33",
+    "certificate-evidence/inputs/check-fjb4vgi9/outputs/member.csv": "6cac4836980b112eab3a0a6ccc1f45995fb37346eaf565e42f2fd6a026f0f03f",
+    "certificate-evidence/inputs/check-fjb4vgi9/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/inputs/check-fjb4vgi9/facts/context.facts": "50dc12f6133813ec20114a89ca5c0dacff6b7b09faaa6160457371e1b8ad06f5",
+    "certificate-evidence/inputs/check-fjb4vgi9/facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a",
+    "certificate-evidence/inputs/check-fjb4vgi9/facts/root_ref.facts": "4f76cc58e993a0a5e914fbc3cdbe8fab65ee56075d5a3dd15608beccc20c496c",
+    "certificate-evidence/inputs/check-fjb4vgi9/facts/root.facts": "32c185b891605b40e0626b22f20e8eaf382e0b07273132308a4d28923d8216d2",
+    "certificate-evidence/inputs/check-fjb4vgi9/facts/rank.facts": "c3449c98cf231d6f385c6c842dcee0716d96a4486110937027eba16340176129"
+  },
+  "sources": {
+    "py/run_qwen35_gate_bisection.py": "f2625275e9fe0857e513b823cdd960155d079dfb1824976d7f9f9c226a58f4d9",
+    "dl/qwen35_gate_bisection_inputs.dl": "e1156cbab75a4d1794740c9ac7609270252ac6b587dd338c8cf347f459cb33c7",
+    "dl/qwen35_gate_bisection.dl": "8e0939b481f67be1976ebe54a6a87787f27c628f3ef4f1027f0cc8cf912aca47",
+    "dl/qwen35_mlp_factor_summary.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398",
+    "docs/qwen35-gate-bisection.md": "5a19b96fc5682fa3d6d6281590585375a5e3b98909173b56e3a593fb0c2e332f"
+  }
+}

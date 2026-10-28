@@ -1,0 +1,19 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "bisect",
+        "0"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_gate_bisection/certificate-evidence/site-2802/check-lsx82918"
+}

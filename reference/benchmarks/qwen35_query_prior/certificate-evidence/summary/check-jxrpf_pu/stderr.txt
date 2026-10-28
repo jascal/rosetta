@@ -1,0 +1,3 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------

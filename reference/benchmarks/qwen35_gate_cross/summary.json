@@ -1,0 +1,44 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "neuron603",
+        "1"
+      ],
+      [
+        "neuron1765",
+        "1"
+      ],
+      [
+        "joint",
+        "2"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": [
+      [
+        "603",
+        "neuron603"
+      ],
+      [
+        "541765",
+        "neuron1765"
+      ],
+      [
+        "9999",
+        "joint"
+      ],
+      [
+        "549999",
+        "joint"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_gate_cross/certificate-evidence/summary/check-a_yjnuru"
+}

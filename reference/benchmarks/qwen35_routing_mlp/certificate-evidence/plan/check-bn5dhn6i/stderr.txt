@@ -1,0 +1,24 @@
+Warning: Variable B only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+--------------------------^----------------------------------------
+Warning: Variable A only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+----------------------------^--------------------------------------
+Warning: Variable T only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+------------------------------^------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+--------------------------------^----------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+-------------------------------------------------^-----------------
+Warning: Variable D only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+---------------------------------------------------^---------------
+Warning: Variable U only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+-----------------------------------------------------^-------------
+Warning: Variable Q only occurs once in file verify.dl at line 18
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+-------------------------------------------------------^-----------

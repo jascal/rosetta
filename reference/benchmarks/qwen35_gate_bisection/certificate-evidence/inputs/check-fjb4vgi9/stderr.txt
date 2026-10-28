@@ -1,0 +1,12 @@
+Warning: Variable V only occurs once in file verify.dl at line 17
+invalid() :- member(I,R,N,V), member(I,R,M,U), N != M.
+--------------------------^----------------------------
+Warning: Variable U only occurs once in file verify.dl at line 17
+invalid() :- member(I,R,N,V), member(I,R,M,U), N != M.
+-------------------------------------------^-----------
+Warning: Variable N only occurs once in file verify.dl at line 18
+invalid() :- member(I,R,N,V), member(I,R,M,U), V != U.
+------------------------^------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 18
+invalid() :- member(I,R,N,V), member(I,R,M,U), V != U.
+-----------------------------------------^-------------

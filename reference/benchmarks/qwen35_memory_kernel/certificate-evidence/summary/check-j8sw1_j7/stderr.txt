@@ -1,0 +1,42 @@
+Warning: No rules/facts defined for relation lc_option in file circuit.dl at line 1
+.decl lc_option(c:number,minmatch:number,margin:number)
+------^-------------------------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 21
+mass(M,I,W) :- mode(M), sample(I,_), W = sum V : { weight(M,I,J,V) }.
+--------------------------------------------------------------^-------
+Warning: Variable J only occurs once in file verify.dl at line 25
+predicted(M,I,N,V/W) :- mass(M,I,W), W > 0.0, unit(N), V = sum X : { term(M,I,N,J,X) }.
+--------------------------------------------------------------------------------^-------
+Warning: Variable N only occurs once in file verify.dl at line 31
+score(M,I,T,V) :- mode(M), source(I,T), V = sum X : { score_term(M,I,T,N,X) }.
+-----------------------------------------------------------------------^-------
+Warning: Variable T only occurs once in file verify.dl at line 33
+maximum(M,I,V) :- mode(M), sample(I,_), V = max X : { score(M,I,T,X) }.
+----------------------------------------------------------------^-------
+Warning: Variable I0 only occurs once in file verify.dl at line 47
+counts(M,N,W,F,E) :- mode(M), N = count : { preference(M,I,T) }, W = count : { wrong(M,I) },
+---------------------------------------------------------^-----------------------------------
+Warning: Variable T0 only occurs once in file verify.dl at line 47
+counts(M,N,W,F,E) :- mode(M), N = count : { preference(M,I,T) }, W = count : { wrong(M,I) },
+-----------------------------------------------------------^---------------------------------
+Warning: Variable I1 only occurs once in file verify.dl at line 47
+counts(M,N,W,F,E) :- mode(M), N = count : { preference(M,I,T) }, W = count : { wrong(M,I) },
+---------------------------------------------------------------------------------------^-----
+Warning: Variable I2 only occurs once in file verify.dl at line 48
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+-------------------------^---------------------------------------
+Warning: Variable T1 only occurs once in file verify.dl at line 48
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+---------------------------^-------------------------------------
+Warning: Variable I only occurs once in file verify.dl at line 48
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+-------------------------------------------------------^---------
+Warning: Variable T only occurs once in file verify.dl at line 48
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+---------------------------------------------------------^-------
+Warning: Variable U only occurs once in file verify.dl at line 48
+ F = count : { guarded(M,I,T) }, E = count : { error(M,I,T,U) }.
+-----------------------------------------------------------^-----
+Warning: Variable I only occurs once in file verify.dl at line 52
+invalid() :- sample(I,G), !query(_,G,1).
+--------------------^--------------------

@@ -87,3 +87,10 @@ the competing source successor in 36 selected training-derived contexts. Thirtee
 answers change: five track the new decoy and eight switch to the unchanged long
 target. This provides a causal source-value contrast for subsequent internal
 localization; it does not add certified circuit coverage.
+
+The [completed MLP exchanges](qwen35-routing-mlp.md) transfer the long-source
+answer in all three old-to-new layer31 interventions, with zero reverse
+transfers. Layer3 transfers one directed case; layers0 and15 transfer none.
+All identity controls and full-site checks pass, and all 78 argmax witnesses plus
+76 other queries replay unchanged. These are causal development observations,
+not new certified circuit coverage.

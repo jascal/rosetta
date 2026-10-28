@@ -1,0 +1,43 @@
+{
+  "scope": "whole-width last-position MLP donor transfer, development only",
+  "layers": [
+    0,
+    3,
+    15,
+    31
+  ],
+  "width": 9216,
+  "selection": "lowest-ID changed-to-long counterfactual per vocabulary group, both directions",
+  "arms": "baseline plus identity, zero, donor at each layer; all 9216 products before down projection; no other sites",
+  "interpretation": "donor-answer transfer is causal sensitivity, not standalone computation or coverage; preserve all failures",
+  "priors": {
+    "reference/benchmarks/qwen35_decoy_counterfactual/closed.json": "25c96bba4c08a2417b6aa4ef0103a4d4c36aa6fe8a554936fe69c10b552b37f7",
+    "reference/benchmarks/qwen35_copy_inventory/closed.json": "edead1a31f8a94c0ce3cd2c377c13f20284a1f394dfa67f85a57a70f5c54f030"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "plan.json": "116f5c3991baf3dc76063e2a3597eed0f84682a4fe2e09ea0ac972171b3a1cb5",
+    "certificate-evidence/plan/check-bn5dhn6i/stderr.txt": "4e8b24ddc82219364d9f1981d33a5c9cc035719bb51b60351cdce02f37f44679",
+    "certificate-evidence/plan/check-bn5dhn6i/verify.dl": "3926247a103813964410fed66ee6483eddaa632b1d81a259bc77468ebeeb32f9",
+    "certificate-evidence/plan/check-bn5dhn6i/circuit.dl": "3926247a103813964410fed66ee6483eddaa632b1d81a259bc77468ebeeb32f9",
+    "certificate-evidence/plan/check-bn5dhn6i/certificate.json": "f39604a168cc12c761a11d7afb9ce00494d8b6ac295b4d2077e221a88fc1f7df",
+    "certificate-evidence/plan/check-bn5dhn6i/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-bn5dhn6i/outputs/run.csv": "16c0012d375fbec0d6bdac14355b3047504a2021ae0d279c316ad4811c7538d9",
+    "certificate-evidence/plan/check-bn5dhn6i/outputs/selected.csv": "7ebdf30de4de97675eeaaf0c83481dcf0f34259fdf6e03ec0deccd3de8c30705",
+    "certificate-evidence/plan/check-bn5dhn6i/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-bn5dhn6i/outputs/context.csv": "418ec2b7f8c6b4e4fe77fbce640ad823d7d8448bfff5755922bfb5987754ad85",
+    "certificate-evidence/plan/check-bn5dhn6i/facts/contrast.facts": "ac7bc67a8d2ab1ae95f5d10a0b35c035e7d2cb080f1b5551defb132ffb5936c9"
+  },
+  "sources": {
+    "py/run_qwen35_routing_mlp.py": "7ca36b3f51db4687aa073b08fdb545d26e26fe72fc037a8a1789a1d7293df222",
+    "dl/qwen35_routing_mlp_plan.dl": "3926247a103813964410fed66ee6483eddaa632b1d81a259bc77468ebeeb32f9",
+    "dl/qwen35_routing_mlp_summary.dl": "7536e770da132b1dc1faef4c131be14aed83168ec93ec8cf06a3132f0681a493",
+    "dl/qwen35_exchange_payload.dl": "caacae14c995afcbb7d4e94e637b8152d48ce76bff40fe29eb517500addb0ac7",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

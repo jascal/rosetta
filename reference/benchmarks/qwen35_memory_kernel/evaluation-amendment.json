@@ -1,0 +1,9 @@
+{
+  "reason": "Original summary mixes number and float types; explicit to_float casts preserve the preregistered mathematical formulas. Test caught compilation failure during probe collection, before evaluation.",
+  "unchanged": "all probes, coefficients, mixtures, thresholds, cases and interpretation",
+  "original_protocol_sha256": "c6490078b6b7b6b08b5a50e6215ed98d53f79f625a3898b5ce1aa8e89ab7d332",
+  "sources": {
+    "dl/qwen35_memory_kernel_typed.dl": "f1c30c28aaf2fb0cb8a338478b9dda44d515b5affcfa78616acacffb5a3a385f",
+    "py/evaluate_qwen35_memory_kernel_typed.py": "6b0f5b260d4bbd3120aee6a3b76d81d0ac0485641300cd77877db2a36583a6d3"
+  }
+}

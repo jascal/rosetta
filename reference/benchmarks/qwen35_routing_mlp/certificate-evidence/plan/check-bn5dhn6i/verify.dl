@@ -1,0 +1,21 @@
+.decl contrast(i:number,g:symbol,before:number,after:number,long:number,last:number) .input contrast
+.decl eligible(i:number,g:symbol)
+eligible(I,G) :- contrast(I,G,B,A,T,_), B != A, A = T.
+.decl selected(i:number,g:symbol) .output selected
+selected(I,G) :- eligible(_,G), I = min J : { eligible(J,G) }.
+.decl context(i:number,contrast:number,side:symbol,expected:number,last:number) .output context
+context(2*I,I,"old",B,P) :- selected(I,_), contrast(I,_,B,_,_,P).
+context(2*I+1,I,"new",A,P) :- selected(I,_), contrast(I,_,_,A,_,P).
+.decl layer(l:number)
+layer(0). layer(3). layer(15). layer(31).
+.decl run(a:number,target:number,donor:number,l:number,mode:symbol) .output run
+run(100*C+99,C,C,-1,"baseline") :- context(C,_,_,_,_).
+run(100*C+3*L,C,C,L,"identity") :- context(C,_,_,_,_), layer(L).
+run(100*C+3*L+1,C,C,L,"zero") :- context(C,_,_,_,_), layer(L).
+run(100*C+3*L+2,C,D,L,"donor") :- context(C,I,S,_,_), context(D,I,T,_,_), S != T, layer(L).
+.decl invalid() .output invalid
+invalid() :- !selected(_,_).
+invalid() :- contrast(I,G,B,A,T,P), contrast(I,H,C,D,U,Q), G != H.
+invalid() :- context(_,_,_,_,P), P < 0.
+.decl certified() .output certified
+certified() :- !invalid().

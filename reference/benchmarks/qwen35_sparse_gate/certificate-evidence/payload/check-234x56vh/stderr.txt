@@ -1,0 +1,36 @@
+Warning: Variable M0 only occurs once in file verify.dl at line 13
+ A = count : { magnitude(I,M,U), U > V },
+---------------------------^--------------
+Warning: Variable D only occurs once in file verify.dl at line 32
+invalid() :- donor(I,D), !context(I,_).
+---------------------^------------------
+Warning: Variable I only occurs once in file verify.dl at line 33
+invalid() :- donor(I,D), !context(D,_).
+-------------------^--------------------
+Warning: Variable H only occurs once in file verify.dl at line 37
+invalid() :- product(I,N,B,H), product(I,N,C,V), B != C.
+---------------------------^-----------------------------
+Warning: Variable V only occurs once in file verify.dl at line 37
+invalid() :- product(I,N,B,H), product(I,N,C,V), B != C.
+---------------------------------------------^-----------
+Warning: Variable B only occurs once in file verify.dl at line 38
+invalid() :- product(I,N,B,H), product(I,N,C,V), H != V.
+-------------------------^-------------------------------
+Warning: Variable C only occurs once in file verify.dl at line 38
+invalid() :- product(I,N,B,H), product(I,N,C,V), H != V.
+-------------------------------------------^-------------
+Warning: Variable R only occurs once in file verify.dl at line 46
+invalid() :- random_order(N,R), N < 0.
+----------------------------^----------
+Warning: Variable N only occurs once in file verify.dl at line 47
+invalid() :- random_order(N,R), R < 0.
+--------------------------^------------
+Warning: Variable R only occurs once in file verify.dl at line 48
+invalid() :- random_order(N,R), shape(W), N >= W.
+----------------------------^---------------------
+Warning: Variable N only occurs once in file verify.dl at line 49
+invalid() :- random_order(N,R), shape(W), R >= W.
+--------------------------^-----------------------
+Warning: Variable I only occurs once in file verify.dl at line 55
+invalid() :- selected(A,I,N), !patch(A,31,_,N,_).
+------------------------^-------------------------

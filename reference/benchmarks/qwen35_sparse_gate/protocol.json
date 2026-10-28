@@ -1,0 +1,42 @@
+{
+  "scope": "development sparse gate screen; no circuit/final certificate",
+  "forwards": 42,
+  "selection": "absolute donor-gate induced product change descending, neuron ID ties; budgets32/128/512; fixed seed2200 random controls; complement top128; all six directions",
+  "interpretation": "sufficiency screen only; random controls may themselves transfer; complement tests redundancy/distribution; no outcome-dependent subset retuning",
+  "prior": {
+    "path": "reference/benchmarks/qwen35_mlp_factor/closed.json",
+    "sha256": "3e310fed58737ba4c8aa36989b04ec0c64ac2b1ecdf3611299c90ac9b2ac54f2"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "payload.json": "496ef02fc8e558d721b622fac4bcc5032cfe0ad37f37b11689b32125d4e15f78",
+    "certificate-evidence/payload/check-234x56vh/stderr.txt": "80409018febdc6a361da1933a39084ee5815be33e3cfc5a2529ea510c7f6601d",
+    "certificate-evidence/payload/check-234x56vh/verify.dl": "af420a8219cff38ce6df9848f1318ccbe40e255ba5b2c59f92161be010f12893",
+    "certificate-evidence/payload/check-234x56vh/circuit.dl": "af420a8219cff38ce6df9848f1318ccbe40e255ba5b2c59f92161be010f12893",
+    "certificate-evidence/payload/check-234x56vh/certificate.json": "62f4e7aa0dc876f064382da6016d05ba2801d8426160c631822b55bb38f72dc1",
+    "certificate-evidence/payload/check-234x56vh/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/payload/check-234x56vh/outputs/rank.csv": "c3449c98cf231d6f385c6c842dcee0716d96a4486110937027eba16340176129",
+    "certificate-evidence/payload/check-234x56vh/outputs/patch.csv": "d8c2ba05494c47484c5547f516f7b2ab90f39a69086a30a667422b34d1fa6a0d",
+    "certificate-evidence/payload/check-234x56vh/outputs/run.csv": "9b7d365fa1913d96442409a96f0d0817cebd10cac44811989fb663f81ad49175",
+    "certificate-evidence/payload/check-234x56vh/outputs/selected.csv": "e310f8696e3eb3507ac8a660616445d9664a1d2a3be4328d039ce462a56c1bb5",
+    "certificate-evidence/payload/check-234x56vh/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/payload/check-234x56vh/facts/context.facts": "2d0db42ea4afe56b479e10ddc9086dc7a9f71c58f14550dadb2a637d6d53579e",
+    "certificate-evidence/payload/check-234x56vh/facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a",
+    "certificate-evidence/payload/check-234x56vh/facts/random_order.facts": "3c91fd6951f5a2895d6182af590a3f90ea0d581cbf2bad5186730749706367f1",
+    "certificate-evidence/payload/check-234x56vh/facts/budget.facts": "a1953c8bbbd200a82f06d147143f2bdc2847738c9c924cafe33c24e82e0a8fd4",
+    "certificate-evidence/payload/check-234x56vh/facts/shape.facts": "8601bee786b9e7a9f33d07b3f65c00cbb421a158b5e4009fea271dad811fd682",
+    "certificate-evidence/payload/check-234x56vh/facts/product.facts": "c575b4a1cbe4309c9ed75ecb6bd1e374ea467c9526303f803e0d4fe74f7069cf"
+  },
+  "sources": {
+    "py/run_qwen35_sparse_gate.py": "6ffe118cc4a1a9dbabc7365e83759c7d6cc4a1bb915fa8288712360ae0203a02",
+    "dl/qwen35_sparse_gate_payload.dl": "af420a8219cff38ce6df9848f1318ccbe40e255ba5b2c59f92161be010f12893",
+    "py/run_qwen35_mlp_factor.py": "098763200da3632d16efc940ba519353c254058fb4d63bb2d9486c90faecafc1",
+    "dl/qwen35_mlp_factor_summary.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

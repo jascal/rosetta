@@ -1,0 +1,49 @@
+// Development-only sufficient-subset search. Both children must be observed.
+.decl caseinfo(c:number,last:number,wanted:number) .input caseinfo
+.decl member(c:number,r:number,n:number,v:float) .input member
+.decl ref(c:number,node:number,t:number) .input ref
+.decl width(c:number,w:number)
+width(C,W) :- caseinfo(C,_,_), W = count : { member(C,_,_,_) }.
+.decl node(c:number,id:number,lo:number,hi:number)
+node(C,0,0,W) :- width(C,W), W > 0.
+node(C,2*P+1,L,(L+H)/2) :- node(C,P,L,H), H-L > 1.
+node(C,2*P+2,(L+H)/2,H) :- node(C,P,L,H), H-L > 1.
+.decl child(c:number,p:number,n:number)
+child(C,P,2*P+1) :- node(C,P,L,H), H-L > 1.
+child(C,P,2*P+2) :- node(C,P,L,H), H-L > 1.
+.decl success(c:number,n:number)
+success(C,N) :- ref(C,N,T), caseinfo(C,_,T).
+.decl complete(c:number,p:number)
+complete(C,P) :- child(C,P,2*P+1), ref(C,2*P+1,_), ref(C,2*P+2,_).
+.decl chosen(c:number,p:number,n:number)
+chosen(C,P,2*P+1) :- complete(C,P), success(C,2*P+1).
+chosen(C,P,2*P+2) :- complete(C,P), !success(C,2*P+1), success(C,2*P+2).
+.decl active(c:number,n:number) .output active
+active(C,0) :- caseinfo(C,_,_).
+active(C,N) :- active(C,P), success(C,P), chosen(C,P,N).
+.decl pending(c:number,n:number) .output pending
+pending(C,N) :- active(C,P), success(C,P), child(C,P,N), !ref(C,N,_).
+.decl patch(c:number,node:number,l:number,p:number,n:number,v:float) .output patch
+patch(C,N,31,P,U,V) :- pending(C,N), node(C,N,L,H), member(C,R,U,V), R >= L, R < H, caseinfo(C,P,_).
+.decl leaf(c:number,node:number,neuron:number) .output leaf
+leaf(C,N,U) :- active(C,N), success(C,N), node(C,N,L,H), H-L = 1, member(C,L,U,_).
+.decl interaction_stop(c:number,node:number) .output interaction_stop
+interaction_stop(C,N) :- active(C,N), success(C,N), complete(C,N), !chosen(C,N,_).
+.decl root_failed(c:number) .output root_failed
+root_failed(C) :- ref(C,0,_), !success(C,0).
+.decl invalid() .output invalid
+invalid() :- !caseinfo(_,_,_).
+invalid() :- caseinfo(C,_,_), !ref(C,0,_).
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), P != Q.
+invalid() :- caseinfo(C,P,T), caseinfo(C,Q,U), T != U.
+invalid() :- width(_,0).
+invalid() :- member(C,R,N,V), !caseinfo(C,_,_).
+invalid() :- member(C,R,_,_), R < 0.
+invalid() :- member(C,R,_,_), width(C,W), R >= W.
+invalid() :- member(C,R,N,V), member(C,R,M,U), N != M.
+invalid() :- member(C,R,N,V), member(C,R,M,U), V != U.
+invalid() :- member(C,R,N,_), member(C,S,N,_), R != S.
+invalid() :- ref(C,N,_), !node(C,N,_,_).
+invalid() :- ref(C,N,T), ref(C,N,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().

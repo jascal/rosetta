@@ -1,0 +1,14 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl answer(i:number,t:number) .input answer
+.decl candidate(n:number) .input candidate
+#include "circuit.dl"
+.decl token(t:number) .output token
+token(T) :- answer(_,T).
+token(T) :- lc_source(_,_,K,T), K >= 12.
+.decl unit(n:number) .output unit
+unit(N) :- candidate(N).
+.decl invalid() .output invalid
+invalid() :- !token(_).
+invalid() :- !unit(_).
+.decl certified() .output certified
+certified() :- !invalid().

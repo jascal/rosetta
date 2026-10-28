@@ -1,0 +1,17 @@
+.decl context(i:number,side:symbol) .input context
+.decl selected(a:number,i:number,n:number) .input selected
+.decl picked(i:number,n:number) .output picked
+picked(I,N) :- context(I,"old"), selected(10000*I+320,I,N).
+.decl support(n:number,k:number) .output support
+support(N,K) :- picked(_,N), K = count : { picked(_,N) }.
+.decl groups(k:number) .output groups
+groups(K) :- K = count : { context(_,"old") }.
+.decl shared(n:number) .output shared
+shared(N) :- support(N,K), groups(K).
+.decl histogram(k:number,n:number) .output histogram
+histogram(K,N) :- support(_,K), N = count : { support(_,K) }.
+.decl invalid() .output invalid
+invalid() :- groups(0).
+invalid() :- context(I,"old"), !picked(I,_).
+.decl certified() .output certified
+certified() :- !invalid().

@@ -1,0 +1,17 @@
+.decl sample(i:number,g:symbol,prefix:number) .input sample
+.decl variant(v:number,k:number)
+variant(0,1). variant(1,4). variant(2,0).
+.decl representative(i:number,g:symbol,prefix:number) .output representative
+representative(I,G,P) :- sample(_,G,_), I = min J : { sample(J,G,_) }, sample(I,G,P).
+.decl query(q:number,instance:number,length:number,variant:number) .output query
+query(3*I+V,I,K,V) :- representative(I,_,_), variant(V,K), K > 0.
+query(3*I+2,I,P,2) :- representative(I,_,P).
+.decl invalid() .output invalid
+invalid() :- !sample(_,_,_).
+invalid() :- sample(I,G,P), P < 4.
+invalid() :- sample(I,G,P), sample(I,H,Q), G != H.
+.decl certified() .output certified
+certified() :- !invalid().
+
+.decl unit(l:number,n:number) .output unit
+unit(31,603). unit(31,1765).

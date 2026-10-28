@@ -1,0 +1,44 @@
+.decl context(i:number,last:number) .input context
+.decl donor(i:number,d:number) .input donor
+.decl hybrid(i:number,n:number,v:float) .input hybrid
+.decl top(i:number,n:number) .input top
+.decl shared(n:number) .input shared
+.decl random_order(n:number,r:number) .input random_order
+.decl eligible_random(n:number,r:number)
+eligible_random(N,R) :- random_order(N,R), !shared(N).
+.decl random_first(r:number)
+random_first(R) :- R = min Q : { eligible_random(_,Q) }.
+.decl random_second(r:number)
+random_second(R) :- random_first(S), R = min Q : { eligible_random(_,Q), Q > S }.
+.decl control(n:number)
+control(N) :- random_first(R), eligible_random(N,R).
+control(N) :- random_second(R), eligible_random(N,R).
+.decl mode(k:number,m:symbol)
+mode(0,"neuron162"). mode(1,"neuron381"). mode(2,"joint").
+mode(3,"rest_top32"). mode(4,"random2").
+.decl run(a:number,target:number,donor:number,mode:symbol) .output run
+run(10*I+K,I,D,M) :- donor(I,D), mode(K,M).
+.decl selected(a:number,i:number,n:number) .output selected
+selected(10*I,I,162) :- donor(I,_).
+selected(10*I+1,I,381) :- donor(I,_).
+selected(10*I+2,I,N) :- donor(I,_), shared(N).
+selected(10*I+3,I,N) :- donor(I,_), top(I,N), !shared(N).
+selected(10*I+4,I,N) :- donor(I,_), control(N).
+.decl patch(a:number,l:number,p:number,n:number,v:float) .output patch
+patch(A,31,P,N,V) :- selected(A,I,N), context(I,P), hybrid(I,N,V).
+.decl counts(a:number,n:number) .output counts
+counts(A,N) :- run(A,_,_,_), N = count : { selected(A,_,_) }.
+.decl invalid() .output invalid
+invalid() :- !donor(_,_).
+invalid() :- !shared(162).
+invalid() :- !shared(381).
+invalid() :- shared(N), N != 162, N != 381.
+invalid() :- donor(I,D), !context(I,_).
+invalid() :- donor(I,D), !context(D,_).
+invalid() :- selected(A,I,N), !patch(A,31,_,N,_).
+invalid() :- hybrid(I,N,V), hybrid(I,N,W), V != W.
+invalid() :- counts(A,0).
+invalid() :- run(A,_,_,"joint"), counts(A,N), N != 2.
+invalid() :- run(A,_,_,"random2"), counts(A,N), N != 2.
+.decl certified() .output certified
+certified() :- !invalid().

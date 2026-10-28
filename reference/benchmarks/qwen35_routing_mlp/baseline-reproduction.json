@@ -1,0 +1,12 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "certified": [
+      [
+        "()"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_routing_mlp/certificate-evidence/baseline-reproduction/check-8cw7xm3a"
+}

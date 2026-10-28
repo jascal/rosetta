@@ -1,0 +1,36 @@
+Warning: Variable G0 only occurs once in file verify.dl at line 9
+ N = count : { query(Q,G,V), guarded(Q,I,T) },
+-----------------------^-----------------------
+Warning: Variable I0 only occurs once in file verify.dl at line 9
+ N = count : { query(Q,G,V), guarded(Q,I,T) },
+---------------------------------------^-------
+Warning: Variable T0 only occurs once in file verify.dl at line 9
+ N = count : { query(Q,G,V), guarded(Q,I,T) },
+-----------------------------------------^-----
+Warning: Variable G only occurs once in file verify.dl at line 10
+ W = count : { query(Q,G,V), error(Q,I,T,R) }.
+-----------------------^-----------------------
+Warning: Variable I only occurs once in file verify.dl at line 10
+ W = count : { query(Q,G,V), error(Q,I,T,R) }.
+-------------------------------------^---------
+Warning: Variable T only occurs once in file verify.dl at line 10
+ W = count : { query(Q,G,V), error(Q,I,T,R) }.
+---------------------------------------^-------
+Warning: Variable R only occurs once in file verify.dl at line 10
+ W = count : { query(Q,G,V), error(Q,I,T,R) }.
+-----------------------------------------^-----
+Warning: Variable G0 only occurs once in file verify.dl at line 13
+ N = count : { query(Q,G,V), preference(Q,I,T) },
+-----------------------^--------------------------
+Warning: Variable I0 only occurs once in file verify.dl at line 13
+ N = count : { query(Q,G,V), preference(Q,I,T) },
+------------------------------------------^-------
+Warning: Variable T only occurs once in file verify.dl at line 13
+ N = count : { query(Q,G,V), preference(Q,I,T) },
+--------------------------------------------^-----
+Warning: Variable G only occurs once in file verify.dl at line 14
+ W = count : { query(Q,G,V), disagreement(Q,I) }.
+-----------------------^--------------------------
+Warning: Variable I only occurs once in file verify.dl at line 14
+ W = count : { query(Q,G,V), disagreement(Q,I) }.
+--------------------------------------------^-----

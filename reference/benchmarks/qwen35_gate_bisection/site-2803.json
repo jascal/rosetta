@@ -1,0 +1,24 @@
+{
+  "certified": true,
+  "relations": {
+    "invalid": [],
+    "counts": [
+      [
+        "bisect",
+        "1"
+      ]
+    ],
+    "certified": [
+      [
+        "()"
+      ]
+    ],
+    "transfer": [
+      [
+        "2803",
+        "bisect"
+      ]
+    ]
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_gate_bisection/certificate-evidence/site-2803/check-gzz5xz8e"
+}

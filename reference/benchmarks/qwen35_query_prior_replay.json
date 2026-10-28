@@ -1,0 +1,8 @@
+{
+  "closed_sha256": "8d22dd9bf206b1d468fb93606246e937820de7b72e9982fdd2f6805aa9e29fe9",
+  "reference_witnesses": 9,
+  "queries": 3,
+  "unchanged": true,
+  "summary_certified": true,
+  "audit_source_sha256": "982b8a7a6d44dd7b1c7c8075ae3b7e6fbe42c91f9588144bdfbc131f4a2bf076"
+}

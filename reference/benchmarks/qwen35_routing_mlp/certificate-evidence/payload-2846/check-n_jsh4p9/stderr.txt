@@ -1,0 +1,120 @@
+Warning: Variable D only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-------------------------^---------------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+---------------------------^-------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-----------------------------^-----------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-------------------------------^---------------------------------
+Warning: Variable E only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-----------------------------------------------^-----------------
+Warning: Variable K only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-------------------------------------------------^---------------
+Warning: Variable Q only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+---------------------------------------------------^-------------
+Warning: Variable H only occurs once in file verify.dl at line 23
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), I != J.
+-----------------------------------------------------^-----------
+Warning: Variable I only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+-----------------------^-----------------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+---------------------------^-------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+-----------------------------^-----------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+-------------------------------^---------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+---------------------------------------------^-------------------
+Warning: Variable K only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+-------------------------------------------------^---------------
+Warning: Variable Q only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+---------------------------------------------------^-------------
+Warning: Variable H only occurs once in file verify.dl at line 24
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), D != E.
+-----------------------------------------------------^-----------
+Warning: Variable I only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-----------------------^-----------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-------------------------^---------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-----------------------------^-----------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-------------------------------^---------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+---------------------------------------------^-------------------
+Warning: Variable E only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-----------------------------------------------^-----------------
+Warning: Variable Q only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+---------------------------------------------------^-------------
+Warning: Variable H only occurs once in file verify.dl at line 25
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), L != K.
+-----------------------------------------------------^-----------
+Warning: Variable I only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-----------------------^-----------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-------------------------^---------------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+---------------------------^-------------------------------------
+Warning: Variable M only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-------------------------------^---------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+---------------------------------------------^-------------------
+Warning: Variable E only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-----------------------------------------------^-----------------
+Warning: Variable K only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-------------------------------------------------^---------------
+Warning: Variable H only occurs once in file verify.dl at line 26
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), P != Q.
+-----------------------------------------------------^-----------
+Warning: Variable I only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+-----------------------^-----------------------------------------
+Warning: Variable D only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+-------------------------^---------------------------------------
+Warning: Variable L only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+---------------------------^-------------------------------------
+Warning: Variable P only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+-----------------------------^-----------------------------------
+Warning: Variable J only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+---------------------------------------------^-------------------
+Warning: Variable E only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+-----------------------------------------------^-----------------
+Warning: Variable K only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+-------------------------------------------------^---------------
+Warning: Variable Q only occurs once in file verify.dl at line 27
+invalid() :- request(A,I,D,L,P,M), request(A,J,E,K,Q,H), M != H.
+---------------------------------------------------^-------------

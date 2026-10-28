@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "command": [
+    "souffle",
+    "verify.dl",
+    "-F",
+    "facts",
+    "-D",
+    "outputs",
+    "-I",
+    "."
+  ],
+  "souffle_version": "----------------------------------------------------------------------------\nVersion: 2.5 (2.5)\nWord size: 64 bits\nOptions enabled: ffi openmp ncurses sqlite zlib\n----------------------------------------------------------------------------\nCopyright (c) 2016-25 The Souffle Developers.\nCopyright (c) 2013-16 Oracle and/or its affiliates.\nAll rights reserved.\n============================================================================",
+  "provenance": {
+    "source": "development bisection planning/application consistency; not replacement certification"
+  },
+  "scalars": {},
+  "result": {
+    "certified": true
+  },
+  "sha256": {
+    "circuit.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "facts/applied.facts": "59dbd9337d353b44480f60095b94908bfc0bf8d21b309462e13520c0cf344900",
+    "facts/expected.facts": "02dc4d2d778f2694c419dc499cb191560f9a087d5fc91eb8dc1640a7e97e165f",
+    "facts/reconstruction.facts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "facts/ref.facts": "7df7a1cb38d3bac97eb49c6055358a5d2dfc786799a09b70ca67fa4c59583c81",
+    "facts/request.facts": "e46d7423dd5e67740f8252f9b2913059ef30f319db5dbc83e0aa701424bc3694",
+    "facts/run.facts": "58a1319372b17cee9ed8c3d332483ac2caca15a55f5abae9074741f277643133",
+    "outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "outputs/counts.csv": "4656eb8401a4949bc338b8a48c3aa3e8f80b294db8f841f6c1f45a3b65b0f1c1",
+    "outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/transfer.csv": "1c6b47ad42fe667de11549d95d16c83ea165a0e5a7bdf9ca3afdb127bb14f949",
+    "stderr.txt": "a0af1c72cde96737c95fb121fb94c552decd9b6070f6b08f7a5576ffef0b260b",
+    "verify.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393"
+  }
+}

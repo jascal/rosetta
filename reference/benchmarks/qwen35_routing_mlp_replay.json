@@ -1,0 +1,8 @@
+{
+  "scope": "model-free closed development intervention evidence; not extracted circuit equivalence",
+  "closed_sha256": "8ed1d0e093d4b95e239b0d0e2567cb20cd9d23a8197c737ca53441f06c9b2e50",
+  "reference_witnesses": 78,
+  "other_queries": 76,
+  "unchanged": true,
+  "audit_source_sha256": "c0520a080ecdc240e4859fa0821b881b020458c6c5a9a09579ac21eb01798521"
+}

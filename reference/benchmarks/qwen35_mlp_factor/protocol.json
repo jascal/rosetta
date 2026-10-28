@@ -1,0 +1,46 @@
+{
+  "scope": "development factorization, not standalone replacement",
+  "layer": 31,
+  "width": 9216,
+  "forwards": 24,
+  "arms": "reconstructed target, reconstructed donor, donor gate times target up, target gate times donor up; all six directed contrasts",
+  "numerics": "stable double-precision Datalog SiLU then model FP32 substitution; reconstructed controls must match prior exact-product full logits within .002+.002abs and argmax exactly",
+  "prior": {
+    "path": "reference/benchmarks/qwen35_routing_mlp/closed.json",
+    "sha256": "8ed1d0e093d4b95e239b0d0e2567cb20cd9d23a8197c737ca53441f06c9b2e50"
+  },
+  "files": {
+    "contexts.json": "37295f7be2246d38c260dc0df90475cc3df7ec9a7875954532b46e113db6b760",
+    "payload.json": "16c5e960b6c8005da39682212d3554c3012d8211232e23ec6682d4b062cd656a",
+    "certificate-evidence/payload/check-94qtwury/stderr.txt": "89b2964eb27cd80adcd4a15023bc9d98de7d36df82e2f1da27866a43c2c6bd10",
+    "certificate-evidence/payload/check-94qtwury/verify.dl": "960d3fea3b2d146e67952f216fa11505dc182bd52d8d2cd1474ac7c9c870ad81",
+    "certificate-evidence/payload/check-94qtwury/circuit.dl": "960d3fea3b2d146e67952f216fa11505dc182bd52d8d2cd1474ac7c9c870ad81",
+    "certificate-evidence/payload/check-94qtwury/certificate.json": "e8de43451086bce3527bd18342152cbbe8d8eac023033f7f45936dce6d17a257",
+    "certificate-evidence/payload/check-94qtwury/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/payload/check-94qtwury/outputs/patch.csv": "d4eeb948ad0589c0d088fb26547fcdc3c19eb7f15e788bd0058e808b39478703",
+    "certificate-evidence/payload/check-94qtwury/outputs/run.csv": "a22dae306fed6468c1432a821eee9c51238992e18d88bd4924c757f891edb24d",
+    "certificate-evidence/payload/check-94qtwury/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/payload/check-94qtwury/facts/observation.facts": "5aba89d5fa22d75d4994d669226e9e5dd9b8e3e5ccf267bc1085958ae23fadfc",
+    "certificate-evidence/payload/check-94qtwury/facts/context.facts": "2d0db42ea4afe56b479e10ddc9086dc7a9f71c58f14550dadb2a637d6d53579e",
+    "certificate-evidence/payload/check-94qtwury/facts/donor.facts": "b13fde7c0773b43185876562369240ae035b38c145707528bc14614ffff84e4a",
+    "certificate-evidence/payload/check-94qtwury/facts/shape.facts": "8601bee786b9e7a9f33d07b3f65c00cbb421a158b5e4009fea271dad811fd682"
+  },
+  "sources": {
+    "py/run_qwen35_mlp_factor.py": "098763200da3632d16efc940ba519353c254058fb4d63bb2d9486c90faecafc1",
+    "dl/qwen35_mlp_factor_payload.dl": "960d3fea3b2d146e67952f216fa11505dc182bd52d8d2cd1474ac7c9c870ad81",
+    "dl/qwen35_factor_reconstruction.dl": "5a54c7821ebc808aabb9feb8b9fe502458efeb5c844790b828956b240fd0c377",
+    "dl/qwen35_mlp_factor_summary.dl": "479dfde1f4a528dffaf4755b1c0021f80c011ed2c3f34132a7fe1abf27d9a393",
+    "py/qwen35_mlp_reference.py": "e0a89968537444ab14dc20edd26110192c5c92b8e20b3e8f134d8de0ac4f8584",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/certificate.py": "3f57efae983ff6d9c7c7e986f96231f54aa62d857263023fe03733bbcc57e842",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  },
+  "amendment": {
+    "phase": "before any new forward or reference",
+    "reason": "FP32 model storage narrows Datalog double products; compare applied values within 1e-7+1e-7abs rather than exact equality",
+    "original_protocol_sha256": "81a6eb867a850aa10b4a35867e929df67cd40af5946f752a1e4d932b5ae81e9e",
+    "unchanged": "all contexts, arms, double patch values, reconstruction tolerances, outcome definitions"
+  }
+}

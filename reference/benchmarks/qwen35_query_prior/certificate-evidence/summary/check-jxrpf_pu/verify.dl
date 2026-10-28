@@ -1,0 +1,38 @@
+.decl tok(i:number,p:number,t:number) .input tok
+.decl sample(i:number,g:symbol) .input sample
+.decl query(q:number,g:symbol,variant:number) .input query
+.decl prior(q:number,t:number,s:float) .input prior
+.decl ref(i:number,t:number) .input ref
+#include "circuit.dl"
+.decl source(i:number,t:number)
+source(I,T) :- lc_source(I,_,K,T), K >= 12.
+.decl best(q:number,i:number,s:float)
+best(Q,I,S) :- query(Q,G,_), sample(I,G), source(I,_), S = max X : { source(I,T), prior(Q,T,X) }.
+.decl top(q:number,i:number,t:number)
+top(Q,I,T) :- best(Q,I,S), source(I,T), prior(Q,T,S).
+.decl tie(q:number,i:number)
+tie(Q,I) :- top(Q,I,T), top(Q,I,U), T != U.
+.decl preference(q:number,i:number,t:number) .output preference
+preference(Q,I,T) :- top(Q,I,T), !tie(Q,I).
+.decl winner_agreement(q:number,i:number,c:symbol) .output winner_agreement
+winner_agreement(Q,I,"prior_matches_model") :- preference(Q,I,T), ref(I,T).
+winner_agreement(Q,I,"prior_differs_model") :- preference(Q,I,T), ref(I,U), T != U.
+.decl guarded(q:number,i:number,t:number) .output guarded
+guarded(Q,I,T) :- preference(Q,I,T), lc_winner(I,T), lc_best(I,K), K >= 24,
+ lc_runner(I,R), R >= 12, K-R >= 4.
+.decl error(q:number,i:number,p:number,r:number) .output error
+error(Q,I,T,U) :- guarded(Q,I,T), ref(I,U), T != U.
+.decl counts(variant:number,n:number,wrong:number) .output counts
+counts(V,N,W) :- query(_,_,V), N = count : { query(Q,_,V), guarded(Q,_,_) },
+ W = count : { query(Q,_,V), error(Q,_,_,_) }.
+.decl priorcounts(variant:number,n:number,wrong:number) .output priorcounts
+priorcounts(V,N,W) :- query(_,_,V), N = count : { query(Q,_,V), preference(Q,_,_) },
+ W = count : { query(Q,_,V), winner_agreement(Q,_,"prior_differs_model") }.
+.decl invalid() .output invalid
+invalid() :- !sample(_,_).
+invalid() :- sample(I,_), !ref(I,_).
+invalid() :- query(Q,G,_), sample(I,G), source(I,T), !prior(Q,T,_).
+invalid() :- prior(Q,T,S), prior(Q,T,R), S != R.
+invalid() :- ref(I,T), ref(I,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().
