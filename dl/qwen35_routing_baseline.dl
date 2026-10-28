@@ -1,0 +1,10 @@
+.decl expected(a:number,t:number) .input expected
+.decl ref(a:number,t:number) .input ref
+.decl invalid() .output invalid
+invalid() :- !expected(_,_).
+invalid() :- expected(A,_), !ref(A,_).
+invalid() :- ref(A,_), !expected(A,_).
+invalid() :- expected(A,T), ref(A,U), T != U.
+invalid() :- ref(A,T), ref(A,U), T != U.
+.decl certified() .output certified
+certified() :- !invalid().

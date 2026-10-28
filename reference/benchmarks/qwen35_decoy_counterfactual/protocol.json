@@ -1,0 +1,29 @@
+{
+  "scope": "development causal source edits; no final circuit selection or proof",
+  "seed": 2100,
+  "selection": "one pair per training group/exposure/order; prefer any designated-source departure, minimum ID; both long-target states receive same decoy edit",
+  "contrasts": "old versus new decoy under both long-target states; observe tracking new decoy, long target, or unchanged old answer; no retuning final tests",
+  "inventory_closed_sha256": "edead1a31f8a94c0ce3cd2c377c13f20284a1f394dfa67f85a57a70f5c54f030",
+  "files": {
+    "dataset.json": "0fd7a772d5a6309392718e70c565befb41b34b5a2fb676652b5ec06e7afb9693",
+    "plan.json": "6aefb616a0a0e69fa174c8d590767653f0ec5ae7b61f1a041a1124510a8eb9cb",
+    "certificate-evidence/plan/check-sf8n2p2x/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-sf8n2p2x/verify.dl": "1190a4bd5a0ea4e49ea6d0241477a817659df88be502e0280e860857b35a2192",
+    "certificate-evidence/plan/check-sf8n2p2x/circuit.dl": "1190a4bd5a0ea4e49ea6d0241477a817659df88be502e0280e860857b35a2192",
+    "certificate-evidence/plan/check-sf8n2p2x/certificate.json": "497398ae72406fab443a6af69098185bbae1a276c53c1661c445304d5081e43b",
+    "certificate-evidence/plan/check-sf8n2p2x/outputs/invalid.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "certificate-evidence/plan/check-sf8n2p2x/outputs/selected.csv": "b4ffb1439dd88b079655ea3ad2da363032d6e83dcd75dfbf34d2be2493387cdf",
+    "certificate-evidence/plan/check-sf8n2p2x/outputs/certified.csv": "71d200d8ffab1b98ab940769da680c27d48873242f3f141a4910e6e10766e84b",
+    "certificate-evidence/plan/check-sf8n2p2x/facts/pair.facts": "1abe362318194a288a3f0ee25aa39621bc0f47d618f33d63cec0b48495d2a7d9",
+    "certificate-evidence/plan/check-sf8n2p2x/facts/sample.facts": "250b8924f4be397d980a9af394110a2dfb7bb570753957c3f83871db8407d7bd",
+    "certificate-evidence/plan/check-sf8n2p2x/facts/ref.facts": "8c9e3d8f382303e6e5efc19876ad1e1b73b51f47d566a0647c2ef173caa25e7c"
+  },
+  "sources": {
+    "py/run_qwen35_decoy_counterfactual.py": "d2cbd8721fdd16516e09172f129c8c241cd4d86ccd47a83e7425fc0c266864d0",
+    "dl/qwen35_decoy_plan.dl": "1190a4bd5a0ea4e49ea6d0241477a817659df88be502e0280e860857b35a2192",
+    "py/qwen35_reference_evidence.py": "3c9009be6754eb8a0e978b3d074d87fe33533f2eb5c83eeff58786dfbaaa2d95",
+    "py/qwen35_lazy_reference.py": "04dee07a102ecd63ba8394fdf1250959458dbc045d5dd05f3b8eb69308b9942d",
+    "py/qwen35_stream_reference.py": "5b9adf7c10c57ced3f2a7cf9aff09fa08d2d8f51535f632fb1bbb809405eaddf",
+    "dl/qwen35_reference_argmax.dl": "d3dc038ec805e740ffd539f211d195cba689a38fc8782a725f08ae3986ad0398"
+  }
+}

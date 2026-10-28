@@ -1,0 +1,21 @@
+Warning: Variable T only occurs once in file verify.dl at line 5
+invalid() :- original(I,P,T), !edited(I,P,_).
+--------------------------^-------------------
+Warning: Variable T only occurs once in file verify.dl at line 6
+invalid() :- edited(I,P,T), !original(I,P,_).
+------------------------^---------------------
+Warning: Variable U only occurs once in file verify.dl at line 8
+invalid() :- edit(I,P,T,U), !original(I,P,T).
+------------------------^---------------------
+Warning: Variable T only occurs once in file verify.dl at line 9
+invalid() :- edit(I,P,T,U), !edited(I,P,U).
+----------------------^---------------------
+Warning: Variable I only occurs once in file verify.dl at line 10
+invalid() :- edit(I,P,T,U), T = U.
+------------------^----------------
+Warning: Variable P only occurs once in file verify.dl at line 10
+invalid() :- edit(I,P,T,U), T = U.
+--------------------^--------------
+Warning: Variable P only occurs once in file verify.dl at line 11
+invalid() :- edit(I,P,_,U), original(I,_,U).
+--------------------^------------------------

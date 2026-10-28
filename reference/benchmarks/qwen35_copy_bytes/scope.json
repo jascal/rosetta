@@ -1,0 +1,8 @@
+{
+  "scope": "post-hoc training-only byte compatibility; no proposals or final claim",
+  "positive_rows": 144,
+  "validation_labels_used": false,
+  "protocol_sha256": "624847ef0514db9cc0d4c3ab6413d27b2e38f58f7c3e882350eae3881444d997",
+  "tokenizer_sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+  "note": "Uses raw ByteLevel bytes, with no Unicode normalization or inferred source routing."
+}

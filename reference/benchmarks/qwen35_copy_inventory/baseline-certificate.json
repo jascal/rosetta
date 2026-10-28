@@ -1,0 +1,46 @@
+{
+  "certified": false,
+  "ndomain": 0,
+  "nmiss": 0,
+  "nuncov": 0,
+  "nmissing": 0,
+  "ninvalid": 0,
+  "relations": {
+    "nuncov": [
+      [
+        "0"
+      ]
+    ],
+    "invalid": [],
+    "nmissing": [
+      [
+        "0"
+      ]
+    ],
+    "missing_ref": [],
+    "ncover": [
+      [
+        "0"
+      ]
+    ],
+    "certified": [],
+    "nmiss": [
+      [
+        "0"
+      ]
+    ],
+    "ndomain": [
+      [
+        "0"
+      ]
+    ],
+    "mismatch": [],
+    "ninvalid": [
+      [
+        "0"
+      ]
+    ],
+    "uncovered": []
+  },
+  "evidence": "/home/allans/code/rosetta/reference/benchmarks/qwen35_copy_inventory/certificate-evidence/baseline-development-equiv/check-97tmdye8"
+}

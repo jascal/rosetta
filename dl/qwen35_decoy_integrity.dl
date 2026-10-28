@@ -1,0 +1,15 @@
+.decl original(i:number,p:number,t:number) .input original
+.decl edited(i:number,p:number,t:number) .input edited
+.decl edit(i:number,p:number,old:number,new:number) .input edit
+.decl invalid() .output invalid
+invalid() :- original(I,P,T), !edited(I,P,_).
+invalid() :- edited(I,P,T), !original(I,P,_).
+invalid() :- original(I,P,T), edited(I,P,U), T != U, !edit(I,P,T,U).
+invalid() :- edit(I,P,T,U), !original(I,P,T).
+invalid() :- edit(I,P,T,U), !edited(I,P,U).
+invalid() :- edit(I,P,T,U), T = U.
+invalid() :- edit(I,P,_,U), original(I,_,U).
+invalid() :- edit(I,P,_,_), edit(I,Q,_,_), P != Q.
+invalid() :- edited(I,_,_), !edit(I,_,_,_).
+.decl certified() .output certified
+certified() :- !invalid(), edit(_,_,_,_).
